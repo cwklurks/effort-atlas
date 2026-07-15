@@ -1,0 +1,24 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "effort-atlas"
+version = "0.1.0"
+description = "Per-domain effort/performance curves and an effort autopilot for Inkling."
+readme = "README.md"
+requires-python = ">=3.10"
+authors = [{ name = "Connor Klann" }]
+dependencies = [
+  "openai>=1.50",
+  "pyyaml>=6.0",
+  "pandas>=2.0",
+  "matplotlib>=3.8",
+  "python-dotenv>=1.0",
+]
+
+[project.optional-dependencies]
+data = ["datasets>=3.0"]
+
+[tool.setuptools.packages.find]
+where = ["src"]

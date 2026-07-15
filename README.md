@@ -21,7 +21,9 @@ generate data  →  dry-run (cost estimate)  →  sweep  →  analyze
 ```
 
 ```bash
-pip install -r requirements.txt
+python -m pip install -e .
+# Optional Hugging Face dataset fetcher:
+# python -m pip install -e ".[data]"
 
 # 1. Build the local question sets (synthetic extraction is fully offline;
 #    math/knowledge fetch small fixed subsets from Hugging Face)
