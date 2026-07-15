@@ -1,0 +1,45 @@
+{"item_id":"math_0000","domain":"math","gold":"280","effort":0.2,"final_answer":"280","correct":1,"length":"S","response_text":"The conditions are n ≡ 0 (mod 7) and n ≡ 2 (mod 3). Solving gives n ≡ 14 (mod 21). So the values below 100 are: 14, 35, 56, 77, 98. Sum: 14 + 35 + 56 + 77 + 98 = 280. Final answer: 280"}
+{"item_id":"math_0000","domain":"math","gold":"280","effort":0.6,"final_answer":"280","correct":1,"length":"S","latency_s":5.3,"response_text":"Final answer: 280"}
+{"item_id":"math_0000","domain":"math","gold":"280","effort":0.99,"final_answer":"280","correct":1,"length":"S","latency_s":8.3,"response_text":"Final answer: 280"}
+{"item_id":"math_0001","domain":"math","gold":"19","effort":0.2,"final_answer":"19","correct":1,"length":"S","latency_s":2.7,"response_text":"Choose 2 from 8: C(8,2)=28. Choose 2 red from 5: C(5,2)=10. Probability = 10/28 = 5/14. So m+n = 5+14 = 19. Final answer: 19"}
+{"item_id":"math_0001","domain":"math","gold":"19","effort":0.6,"final_answer":"19","correct":1,"length":"S","latency_s":3.2,"response_text":"Final answer: 19"}
+{"item_id":"math_0001","domain":"math","gold":"19","effort":0.99,"final_answer":"19","correct":1,"length":"S","latency_s":3.2,"response_text":"Final answer: 19"}
+{"item_id":"math_0002","domain":"math","gold":"1","effort":0.2,"final_answer":"1","correct":1,"length":"S","latency_s":2.2,"response_text":"Since φ(125) = 100 and gcd(2,125)=1, Euler's theorem gives 2^100 ≡ 1 (mod 125). Final answer: 1"}
+{"item_id":"math_0002","domain":"math","gold":"1","effort":0.6,"final_answer":"1","correct":1,"length":"S","latency_s":2.7,"response_text":"We use Euler’s theorem: φ(125) = 125(1-1/5) = 100, and gcd(2,125)=1, so 2^100 ≡ 1 (mod 125). Thus the remainder is 1. Final answer: 1"}
+{"item_id":"math_0002","domain":"math","gold":"1","effort":0.99,"final_answer":"1","correct":1,"length":"S","latency_s":5.7,"response_text":". Final answer: 1"}
+{"item_id":"math_0003","domain":"math","gold":"96","effort":0.2,"final_answer":"96","correct":1,"length":"S","latency_s":5.2,"response_text":"So 8! = 2⁷·3²·5¹·7¹. Divisors: (7+1)(2+1)(1+1)(1+1) = 8·3·2·2 = 96. Final answer: 96"}
+{"item_id":"math_0003","domain":"math","gold":"96","effort":0.6,"final_answer":"96","correct":1,"length":"S","latency_s":5.5,"response_text":"So 8! = 2⁷ · 3² · 5¹ · 7¹. Number of divisors: (7+1)(2+1)(1+1)(1+1) = 8 · 3 · 2 · 2 = 96. Final answer: 96"}
+{"item_id":"math_0003","domain":"math","gold":"96","effort":0.99,"final_answer":"96","correct":1,"length":"S","latency_s":5.8,"response_text":"Final answer: 96"}
+{"item_id":"math_0004","domain":"math","gold":"60","effort":0.2,"final_answer":"60","correct":1,"length":"S","latency_s":4.7,"response_text":"The smallest is 60 (divisors: 1,2,3,4,5,6,10,12,15,20,30,60). Final answer: 60"}
+{"item_id":"math_0004","domain":"math","gold":"60","effort":0.6,"final_answer":"60","correct":1,"length":"S","latency_s":7.3,"response_text":"Final answer: 60"}
+{"item_id":"math_0004","domain":"math","gold":"60","effort":0.99,"final_answer":"60","correct":1,"length":"S","latency_s":16.5,"response_text":"Final answer: 60"}
+{"item_id":"extraction_0000","domain":"extraction","gold":"INV-2026404","effort":0.2,"final_answer":"INV-2026404","correct":1,"length":"S","latency_s":1.7,"response_text":"Final answer: INV-2026404"}
+{"item_id":"extraction_0000","domain":"extraction","gold":"INV-2026404","effort":0.6,"final_answer":"INV-2026404","correct":1,"length":"S","latency_s":1.7,"response_text":"Final answer: INV-2026404"}
+{"item_id":"extraction_0000","domain":"extraction","gold":"INV-2026404","effort":0.99,"final_answer":"INV-2026404","correct":1,"length":"S","latency_s":4.7,"response_text":"Final answer: INV-2026404"}
+{"item_id":"extraction_0001","domain":"extraction","gold":"Toronto","effort":0.2,"final_answer":"Toronto","correct":1,"length":"S","latency_s":1.7,"response_text":"Final answer: Toronto"}
+{"item_id":"extraction_0001","domain":"extraction","gold":"Toronto","effort":0.6,"final_answer":"Toronto","correct":1,"length":"S","latency_s":2.2,"response_text":"Final answer: Toronto"}
+{"item_id":"extraction_0001","domain":"extraction","gold":"Toronto","effort":0.99,"final_answer":"Toronto","correct":1,"length":"S","latency_s":2.2,"response_text":"Final answer: Toronto"}
+{"item_id":"extraction_0002","domain":"extraction","gold":"5","effort":0.2,"final_answer":"5","correct":1,"length":"S","latency_s":1.7,"response_text":"Final answer: 5"}
+{"item_id":"extraction_0002","domain":"extraction","gold":"5","effort":0.6,"final_answer":"5","correct":1,"length":"S","latency_s":1.7,"response_text":"Final answer: 5"}
+{"item_id":"extraction_0002","domain":"extraction","gold":"5","effort":0.99,"final_answer":"5","correct":1,"length":"S","latency_s":1.9,"response_text":"Final answer: 5"}
+{"item_id":"extraction_0003","domain":"extraction","gold":"60.46","effort":0.2,"final_answer":"60.46","correct":1,"length":"S","latency_s":1.7,"response_text":"Final answer: 60.46"}
+{"item_id":"extraction_0003","domain":"extraction","gold":"60.46","effort":0.6,"final_answer":"60.46","correct":1,"length":"S","latency_s":2.2,"response_text":"The unit price of monitor arm is $60.46. Final answer: 60.46"}
+{"item_id":"extraction_0003","domain":"extraction","gold":"60.46","effort":0.99,"final_answer":"60.46","correct":1,"length":"S","latency_s":4.7,"response_text":"The unit price listed for the monitor arm is $60.46. Final answer: 60.46"}
+{"item_id":"extraction_0004","domain":"extraction","gold":"INV-2026985","effort":0.2,"final_answer":"INV-2026985","correct":1,"length":"S","latency_s":1.7,"response_text":"Final answer: INV-2026985"}
+{"item_id":"extraction_0004","domain":"extraction","gold":"INV-2026985","effort":0.6,"final_answer":"INV-2026985","correct":1,"length":"S","latency_s":1.7,"response_text":"Final answer: INV-2026985"}
+{"item_id":"extraction_0004","domain":"extraction","gold":"INV-2026985","effort":0.99,"final_answer":"INV-2026985","correct":1,"length":"S","latency_s":2.7,"response_text":"Final answer: INV-2026985"}
+{"item_id":"extraction_0005","domain":"extraction","gold":"Halifax","effort":0.2,"final_answer":"Halifax","correct":1,"length":"S","latency_s":1.2,"response_text":"Final answer: Halifax"}
+{"item_id":"extraction_0005","domain":"extraction","gold":"Halifax","effort":0.6,"final_answer":"Halifax","correct":1,"length":"S","latency_s":1.7,"response_text":"Final answer: Halifax"}
+{"item_id":"extraction_0005","domain":"extraction","gold":"Halifax","effort":0.99,"final_answer":"Halifax","correct":1,"length":"S","latency_s":2.2,"response_text":"Final answer: Halifax"}
+{"item_id":"extraction_0006","domain":"extraction","gold":"2","effort":0.2,"final_answer":"2","correct":1,"length":"S","latency_s":1.2,"response_text":"Final answer: 2"}
+{"item_id":"extraction_0006","domain":"extraction","gold":"2","effort":0.6,"final_answer":"2","correct":1,"length":"S","latency_s":2.2,"response_text":"The invoice shows 2 x webcam. Final answer: 2"}
+{"item_id":"extraction_0006","domain":"extraction","gold":"2","effort":0.99,"final_answer":"2","correct":1,"length":"S","latency_s":1.7,"response_text":"The invoice shows 2 x webcam. Final answer: 2"}
+{"item_id":"extraction_0007","domain":"extraction","gold":"241.81","effort":0.2,"final_answer":"241.81","correct":1,"length":"S","latency_s":1.2,"response_text":"Final answer: 241.81"}
+{"item_id":"extraction_0007","domain":"extraction","gold":"241.81","effort":0.6,"final_answer":"241.81","correct":1,"length":"S","latency_s":1.2,"response_text":"Final answer: 241.81"}
+{"item_id":"extraction_0007","domain":"extraction","gold":"241.81","effort":0.99,"final_answer":"241.81","correct":1,"length":"S","latency_s":2.7,"response_text":"Final answer: 241.81"}
+{"item_id":"extraction_0008","domain":"extraction","gold":"INV-2026975","effort":0.2,"final_answer":"INV-2026975","correct":1,"length":"S","latency_s":2.2,"response_text":"Final answer: INV-2026975"}
+{"item_id":"extraction_0008","domain":"extraction","gold":"INV-2026975","effort":0.6,"final_answer":"INV-2026975","correct":1,"length":"S","latency_s":1.7,"response_text":"Final answer: INV-2026975"}
+{"item_id":"extraction_0008","domain":"extraction","gold":"INV-2026975","effort":0.99,"final_answer":"INV-2026975","correct":1,"length":"S","latency_s":2.2,"response_text":"Final answer: INV-2026975"}
+{"item_id":"extraction_0009","domain":"extraction","gold":"Vancouver","effort":0.2,"final_answer":"Vancouver","correct":1,"length":"S","latency_s":1.2,"response_text":"Final answer: Vancouver"}
+{"item_id":"extraction_0009","domain":"extraction","gold":"Vancouver","effort":0.6,"final_answer":"Vancouver","correct":1,"length":"S","latency_s":1.2,"response_text":"Final answer: Vancouver"}
+{"item_id":"extraction_0009","domain":"extraction","gold":"Vancouver","effort":0.99,"final_answer":"Vancouver","correct":1,"length":"S","latency_s":2.7,"response_text":"Final answer: Vancouver"}

@@ -1,0 +1,53 @@
+# ── Provider: Tinker's OpenAI-compatible endpoint (beta) ────────────────
+# Docs: https://tinker-docs.thinkingmachines.ai/tinker/compatible-apis/openai/
+# Set TINKER_API_KEY in .env. Model must be a Tinker sampler checkpoint path —
+# get yours from the Tinker console/quickstart, e.g.
+#   tinker://<run-id>:train:0/sampler_weights/000000
+provider:
+  base_url_env: TINKER_BASE_URL           # override only if TML changes it
+  default_base_url: https://tinker.thinkingmachines.dev/services/tinker-prod/oai/api/v1
+  api_key_env: TINKER_API_KEY
+  model: "tinker://REPLACE-WITH-INKLING-SAMPLER-PATH"
+  max_completion_tokens: 32768
+  timeout_s: 600
+  max_retries: 4
+  concurrency: 2          # OAI-compatible endpoint is beta / low-traffic; be polite
+
+# ── Effort injection — VERIFIED against Tinker docs 2026-07-15 ──────────
+# /chat/completions accepts reasoning_effort as a raw float in [0.0, 1.0] via
+# extra_body (strings minimal/low/medium/high map to 0.01/0.3/0.6/0.9).
+# Models that don't support it return HTTP 400.
+effort:
+  mode: extra_body
+  param_name: reasoning_effort
+  system_template: "Thinking effort: {effort}"
+  levels: [0.2, 0.4, 0.6, 0.8, 0.99]
+
+# ── Sweep ────────────────────────────────────────────────────────────────
+sweep:
+  items_per_domain: 50
+  seed: 7
+  domains: [math, knowledge, extraction]
+  # code domain ships in the repo but is off by default (needs local test execution)
+
+# ── Pricing (for --dry-run estimator only; real costs come from Tinker) ──
+# Placeholder rates — check Inkling's sample/prefill price in the Tinker console.
+# ⚠ Tinker raises prefill/sample prices ~50% on July 17, 2026 → sweep before then.
+pricing:
+  input_per_mtok: 1.50
+  output_per_mtok: 4.00
+  # expected completion tokens by effort level, used only for the estimate;
+  # refined automatically from real results once you have some
+  expected_output_tokens:
+    "0.2": 800
+    "0.4": 2000
+    "0.6": 4500
+    "0.8": 9000
+    "0.99": 18000
+  expected_input_tokens: 900
+
+paths:
+  data: data
+  results: results
+  reports: reports
+  cache: .cache
