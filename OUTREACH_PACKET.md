@@ -41,9 +41,9 @@ pushed and independently opened.
 | Material | Immutable prospective URL | Current state |
 |---|---|---|
 | Preregistered protocol | https://github.com/cwklurks/effort-atlas/blob/bc941bf118516cddafc671fcb9acc4607fd7ea33/PREREGISTRATION.md | Inactive until push |
-| Methods brief | https://github.com/cwklurks/effort-atlas/blob/55d8bc500f298f02de2818294104a722ae058aa3/METHODS_BRIEF.md | Inactive until push |
-| Pre-data scoring amendment | [IMMUTABLE AMENDMENT LINK AFTER COMMIT] | Inactive until push |
-| Frozen schedule manifest | [IMMUTABLE AMENDED SCHEDULE LINK AFTER EXPORT] | Inactive until push |
+| Methods brief | https://github.com/cwklurks/effort-atlas/blob/8bf2420c4a925b9f3eb3e94ff54011396b9b2f0e/METHODS_BRIEF.md | Inactive until push |
+| Pre-data scoring amendment | https://github.com/cwklurks/effort-atlas/blob/8bf2420c4a925b9f3eb3e94ff54011396b9b2f0e/PREREGISTRATION_AMENDMENT_2026-07-22.md | Inactive until push |
+| Frozen amended schedule manifest | https://github.com/cwklurks/effort-atlas/blob/24cadfb3a3d54366e6950543049c4546c10388d9/confirmatory_artifacts/preflight-2026-07-22-amended/schedule_manifest.json | Inactive until push |
 | Exploratory cap audit | https://github.com/cwklurks/effort-atlas/blob/4ea36c7a819906c3ed77d37bc77b418aca2705de/CAP_SEMANTICS.md | Inactive until push |
 
 The scientific emails need only the protocol and methods-brief links. Provider
