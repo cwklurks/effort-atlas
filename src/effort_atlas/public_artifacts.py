@@ -263,6 +263,23 @@ def export_bundle(
             loaded.append((source_id, relative_path, raw, rows))
         return loaded
 
+    def load_blob_sources(role: str, paths: list[Path]) -> None:
+        for index, relative_path in enumerate(paths, start=1):
+            if not isinstance(relative_path, Path):
+                relative_path = Path(relative_path)
+            source_id = f"{role}-{index:04d}"
+            resolved = _resolve_source(workspace, relative_path)
+            raw = resolved.read_bytes()
+            sources.append(
+                _source_metadata(
+                    role=role,
+                    source_id=source_id,
+                    relative_path=relative_path,
+                    raw=raw,
+                    line_count=len(raw.splitlines()),
+                )
+            )
+
     for source_id, _, _, rows in load_sources("result", result_paths):
         public_results.extend(
             _public_result(source_id, line_number, row)
@@ -288,7 +305,7 @@ def export_bundle(
                 "sha256": _sha256(raw),
             }
         )
-    load_sources("config", config_paths)
+    load_blob_sources("config", config_paths)
 
     emitted = {
         "results.jsonl": _jsonl_bytes(public_results),

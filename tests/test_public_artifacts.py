@@ -242,6 +242,31 @@ class PublicArtifactTests(unittest.TestCase):
         self.assertEqual(data["datasets"][0]["path"], "private/math.jsonl")
         self.assertNotIn("items", data)
 
+    def test_config_sources_are_hashed_without_parsing_or_copying_content(self):
+        _write_jsonl(self.results, [])
+        _write_jsonl(self.receipts, [])
+        _write_jsonl(self.dataset, [])
+        config = self.workspace / "private" / "route.yaml"
+        config.write_text("provider:\n  api_key_env: PRIVATE_ENV_NAME\n")
+
+        output = export_bundle(
+            workspace=self.workspace,
+            output_root=self.workspace / "public_artifacts",
+            bundle_id="config-source",
+            result_paths=[Path("private/results.jsonl")],
+            receipt_paths=[Path("private/receipts.jsonl")],
+            dataset_paths=[Path("private/math.jsonl")],
+            config_paths=[Path("private/route.yaml")],
+            code_commit="a" * 40,
+        )
+
+        public_text = "".join(path.read_text() for path in output.iterdir())
+        self.assertNotIn("PRIVATE_ENV_NAME", public_text)
+        manifest = json.loads((output / "manifest.json").read_text())
+        source = next(item for item in manifest["sources"] if item["role"] == "config")
+        self.assertEqual(source["line_count"], 2)
+        self.assertEqual(source["sha256"], hashlib.sha256(config.read_bytes()).hexdigest())
+
 
 if __name__ == "__main__":
     unittest.main()
