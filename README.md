@@ -45,6 +45,26 @@ python -m effort_atlas.analyze
 Everything is configured in `config.yaml`: endpoint, model path, effort levels,
 items per domain, and pricing for the estimator.
 
+## Isolated OpenRouter replication
+
+The OpenRouter replication uses `config_openrouter.yaml` and never reads or
+writes the Tinker cache, result series, or reports:
+
+```bash
+PYTHONPATH=src python -m effort_atlas.openrouter_status \
+  --config config_openrouter.yaml
+PYTHONPATH=src python -m effort_atlas.sweep \
+  --config config_openrouter.yaml
+PYTHONPATH=src python -m effort_atlas.analyze \
+  --config config_openrouter.yaml results_openrouter/combined_real.jsonl
+```
+
+Set `OPENROUTER_API_KEY` in `.env`. `OPENROUTER_BASE_URL` is optional; the
+configured default is `https://openrouter.ai/api/v1`. OpenRouter efforts are
+categorical (`minimal`, `low`, `medium`, `high`, `max`) and are analyzed in
+that ordinal order. They are a separate replication and are not merged with
+Tinker's continuous-effort results.
+
 ## Running against Tinker (verified 2026-07-15)
 
 The harness targets Tinker's [OpenAI-compatible endpoint](https://tinker-docs.thinkingmachines.ai/tinker/compatible-apis/openai/) (beta):

@@ -1,0 +1,56 @@
+provider:
+  name: openrouter_cap_kimi26_moonshot
+  base_url_env: OPENROUTER_BASE_URL
+  default_base_url: https://openrouter.ai/api/v1
+  api_key_env: OPENROUTER_API_KEY
+  env_file_override: true
+  model: "moonshotai/kimi-k2.6"
+  max_completion_tokens: 2000
+  timeout_s: 1800
+  max_retries: 0
+  default_headers:
+    X-OpenRouter-Metadata: enabled
+  request_extra_body:
+    provider:
+      only: [moonshotai]
+      allow_fallbacks: false
+      require_parameters: true
+      quantizations: [int4]
+      max_price:
+        prompt: 0.95
+        completion: 4.00
+
+effort:
+  # Kimi K2.6 does not support reasoning_effort. OpenRouter's enabled=true
+  # requests the model/provider default without inventing an effort label.
+  mode: openrouter_reasoning_default
+  param_name: reasoning
+  levels: [default]
+  ordinal: {default: 1}
+
+sweep:
+  enabled: false
+  pause_reason: Cap Semantics Probe completed on 2026-07-21
+  items_per_domain: 50
+  domains: [math, extraction]
+  item_ids: [extraction_0000, math_0003]
+  budgets: [2000]
+
+pricing:
+  input_per_mtok: 0.95
+  output_per_mtok: 4.00
+  expected_output_tokens: {default: 2000}
+  expected_input_tokens: 900
+  cap_bounds_billable_tokens: true
+
+budget:
+  reserve_margin_usd: 0.00
+  target_hard_ceiling_usd: 0.40
+  spend_before_probe_usd: 8.91055695
+  all_provider_hard_ceiling_usd: 10.00
+
+paths:
+  data: data
+  results: results_cap_semantics/kimi_k2_6_moonshot
+  reports: results_cap_semantics/kimi_k2_6_moonshot/reports
+  cache: .cache_cap_semantics/kimi_k2_6_moonshot

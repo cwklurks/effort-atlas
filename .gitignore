@@ -15,11 +15,25 @@ __pycache__/
 
 # Generated datasets and model-call caches
 .cache/
+.cache_openrouter/
+.cache_tinker_rescue/
+.cache_openrouter_rescue/
+.cache_grok45_cap/
+.cache_cap_semantics/
 data/
 
 # Generated mock sweep outputs and reports
 results/
 reports/
+results_openrouter/
+reports_openrouter/
+results_tinker_rescue/
+reports_tinker_rescue/
+results_openrouter_rescue/
+reports_openrouter_rescue/
+results_grok45_cap/
+reports_grok45_cap/
+results_cap_semantics/
 
 # Build and coverage artifacts
 build/

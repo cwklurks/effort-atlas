@@ -1,16 +1,19 @@
 # ── Provider: Tinker's OpenAI-compatible endpoint (beta) ────────────────
 # Docs: https://tinker-docs.thinkingmachines.ai/tinker/compatible-apis/openai/
-# Set TINKER_API_KEY in .env. Model must be a Tinker sampler checkpoint path —
-# get yours from the Tinker console/quickstart, e.g.
-#   tinker://<run-id>:train:0/sampler_weights/000000
+# Set TINKER_API_KEY in .env.
+# Try the plain Tinker ID first (below). If the endpoint rejects it with a
+# model-not-found error, run `python -m effort_atlas.get_sampler_path` and
+# paste the tinker://…/sampler_weights/… path it prints here instead.
 provider:
   base_url_env: TINKER_BASE_URL           # override only if TML changes it
   default_base_url: https://tinker.thinkingmachines.dev/services/tinker-prod/oai/api/v1
   api_key_env: TINKER_API_KEY
-  model: "tinker://REPLACE-WITH-INKLING-SAMPLER-PATH"
-  max_completion_tokens: 32768
+  model: "thinkingmachines/Inkling"       # 64K context — do NOT use :peft:262144 (2x price)
+  # Sent as max_tokens (the endpoint ignores max_completion_tokens and defaults
+  # to 4096). 20000 balances truncation headroom against the remaining budget.
+  max_completion_tokens: 20000
   timeout_s: 600
-  max_retries: 4
+  max_retries: 6
   concurrency: 2          # OAI-compatible endpoint is beta / low-traffic; be polite
 
 # ── Effort injection — VERIFIED against Tinker docs 2026-07-15 ──────────
@@ -27,15 +30,15 @@ effort:
 sweep:
   items_per_domain: 50
   seed: 7
-  domains: [math, knowledge, extraction]
+  domains: [math]
   # code domain ships in the repo but is off by default (needs local test execution)
 
 # ── Pricing (for --dry-run estimator only; real costs come from Tinker) ──
-# Placeholder rates — check Inkling's sample/prefill price in the Tinker console.
-# ⚠ Tinker raises prefill/sample prices ~50% on July 17, 2026 → sweep before then.
+# Real console rates 2026-07-15 (limited-time 50% discount): prefill $1.87/M,
+# sample $4.68/M. ⚠ Prices rise ~50% on July 17, 2026 → sweep before then.
 pricing:
-  input_per_mtok: 1.50
-  output_per_mtok: 4.00
+  input_per_mtok: 1.87
+  output_per_mtok: 4.68
   # expected completion tokens by effort level, used only for the estimate;
   # refined automatically from real results once you have some
   expected_output_tokens:

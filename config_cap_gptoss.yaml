@@ -1,0 +1,54 @@
+provider:
+  name: openrouter_cap_gptoss_deepinfra
+  base_url_env: OPENROUTER_BASE_URL
+  default_base_url: https://openrouter.ai/api/v1
+  api_key_env: OPENROUTER_API_KEY
+  env_file_override: true
+  model: "openai/gpt-oss-120b"
+  max_completion_tokens: 2000
+  timeout_s: 1800
+  max_retries: 0
+  default_headers:
+    X-OpenRouter-Metadata: enabled
+  request_extra_body:
+    provider:
+      only: [deepinfra]
+      allow_fallbacks: false
+      require_parameters: true
+      quantizations: [bf16]
+      max_price:
+        prompt: 0.04
+        completion: 0.18
+
+effort:
+  mode: openrouter_reasoning
+  param_name: reasoning
+  levels: [medium]
+  ordinal: {medium: 1}
+
+sweep:
+  enabled: false
+  pause_reason: Cap Semantics Probe completed on 2026-07-21
+  items_per_domain: 50
+  domains: [math, extraction]
+  item_ids: [extraction_0000, math_0003]
+  budgets: [2000]
+
+pricing:
+  input_per_mtok: 0.04
+  output_per_mtok: 0.18
+  expected_output_tokens: {medium: 2000}
+  expected_input_tokens: 900
+  cap_bounds_billable_tokens: true
+
+budget:
+  reserve_margin_usd: 0.00
+  target_hard_ceiling_usd: 0.40
+  spend_before_probe_usd: 8.91055695
+  all_provider_hard_ceiling_usd: 10.00
+
+paths:
+  data: data
+  results: results_cap_semantics/gpt_oss_120b_deepinfra
+  reports: results_cap_semantics/gpt_oss_120b_deepinfra/reports
+  cache: .cache_cap_semantics/gpt_oss_120b_deepinfra

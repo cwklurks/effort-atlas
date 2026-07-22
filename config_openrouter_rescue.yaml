@@ -1,0 +1,62 @@
+# Isolated paired cap-rescue fallback. It cannot read or write the completed
+# OpenRouter replication's cache or result series.
+provider:
+  name: openrouter_rescue
+  base_url_env: OPENROUTER_BASE_URL
+  default_base_url: https://openrouter.ai/api/v1
+  api_key_env: OPENROUTER_API_KEY
+  env_file_override: true
+  model: "thinkingmachines/inkling"
+  max_completion_tokens: 49152
+  timeout_s: 1800
+  # A failed streamed generation may still incur usage. Missing pairs can be
+  # reconsidered only after the batch spend is measured.
+  max_retries: 0
+  default_headers:
+    X-OpenRouter-Metadata: enabled
+  request_extra_body:
+    provider:
+      only: [together]
+      allow_fallbacks: false
+      require_parameters: true
+
+effort:
+  mode: openrouter_reasoning
+  param_name: reasoning
+  levels: [max]
+  ordinal:
+    minimal: 1
+    low: 2
+    medium: 3
+    high: 4
+    max: 5
+
+sweep:
+  enabled: false
+  pause_reason: OpenRouter stream ended without usage accounting on 2026-07-21
+  items_per_domain: 50
+  seed: 7
+  domains: [math]
+  # Batch 1 after the successful math_0003 pilot. These four rows all ended
+  # at 20,000 tokens in the original Together max-effort sweep.
+  item_ids: [math_0008, math_0009, math_0010, math_0013]
+  budgets: [49152]
+
+pricing:
+  input_per_mtok: 1.00
+  output_per_mtok: 4.05
+  expected_output_tokens:
+    max: 26000
+  expected_input_tokens: 900
+
+budget:
+  reserve_margin_usd: 0.00
+  historical_openrouter_spend_usd: 5.732601
+  historical_tinker_spend_usd: 2.658340
+  all_provider_hard_ceiling_usd: 10.00
+
+paths:
+  data: data
+  results: results_openrouter_rescue
+  reports: reports_openrouter_rescue
+  cache: .cache_openrouter_rescue

@@ -1,0 +1,53 @@
+provider:
+  name: openrouter_cap_inkling_together
+  base_url_env: OPENROUTER_BASE_URL
+  default_base_url: https://openrouter.ai/api/v1
+  api_key_env: OPENROUTER_API_KEY
+  env_file_override: true
+  model: "thinkingmachines/inkling"
+  max_completion_tokens: 2000
+  timeout_s: 1800
+  max_retries: 0
+  default_headers:
+    X-OpenRouter-Metadata: enabled
+  request_extra_body:
+    provider:
+      only: [together]
+      allow_fallbacks: false
+      require_parameters: true
+      max_price:
+        prompt: 1.00
+        completion: 4.05
+
+effort:
+  mode: openrouter_reasoning
+  param_name: reasoning
+  levels: [medium]
+  ordinal: {medium: 1}
+
+sweep:
+  enabled: false
+  pause_reason: Cap Semantics Probe completed on 2026-07-21
+  items_per_domain: 50
+  domains: [math, extraction]
+  item_ids: [extraction_0000, math_0003]
+  budgets: [2000]
+
+pricing:
+  input_per_mtok: 1.00
+  output_per_mtok: 4.05
+  expected_output_tokens: {medium: 2000}
+  expected_input_tokens: 900
+  cap_bounds_billable_tokens: true
+
+budget:
+  reserve_margin_usd: 0.00
+  target_hard_ceiling_usd: 0.40
+  spend_before_probe_usd: 8.91055695
+  all_provider_hard_ceiling_usd: 10.00
+
+paths:
+  data: data
+  results: results_cap_semantics/inkling_together
+  reports: results_cap_semantics/inkling_together/reports
+  cache: .cache_cap_semantics/inkling_together

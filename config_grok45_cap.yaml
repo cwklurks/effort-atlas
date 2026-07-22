@@ -1,0 +1,73 @@
+# Disabled exploratory pilot. xAI's billable native reasoning exceeded the
+# requested max_tokens, so this config cannot implement a controlled cap study.
+provider:
+  name: openrouter_grok45_cap
+  base_url_env: OPENROUTER_BASE_URL
+  default_base_url: https://openrouter.ai/api/v1
+  api_key_env: OPENROUTER_API_KEY
+  env_file_override: true
+  model: "x-ai/grok-4.5"
+  max_completion_tokens: 49152
+  timeout_s: 1800
+  max_retries: 0
+  default_headers:
+    X-OpenRouter-Metadata: enabled
+  request_extra_body:
+    provider:
+      only: [xai]
+      allow_fallbacks: false
+      require_parameters: true
+      max_price:
+        prompt: 2.00
+        completion: 6.00
+
+effort:
+  mode: openrouter_reasoning
+  param_name: reasoning
+  # `max` is retained as the requested value used by the two historical pilot
+  # rows. xAI documents only low/medium/high; do not make more calls with this.
+  levels: [max]
+  ordinal:
+    minimal: 1
+    low: 2
+    medium: 3
+    high: 4
+    max: 5
+
+sweep:
+  enabled: false
+  pause_reason: xAI exceeded max_tokens in billable completion usage on 2026-07-21
+  items_per_domain: 50
+  seed: 7
+  domains: [math]
+  # Run one job per invocation and verify usage/spend before advancing. The
+  # complete order was fixed with random.Random(7) before any Grok output.
+  planned_request_order:
+    - {item_id: math_0009, max_tokens: 20000}
+    - {item_id: math_0003, max_tokens: 20000}
+    - {item_id: math_0009, max_tokens: 49152}
+    - {item_id: math_0008, max_tokens: 49152}
+    - {item_id: math_0003, max_tokens: 49152}
+    - {item_id: math_0008, max_tokens: 20000}
+  item_ids: [math_0003]
+  budgets: [20000]
+  seeds: [7001]
+
+pricing:
+  input_per_mtok: 2.00
+  output_per_mtok: 6.00
+  expected_output_tokens:
+    max: 55000
+  expected_input_tokens: 900
+  cap_bounds_billable_tokens: false
+
+budget:
+  reserve_margin_usd: 0.00
+  spend_before_pilot_usd: 8.547384
+  all_provider_hard_ceiling_usd: 10.00
+
+paths:
+  data: data
+  results: results_grok45_cap
+  reports: reports_grok45_cap
+  cache: .cache_grok45_cap

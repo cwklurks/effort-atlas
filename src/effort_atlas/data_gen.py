@@ -68,12 +68,14 @@ def gen_extraction(n: int, seed: int) -> list[dict]:
 # Tiny built-in samples so the pipeline runs before any HF fetch. The real
 # sweep should use fetch_data.py subsets; these are placeholders, not benchmarks.
 SAMPLE_MATH = [
+    # gold corrected 2026-07-15 pilot audit: n=7k with k≡2 (mod 3) → 14,35,56,77,98
     ("What is the sum of all positive integers n < 100 such that n is divisible "
-     "by 7 and n+1 is divisible by 3?", "735"),
+     "by 7 and n+1 is divisible by 3?", "280"),
     ("A bag has 5 red and 3 blue marbles. Two are drawn without replacement. "
      "What is the probability both are red, as a fraction m/n in lowest terms? "
      "Give m+n.", "19"),
-    ("Compute the remainder when 2^100 is divided by 125.", "76"),
+    # gold corrected 2026-07-15 pilot audit: Euler, φ(125)=100 → 2^100 ≡ 1 (mod 125)
+    ("Compute the remainder when 2^100 is divided by 125.", "1"),
     ("How many positive divisors does 8!, factorial of 8, have?", "96"),
     ("What is the smallest positive integer with exactly 12 divisors?", "60"),
 ]

@@ -1,0 +1,43 @@
+# Isolated cap-rescue pilot. Historical Tinker cache/results remain untouched.
+provider:
+  name: tinker_rescue
+  base_url_env: TINKER_BASE_URL
+  default_base_url: https://tinker.thinkingmachines.dev/services/tinker-prod/oai/api/v1
+  api_key_env: TINKER_API_KEY
+  model: "thinkingmachines/Inkling"
+  max_completion_tokens: 49152
+  timeout_s: 1800
+  # A failed streamed generation may still be billable. Do not automatically
+  # repeat it during this budget-sensitive connectivity pilot.
+  max_retries: 0
+
+effort:
+  mode: extra_body
+  param_name: reasoning_effort
+  levels: [0.99]
+
+sweep:
+  enabled: false
+  pause_reason: Tinker returned HTTP 402 before generation on 2026-07-21
+  items_per_domain: 50
+  seed: 7
+  domains: [math]
+  item_ids: [math_0003]
+  budgets: [49152]
+
+pricing:
+  input_per_mtok: 1.87
+  output_per_mtok: 4.68
+  expected_output_tokens:
+    "0.99": 18000
+  expected_input_tokens: 900
+
+budget:
+  historical_spend_usd: 2.658340
+  total_ceiling_usd: 8.00
+
+paths:
+  data: data
+  results: results_tinker_rescue
+  reports: reports_tinker_rescue
+  cache: .cache_tinker_rescue

@@ -10,9 +10,9 @@ Prints the headline table with 95% Wilson intervals.
 
 from __future__ import annotations
 
+import argparse
 import json
 import math
-import sys
 from pathlib import Path
 
 import matplotlib
@@ -41,31 +41,66 @@ def latest_results(results_dir: Path) -> Path:
     return files[-1]
 
 
-def find_knee(sub: pd.DataFrame) -> float:
+def effort_ordinal(cfg: dict, effort: object) -> float:
+    ordinal = cfg["effort"].get("ordinal", {})
+    key = str(effort)
+    if key in ordinal:
+        return float(ordinal[key])
+    return float(effort)
+
+
+def find_knee(sub: pd.DataFrame) -> object:
     """Lowest effort whose accuracy is within 2pp of this domain's max."""
     best = sub["accuracy"].max()
     ok = sub[sub["accuracy"] >= best - 0.02]
-    return float(ok["effort"].min())
+    return ok.sort_values("effort_ordinal").iloc[0]["effort"]
 
 
-def main() -> None:
-    cfg = load_config()
+def main(argv: list[str] | None = None) -> None:
+    ap = argparse.ArgumentParser()
+    ap.add_argument("results", nargs="?", help="JSONL file to analyze")
+    ap.add_argument(
+        "--config",
+        default=None,
+        help="configuration file (default: config.yaml)",
+    )
+    args = ap.parse_args(argv)
+
+    cfg = load_config(args.config)
     results_dir = ROOT / cfg["paths"]["results"]
     reports_dir = ROOT / cfg["paths"]["reports"]
     reports_dir.mkdir(parents=True, exist_ok=True)
 
-    path = Path(sys.argv[1]) if len(sys.argv) > 1 else latest_results(results_dir)
+    path = Path(args.results) if args.results else latest_results(results_dir)
     rows = [json.loads(line) for line in path.open()]
     df = pd.DataFrame(rows)
+    if "error" in df.columns:
+        n_failed = int(df["error"].notna().sum())
+        if n_failed:
+            print(f"skipping {n_failed} failed rows (connection errors)")
+        df = df[df["error"].isna()]
+    # resumed/combined runs can contain the same (item, effort) twice via cache replay
+    before = len(df)
+    df = df.drop_duplicates(
+        subset=["domain", "item_id", "effort"], keep="last"
+    )
+    if len(df) < before:
+        print(f"deduplicated {before - len(df)} replayed rows")
+    if df.empty:
+        raise SystemExit("No successful rows to analyze.")
+    df["effort_ordinal"] = df["effort"].map(
+        lambda effort: effort_ordinal(cfg, effort)
+    )
     print(f"analyzing {path.name}  ({len(df)} rows, mock={bool(df['mock'].iloc[0])})\n")
 
     grp = (
-        df.groupby(["domain", "effort"])
+        df.groupby(["domain", "effort", "effort_ordinal"], sort=False)
         .agg(n=("correct", "size"), k=("correct", "sum"),
              mean_tokens=("completion_tokens", "mean"),
              mean_latency=("latency_s", "mean"))
         .reset_index()
     )
+    grp = grp.sort_values(["domain", "effort_ordinal"])
     grp["accuracy"] = grp["k"] / grp["n"]
     grp[["ci_lo", "ci_hi"]] = grp.apply(
         lambda r: pd.Series(wilson(int(r["k"]), int(r["n"]))), axis=1
@@ -79,7 +114,8 @@ def main() -> None:
     print(f"{'domain':<12} {'effort':>7} {'acc':>7} {'95% CI':>15} {'tokens':>9}")
     for _, r in grp.iterrows():
         ci = f"[{r['ci_lo']:.2f},{r['ci_hi']:.2f}]"
-        print(f"{r['domain']:<12} {r['effort']:>7} {r['accuracy']:>6.1%} "
+        effort_label = str(r["effort"])
+        print(f"{r['domain']:<12} {effort_label:>7} {r['accuracy']:>6.1%} "
               f"{ci:>15} {r['mean_tokens']:>9,.0f}")
     print("\nknee (lowest effort within 2pp of max accuracy):")
     for d, e in sorted(knees.items()):
@@ -88,12 +124,21 @@ def main() -> None:
     # charts
     fig, axes = plt.subplots(1, 2, figsize=(13, 5))
     for domain, sub in grp.groupby("domain"):
-        sub = sub.sort_values("effort")
+        sub = sub.sort_values("effort_ordinal")
         yerr = [sub["accuracy"] - sub["ci_lo"], sub["ci_hi"] - sub["accuracy"]]
-        axes[0].errorbar(sub["effort"], sub["accuracy"], yerr=yerr,
+        axes[0].errorbar(sub["effort_ordinal"], sub["accuracy"], yerr=yerr,
                          marker="o", capsize=3, label=domain)
         axes[1].errorbar(sub["mean_tokens"], sub["accuracy"], yerr=yerr,
                          marker="o", capsize=3, label=domain)
+    effort_ticks = (
+        grp[["effort", "effort_ordinal"]]
+        .drop_duplicates()
+        .sort_values("effort_ordinal")
+    )
+    axes[0].set_xticks(
+        effort_ticks["effort_ordinal"],
+        [str(effort) for effort in effort_ticks["effort"]],
+    )
     axes[0].set_xlabel("thinking effort")
     axes[1].set_xlabel("mean completion tokens")
     axes[1].set_xscale("log")
@@ -102,10 +147,9 @@ def main() -> None:
         ax.set_ylim(0, 1.02)
         ax.grid(alpha=0.3)
         ax.legend()
-    n_per = int(grp["n"].iloc[0])
     src = "MOCK DATA — pipeline test only" if bool(df["mock"].iloc[0]) else \
         f"Inkling via {cfg['provider']['model']}"
-    fig.suptitle(f"Effort/performance by domain — {src} (n={n_per}/point, 95% Wilson CI)")
+    fig.suptitle(f"Effort/performance by domain — {src} (95% Wilson CI)")
     fig.tight_layout()
     out = reports_dir / "effort_curves.png"
     fig.savefig(out, dpi=150)

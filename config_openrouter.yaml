@@ -1,0 +1,52 @@
+# Isolated OpenRouter replication. The original Tinker config, cache, and
+# results stay untouched in config.yaml, .cache/, and results/.
+provider:
+  name: openrouter
+  base_url_env: OPENROUTER_BASE_URL
+  default_base_url: https://openrouter.ai/api/v1
+  api_key_env: OPENROUTER_API_KEY
+  env_file_override: true
+  model: "thinkingmachines/inkling"
+  max_completion_tokens: 20000
+  timeout_s: 600
+  max_retries: 6
+  default_headers:
+    X-OpenRouter-Metadata: enabled
+
+effort:
+  mode: openrouter_reasoning
+  param_name: reasoning
+  levels: [minimal, low, medium, high, max]
+  ordinal:
+    minimal: 1
+    low: 2
+    medium: 3
+    high: 4
+    max: 5
+
+sweep:
+  items_per_domain: 25
+  seed: 7
+  domains: [extraction]
+
+# Runtime pricing must be rechecked against OpenRouter before paid work.
+pricing:
+  input_per_mtok: 1.00
+  output_per_mtok: 4.05
+  expected_output_tokens:
+    minimal: 800
+    low: 2000
+    medium: 4500
+    high: 9000
+    max: 18000
+  expected_input_tokens: 900
+
+budget:
+  reserve_margin_usd: 1.00
+  replication_hard_ceiling_usd: 10.00
+
+paths:
+  data: data
+  results: results_openrouter
+  reports: reports_openrouter
+  cache: .cache_openrouter

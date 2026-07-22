@@ -134,5 +134,44 @@ not accepted as a financial bound.
 
 ## Measurements
 
-No Cap Semantics Probe calls had been made when the protocol above was written.
-Results will be appended here after the preregistration commit.
+The preregistered 2,000-token probes were run after commit `ea022cd`. Results
+below are scoped to the exact model, provider route, API, and request shape
+shown. Counts are OpenRouter generation-receipt native counts unless explicitly
+labeled as gateway-normalized counts.
+
+| Model, provider, and served precision | Observations: native completion / reasoning tokens; finish; visible answer; latency; cost | Documented versus measured | What the cap bounded | Billing bounded by cap | Truncation signaled honestly | Raw rows and billing receipts |
+|---|---|---|---|---|---|---|
+| `openai/gpt-oss-120b` / DeepInfra / BF16 | Easy: 44 / 23; `stop`; complete and correct; 2.32s; $0.000012808. Hard: 2,000 / 2,066; `length`; truncated, no extracted answer; 57.62s; $0.000345180. | OpenAI's Responses API documents an inclusive cap, but that is not a DeepInfra Chat Completions guarantee. The native billed count stopped exactly at 2,000. The 2,066 reasoning detail is larger than the 2,000 completion total, so the two receipt fields are not arithmetically comparable and were not repaired. | Total generation in native/billed accounting; reasoning split has a tokenizer/accounting anomaly. | Yes, in both observations. | Yes, on the hard cap collision. | [response rows](results_cap_semantics/gpt_oss_120b_deepinfra/sweep_real_20260721_153144.jsonl); [receipts](results_cap_semantics/gpt_oss_120b_deepinfra/generation_receipts.jsonl) |
+| `thinkingmachines/inkling` / Together / unknown | Easy: 39 / 25; `stop`; complete and correct; 2.06s; $0.000262950. Hard: 2,000 / 1,999; `length`; truncated, no extracted answer; 70.44s; $0.008201000. | No provider-specific cap-inclusion statement was found. Measurement was cap-inclusive in native/billed accounting. | Total generation. | Yes, in both observations. | Yes, on the hard cap collision. | [first attempt, including 429](results_cap_semantics/inkling_together/sweep_real_20260721_153334.jsonl); [successful retry rows](results_cap_semantics/inkling_together/sweep_real_20260721_153452.jsonl); [receipts](results_cap_semantics/inkling_together/generation_receipts.jsonl) |
+| `moonshotai/kimi-k2.6` / Moonshot AI / INT4 | Easy: 401 / 391; `stop`; complete and correct; 11.69s; $0.001695200. Hard: 2,000 / 1,999; `length`; truncated, no extracted answer; 52.56s; $0.008083600. | Moonshot says reasoning plus content is at most `max_tokens`. The measured native counts and finish reason agree. | Total generation. | Yes, in both observations. | Yes, on the hard cap collision. | [first attempt, including 429](results_cap_semantics/kimi_k2_6_moonshot/sweep_real_20260721_153643.jsonl); [successful retry rows](results_cap_semantics/kimi_k2_6_moonshot/sweep_real_20260721_153759.jsonl); [receipts](results_cap_semantics/kimi_k2_6_moonshot/generation_receipts.jsonl) |
+| `x-ai/grok-4.5` / xAI / unknown | **20k probe only.** `math_0009`: 5,429 / 4,727; `stop`; complete and correct; 64.72s; $0.032990400. Hard `math_0003`: 54,969 / 53,883; `stop`; complete and correct; 895.40s; $0.330182400. Gateway-normalized completion counts were 958 and 6,302. | xAI maps Chat `max_tokens` to `max_output_tokens` as maximum tokens to generate and bills reasoning at the completion rate. On this OpenRouter/xAI route, native reasoning and billing continued beyond the requested 20,000 cap. | Visible/gateway-normalized completion only in the decisive hard observation. | No; hard native completion was 2.75 times the request. | Not exercised: neither retained row lost its visible answer. | [`math_0009` row](results_grok45_cap/sweep_real_20260721_113233.jsonl); [`math_0003` row](results_grok45_cap/sweep_real_20260721_113431.jsonl); [receipts](results_grok45_cap/generation_receipts_20k.jsonl) |
+
+The observed routes therefore occupy at least two classes under the fixed
+rules: three cap-inclusive routes and one cap-exclusive route. H-CAP is
+supported for these endpoints. The Inkling/Together class was not stated in
+provider-specific documentation found for this audit, satisfying the
+under-documented portion of the prediction. This does not establish behavior
+for other hosts or API surfaces serving the same model names.
+
+The three new two-call targets cost **$0.018600738** in total: $0.000357988
+for GPT-OSS, $0.008463950 for Inkling, and $0.009778800 for Kimi. Adding that
+to the preregistered historical spend gives **$8.929157688** against the
+**$10.00** project ceiling, leaving **$1.070842312**. The Grok receipt total of
+$0.363172800 was already included in historical spend and was not added again.
+
+Inkling and Kimi each returned one HTTP 429 for the hard request after the easy
+call. Both failures had no generation ID or generation receipt. One retry was
+made for each under the preregistered no-billed-generation rule, and both
+retries completed. GPT-OSS required no retry. No response, grade, usage count,
+or receipt was interpolated or edited.
+
+No new Grok call was made. With only two historical reasoning counts, a
+conservative nearest-rank p95 is the larger observation, 53,883 tokens. Twice
+that value is 107,766 output tokens, which would cost about $0.65 at $6 per
+million before input charges and therefore violates the $0.40 target ceiling.
+GPT-5.6 and other closed-model probes remain pending a user-approved top-up.
+
+Going forward, the measured Grok/xAI route is treated as cap-exclusive. Its
+budget gate uses at least 107,766 completion tokens per call until a larger
+sample supports a different p95. Every call on it requires a generation
+receipt and a kill threshold; `max_tokens` is not treated as a cost bound.
