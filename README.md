@@ -18,8 +18,9 @@ As of 2026-07-22:
 - A [pre-data scoring amendment](PREREGISTRATION_AMENDMENT_2026-07-22.md) fixes an
   audit-detected implementation error: finish reason cannot override the unchanged
   grader. No confirmatory response existed when it was corrected.
-- The prompt-free execution order and provenance hashes are under
-  [confirmatory_artifacts/](confirmatory_artifacts/).
+- The current prompt-free execution order and provenance hashes are in the
+  [amended preflight artifact](confirmatory_artifacts/preflight-2026-07-22-amended/).
+  The first frozen artifact remains available as superseded provenance.
 - No confirmatory result has been collected and confirmatory-study spend is $0.00.
 - The confirmatory validator is offline-only. It is not yet connected to a paid
   runner, so no command in the confirmatory artifact path can initiate model calls.
