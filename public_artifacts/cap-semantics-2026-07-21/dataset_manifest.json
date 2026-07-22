@@ -1,0 +1,1 @@
+{"datasets":[{"bytes":20443,"line_count":30,"path":"data/math.jsonl","sha256":"ba50e740a174883d0d4532c136008407419734c46150841170d8acd13fe8fb6b","source_id":"dataset-0001"},{"bytes":24041,"line_count":50,"path":"data/extraction.jsonl","sha256":"d6e9e1f78cdf9afbcf93420e54ef44bb4ba2c9e0b83d549781b4d18cd8304118","source_id":"dataset-0002"}],"schema_version":"public-artifact-v1"}
