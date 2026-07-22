@@ -31,20 +31,19 @@ Do not send any message until all of these are true:
   identifier, or private reasoning trace. Exploratory visible responses already in
   the public history are labeled separately and are not confirmatory evidence.
 
-The local branch contains commits not yet present on `origin/main`.
-Consequently, the prospective GitHub URLs below are intentionally marked **inactive**.
-They must not be placed into outgoing mail until the corresponding commits are
-pushed and independently opened.
+The research commits were pushed on 2026-07-22. Each file below was then downloaded
+without authentication from `raw.githubusercontent.com`; its SHA-256 matched the
+corresponding local file. These links are safe to place into the reviewed drafts.
 
-## Public link map after an approved push
+## Verified public link map
 
 | Material | Immutable prospective URL | Current state |
 |---|---|---|
-| Preregistered protocol | https://github.com/cwklurks/effort-atlas/blob/bc941bf118516cddafc671fcb9acc4607fd7ea33/PREREGISTRATION.md | Inactive until push |
-| Methods brief | https://github.com/cwklurks/effort-atlas/blob/8bf2420c4a925b9f3eb3e94ff54011396b9b2f0e/METHODS_BRIEF.md | Inactive until push |
-| Pre-data scoring amendment | https://github.com/cwklurks/effort-atlas/blob/8bf2420c4a925b9f3eb3e94ff54011396b9b2f0e/PREREGISTRATION_AMENDMENT_2026-07-22.md | Inactive until push |
-| Frozen amended schedule manifest | https://github.com/cwklurks/effort-atlas/blob/24cadfb3a3d54366e6950543049c4546c10388d9/confirmatory_artifacts/preflight-2026-07-22-amended/schedule_manifest.json | Inactive until push |
-| Exploratory cap audit | https://github.com/cwklurks/effort-atlas/blob/4ea36c7a819906c3ed77d37bc77b418aca2705de/CAP_SEMANTICS.md | Inactive until push |
+| Preregistered protocol | https://github.com/cwklurks/effort-atlas/blob/bc941bf118516cddafc671fcb9acc4607fd7ea33/PREREGISTRATION.md | Verified public 2026-07-22 |
+| Methods brief | https://github.com/cwklurks/effort-atlas/blob/8bf2420c4a925b9f3eb3e94ff54011396b9b2f0e/METHODS_BRIEF.md | Verified public 2026-07-22 |
+| Pre-data scoring amendment | https://github.com/cwklurks/effort-atlas/blob/8bf2420c4a925b9f3eb3e94ff54011396b9b2f0e/PREREGISTRATION_AMENDMENT_2026-07-22.md | Verified public 2026-07-22 |
+| Frozen amended schedule manifest | https://github.com/cwklurks/effort-atlas/blob/24cadfb3a3d54366e6950543049c4546c10388d9/confirmatory_artifacts/preflight-2026-07-22-amended/schedule_manifest.json | Verified public 2026-07-22 |
+| Exploratory cap audit | https://github.com/cwklurks/effort-atlas/blob/4ea36c7a819906c3ed77d37bc77b418aca2705de/CAP_SEMANTICS.md | Verified public 2026-07-22 |
 
 The scientific emails need only the protocol and methods-brief links. Provider
 tickets should include the protocol and schedule-manifest links. Do not attach raw
@@ -76,8 +75,8 @@ analysis I should use instead?
 No confirmatory API calls or data exist. The exploratory motivation is separated
 and will not be pooled with confirmatory estimates.
 
-Protocol: [VERIFIED IMMUTABLE PROTOCOL LINK]
-Methods brief: [VERIFIED METHODS BRIEF LINK]
+Protocol: https://github.com/cwklurks/effort-atlas/blob/bc941bf118516cddafc671fcb9acc4607fd7ea33/PREREGISTRATION.md
+Methods brief: https://github.com/cwklurks/effort-atlas/blob/8bf2420c4a925b9f3eb3e94ff54011396b9b2f0e/METHODS_BRIEF.md
 
 Thank you,
 
@@ -110,8 +109,8 @@ recommend different terminology or bounds?
 
 No confirmatory API calls or data exist.
 
-Protocol: [VERIFIED IMMUTABLE PROTOCOL LINK]
-Methods brief: [VERIFIED METHODS BRIEF LINK]
+Protocol: https://github.com/cwklurks/effort-atlas/blob/bc941bf118516cddafc671fcb9acc4607fd7ea33/PREREGISTRATION.md
+Methods brief: https://github.com/cwklurks/effort-atlas/blob/8bf2420c4a925b9f3eb3e94ff54011396b9b2f0e/METHODS_BRIEF.md
 
 Thank you,
 
@@ -146,8 +145,8 @@ Completions behavior for `thinkingmachines/inkling` and `z-ai/glm-5.2` when
    receipt fields are authoritative for native prompt, completion, and reasoning
    tokens, native finish reason, cost, provider, and linkage IDs?
 
-Protocol: [VERIFIED IMMUTABLE PROTOCOL LINK]
-Frozen schedule: [VERIFIED SCHEDULE MANIFEST LINK]
+Protocol: https://github.com/cwklurks/effort-atlas/blob/bc941bf118516cddafc671fcb9acc4607fd7ea33/PREREGISTRATION.md
+Frozen schedule: https://github.com/cwklurks/effort-atlas/blob/24cadfb3a3d54366e6950543049c4546c10388d9/confirmatory_artifacts/preflight-2026-07-22-amended/schedule_manifest.json
 
 Any response will be documented as provider correspondence, not endorsement. We
 will not publish secrets or raw traces. Thank you.
@@ -177,8 +176,8 @@ could you clarify the current behavior for Together-hosted
 5. Is an unsupported parameter rejected or defaulted? With gateway fallbacks
    disabled, can any upstream substitution still occur?
 
-Protocol: [VERIFIED IMMUTABLE PROTOCOL LINK]
-Frozen schedule: [VERIFIED SCHEDULE MANIFEST LINK]
+Protocol: https://github.com/cwklurks/effort-atlas/blob/bc941bf118516cddafc671fcb9acc4607fd7ea33/PREREGISTRATION.md
+Frozen schedule: https://github.com/cwklurks/effort-atlas/blob/24cadfb3a3d54366e6950543049c4546c10388d9/confirmatory_artifacts/preflight-2026-07-22-amended/schedule_manifest.json
 
 This requests factual interface clarification, not endorsement. We will not include
 secrets or raw traces.
