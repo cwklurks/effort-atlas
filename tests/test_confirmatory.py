@@ -35,7 +35,7 @@ def accounted_success(job, **overrides):
         "receipt_cost_usd": 0.01, "native_completion_tokens": 20,
         "native_prompt_tokens": 10, "native_finish_reason": "stop",
         "completion_tokens": 20, "prompt_tokens": 10, "finish_reason": "stop",
-        "correct": False, **overrides,
+        "correct": False, "extracted_answer_present": True, **overrides,
     }
 
 
@@ -150,33 +150,41 @@ class ConfirmatoryPreflightTests(unittest.TestCase):
             ["job_id_not_in_schedule", "schedule_identity_mismatch"],
         )
 
-    def test_accuracy_upper_bound_counts_only_wrong_length_stops(self):
-        schedule = build_schedule(PANEL, ITEMS[:2])
+    def test_accuracy_uses_grader_for_length_stops_and_bounds_only_unanswered(self):
+        schedule = build_schedule(PANEL, ITEMS[:3])
         target_jobs = [job for job in schedule["jobs"] if job["effort"] == "medium" and job["cap"] == 20000]
         rows = [
-            accounted_success(target_jobs[0], generation_id="g-0", receipt_generation_id="g-0", correct=True, finish_reason="length", native_finish_reason="length", receipt_finish_reason="length"),
-            accounted_success(target_jobs[1], generation_id="g-1", receipt_generation_id="g-1", correct=False, finish_reason="length", native_finish_reason="length", receipt_finish_reason="length"),
+            accounted_success(target_jobs[0], generation_id="g-0", receipt_generation_id="g-0", correct=True, extracted_answer_present=True, finish_reason="length", native_finish_reason="length", receipt_finish_reason="length"),
+            accounted_success(target_jobs[1], generation_id="g-1", receipt_generation_id="g-1", correct=False, extracted_answer_present=False, finish_reason="length", native_finish_reason="length", receipt_finish_reason="length"),
+            accounted_success(target_jobs[2], generation_id="g-2", receipt_generation_id="g-2", correct=False, extracted_answer_present=True, finish_reason="length", native_finish_reason="length", receipt_finish_reason="length"),
         ]
 
         report = analyze_confirmatory_events(rows, schedule)
 
-        self.assertEqual(report["cells"][0]["accuracy"], 0.0)
-        self.assertEqual(report["cells"][0]["accuracy_bound_hi"], 1.0)
+        self.assertEqual(report["cells"][0]["accuracy"], 1 / 3)
+        self.assertEqual(report["cells"][0]["length_stops"], 3)
+        self.assertEqual(report["cells"][0]["unanswered_length_stops"], 1)
+        self.assertEqual(report["cells"][0]["accuracy_bound_hi"], 2 / 3)
 
     def test_analyzer_requires_reconciled_receipt_expected_provider_and_boolean_grade(self):
-        schedule = build_schedule(PANEL, ITEMS[:1])
-        first, second, third = schedule["jobs"][:3]
+        schedule = build_schedule(PANEL, ITEMS[:2])
+        first, second, third, fourth, fifth = schedule["jobs"][:5]
         rows = [
             accounted_success(first, served_provider="Other"),
             accounted_success(second, receipt_generation_id="different"),
             accounted_success(third, correct=1),
+            accounted_success(fourth, extracted_answer_present=None),
+            accounted_success(fifth, correct=True, extracted_answer_present=False),
         ]
         report = analyze_confirmatory_events(rows, schedule)
 
         self.assertEqual(report["cells"], [])
         self.assertEqual(
             [row["reason"] for row in report["selection_audit"]["excluded"]],
-            ["served_provider_mismatch", "receipt_linkage_invalid", "malformed_correct"],
+            [
+                "served_provider_mismatch", "receipt_linkage_invalid", "malformed_correct",
+                "malformed_extracted_answer_presence", "grade_extraction_inconsistent",
+            ],
         )
 
     def test_receipt_provider_must_match_and_native_finish_vocabulary_may_differ(self):
@@ -220,6 +228,14 @@ class ConfirmatoryPreflightTests(unittest.TestCase):
             self.assertEqual(
                 manifest["preregistration_file_sha256"],
                 hashlib.sha256((ROOT / "PREREGISTRATION.md").read_bytes()).hexdigest(),
+            )
+            self.assertEqual(
+                manifest["amendment_file_sha256"],
+                {
+                    "PREREGISTRATION_AMENDMENT_2026-07-22.md": hashlib.sha256(
+                        (ROOT / "PREREGISTRATION_AMENDMENT_2026-07-22.md").read_bytes()
+                    ).hexdigest(),
+                },
             )
             self.assertEqual(set(manifest["panels"]), {"inkling_together", "glm52_together"})
             for panel in manifest["panels"].values():

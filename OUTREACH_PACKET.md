@@ -27,10 +27,11 @@ Do not send any message until all of these are true:
   repository. A local commit is not a public link.
 - Every link below returns without authentication in a private browser window.
 - The sender address and signature are the ones Connor wants to use professionally.
-- The public repository contains no secret, account identifier, balance, raw private
-  trace, or environment file.
+- The public repository contains no credential, environment file, account
+  identifier, or private reasoning trace. Exploratory visible responses already in
+  the public history are labeled separately and are not confirmatory evidence.
 
-The local branch was 10 commits ahead of `origin/main` when this packet was prepared.
+The local branch contains commits not yet present on `origin/main`.
 Consequently, the prospective GitHub URLs below are intentionally marked **inactive**.
 They must not be placed into outgoing mail until the corresponding commits are
 pushed and independently opened.
@@ -41,7 +42,8 @@ pushed and independently opened.
 |---|---|---|
 | Preregistered protocol | https://github.com/cwklurks/effort-atlas/blob/bc941bf118516cddafc671fcb9acc4607fd7ea33/PREREGISTRATION.md | Inactive until push |
 | Methods brief | https://github.com/cwklurks/effort-atlas/blob/55d8bc500f298f02de2818294104a722ae058aa3/METHODS_BRIEF.md | Inactive until push |
-| Frozen schedule manifest | https://github.com/cwklurks/effort-atlas/blob/55d8bc500f298f02de2818294104a722ae058aa3/confirmatory_artifacts/preflight-2026-07-22/schedule_manifest.json | Inactive until push |
+| Pre-data scoring amendment | [IMMUTABLE AMENDMENT LINK AFTER COMMIT] | Inactive until push |
+| Frozen schedule manifest | [IMMUTABLE AMENDED SCHEDULE LINK AFTER EXPORT] | Inactive until push |
 | Exploratory cap audit | https://github.com/cwklurks/effort-atlas/blob/4ea36c7a819906c3ed77d37bc77b418aca2705de/CAP_SEMANTICS.md | Inactive until push |
 
 The scientific emails need only the protocol and methods-brief links. Provider
@@ -62,9 +64,10 @@ evaluation of reasoning effort and output limits.
 
 Your *Beyond Accuracy* decomposition is the closest framework I found. I have
 preregistered a 2x2 design crossing two native effort settings with two requested
-output allowances on the same 30 fixed AIME items. Each response is classified as a
-correct normal completion, completed wrong answer, or cap-hit/no-final-answer. The
-primary quantity is whether the effort slope changes with allowance.
+output allowances on the same 30 fixed AIME items. The unchanged grader determines
+accuracy independently of finish reason; cap-hit/no-final-answer rows and
+answer-present length stops are reported separately. The primary quantity is whether
+the effort slope changes with allowance.
 
 Could you spare 10 minutes for one narrow reaction: does this interaction answer a
 meaningfully different question from your decomposition, or is there an existing

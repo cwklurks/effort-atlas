@@ -482,3 +482,20 @@ accuracy to vary before an effort knee can be estimated.
   call until a larger sample supports a different p95, record a receipt for
   every call, and enforce a kill threshold. No prompt, grader, gold label,
   response, usage count, or receipt was hand-adjusted.
+
+- 2026-07-22: A pre-publication audit found that the confirmatory analyzer
+  overrode the unchanged grader by forcing every `finish_reason="length"` row
+  to wrong. A length-stopped response can already contain an extractable final
+  answer, so that rule could manufacture a cap effect. No confirmatory API
+  response existed and confirmatory-study spend was still $0.00 when the issue
+  was found.
+
+  The original preregistration remains unchanged at commit `bc941bf`. The
+  dated pre-data amendment in
+  `PREREGISTRATION_AMENDMENT_2026-07-22.md` changes only the scoring and simple-
+  bound rule. Conventional accuracy now uses the unchanged grader regardless
+  of finish reason. Token-starved/no-answer rows require both a length finish
+  and no extractable answer. Length stops with an answer retain their grader
+  result and are counted separately. The upper descriptive bound adds only
+  unanswered length stops. Model panels, items, prompts, labels, grader,
+  request schedule, budget, and stopping rules did not change.

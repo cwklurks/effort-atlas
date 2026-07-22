@@ -3,6 +3,8 @@ study:
   seed: 20260722
   preregistration_commit: bc941bf118516cddafc671fcb9acc4607fd7ea33
   preregistration_path: PREREGISTRATION.md
+  amendment_paths:
+    - PREREGISTRATION_AMENDMENT_2026-07-22.md
   replicate_decision: 1  # two replicates require a preregistration amendment and budget top-up
   execution_mode: offline_preflight_only
   main_dataset_path: data/math.jsonl

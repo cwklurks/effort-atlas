@@ -9,6 +9,10 @@
 no confirmatory API response has been collected and new-study spend is $0.00
 as of 2026-07-22.
 
+The original preregistration is supplemented by the pre-data scoring amendment in
+[`PREREGISTRATION_AMENDMENT_2026-07-22.md`](PREREGISTRATION_AMENDMENT_2026-07-22.md).
+No confirmatory response existed when the amendment was made.
+
 ## Question
 
 When higher native reasoning effort appears to reduce accuracy, how much of the
@@ -48,17 +52,23 @@ billing receipt, latency, and cost must be recorded for every valid row.
 
 ## Outcomes and estimand
 
-Every valid response remains in one of three operational categories:
+Every valid response receives an unchanged-grader result and a separate termination
+status. The main operational categories are:
 
-1. correct normal completion;
-2. completed but wrong; or
-3. cap-hit/no final answer.
+1. an extractable answer graded correct, whether normally or length-stopped;
+2. an extractable answer graded wrong, whether normally or length-stopped; or
+3. no extractable answer, with length-stopped and other finish reasons separated.
 
-Cap-hit rows remain wrong for conventional accuracy under that endpoint
-configuration. Their generation length is right-censored, while their
-counterfactual correctness with more output room is unobserved. Completed-only
-accuracy is reported only as a selected descriptive quantity, never as a replacement
-for conventional accuracy.
+A token-starved/no-answer row specifically has `finish_reason="length"` and no
+extractable final answer. It remains wrong because the unchanged grader found no
+answer, not merely because generation hit the cap. A length-stopped row that already
+contains an answer retains its grader result and is reported separately.
+
+For `n` valid rows, `k` graded correct, and `u` unanswered length stops, the narrow
+descriptive bound is `[k/n, (k+u)/n]`. It describes only uncertainty attributable to
+no-answer cap terminations. It is not a bound on every counterfactual change an
+independent larger-cap generation could make. Completed-only accuracy is a selected
+descriptive quantity, never a replacement for conventional accuracy.
 
 At allowance `c`, define the effort slope as:
 

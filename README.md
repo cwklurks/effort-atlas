@@ -1,113 +1,113 @@
-# effort-atlas
+# Thinking Cut Short
 
-**How much is thinking actually worth?** Per-domain effort/performance curves for
-[Inkling](https://thinkingmachines.ai/news/introducing-inkling/), the first open-weights
-model with a continuous thinking-effort dial — plus (Phase 2) a learned controller that
-sets the dial automatically per query.
+## Separating token starvation from genuine overthinking in reasoning models
 
-## The question
+Higher reasoning effort can appear to reduce accuracy when a model uses its output
+allowance for reasoning and is stopped before producing an answer. This project
+crosses native reasoning effort with output allowance on the same math items to
+measure how much of a negative effort slope is associated with no-answer length
+stops, and how much remains among completed responses.
 
-Inkling exposes a thinking-effort setting (0.2 → 0.99). Thinking Machines published
-effort/performance curves for exactly three benchmarks. Nobody knows:
+## Study status
 
-1. Where the knee of the curve is per *task type* (math vs extraction vs knowledge vs code)
-2. Whether effort helps *perception* tasks (audio, charts) at all — Phase 2
-3. Whether the minimum sufficient effort per query is *predictable* — Phase 3
+As of 2026-07-22:
 
-## Pipeline
+- Earlier Tinker and OpenRouter measurements are exploratory only.
+- The confirmatory hypotheses and design were frozen in
+  [PREREGISTRATION.md](PREREGISTRATION.md) before any confirmatory response.
+- A [pre-data scoring amendment](PREREGISTRATION_AMENDMENT_2026-07-22.md) fixes an
+  audit-detected implementation error: finish reason cannot override the unchanged
+  grader. No confirmatory response existed when it was corrected.
+- The prompt-free execution order and provenance hashes are under
+  [confirmatory_artifacts/](confirmatory_artifacts/).
+- No confirmatory result has been collected and confirmatory-study spend is $0.00.
+- The confirmatory validator is offline-only. It is not yet connected to a paid
+  runner, so no command in the confirmatory artifact path can initiate model calls.
 
-```
-generate data  →  dry-run (cost estimate)  →  sweep  →  analyze
-```
+The intended submission is the EACL 2027 Industry Track. That is an intention, not
+an acceptance or affiliation.
+
+## Confirmatory question
+
+For each pinned model/provider route, the same 30 audited AIME-25 items are evaluated
+in a blocked 2x2 design:
+
+| | Smaller output allowance | Larger output allowance |
+|---|---:|---:|
+| Lower native effort | same items and prompts | same items and prompts |
+| Higher native effort | same items and prompts | same items and prompts |
+
+The primary quantity is the change in the effort slope when allowance increases.
+Conventional accuracy always follows the unchanged grader. Termination and answer
+availability are reported separately:
+
+- all `finish_reason="length"` responses;
+- unanswered length stops, defined as a length stop with no extractable final answer;
+- answer-present length stops; and
+- normally completed correct and wrong responses.
+
+A completed high-effort error is not automatically called overthinking. Stronger
+mechanistic language requires additional evidence described in the protocol.
+
+## Research artifacts
+
+- [METHODS_BRIEF.md](METHODS_BRIEF.md): short design and estimand summary.
+- [PREREGISTRATION.md](PREREGISTRATION.md): original frozen confirmatory protocol.
+- [PREREGISTRATION_AMENDMENT_2026-07-22.md](PREREGISTRATION_AMENDMENT_2026-07-22.md):
+  pre-data correction to length-stop scoring and bounds.
+- [CONFIRMATORY_PREFLIGHT.md](CONFIRMATORY_PREFLIGHT.md): schedule, ledger, and
+  validation contract.
+- [CAP_SEMANTICS.md](CAP_SEMANTICS.md): exploratory audit of what provider routes
+  actually bound with `max_tokens`-family parameters.
+- [TRUNCATION_STUDY.md](TRUNCATION_STUDY.md): exploratory 4,096-token artifact and
+  rerun record.
+- [public_artifacts/](public_artifacts/): sanitized exploratory metadata and billing
+  receipts. Prompts, gold labels, visible responses, and reasoning traces are omitted.
+- [OUTREACH_RESEARCH.md](OUTREACH_RESEARCH.md): literature and reviewer-selection
+  dossier. It is not evidence of endorsement.
+
+Exploratory and confirmatory rows are never pooled. Earlier accuracy numbers that
+treated hidden output caps as ordinary completed errors are explicitly invalidated in
+the research log.
+
+## Offline verification
+
+Install the package and run the full offline suite:
 
 ```bash
 python -m pip install -e .
-# Optional Hugging Face dataset fetcher:
-# python -m pip install -e ".[data]"
-
-# 1. Build the local question sets (synthetic extraction is fully offline;
-#    math/knowledge fetch small fixed subsets from Hugging Face)
-python -m effort_atlas.data_gen
-python -m effort_atlas.fetch_data          # optional, needs `datasets`
-
-# 2. See what the sweep will cost BEFORE spending anything
-python -m effort_atlas.sweep --dry-run
-
-# 3. Test the entire pipeline with zero API calls
-python -m effort_atlas.sweep --mock
-python -m effort_atlas.analyze
-
-# 4. The real thing (needs TINKER_API_KEY in .env)
-python -m effort_atlas.sweep
-python -m effort_atlas.analyze
+PYTHONPATH=src python -m unittest discover -s tests -v
 ```
 
-Everything is configured in `config.yaml`: endpoint, model path, effort levels,
-items per domain, and pricing for the estimator.
+The confirmatory schedule exporter is also offline. It reads audited item IDs,
+creates deterministic schedules, and hashes protocol, amendment, configuration,
+dataset, and code inputs. See [CONFIRMATORY_PREFLIGHT.md](CONFIRMATORY_PREFLIGHT.md)
+before regenerating anything.
 
-## Isolated OpenRouter replication
+## Legacy evaluation harness
 
-The OpenRouter replication uses `config_openrouter.yaml` and never reads or
-writes the Tinker cache, result series, or reports:
+The repository began as `effort-atlas`, a harness for measuring Inkling's continuous
+Tinker `reasoning_effort` setting and later gained an isolated categorical-effort
+OpenRouter path. These components remain for reproducing the exploratory history:
 
-```bash
-PYTHONPATH=src python -m effort_atlas.openrouter_status \
-  --config config_openrouter.yaml
-PYTHONPATH=src python -m effort_atlas.sweep \
-  --config config_openrouter.yaml
-PYTHONPATH=src python -m effort_atlas.analyze \
-  --config config_openrouter.yaml results_openrouter/combined_real.jsonl
+```text
+src/effort_atlas/client.py       provider client, streaming, cache identity
+src/effort_atlas/sweep.py        domains x efforts x items runner
+src/effort_atlas/analyze.py      exploratory curves and summary tables
+src/effort_atlas/confirmatory.py offline schedule, ledger, and validator
 ```
 
-Set `OPENROUTER_API_KEY` in `.env`. `OPENROUTER_BASE_URL` is optional; the
-configured default is `https://openrouter.ai/api/v1`. OpenRouter efforts are
-categorical (`minimal`, `low`, `medium`, `high`, `max`) and are analyzed in
-that ordinal order. They are a separate replication and are not merged with
-Tinker's continuous-effort results.
+Provider configurations keep caches and result directories isolated. The raw local
+datasets, caches, results, reports, and `.env` files are ignored by Git. Real model
+calls require an explicitly configured provider key and are outside the offline
+verification workflow above.
 
-## Running against Tinker (verified 2026-07-15)
+## Evidence and licensing
 
-The harness targets Tinker's [OpenAI-compatible endpoint](https://tinker-docs.thinkingmachines.ai/tinker/compatible-apis/openai/) (beta):
+Provider-reported usage and receipt fields are retained where needed for accounting.
+Missing observations remain missing; no row is fabricated, repaired, interpolated,
+or silently retried. Public evidence exporters use explicit field allowlists.
 
-- **Base URL** (already the default): `https://tinker.thinkingmachines.dev/services/tinker-prod/oai/api/v1`
-- **Auth**: your `TINKER_API_KEY`, in `.env`
-- **Effort**: `reasoning_effort` as a raw float in [0.0, 1.0] via `extra_body` —
-  confirmed in the docs. Strings map to floats: minimal=0.01, low=0.3, medium=0.6, high=0.9.
-- **Reasoning separation**: `separate_reasoning: true` puts chain-of-thought in
-  `reasoning_content`; we grade only the final `content` and log the trace length.
-
-## ⚠ Remaining day-1 TODO
-
-- [ ] **Get an Inkling sampler checkpoint path** (`tinker://…/sampler_weights/…`)
-      and set it as `provider.model` in `config.yaml`. The OAI endpoint takes
-      sampler paths, not plain model names — grab one from the Tinker console or
-      create one via the SDK quickstart against the Inkling base model.
-- [ ] Confirm Inkling's **sample/prefill price** in the Tinker console and update
-      `pricing:`. **Prices rise ~50% on July 17, 2026 — run the sweep before then.**
-- [ ] Verify the HF dataset ids in `fetch_data.py` still resolve; swap subsets if needed.
-- [ ] The endpoint is beta/low-throughput: keep `concurrency` at 2 and expect
-      variable latency.
-
-## Honest-claims policy
-
-- Accuracy is reported with 95% Wilson intervals; n per point is always shown.
-- Token counts are **provider-reported completion tokens**, not estimates.
-- Every result JSONL row stores the full request config for reproduction.
-- We claim "first public effort curves for Inkling across domains" — NOT
-  "we invented adaptive test-time compute" (see prior art in RESEARCH_LOG.md).
-
-## Layout
-
-```
-config.yaml                 all knobs
-src/effort_atlas/
-  client.py                 OpenAI-compatible client, effort injection, disk cache, retries
-  data_gen.py               synthetic extraction tasks (offline, deterministic)
-  fetch_data.py             small fixed HF subsets → data/*.jsonl
-  graders.py                numeric / multiple-choice / exact-field graders
-  sweep.py                  runner: domains × efforts × items → results/*.jsonl
-  analyze.py                curves, summary table, knee detection → reports/
-data/                       question sets (JSONL, standard schema)
-results/                    raw sweep output (one JSONL per run)
-reports/                    charts + summary
-```
+The MIT license applies to project code. It does not claim ownership or a
+redistribution license for benchmark content or model outputs. Dataset identifiers
+and cryptographic hashes are published when source text cannot be redistributed.

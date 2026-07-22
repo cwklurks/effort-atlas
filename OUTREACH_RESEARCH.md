@@ -372,9 +372,9 @@ not a guarantee.
 
 ## Personalized email drafts
 
-Each draft uses a placeholder for a repository or protocol URL because no public URL
-has been verified. Replace the placeholder only with a real, accessible link. Attach
-at most a one-page protocol and one figure. Do not send all five at once.
+These are archived working drafts from the literature review. They predate the
+2026-07-22 scoring amendment and must not be sent. The current reviewed drafts and
+send gates are in [OUTREACH_PACKET.md](OUTREACH_PACKET.md).
 
 ### Draft 1: Daniel Kaiser
 
