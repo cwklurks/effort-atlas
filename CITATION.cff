@@ -1,0 +1,23 @@
+cff-version: 1.2.0
+message: "If you use this software or its research artifacts, please cite the manuscript."
+title: "Thinking Cut Short: Separating Token Starvation from Genuine Overthinking in Reasoning Models"
+type: software
+authors:
+  - family-names: Klann
+    given-names: Connor
+    orcid: "https://orcid.org/0009-0002-5056-6670"
+license: MIT
+keywords:
+  - reasoning models
+  - test-time compute
+  - language model evaluation
+  - output censoring
+  - reproducibility
+preferred-citation:
+  type: article
+  title: "Thinking Cut Short: Separating Token Starvation from Genuine Overthinking in Reasoning Models"
+  authors:
+    - family-names: Klann
+      given-names: Connor
+      orcid: "https://orcid.org/0009-0002-5056-6670"
+  year: 2026
