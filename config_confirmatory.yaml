@@ -1,0 +1,39 @@
+# Offline preflight contract. This file cannot authorize a paid run.
+study:
+  seed: 20260722
+  preregistration_commit: bc941bf118516cddafc671fcb9acc4607fd7ea33
+  preregistration_path: PREREGISTRATION.md
+  replicate_decision: 1  # two replicates require a preregistration amendment and budget top-up
+  execution_mode: offline_preflight_only
+  main_dataset_path: data/math.jsonl
+  main_item_count: 30
+  audited_dataset_paths: [data/math.jsonl, data/extraction.jsonl]
+  code_provenance_paths:
+    - src/effort_atlas/sweep.py
+    - src/effort_atlas/graders.py
+    - src/effort_atlas/client.py
+    - src/effort_atlas/confirmatory.py
+panels:
+  - name: inkling_together
+    model: thinkingmachines/inkling
+    requested_provider: Together
+    efforts: [medium, max]
+    caps: [20000, 49152]
+    replicates: 1
+    smoke_jobs:
+      - item_id: extraction_0000
+        effort: medium
+        cap: 2000
+  - name: glm52_together
+    model: z-ai/glm-5.2
+    requested_provider: Together
+    efforts: [high, xhigh]
+    caps: [4096, 32000]
+    replicates: 1
+    smoke_jobs:
+      - item_id: extraction_0000
+        effort: high
+        cap: 2000
+      - item_id: math_0003
+        effort: xhigh
+        cap: 2000

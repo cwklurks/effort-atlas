@@ -4,8 +4,10 @@
 
 **Connor Klann, Independent Researcher**  
 [ORCID 0009-0002-5056-6670](https://orcid.org/0009-0002-5056-6670)  
-**Protocol status:** Preregistered draft; no confirmatory API response collected and
-new-study spend is $0.00 as of 2026-07-22.
+**Protocol status:** Preregistered in commit
+[`bc941bf`](https://github.com/cwklurks/effort-atlas/commit/bc941bf118516cddafc671fcb9acc4607fd7ea33);
+no confirmatory API response has been collected and new-study spend is $0.00
+as of 2026-07-22.
 
 ## Question
 
@@ -79,17 +81,18 @@ was subsequently abandoned, a forced-stop or forced-continuation intervention, o
 repeated correct-to-wrong transitions. Visible reasoning-text interpretation is
 qualitative and cannot override the automated final-answer grade.
 
-## Open methods decision before spending
+## Committed sampling design and limitation
 
-The current $30.06 balance supports two model panels with one stochastic generation
-per item and cell under a $27.00 study ceiling. That design supports a narrow,
+The committed design uses two model panels with one stochastic generation per
+item and cell under a $27.00 study ceiling. The current $30.06 balance supports
+that design while retaining a $3.06 margin. This supports a narrow,
 single-sample fixed-benchmark route audit, but it does not estimate within-item
 generation variability.
 
-Adding a second generation to both panels raises conservative worst-case exposure to
-about $53.50. Preserving the existing $3.06 margin would require a balance of about
-$56.56. The alternative is to keep the current budget and trade model breadth or
-item coverage for repeats. This choice will be committed before any paid response.
+Adding a second generation to both panels would raise conservative worst-case
+exposure to about $53.50. Preserving the existing $3.06 margin would require a
+balance of about $56.56 and a preregistration amendment before any paid
+response. No such amendment has been made.
 
 ## Requested pre-data feedback
 
