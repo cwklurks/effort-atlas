@@ -1,0 +1,51 @@
+{
+  "control_rule": "any applicable failed control makes the pipeline control_disqualified and excludes it from headline comparisons",
+  "fallback_origin_rule": "report only when call tracing proves origin",
+  "frozen_at": "2026-08-07T04:26:44.234893+00:00",
+  "metrics": {
+    "accidental_correct_pct": {
+      "denominator": "all applicable truncated rows",
+      "numerator": "applicable truncated rows scored correct by harness-native downstream path",
+      "unavailable": "not_measured"
+    },
+    "answer_returned_after_truncation_pct": {
+      "alias": "fabrication_pct is an operational alias only",
+      "denominator": "all applicable truncated rows",
+      "numerator": "applicable truncated rows with non-null, non-empty extracted answer"
+    },
+    "control_pass_pct": {
+      "denominator": "all applicable controls",
+      "numerator": "applicable controls scored correct by actual pipeline"
+    },
+    "crash_pct": {
+      "denominator": "all applicable truncated rows",
+      "numerator": "applicable truncated rows with exception escaping adapter"
+    },
+    "swallowed_error_pct": {
+      "denominator": "all applicable truncated rows",
+      "numerator": "applicable truncated rows with defined observable suppressed-error event",
+      "unavailable": "not_measured, never inferred zero"
+    }
+  },
+  "primary_truncated_denominator": {
+    "count_when_both_applicable": 231,
+    "inclusion": "all applicable real_truncated plus synthetic_truncated rows, including empty text"
+  },
+  "schema_version": 1,
+  "seed": 1729,
+  "statuses": [
+    "ok",
+    "not_runnable",
+    "install_failed",
+    "import_failed",
+    "control_disqualified",
+    "not_applicable",
+    "not_traceable",
+    "not_measured"
+  ],
+  "strata": {
+    "finished_control": 64,
+    "real_truncated": 131,
+    "synthetic_truncated": 100
+  }
+}

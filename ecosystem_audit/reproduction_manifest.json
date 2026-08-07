@@ -1,0 +1,346 @@
+{
+  "base_repository": "cwklurks/effort-atlas",
+  "branch": "codex/ecosystem-audit",
+  "created_at": "2026-08-07T04:26:44.235311+00:00",
+  "external_checkout_root": "ecosystem_audit/_repos",
+  "github_access": "verified via public API and credential-free git ls-remote",
+  "machine": "arm64",
+  "merge_base": "7451f1c0bd650201bb59cbf2ad90a8d2c4adffdd",
+  "paid_provider_or_model_calls": "forbidden and not required",
+  "platform": "macOS-26.3.1-arm64-arm-64bit",
+  "push_permission": "verified by git push --dry-run",
+  "python": "Python 3.12.8",
+  "repositories": [
+    {
+      "build_install_hooks": [
+        {
+          "build_backend": "setuptools.build_meta",
+          "requires": [
+            "setuptools>=64.0"
+          ]
+        }
+      ],
+      "canonical_remote": "https://github.com/EleutherAI/lm-evaluation-harness.git",
+      "clone_protocol": "https",
+      "dependency_lock_hash": "6975fac256e53cea691cb0ef69052301d24d169f6c8262b2b02b222466636282",
+      "dependency_metadata": [
+        {
+          "path": "pyproject.toml",
+          "sha256": "40d43320a7837e6e34c2875e3befd2b3e91275f265beb01c0bf94a568969c39d"
+        }
+      ],
+      "environment_install_command": "none in Phase 0; each adapter runs in a separate subprocess from the prepared root .venv unless a dated GAPS.md amendment records an isolated environment",
+      "lfs_policy": "GIT_LFS_SKIP_SMUDGE=1 at clone; no LFS pull",
+      "lfs_state": "none_declared",
+      "name": "lm-evaluation-harness",
+      "resolved_remote_head_ref": "refs/remotes/origin/main",
+      "sha": "f4d4b3de3ee6741a7151a9fe74945ee515262f4c",
+      "submodule_policy": "not initialized; no recursive checkout",
+      "submodule_state": "none_declared"
+    },
+    {
+      "build_install_hooks": [
+        {
+          "execution_policy": "not executed during metadata inspection",
+          "legacy_build_metadata": "setup.py"
+        }
+      ],
+      "canonical_remote": "https://github.com/open-compass/opencompass.git",
+      "clone_protocol": "https",
+      "dependency_lock_hash": "2a5ef3d114d22753d75f4d329f877d23f0ff6ac710109954a4bd95769b97020e",
+      "dependency_metadata": [
+        {
+          "path": "requirements/agent.txt",
+          "sha256": "36a77f91156504aede67310984a2632c867edadf1e7c5f3e2901032390d55a35"
+        },
+        {
+          "path": "requirements/api.txt",
+          "sha256": "6426a1764e0b4546d01e0ac6efc65a75b0ae69a29c8771b3f993a2d73f2cd4db"
+        },
+        {
+          "path": "requirements/docs.txt",
+          "sha256": "19e84ebcb1a22f1e1ffc6e32f43231cb98ecbc42a7c3f27629ba689ad55e6cab"
+        },
+        {
+          "path": "requirements/extra.txt",
+          "sha256": "3b483b103664127df12cccc954d79708642d7b4989d58393964a51248b93559b"
+        },
+        {
+          "path": "requirements/lmdeploy.txt",
+          "sha256": "d385dab440075e1ed39842ae7794e2d51c8bb9425954455ba801507c5305d6bf"
+        },
+        {
+          "path": "requirements/runtime.txt",
+          "sha256": "cbecfa03079178ef6a0ecc2bc1a9af0a27cbde3016d976e8fde7ff5d3df53f8a"
+        },
+        {
+          "path": "requirements/vllm.txt",
+          "sha256": "7c081bf0fb78cd0a0a4d40376672842207238742fdeff7701236034cbe4c104a"
+        },
+        {
+          "path": "requirements.txt",
+          "sha256": "7f0ede8f86de273980eb9064381dde9d2d9fd5f73b818b02325d1f017a4cbce3"
+        },
+        {
+          "path": "setup.py",
+          "sha256": "3649193c5d0f68340fc4a88c16b983dc005e17f3a61ae908623342043541d45b"
+        }
+      ],
+      "environment_install_command": "none in Phase 0; each adapter runs in a separate subprocess from the prepared root .venv unless a dated GAPS.md amendment records an isolated environment",
+      "lfs_policy": "GIT_LFS_SKIP_SMUDGE=1 at clone; no LFS pull",
+      "lfs_state": "none_declared",
+      "name": "opencompass",
+      "resolved_remote_head_ref": "refs/remotes/origin/main",
+      "sha": "96263b1a16899260586c8e945eea06934c43c225",
+      "submodule_policy": "not initialized; no recursive checkout",
+      "submodule_state": "none_declared"
+    },
+    {
+      "build_install_hooks": [
+        {
+          "build_backend": "setuptools.build_meta",
+          "requires": [
+            "setuptools"
+          ]
+        }
+      ],
+      "canonical_remote": "https://github.com/stanford-crfm/helm.git",
+      "clone_protocol": "https",
+      "dependency_lock_hash": "a9ed48af9f9881ec37d680e7868387b3c96c8bb58c93e72d13c8a958a7a20554",
+      "dependency_metadata": [
+        {
+          "path": "pyproject.toml",
+          "sha256": "a73d17852e9ef56fea2580d2d8ff0212f894e2e7f73b9eb5cee49f80788d5272"
+        },
+        {
+          "path": "uv.lock",
+          "sha256": "75f47a02a4adbb828b93d6e9e1c3f7b995a6e7c700ce21401d9b97c756ba1ff5"
+        }
+      ],
+      "environment_install_command": "none in Phase 0; each adapter runs in a separate subprocess from the prepared root .venv unless a dated GAPS.md amendment records an isolated environment",
+      "lfs_policy": "GIT_LFS_SKIP_SMUDGE=1 at clone; no LFS pull",
+      "lfs_state": "none_declared",
+      "name": "helm",
+      "resolved_remote_head_ref": "refs/remotes/origin/main",
+      "sha": "63754d05db6f874e41a395880fb573890a13e791",
+      "submodule_policy": "not initialized; no recursive checkout",
+      "submodule_state": "none_declared"
+    },
+    {
+      "build_install_hooks": [
+        {
+          "build_backend": "setuptools.build_meta",
+          "requires": [
+            "setuptools>=64",
+            "setuptools_scm[toml]>=8"
+          ]
+        }
+      ],
+      "canonical_remote": "https://github.com/UKGovernmentBEIS/inspect_ai.git",
+      "clone_protocol": "https",
+      "dependency_lock_hash": "f6f71ef8e6593c3c34c5811b55febcdd9e6eba13a3bc49d760431c9dc93dfd61",
+      "dependency_metadata": [
+        {
+          "path": "pyproject.toml",
+          "sha256": "f01e2d143ab1c62131e56cc628d2276daf080932907bcaf8537b06ba722d1e9d"
+        },
+        {
+          "path": "requirements-dev.txt",
+          "sha256": "59e67fe058909203a96420ac2515156b9ea7599cc8ff711abf94bc20d1597dbf"
+        },
+        {
+          "path": "requirements-dist.txt",
+          "sha256": "d9cb1a19daf58247d34e5b7c32a18cd072c160662718b6f404dc1c96496cf0bd"
+        },
+        {
+          "path": "requirements-doc.txt",
+          "sha256": "15f62a24b550aaf36c983f786f583a763ef8f1e52234525e4a73332a40c3ad37"
+        },
+        {
+          "path": "requirements.txt",
+          "sha256": "c1b3769774648fe11e780134c952e1c2c5c6baf6d4eea29a0c5f50c93b62452c"
+        },
+        {
+          "path": "uv.lock",
+          "sha256": "a27c3d46f473eee98f3742c2077251caa2bd82181c014c295589d295a5873bac"
+        }
+      ],
+      "environment_install_command": "none in Phase 0; each adapter runs in a separate subprocess from the prepared root .venv unless a dated GAPS.md amendment records an isolated environment",
+      "lfs_policy": "GIT_LFS_SKIP_SMUDGE=1 at clone; no LFS pull",
+      "lfs_state": "none_declared",
+      "name": "inspect_ai",
+      "resolved_remote_head_ref": "refs/remotes/origin/main",
+      "sha": "f10dc46f20df0738a9acbfb4c4be0bd3d60601ed",
+      "submodule_policy": "not initialized; no recursive checkout",
+      "submodule_state": "present_uninitialized"
+    },
+    {
+      "build_install_hooks": [
+        {
+          "build_backend": "setuptools.build_meta",
+          "requires": [
+            "setuptools>=64",
+            "setuptools_scm[toml]>=8"
+          ]
+        }
+      ],
+      "canonical_remote": "https://github.com/UKGovernmentBEIS/inspect_evals.git",
+      "clone_protocol": "https",
+      "dependency_lock_hash": "1da951240364a42c5daba4e28a94aa450da4439bf691ede1510f858ad1dc02f3",
+      "dependency_metadata": [
+        {
+          "path": "pyproject.toml",
+          "sha256": "d930d9198191748998ce69f51bd1d677ae18477b7cbfe025a1024297549be602"
+        },
+        {
+          "path": "uv.lock",
+          "sha256": "447adf3de34ba8f01f81c708d606ff86174982c3ad4edf6f1f64d942f03ad369"
+        }
+      ],
+      "environment_install_command": "none in Phase 0; each adapter runs in a separate subprocess from the prepared root .venv unless a dated GAPS.md amendment records an isolated environment",
+      "lfs_policy": "GIT_LFS_SKIP_SMUDGE=1 at clone; no LFS pull",
+      "lfs_state": "none_declared",
+      "name": "inspect_evals",
+      "resolved_remote_head_ref": "refs/remotes/origin/main",
+      "sha": "b31daf3f6f74ce48cb905d185a4c2afc524205b2",
+      "submodule_policy": "not initialized; no recursive checkout",
+      "submodule_state": "none_declared"
+    },
+    {
+      "build_install_hooks": [],
+      "canonical_remote": "https://github.com/openai/simple-evals.git",
+      "clone_protocol": "https",
+      "dependency_lock_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "dependency_metadata": [],
+      "environment_install_command": "none in Phase 0; each adapter runs in a separate subprocess from the prepared root .venv unless a dated GAPS.md amendment records an isolated environment",
+      "lfs_policy": "GIT_LFS_SKIP_SMUDGE=1 at clone; no LFS pull",
+      "lfs_state": "none_declared",
+      "name": "simple-evals",
+      "resolved_remote_head_ref": "refs/remotes/origin/main",
+      "sha": "652c89d0ca9df547706735883097e9537d40dc47",
+      "submodule_policy": "not initialized; no recursive checkout",
+      "submodule_state": "none_declared"
+    },
+    {
+      "build_install_hooks": [
+        {
+          "build_backend": "setuptools.build_meta",
+          "requires": [
+            "setuptools>=61.0"
+          ]
+        },
+        {
+          "execution_policy": "not executed during metadata inspection",
+          "legacy_build_metadata": "setup.py"
+        }
+      ],
+      "canonical_remote": "https://github.com/huggingface/lighteval.git",
+      "clone_protocol": "https",
+      "dependency_lock_hash": "04a8841fec67d6910c44cefdfb580454947a0e7938d6d04bdcb15cfd30212795",
+      "dependency_metadata": [
+        {
+          "path": "pyproject.toml",
+          "sha256": "a70ea3835c3b674830a3aac775e612f605a547bad56944a527547fbfa66295a6"
+        },
+        {
+          "path": "setup.py",
+          "sha256": "33b770502be58410b4a18322146346a589fb4929e7eb67f602d172899959b960"
+        }
+      ],
+      "environment_install_command": "none in Phase 0; each adapter runs in a separate subprocess from the prepared root .venv unless a dated GAPS.md amendment records an isolated environment",
+      "lfs_policy": "GIT_LFS_SKIP_SMUDGE=1 at clone; no LFS pull",
+      "lfs_state": "attributes_present",
+      "name": "lighteval",
+      "resolved_remote_head_ref": "refs/remotes/origin/main",
+      "sha": "64f4f5ae173626509fad6e477ca4ee56ebb26129",
+      "submodule_policy": "not initialized; no recursive checkout",
+      "submodule_state": "none_declared"
+    },
+    {
+      "build_install_hooks": [
+        {
+          "build_backend": "setuptools.build_meta",
+          "requires": [
+            "setuptools>=61.0"
+          ]
+        }
+      ],
+      "canonical_remote": "https://github.com/LiveBench/LiveBench.git",
+      "clone_protocol": "https",
+      "dependency_lock_hash": "0e001adb7da34d10a4748fabc29cd65a2e82f1fe80bb885ba54c9c359b5626b7",
+      "dependency_metadata": [
+        {
+          "path": "pyproject.toml",
+          "sha256": "14aa62cce0a0c6bb3ef2886d214f6db115d4130d10b1105701e76f582c8edf0a"
+        }
+      ],
+      "environment_install_command": "none in Phase 0; each adapter runs in a separate subprocess from the prepared root .venv unless a dated GAPS.md amendment records an isolated environment",
+      "lfs_policy": "GIT_LFS_SKIP_SMUDGE=1 at clone; no LFS pull",
+      "lfs_state": "none_declared",
+      "name": "livebench",
+      "resolved_remote_head_ref": "refs/remotes/origin/main",
+      "sha": "00eae856aa1c1a9e9d058a65a9a94d85884034c4",
+      "submodule_policy": "not initialized; no recursive checkout",
+      "submodule_state": "none_declared"
+    },
+    {
+      "build_install_hooks": [
+        {
+          "build_backend": "setuptools.build_meta",
+          "requires": [
+            "setuptools"
+          ]
+        }
+      ],
+      "canonical_remote": "https://github.com/huggingface/Math-Verify.git",
+      "clone_protocol": "https",
+      "dependency_lock_hash": "893af6628e01a7b3af0370f4bbbecd802786cd840ccc9baec44ebc543f5507d0",
+      "dependency_metadata": [
+        {
+          "path": "pyproject.toml",
+          "sha256": "334ef6f223026b4bdbf20b92f4e54ade5504eb0319732777f08a2ab4831fa3e8"
+        }
+      ],
+      "environment_install_command": "none in Phase 0; each adapter runs in a separate subprocess from the prepared root .venv unless a dated GAPS.md amendment records an isolated environment",
+      "lfs_policy": "GIT_LFS_SKIP_SMUDGE=1 at clone; no LFS pull",
+      "lfs_state": "none_declared",
+      "name": "math-verify",
+      "resolved_remote_head_ref": "refs/remotes/origin/main",
+      "sha": "ba3d3aaff23b3f4cac7a14672b4f6e293d97c98b",
+      "submodule_policy": "not initialized; no recursive checkout",
+      "submodule_state": "present_uninitialized"
+    },
+    {
+      "build_install_hooks": [
+        {
+          "build_backend": "hatchling.build",
+          "requires": [
+            "hatchling"
+          ]
+        }
+      ],
+      "canonical_remote": "https://github.com/eth-sri/matharena.git",
+      "clone_protocol": "https",
+      "dependency_lock_hash": "338a4dac88699a71fec26ff5e88a0b17343ff37fa480d5c19a647e2ceb4a6474",
+      "dependency_metadata": [
+        {
+          "path": "pyproject.toml",
+          "sha256": "f46068bb21ae6cf25e844bd52c4b923072aad215a4bf3afa7b80314a48e5df67"
+        }
+      ],
+      "environment_install_command": "none in Phase 0; each adapter runs in a separate subprocess from the prepared root .venv unless a dated GAPS.md amendment records an isolated environment",
+      "lfs_policy": "GIT_LFS_SKIP_SMUDGE=1 at clone; no LFS pull",
+      "lfs_state": "none_declared",
+      "name": "matharena",
+      "resolved_remote_head_ref": "refs/remotes/origin/main",
+      "sha": "a11194deff8c67a232974a383795e8a2776b4c6f",
+      "submodule_policy": "not initialized; no recursive checkout",
+      "submodule_state": "none_declared"
+    }
+  ],
+  "root_environment": ".venv",
+  "root_requirements": "requirements.txt",
+  "root_requirements_check": "MPLBACKEND=Agg .venv/bin/python -c \"import openai,yaml,pandas,matplotlib,dotenv\"",
+  "schema_version": 1,
+  "task_start_commit": "da183fc9cba84fb866be757ec0158c79ed28571c"
+}
