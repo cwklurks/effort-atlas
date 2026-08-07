@@ -18,8 +18,8 @@ def table(path):
 
 def verify_files():
     missing=[name for name in REQUIRED if not (A/name).is_file()];assert not missing,f'missing files: {missing}'
-    result_required={'target','pipeline_id','commit','fixture_id','kind','stratum','shape','truncated','applicable','adapter_status','applicability_reason','extracted_answer','answer_returned','native_correct','escaped_exception','exception_class','exception_message','swallowed_error_observed','swallowed_error_detail','duration_status'}
-    metric_required={'target','pipeline_id','commit','pipeline_status','stratum','metric','numerator','denominator','pct','value'}
+    result_required={'target','pipeline_id','repository_sha','fixture_id','kind','stratum','shape','applicable','adapter_status','applicability_reason','status_reason','extracted_answer','answer_returned','native_correct','exception_class','exception_message','swallowed_error_observed','swallowed_error_detail','duration_status'}
+    metric_required={'target','pipeline_id','pipeline_status','stratum','metric','numerator','denominator','percent','metric_status'}
     timeline_required={'harness','pipeline_or_task','setting','value','introduced_commit','introduced_date','remediated_value','remediated_commit','remediated_date','era_relation','evidence_command','status'}
     for path,required in [(A/'fixture_results.csv',result_required),(A/'pipeline_metrics.csv',metric_required),(A/'timeline.csv',timeline_required)]:
         rows=table(path);assert rows and required<=set(rows[0]),f'columns missing in {path.name}: {required-set(rows[0])}'
