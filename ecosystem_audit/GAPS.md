@@ -34,3 +34,9 @@ Before any measured execution, candidate callables were narrowed to task-traced 
 - The Inspect Evals AIME and LiveBench olympiad rows passed every applicable control and remain headline-eligible. lm-eval, HELM, Inspect AI, simple-evals, LightEval, math-verify, and MathArena each failed at least one applicable control; their measurements remain in `fixture_results.csv` with `control_disqualified` status and are excluded from the headline section.
 - Swallowed-error rates are `not_measured` except where the adapter manifest declares concrete logger/sentinel instrumentation. Per-fixture wall time is captured in ephemeral adapter timing logs; timing is excluded from committed deterministic result bytes.
 - The isolated environments and exact frozen package sets are under `ecosystem_audit/environments/`; install commands and dependency-lock hashes are in `adapter_manifest.json`.
+
+## 2026-08-07 Phase 3 archaeology limits
+
+- `timeline.csv` records commit author timestamps (`%aI`), not merge or release dates. `validate_timeline.py` verifies each traced commit is in the pinned snapshot ancestry and the historical blob contains the cited setting.
+- OpenCompass AIME and GPQA task-local numeric caps are `not_traceable` in the pinned configuration tree. Exact zero-result `git grep` commands are preserved in `timeline_evidence.json`; no model/provider default is guessed.
+- A setting's presence in history does not establish that every downstream invocation used it. Each timeline scope distinguishes shared defaults, provider defaults, and task-local caps.
