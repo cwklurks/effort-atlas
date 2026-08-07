@@ -1003,3 +1003,14 @@ Encoding/line endings: `utf-8` / `LF`; generated file: `false`.
 Phase 1 receipt gate: `.venv/bin/python ecosystem_audit/validate_receipts.py` (exit 0).
 
 Full offline, strict, executable-reproduction, root-suite, and PR gates are recorded here only after they run successfully.
+
+## Git archaeology and era comparison
+
+`timeline.csv` contains 35 generated setting histories. Status counts: not_traceable=2, verified=33.
+Era buckets are generated from author dates: not_traceable=2, o1_to_r1_markers=2, post_r1_marker=16, pre_o1_marker=15. The rows contain 8 evidenced remediation events.
+
+OpenAI o1 (`2024-09`) and DeepSeek R1 (`2025-01`) are supplied contextual era markers, not causal evidence. The history does not support a universal story that every cap predates reasoning models: traced introductions occur both before and after the markers. Several repositories later raised or removed task caps, but their commit messages establish only local motivation, not ecosystem-wide causation.
+
+The supplied local REAP context says o4-mini(high) p90 is 38,125 tokens. That observation is sourced to `TASK.md` only and is not evidence about any external repository’s runtime behavior. It is not compared to `not_traceable` or dynamic settings as if those were numeric caps.
+
+Every verified row preserves exact history commands in `timeline_evidence.json`. OpenCompass AIME and GPQA task-local caps use the required `not found at configs/ searched at ...` form rather than guessing provider defaults.

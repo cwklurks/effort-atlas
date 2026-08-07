@@ -13,7 +13,7 @@ def git(repo,*args,check=True):
 def main():
     lock={row['name']:row for row in json.loads((A/'repos.lock.json').read_text())['repositories']}
     with (A/'timeline.csv').open(newline='',encoding='utf-8') as handle: rows=list(csv.DictReader(handle))
-    required={'timeline_id','target','repository','setting_scope','event','introduced_date','introduced_commit','previous_value','new_value','remediation','remediation_date','remediation_commit','current_snapshot_sha','status','path','source_text','evidence_command','notes'}
+    required={'harness','pipeline_or_task','setting','value','introduced_commit','introduced_date','remediated_value','remediated_commit','remediated_date','era_relation','evidence_command','status','timeline_id','target','repository','setting_scope','event','previous_value','new_value','remediation','current_snapshot_sha','path','source_text','notes'}
     assert rows and required<=set(rows[0])
     assert len(rows)>=35 and len({r['timeline_id'] for r in rows})==len(rows)
     assert set(lock)=={r['target'] for r in rows},'every locked target must have timeline coverage'
@@ -28,7 +28,13 @@ def main():
         assert origin==expected,(target,origin,expected)
     for row in rows:
         assert row['repository']==lock[row['target']]['repository']
+        assert row['harness']==row['target'] and row['pipeline_or_task']==row['setting_scope'] and row['value']==row['new_value']
         assert row['current_snapshot_sha']==lock[row['target']]['sha']
+        if row['introduced_date']:
+            day=row['introduced_date'][:10]
+            expected_era='pre_o1_marker' if day<'2024-09-01' else ('o1_to_r1_markers' if day<'2025-01-01' else 'post_r1_marker')
+            assert row['era_relation']==expected_era
+        else: assert row['era_relation']=='not_traceable'
         item=evidence[row['timeline_id']]
         if row['status']=='verified':
             sha=row['introduced_commit'];repo=row['target']
@@ -43,9 +49,11 @@ def main():
             assert any(row['source_text'] in line for line in commands[1]['matching_lines'])
             if row['remediation']=='true':
                 assert row['event']=='remediation' and row['previous_value'] and row['remediation_commit']==sha and row['remediation_date']==row['introduced_date']
-            else: assert not row['remediation_commit'] and not row['remediation_date']
+                assert row['remediated_value']==row['new_value'] and row['remediated_commit']==sha and row['remediated_date']==row['introduced_date']
+            else:
+                assert not row['remediation_commit'] and not row['remediation_date'] and not row['remediated_value'] and not row['remediated_commit'] and not row['remediated_date']
         elif row['status']=='not_traceable':
-            assert not row['introduced_commit'] and not row['introduced_date'] and row['notes']
+            assert not row['introduced_commit'] and not row['introduced_date'] and row['notes'].startswith('not found at ')
             commands=item['commands'];assert len(commands)==1 and commands[0]['command']==row['evidence_command'] and commands[0]['returncode']==1 and not commands[0]['stdout']
         else: raise AssertionError(f"invalid status: {row['status']}")
     print(f"validated {len(rows)} timeline rows across {len(lock)} full-history clones: {dict(sorted(Counter(r['status'] for r in rows).items()))}")

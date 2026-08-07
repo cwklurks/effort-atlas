@@ -72,9 +72,14 @@ timeline=ROOT/'timeline.csv'
 if timeline.exists():
     with timeline.open(newline='',encoding='utf-8') as f: trows=list(csv.DictReader(f))
     status=Counter(r['status'] for r in trows)
+    eras=Counter(r['era_relation'] for r in trows)
+    remediation=sum(r['remediation']=='true' for r in trows)
     lines += ['## Git archaeology and era comparison','',
-              f"`timeline.csv` contains {len(trows)} generated setting histories. Status counts: "+', '.join(f"{k}={v}" for k,v in sorted(status.items()))+'.','',
-              'OpenAI o1 (`2024-09`) and DeepSeek R1 (`2025-01`) are supplied contextual era markers, not causal evidence. Each row preserves its exact history command and validation status.','']
+              f"`timeline.csv` contains {len(trows)} generated setting histories. Status counts: "+', '.join(f"{k}={v}" for k,v in sorted(status.items()))+'.',
+              f"Era buckets are generated from author dates: "+', '.join(f"{k}={v}" for k,v in sorted(eras.items()))+f". The rows contain {remediation} evidenced remediation events.",'',
+              'OpenAI o1 (`2024-09`) and DeepSeek R1 (`2025-01`) are supplied contextual era markers, not causal evidence. The history does not support a universal story that every cap predates reasoning models: traced introductions occur both before and after the markers. Several repositories later raised or removed task caps, but their commit messages establish only local motivation, not ecosystem-wide causation.','',
+              'The supplied local REAP context says o4-mini(high) p90 is 38,125 tokens. That observation is sourced to `TASK.md` only and is not evidence about any external repository’s runtime behavior. It is not compared to `not_traceable` or dynamic settings as if those were numeric caps.','',
+              'Every verified row preserves exact history commands in `timeline_evidence.json`. OpenCompass AIME and GPQA task-local caps use the required `not found at configs/ searched at ...` form rather than guessing provider defaults.','']
 fields=['finding_id','target','category','claim','repository','sha','path','line_start','line_end','permalink','quote','status']
 with (ROOT/'audit_data.csv').open('w',newline='',encoding='utf-8') as handle:
     writer=csv.DictWriter(handle,fieldnames=fields,lineterminator='\n');writer.writeheader()
