@@ -6,6 +6,20 @@
 - Base origin, GitHub access, authentication, dry-run push permission, and unoccupied remote head were verified.
 - Python is 3.12.8. Root requirement imports pass when `MPLBACKEND=Agg` overrides the parent notebook's non-project inline backend.
 - The real fixture SHA-256 is `b84adb85eccd6b628829cdadb71c29fa25eb4dc0a37d387f554464b312d96f43`; 195 rows decode: 131 truncated, 64 controls, and 12 empty truncated texts.
-- All ten named components were cloned with full default-branch history and frozen in `repos.lock.json`. Tags were intentionally not fetched. `inspect_ai` declares an uninitialized submodule; no task candidate needs it.
+- All ten named components were cloned with full default-branch history and frozen in `repos.lock.json`. Tags were intentionally not fetched. `inspect_ai` and `math-verify` declare uninitialized submodules; no selected executable candidate needs those gitlinks because the package dependency path is used.
 - Applicability was frozen before any executable measurement. A candidate that proves unimportable remains in results with its concrete status; no measured rate will be substituted.
 - No paid key or model/dataset call is needed or permitted.
+
+## 2026-08-07 Phase 1 search gaps
+
+- `lm-evaluation-harness`: `not found at <lm_eval/**/*.py paths searched>` for `finish_reason`, `stop_reason`, or `incomplete_details` capture/persistence/scorer use; search: `rg -n 'finish_reason|stop_reason|incomplete_details' lm_eval`.
+- `lm-evaluation-harness`: AIME task `not found at <lm_eval/tasks paths searched>`; MATH and GPQA task cap omissions/default paths were searched with `rg -ni 'aime|max_gen_toks' lm_eval/tasks` and are not converted into guessed values.
+- `opencompass`: scorer logic using captured finish reason to distinguish truncation from wrong was `not found at <opencompass/evaluator, opencompass/datasets, opencompass/tasks paths searched>`; search pattern `finish_reason|stop_reason|incomplete_details`.
+- `helm`: AIME task `not found at <src/helm paths searched>` using `rg -ni '\baime\b' src/helm`. A correctness scorer condition on finish reason was `not found at <src/helm/benchmark/metrics/gpqa_chain_of_thought_metric.py, src/helm/benchmark/metrics/evaluate_reference_metrics.py paths searched>`.
+- `inspect_ai` / `inspect_evals`: AIME scorer use of `stop_reason` was `not found at <src/inspect_evals/utils/aime_common.py and src/inspect_ai/scorer paths searched>`; the signal remains present on ModelOutput but is not a scorer input in this path.
+- `simple-evals`: AIME and GSM8K exact tasks were `not found at <*.py paths searched>` with `rg -ni '\baime\b|gsm8k' .`; MGSM is the closest GSM path. Any captured/persisted finish signal was `not found at <sampler/*.py, *_eval.py, types.py, simple_evals.py paths searched>` using `finish_reason|stop_reason|incomplete_details`.
+- `lighteval`: output `finish_reason`, `stop_reason`, and `incomplete_details` were `not found at <src/lighteval paths searched>`; the inspected LiteLLM conversion explicitly reduces choices to content/reasoning. `truncated_tokens_count` is input truncation, not completion termination.
+- `livebench`: GSM8K and GPQA were `not found at <livebench tracked paths searched>`; closest math/reasoning tasks were audited. Task-specific cap fields were `not found at <livebench/process_results and ground-truth dispatch paths searched>`; tasks inherit the global CLI/model configuration.
+- `math-verify`: generation finish fields were `not found at <tracked checkout paths searched>` using `git grep -n -E 'finish_reason|stop_reason|incomplete_details'`; this package accepts post-generation text.
+- `matharena`: literal `finish_reason` and `stop_reason` were `not found at <src, configs, scripts, app paths searched>`. Provider raw response logs may contain a signal, but the semantic result drops it and the scorer uses only a token-count heuristic.
+- Issue discovery used the requested combined terms against every locked repository and preserved the search result metadata in `issue_searches.json`. The four mandated anchors were fetched directly and independently into `issue_receipts.json`.

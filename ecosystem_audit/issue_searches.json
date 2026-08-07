@@ -1,0 +1,76 @@
+{
+  "query": "truncation OR max_gen_toks OR \"token limit\" OR \"max output\" OR finish_reason OR \"reasoning cut off\"",
+  "repositories": [
+    {
+      "error": "",
+      "repository": "EleutherAI/lm-evaluation-harness",
+      "results": [],
+      "status": "ok",
+      "target": "lm-evaluation-harness"
+    },
+    {
+      "error": "",
+      "repository": "open-compass/opencompass",
+      "results": [],
+      "status": "ok",
+      "target": "opencompass"
+    },
+    {
+      "error": "",
+      "repository": "stanford-crfm/helm",
+      "results": [],
+      "status": "ok",
+      "target": "helm"
+    },
+    {
+      "error": "",
+      "repository": "UKGovernmentBEIS/inspect_ai",
+      "results": [],
+      "status": "ok",
+      "target": "inspect_ai"
+    },
+    {
+      "error": "",
+      "repository": "UKGovernmentBEIS/inspect_evals",
+      "results": [],
+      "status": "ok",
+      "target": "inspect_evals"
+    },
+    {
+      "error": "",
+      "repository": "openai/simple-evals",
+      "results": [],
+      "status": "ok",
+      "target": "simple-evals"
+    },
+    {
+      "error": "",
+      "repository": "huggingface/lighteval",
+      "results": [],
+      "status": "ok",
+      "target": "lighteval"
+    },
+    {
+      "error": "",
+      "repository": "LiveBench/LiveBench",
+      "results": [],
+      "status": "ok",
+      "target": "livebench"
+    },
+    {
+      "error": "",
+      "repository": "huggingface/Math-Verify",
+      "results": [],
+      "status": "ok",
+      "target": "math-verify"
+    },
+    {
+      "error": "",
+      "repository": "eth-sri/matharena",
+      "results": [],
+      "status": "ok",
+      "target": "matharena"
+    }
+  ],
+  "retrieved_at": "2026-08-07T04:30:26.933625+00:00"
+}
