@@ -1,0 +1,106 @@
+{
+  "pipelines": [
+    {
+      "adapter_status_counts": {
+        "ok": 295
+      },
+      "command": "ecosystem_audit/_envs/lm_eval/bin/python ecosystem_audit/adapters/lm_eval.py --input <canonical-fixtures.jsonl> --output <results.jsonl> --repo ecosystem_audit/_repos/lm-evaluation-harness",
+      "pipeline_id": "gsm8k_flexible_extract",
+      "status_reasons": [],
+      "target": "lm-evaluation-harness"
+    },
+    {
+      "adapter_status_counts": {
+        "import_failed": 295
+      },
+      "command": "ecosystem_audit/_envs/opencompass/bin/python ecosystem_audit/adapters/opencompass.py --input <canonical-fixtures.jsonl> --output <results.jsonl> --repo ecosystem_audit/_repos/opencompass",
+      "pipeline_id": "gsm8k_last_number",
+      "status_reasons": [
+        "ModuleNotFoundError: No module named 'rouge_score'"
+      ],
+      "target": "opencompass"
+    },
+    {
+      "adapter_status_counts": {
+        "ok": 295
+      },
+      "command": "ecosystem_audit/_envs/helm/bin/python ecosystem_audit/adapters/helm.py --input <canonical-fixtures.jsonl> --output <results.jsonl> --repo ecosystem_audit/_repos/helm",
+      "pipeline_id": "math_chain_of_thought",
+      "status_reasons": [],
+      "target": "helm"
+    },
+    {
+      "adapter_status_counts": {
+        "not_applicable": 119,
+        "ok": 176
+      },
+      "command": "ecosystem_audit/_envs/inspect/bin/python ecosystem_audit/adapters/inspect_ai.py --input <canonical-fixtures.jsonl> --output <results.jsonl> --repo ecosystem_audit/_repos/inspect_ai",
+      "pipeline_id": "gsm8k_numeric_match",
+      "status_reasons": [
+        "gold_answer is not a finite numeric scalar"
+      ],
+      "target": "inspect_ai"
+    },
+    {
+      "adapter_status_counts": {
+        "not_applicable": 182,
+        "ok": 113
+      },
+      "command": "ecosystem_audit/_envs/inspect/bin/python ecosystem_audit/adapters/inspect_evals.py --input <canonical-fixtures.jsonl> --output <results.jsonl> --repo ecosystem_audit/_repos/inspect_evals",
+      "pipeline_id": "aime_last_line_numeric",
+      "status_reasons": [
+        "real fixture is not from the frozen AIME 2026 dataset"
+      ],
+      "target": "inspect_evals"
+    },
+    {
+      "adapter_status_counts": {
+        "ok": 295
+      },
+      "command": "ecosystem_audit/_envs/simple/bin/python ecosystem_audit/adapters/simple_evals.py --input <canonical-fixtures.jsonl> --output <results.jsonl> --repo ecosystem_audit/_repos/simple-evals",
+      "pipeline_id": "mgsm_answer_prefix",
+      "status_reasons": [],
+      "target": "simple-evals"
+    },
+    {
+      "adapter_status_counts": {
+        "ok": 295
+      },
+      "command": "ecosystem_audit/_envs/lighteval/bin/python ecosystem_audit/adapters/lighteval.py --input <canonical-fixtures.jsonl> --output <results.jsonl> --repo ecosystem_audit/_repos/lighteval",
+      "pipeline_id": "math_extractive_match",
+      "status_reasons": [],
+      "target": "lighteval"
+    },
+    {
+      "adapter_status_counts": {
+        "not_applicable": 119,
+        "ok": 176
+      },
+      "command": ".venv/bin/python ecosystem_audit/adapters/livebench.py --input <canonical-fixtures.jsonl> --output <results.jsonl> --repo ecosystem_audit/_repos/livebench",
+      "pipeline_id": "olympiad_expression",
+      "status_reasons": [
+        "non-integer gold_answer"
+      ],
+      "target": "livebench"
+    },
+    {
+      "adapter_status_counts": {
+        "ok": 295
+      },
+      "command": "ecosystem_audit/_envs/math_verify/bin/python ecosystem_audit/adapters/math_verify.py --input <canonical-fixtures.jsonl> --output <results.jsonl> --repo ecosystem_audit/_repos/math-verify",
+      "pipeline_id": "default_parse_verify",
+      "status_reasons": [],
+      "target": "math-verify"
+    },
+    {
+      "adapter_status_counts": {
+        "ok": 295
+      },
+      "command": "ecosystem_audit/_envs/matharena/bin/python ecosystem_audit/adapters/matharena.py --input <canonical-fixtures.jsonl> --output <results.jsonl> --repo ecosystem_audit/_repos/matharena",
+      "pipeline_id": "competition_extract_and_grade",
+      "status_reasons": [],
+      "target": "matharena"
+    }
+  ],
+  "schema_version": 1
+}

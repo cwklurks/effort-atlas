@@ -59,11 +59,11 @@ lines += [table(issue_rows,['Repository','Issue','Title','State','Created','Clos
 '## Receipt ledger','']
 for r in receipts:
     lines += [f"### {r['finding_id']}",'',r['claim'],'',
-              f"Repository: `{r['repository']}` at `{r['sha']}`  ",
-              f"Path: `{r['path']}` lines {r['line_start']}-{r['line_end']}  ",
-              f"Permalink: {r['permalink']}  ",
+              f"Repository: `{r['repository']}` at `{r['sha']}`",
+              f"Path: `{r['path']}` lines {r['line_start']}-{r['line_end']}",
+              f"Permalink: {r['permalink']}",
               f"Encoding/line endings: `{r['encoding']}` / `{r['line_ending']}`; generated file: `{str(r['generated_file']).lower()}`.",'',
-              '````text',r['quote'].rstrip('\r\n'),'````','']
+              '````json',json.dumps(r['quote'], ensure_ascii=False),'````','']
 lines += ['## Verification log','',
 'Phase 1 receipt gate: `.venv/bin/python ecosystem_audit/validate_receipts.py` (exit 0).','',
 'Full offline, strict, executable-reproduction, root-suite, and PR gates are recorded here only after they run successfully.','']
@@ -75,4 +75,10 @@ if timeline.exists():
     lines += ['## Git archaeology and era comparison','',
               f"`timeline.csv` contains {len(trows)} generated setting histories. Status counts: "+', '.join(f"{k}={v}" for k,v in sorted(status.items()))+'.','',
               'OpenAI o1 (`2024-09`) and DeepSeek R1 (`2025-01`) are supplied contextual era markers, not causal evidence. Each row preserves its exact history command and validation status.','']
+fields=['finding_id','target','category','claim','repository','sha','path','line_start','line_end','permalink','quote','status']
+with (ROOT/'audit_data.csv').open('w',newline='',encoding='utf-8') as handle:
+    writer=csv.DictWriter(handle,fieldnames=fields,lineterminator='\n');writer.writeheader()
+    for receipt in receipts:
+        row={key:receipt[key] for key in fields};row['quote']=json.dumps(row['quote'],ensure_ascii=False)
+        writer.writerow(row)
 (ROOT/'AUDIT.md').write_text('\n'.join(lines),encoding='utf-8')

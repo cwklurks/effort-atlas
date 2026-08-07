@@ -23,3 +23,14 @@
 - `math-verify`: generation finish fields were `not found at <tracked checkout paths searched>` using `git grep -n -E 'finish_reason|stop_reason|incomplete_details'`; this package accepts post-generation text.
 - `matharena`: literal `finish_reason` and `stop_reason` were `not found at <src, configs, scripts, app paths searched>`. Provider raw response logs may contain a signal, but the semantic result drops it and the scorer uses only a token-count heuristic.
 - Issue discovery used the requested combined terms against every locked repository and preserved the search result metadata in `issue_searches.json`. The four mandated anchors were fetched directly and independently into `issue_receipts.json`.
+
+## 2026-08-07 pre-execution applicability amendment
+
+Before any measured execution, candidate callables were narrowed to task-traced functions found during Phase 1. No rates had been observed. The amended `applicability.csv` preserves all ten named targets. Registered no-answer sentinels `[invalid]` (lm-eval) and `NULL` (OpenCompass) are classified as empty/no answer before measurement because the harnesses themselves use them for failed extraction. MathArena uses each real row's named competition config with `strict_parsing=false`; Inspect Evals is scoped to AIME real rows plus numeric synthetic rows; nonapplicable fixture rows remain explicit.
+
+## 2026-08-07 Phase 2 execution statuses
+
+- OpenCompass remained `import_failed`: importing the real registered dataset module through the pinned package ended at `ModuleNotFoundError: No module named 'rouge_score'` after the frozen dependency attempt. No percentage was synthesized.
+- The Inspect Evals AIME and LiveBench olympiad rows passed every applicable control and remain headline-eligible. lm-eval, HELM, Inspect AI, simple-evals, LightEval, math-verify, and MathArena each failed at least one applicable control; their measurements remain in `fixture_results.csv` with `control_disqualified` status and are excluded from the headline section.
+- Swallowed-error rates are `not_measured` except where the adapter manifest declares concrete logger/sentinel instrumentation. Per-fixture wall time is captured in ephemeral adapter timing logs; timing is excluded from committed deterministic result bytes.
+- The isolated environments and exact frozen package sets are under `ecosystem_audit/environments/`; install commands and dependency-lock hashes are in `adapter_manifest.json`.

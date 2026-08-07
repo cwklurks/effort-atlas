@@ -1,0 +1,360 @@
+{
+  "created_at": "2026-08-07T04:49:06.418251+00:00",
+  "no_model_calls": true,
+  "pipelines": [
+    {
+      "adapter_status_counts": {
+        "ok": 295
+      },
+      "applicability": "all rows with scalar gold; registered [invalid] sentinel is no answer",
+      "callable": "lm_eval.filters.extraction:RegexFilter.apply + lm_eval.api.metrics:exact_match_hf_evaluate",
+      "environment": {
+        "install_command": "uv venv --python 3.12 ecosystem_audit/_envs/lm_eval && uv pip install --python ecosystem_audit/_envs/lm_eval/bin/python -r ecosystem_audit/environments/lm_eval.requirements.txt && uv pip install --python ecosystem_audit/_envs/lm_eval/bin/python --no-deps -e ecosystem_audit/_repos/lm-evaluation-harness",
+        "interpreter": "ecosystem_audit/_envs/lm_eval/bin/python",
+        "lock_file": "ecosystem_audit/environments/lm_eval.requirements.txt",
+        "lock_sha256": "536d0974b700b7cf11c150cb0993469f7670f1b40485aedf403223e44af3e490"
+      },
+      "nonsemantic_marshaling": "text:str; gold_answer:str",
+      "pipeline_id": "gsm8k_flexible_extract",
+      "repository": "EleutherAI/lm-evaluation-harness",
+      "resource_ceiling": "512 MiB",
+      "sha": "f4d4b3de3ee6741a7151a9fe74945ee515262f4c",
+      "source_receipts": [
+        {
+          "finding_id": "F004",
+          "permalink": "https://github.com/EleutherAI/lm-evaluation-harness/blob/f4d4b3de3ee6741a7151a9fe74945ee515262f4c/lm_eval/tasks/gsm8k/gsm8k-cot.yaml#L46-L57"
+        },
+        {
+          "finding_id": "F005",
+          "permalink": "https://github.com/EleutherAI/lm-evaluation-harness/blob/f4d4b3de3ee6741a7151a9fe74945ee515262f4c/lm_eval/filters/extraction.py#L39-L58"
+        }
+      ],
+      "status": "control_disqualified",
+      "status_reasons": [],
+      "swallowed_error_observable": false,
+      "target": "lm-evaluation-harness",
+      "task_or_config": "lm_eval/tasks/gsm8k/gsm8k.yaml flexible-extract",
+      "timeout_seconds": 10,
+      "timing": "per-fixture wall duration captured in ephemeral .timings.jsonl and excluded from deterministic committed outputs"
+    },
+    {
+      "adapter_status_counts": {
+        "import_failed": 295
+      },
+      "applicability": "numeric-compatible gold; registered NULL sentinel is no answer",
+      "callable": "opencompass.datasets.gsm8k:gsm8k_postprocess + Gsm8kEvaluator.score",
+      "environment": {
+        "install_command": "uv venv --python 3.12 ecosystem_audit/_envs/opencompass && uv pip install --python ecosystem_audit/_envs/opencompass/bin/python -r ecosystem_audit/environments/opencompass.requirements.txt && uv pip install --python ecosystem_audit/_envs/opencompass/bin/python --no-deps -e ecosystem_audit/_repos/opencompass",
+        "interpreter": "ecosystem_audit/_envs/opencompass/bin/python",
+        "lock_file": "ecosystem_audit/environments/opencompass.requirements.txt",
+        "lock_sha256": "1bbea84fc9aacff6eb90b6dd84836e3e108c6f2edc052d2a84331a79ff4bc3f3"
+      },
+      "nonsemantic_marshaling": "text:str; numeric gold_answer:str",
+      "pipeline_id": "gsm8k_last_number",
+      "repository": "open-compass/opencompass",
+      "resource_ceiling": "1 GiB",
+      "sha": "96263b1a16899260586c8e945eea06934c43c225",
+      "source_receipts": [
+        {
+          "finding_id": "F065",
+          "permalink": "https://github.com/open-compass/opencompass/blob/96263b1a16899260586c8e945eea06934c43c225/opencompass/datasets/gsm8k.py#L43-L79"
+        },
+        {
+          "finding_id": "F066",
+          "permalink": "https://github.com/open-compass/opencompass/blob/96263b1a16899260586c8e945eea06934c43c225/opencompass/configs/datasets/gsm8k/gsm8k_gen_1d7fe4.py#L23-L31"
+        }
+      ],
+      "status": "import_failed",
+      "status_reasons": [
+        "ModuleNotFoundError: No module named 'rouge_score'"
+      ],
+      "swallowed_error_observable": false,
+      "target": "opencompass",
+      "task_or_config": "configs/datasets/gsm8k/gsm8k_gen_1d7fe4.py",
+      "timeout_seconds": 10,
+      "timing": "per-fixture wall duration captured in ephemeral .timings.jsonl and excluded from deterministic committed outputs"
+    },
+    {
+      "adapter_status_counts": {
+        "ok": 295
+      },
+      "applicability": "all scalar-gold rows",
+      "callable": "helm.benchmark.scenarios.math_scenario:get_answer + is_equiv",
+      "environment": {
+        "install_command": "uv venv --python 3.12 ecosystem_audit/_envs/helm && uv pip install --python ecosystem_audit/_envs/helm/bin/python -r ecosystem_audit/environments/helm.requirements.txt && uv pip install --python ecosystem_audit/_envs/helm/bin/python --no-deps -e ecosystem_audit/_repos/helm",
+        "interpreter": "ecosystem_audit/_envs/helm/bin/python",
+        "lock_file": "ecosystem_audit/environments/helm.requirements.txt",
+        "lock_sha256": "20f53789496b1cca7a6e8787c17c9928507d0ff9c9b4801b43711a0f3a7cd1c1"
+      },
+      "nonsemantic_marshaling": "text:str; gold_answer:str",
+      "pipeline_id": "math_chain_of_thought",
+      "repository": "stanford-crfm/helm",
+      "resource_ceiling": "1 GiB",
+      "sha": "63754d05db6f874e41a395880fb573890a13e791",
+      "source_receipts": [
+        {
+          "finding_id": "F039",
+          "permalink": "https://github.com/eth-sri/matharena/blob/a11194deff8c67a232974a383795e8a2776b4c6f/src/matharena/grader.py#L152-L189"
+        },
+        {
+          "finding_id": "F057",
+          "permalink": "https://github.com/stanford-crfm/helm/blob/63754d05db6f874e41a395880fb573890a13e791/src/helm/benchmark/metrics/evaluate_reference_metrics.py#L145-L161"
+        }
+      ],
+      "status": "control_disqualified",
+      "status_reasons": [],
+      "swallowed_error_observable": false,
+      "target": "helm",
+      "task_or_config": "src/helm/benchmark/run_specs/lite_run_specs.py MATH CoT",
+      "timeout_seconds": 10,
+      "timing": "per-fixture wall duration captured in ephemeral .timings.jsonl and excluded from deterministic committed outputs"
+    },
+    {
+      "adapter_status_counts": {
+        "not_applicable": 119,
+        "ok": 176
+      },
+      "applicability": "numeric-compatible gold rows",
+      "callable": "inspect_ai.scorer:match(numeric=True)",
+      "environment": {
+        "install_command": "uv venv --python 3.12 ecosystem_audit/_envs/inspect && uv pip install --python ecosystem_audit/_envs/inspect/bin/python -r ecosystem_audit/environments/inspect.requirements.txt && uv pip install --python ecosystem_audit/_envs/inspect/bin/python --no-deps -e ecosystem_audit/_repos/inspect_ai",
+        "interpreter": "ecosystem_audit/_envs/inspect/bin/python",
+        "lock_file": "ecosystem_audit/environments/inspect.requirements.txt",
+        "lock_sha256": "3e15913683bdd7cc3861ea5a487165e247e8a68d7bb9e14e9c4b109b9556ade4"
+      },
+      "nonsemantic_marshaling": "text:str; numeric gold_answer:str",
+      "pipeline_id": "gsm8k_numeric_match",
+      "repository": "UKGovernmentBEIS/inspect_ai",
+      "resource_ceiling": "1 GiB",
+      "sha": "f10dc46f20df0738a9acbfb4c4be0bd3d60601ed",
+      "source_receipts": [
+        {
+          "finding_id": "F063",
+          "permalink": "https://github.com/UKGovernmentBEIS/inspect_ai/blob/f10dc46f20df0738a9acbfb4c4be0bd3d60601ed/src/inspect_ai/scorer/_common.py#L59-L83"
+        },
+        {
+          "finding_id": "F064",
+          "permalink": "https://github.com/UKGovernmentBEIS/inspect_evals/blob/b31daf3f6f74ce48cb905d185a4c2afc524205b2/src/inspect_evals/gsm8k/gsm8k.py#L78-L91"
+        }
+      ],
+      "status": "control_disqualified",
+      "status_reasons": [
+        "gold_answer is not a finite numeric scalar"
+      ],
+      "swallowed_error_observable": false,
+      "target": "inspect_ai",
+      "task_or_config": "inspect_evals/gsm8k",
+      "timeout_seconds": 10,
+      "timing": "per-fixture wall duration captured in ephemeral .timings.jsonl and excluded from deterministic committed outputs"
+    },
+    {
+      "adapter_status_counts": {
+        "not_applicable": 182,
+        "ok": 113
+      },
+      "applicability": "real dataset aime_2026_outputs plus integer synthetic fixtures",
+      "callable": "inspect_evals.utils.aime_common:aime_scorer",
+      "environment": {
+        "install_command": "uv venv --python 3.12 ecosystem_audit/_envs/inspect && uv pip install --python ecosystem_audit/_envs/inspect/bin/python -r ecosystem_audit/environments/inspect.requirements.txt && uv pip install --python ecosystem_audit/_envs/inspect/bin/python --no-deps -e ecosystem_audit/_repos/inspect_ai -e ecosystem_audit/_repos/inspect_evals",
+        "interpreter": "ecosystem_audit/_envs/inspect/bin/python",
+        "lock_file": "ecosystem_audit/environments/inspect.requirements.txt",
+        "lock_sha256": "3e15913683bdd7cc3861ea5a487165e247e8a68d7bb9e14e9c4b109b9556ade4"
+      },
+      "nonsemantic_marshaling": "text:str; integer gold_answer:str; dataset AIME or synthetic",
+      "pipeline_id": "aime_last_line_numeric",
+      "repository": "UKGovernmentBEIS/inspect_evals",
+      "resource_ceiling": "1 GiB",
+      "sha": "b31daf3f6f74ce48cb905d185a4c2afc524205b2",
+      "source_receipts": [
+        {
+          "finding_id": "F020",
+          "permalink": "https://github.com/UKGovernmentBEIS/inspect_evals/blob/b31daf3f6f74ce48cb905d185a4c2afc524205b2/src/inspect_evals/utils/aime_common.py#L37-L59"
+        }
+      ],
+      "status": "ok",
+      "status_reasons": [
+        "real fixture is not from the frozen AIME 2026 dataset"
+      ],
+      "swallowed_error_observable": false,
+      "target": "inspect_evals",
+      "task_or_config": "inspect_evals/aime2026",
+      "timeout_seconds": 10,
+      "timing": "per-fixture wall duration captured in ephemeral .timings.jsonl and excluded from deterministic committed outputs"
+    },
+    {
+      "adapter_status_counts": {
+        "ok": 295
+      },
+      "applicability": "numeric-compatible gold rows",
+      "callable": "mgsm_eval:parse_answer + score_mgsm",
+      "environment": {
+        "install_command": "uv venv --python 3.12 ecosystem_audit/_envs/simple && uv pip install --python ecosystem_audit/_envs/simple/bin/python -r ecosystem_audit/environments/simple.requirements.txt",
+        "interpreter": "ecosystem_audit/_envs/simple/bin/python",
+        "lock_file": "ecosystem_audit/environments/simple.requirements.txt",
+        "lock_sha256": "cbee1d8569567c4bdc1c124c6799818713f6d87b906d797c01acf7f4afd97ac6"
+      },
+      "nonsemantic_marshaling": "text:str; numeric gold_answer:str",
+      "pipeline_id": "mgsm_answer_prefix",
+      "repository": "openai/simple-evals",
+      "resource_ceiling": "512 MiB",
+      "sha": "652c89d0ca9df547706735883097e9537d40dc47",
+      "source_receipts": [
+        {
+          "finding_id": "F059",
+          "permalink": "https://github.com/openai/simple-evals/blob/652c89d0ca9df547706735883097e9537d40dc47/mgsm_eval.py#L83-L100"
+        },
+        {
+          "finding_id": "F060",
+          "permalink": "https://github.com/openai/simple-evals/blob/652c89d0ca9df547706735883097e9537d40dc47/mgsm_eval.py#L154-L181"
+        }
+      ],
+      "status": "control_disqualified",
+      "status_reasons": [],
+      "swallowed_error_observable": false,
+      "target": "simple-evals",
+      "task_or_config": "mgsm_eval English Answer: prefix",
+      "timeout_seconds": 10,
+      "timing": "per-fixture wall duration captured in ephemeral .timings.jsonl and excluded from deterministic committed outputs"
+    },
+    {
+      "adapter_status_counts": {
+        "ok": 295
+      },
+      "applicability": "all scalar-gold rows",
+      "callable": "lighteval.metrics.utils.extractive_match_utils:extract_target_from_pred",
+      "environment": {
+        "install_command": "uv venv --python 3.12 ecosystem_audit/_envs/lighteval && uv pip install --python ecosystem_audit/_envs/lighteval/bin/python -r ecosystem_audit/environments/lighteval.requirements.txt && uv pip install --python ecosystem_audit/_envs/lighteval/bin/python --no-deps -e ecosystem_audit/_repos/lighteval",
+        "interpreter": "ecosystem_audit/_envs/lighteval/bin/python",
+        "lock_file": "ecosystem_audit/environments/lighteval.requirements.txt",
+        "lock_sha256": "5dd26674f3abf6518c866092a5a8b6a1b673af396cbc4bf25b115f137b79a044"
+      },
+      "nonsemantic_marshaling": "text:str; scalar gold_answer:str",
+      "pipeline_id": "math_extractive_match",
+      "repository": "huggingface/lighteval",
+      "resource_ceiling": "1 GiB",
+      "sha": "64f4f5ae173626509fad6e477ca4ee56ebb26129",
+      "source_receipts": [
+        {
+          "finding_id": "F029",
+          "permalink": "https://github.com/huggingface/lighteval/blob/64f4f5ae173626509fad6e477ca4ee56ebb26129/src/lighteval/metrics/utils/extractive_match_utils.py#L590-L632"
+        }
+      ],
+      "status": "control_disqualified",
+      "status_reasons": [],
+      "swallowed_error_observable": false,
+      "target": "lighteval",
+      "task_or_config": "Metrics.expr_gold_metric extraction configuration",
+      "timeout_seconds": 10,
+      "timing": "per-fixture wall duration captured in ephemeral .timings.jsonl and excluded from deterministic committed outputs"
+    },
+    {
+      "adapter_status_counts": {
+        "not_applicable": 119,
+        "ok": 176
+      },
+      "applicability": "integer or comma-separated-integer gold rows",
+      "callable": "livebench.process_results.math.olympiad.utils:extract_expression_completions_from_generation + proof_rearrangement_process_results",
+      "environment": {
+        "install_command": "uv pip install --python .venv/bin/python -r requirements.txt",
+        "interpreter": ".venv/bin/python",
+        "lock_file": "requirements.txt",
+        "lock_sha256": "d795fe06fbd4f827928275767e2f812273d2db4cf2e774771ee90310209e376f"
+      },
+      "nonsemantic_marshaling": "text:str; comma-separated integer gold_answer",
+      "pipeline_id": "olympiad_expression",
+      "repository": "LiveBench/LiveBench",
+      "resource_ceiling": "512 MiB",
+      "sha": "00eae856aa1c1a9e9d058a65a9a94d85884034c4",
+      "source_receipts": [
+        {
+          "finding_id": "F067",
+          "permalink": "https://github.com/LiveBench/LiveBench/blob/00eae856aa1c1a9e9d058a65a9a94d85884034c4/livebench/process_results/math/olympiad/utils.py#L27-L129"
+        }
+      ],
+      "status": "ok",
+      "status_reasons": [
+        "non-integer gold_answer"
+      ],
+      "swallowed_error_observable": true,
+      "target": "livebench",
+      "task_or_config": "LiveBench olympiad proof rearrangement edit_distance=True",
+      "timeout_seconds": 10,
+      "timing": "per-fixture wall duration captured in ephemeral .timings.jsonl and excluded from deterministic committed outputs"
+    },
+    {
+      "adapter_status_counts": {
+        "ok": 295
+      },
+      "applicability": "gold parses with actual Latex+Expr parser",
+      "callable": "math_verify:parse + verify",
+      "environment": {
+        "install_command": "uv venv --python 3.12 ecosystem_audit/_envs/math_verify && uv pip install --python ecosystem_audit/_envs/math_verify/bin/python -r ecosystem_audit/environments/math_verify.requirements.txt && uv pip install --python ecosystem_audit/_envs/math_verify/bin/python --no-deps -e ecosystem_audit/_repos/math-verify",
+        "interpreter": "ecosystem_audit/_envs/math_verify/bin/python",
+        "lock_file": "ecosystem_audit/environments/math_verify.requirements.txt",
+        "lock_sha256": "2f369364c734b9177aa85870f11a2aa50f092125c6d9a5a5e21f2838a50b5cac"
+      },
+      "nonsemantic_marshaling": "text:str; scalar gold_answer:str",
+      "pipeline_id": "default_parse_verify",
+      "repository": "huggingface/Math-Verify",
+      "resource_ceiling": "1 GiB",
+      "sha": "ba3d3aaff23b3f4cac7a14672b4f6e293d97c98b",
+      "source_receipts": [
+        {
+          "finding_id": "F034",
+          "permalink": "https://github.com/huggingface/Math-Verify/blob/ba3d3aaff23b3f4cac7a14672b4f6e293d97c98b/src/math_verify/parser.py#L649-L682"
+        },
+        {
+          "finding_id": "F035",
+          "permalink": "https://github.com/huggingface/Math-Verify/blob/ba3d3aaff23b3f4cac7a14672b4f6e293d97c98b/src/math_verify/parser.py#L700-L706"
+        },
+        {
+          "finding_id": "F036",
+          "permalink": "https://github.com/huggingface/Math-Verify/blob/ba3d3aaff23b3f4cac7a14672b4f6e293d97c98b/src/math_verify/grader.py#L755-L773"
+        }
+      ],
+      "status": "control_disqualified",
+      "status_reasons": [],
+      "swallowed_error_observable": true,
+      "target": "math-verify",
+      "task_or_config": "public default Latex+Expr parser; generic isolated utility",
+      "timeout_seconds": 10,
+      "timing": "per-fixture wall duration captured in ephemeral .timings.jsonl and excluded from deterministic committed outputs"
+    },
+    {
+      "adapter_status_counts": {
+        "ok": 295
+      },
+      "applicability": "all real rows and integer synthetic rows",
+      "callable": "matharena.grader:extract_and_grade",
+      "environment": {
+        "install_command": "uv venv --python 3.12 ecosystem_audit/_envs/matharena && uv pip install --python ecosystem_audit/_envs/matharena/bin/python -r ecosystem_audit/environments/matharena.requirements.txt",
+        "interpreter": "ecosystem_audit/_envs/matharena/bin/python",
+        "lock_file": "ecosystem_audit/environments/matharena.requirements.txt",
+        "lock_sha256": "5a8feb9f12c4aef27e7b482e83537c9c2c6420ea0235ed45790f2ea49ef28ff4"
+      },
+      "nonsemantic_marshaling": "text:str; output_tokens:int; gold_answer:str",
+      "pipeline_id": "competition_extract_and_grade",
+      "repository": "eth-sri/matharena",
+      "resource_ceiling": "1 GiB",
+      "sha": "a11194deff8c67a232974a383795e8a2776b4c6f",
+      "source_receipts": [
+        {
+          "finding_id": "F038",
+          "permalink": "https://github.com/eth-sri/matharena/blob/a11194deff8c67a232974a383795e8a2776b4c6f/src/matharena/parser.py#L346-L395"
+        },
+        {
+          "finding_id": "F039",
+          "permalink": "https://github.com/eth-sri/matharena/blob/a11194deff8c67a232974a383795e8a2776b4c6f/src/matharena/grader.py#L152-L189"
+        }
+      ],
+      "status": "control_disqualified",
+      "status_reasons": [],
+      "swallowed_error_observable": false,
+      "target": "matharena",
+      "task_or_config": "dataset-matched AIME/BRUMO/HMMT configs, strict_parsing=false",
+      "timeout_seconds": 10,
+      "timing": "per-fixture wall duration captured in ephemeral .timings.jsonl and excluded from deterministic committed outputs"
+    }
+  ],
+  "schema_version": 1
+}
