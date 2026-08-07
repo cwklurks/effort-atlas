@@ -68,6 +68,8 @@ print(report_to_markdown(report))
 print(results_to_csv(report))
 ```
 
+For a committed adapter ledger, `summarize_results(...)` accepts validated `Result` records and applies the identical metric/control-disqualification contract without rerunning the external callable. The ecosystem audit uses this API as an independent metric check.
+
 The report includes:
 
 - `answer_returned_after_truncation_pct`, with `fabrication_pct` as an explicitly

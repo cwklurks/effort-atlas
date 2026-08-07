@@ -5,7 +5,7 @@ from collections import Counter
 from pathlib import Path
 ROOT=Path(__file__).resolve().parents[1];A=ROOT/'ecosystem_audit'
 sys.path.insert(0,str(ROOT/'trunccheck/src'))
-from trunccheck import fixtures_to_jsonl,generate_synthetic_fixtures,load_real_fixtures
+from trunccheck import Result,fixtures_to_jsonl,generate_synthetic_fixtures,load_real_fixtures,summarize_results
 
 def main():
     synth=(A/'synthetic_fixtures.jsonl').read_bytes(); expected=fixtures_to_jsonl(generate_synthetic_fixtures(1729))
@@ -28,6 +28,32 @@ def main():
     expected_metrics=module.calculate_metrics(results,app)
     with (A/'pipeline_metrics.csv').open(newline='',encoding='utf-8') as f:metrics=list(csv.DictReader(f))
     assert metrics==expected_metrics,'metric recalculation differs'
+    def optional_bool(value): return None if value=='' else value.lower()=='true'
+    for config in app:
+        subset=[r for r in results if r['pipeline_id']==config['pipeline_id'] and r['adapter_status']=='ok' and r['applicable']=='true']
+        if not subset: continue
+        observed=[Result(
+            fixture_id=r['fixture_id'],kind=r['kind'],stratum=r['stratum'],
+            extracted_answer=r['extracted_answer'] or None,answer_returned=r['answer_returned']=='true',
+            escaped_exception_class=r['exception_class'] or None,escaped_exception_message=r['exception_message'] or None,
+            swallowed_error=optional_bool(r['swallowed_error_observed']),scored_correct=optional_bool(r['native_correct']),
+        ) for r in subset]
+        report=summarize_results(
+            observed,pipeline=config['pipeline_id'],
+            scorer_measured=any(r['native_correct']!='' for r in subset),
+            swallowed_error_measured=any(r['swallowed_error_observed']!='' for r in subset),
+        )
+        expected={(r['metric'],r['stratum']):(int(r['numerator']) if r['numerator'] else None,int(r['denominator']) if r['denominator'] else None,r['metric_status']) for r in metrics if r['pipeline_id']==config['pipeline_id']}
+        actual={}
+        for metric in report.metrics:
+            if metric.name=='control_answer_returned_pct': continue
+            name=metric.name;stratum='combined'
+            for suffix,label in (('_real_truncated','real'),('_synthetic_truncated','synthetic')):
+                if name.endswith(suffix): name=name[:-len(suffix)];stratum=label
+            if name=='control_pass_pct': stratum='control'
+            actual[(name,stratum)]=(metric.numerator,metric.denominator,metric.status)
+        assert actual==expected,(config['pipeline_id'],'trunccheck metric validation differs')
+        assert report.status==next(r['pipeline_status'] for r in metrics if r['pipeline_id']==config['pipeline_id'])
     entries=module.locked();assert (A/'results_table.md').read_text()==module.markdown(metrics,entries)
     statuses={r['pipeline_id']:r['pipeline_status'] for r in metrics}
     md=(A/'results_table.md').read_text()
@@ -36,5 +62,5 @@ def main():
             assert f'| {pipeline} | control_disqualified |' in md
             headline=md.split('## Headline-eligible pipeline rows',1)[1].split('## Locked repositories',1)[0]
             assert f'| {pipeline} |' not in headline
-    print(f'phase 2 verified: {len(results)} fixture-pipeline rows; synthetic sha256={hashlib.sha256(synth).hexdigest()}')
+    print(f'phase 2 verified with trunccheck: {len(results)} fixture-pipeline rows; synthetic sha256={hashlib.sha256(synth).hexdigest()}')
 if __name__=='__main__':main()

@@ -24,6 +24,19 @@ for pipeline in pipelines:
     if command not in seen:
         subprocess.run(command,shell=True,check=True);seen.add(command)
 PY
+# Reconstruct ignored, metadata-only root test inputs from committed preflight schedules.
+python3 - <<'PY'
+import json
+from pathlib import Path
+root=Path.cwd();items={}
+for path in (root/'confirmatory_artifacts/preflight-2026-07-22').glob('*_schedule.json'):
+    for job in json.loads(path.read_text())['jobs']:
+        items[job['item_id']]=job['domain']
+data=root/'data';data.mkdir(exist_ok=True)
+for domain in ('math','extraction'):
+    selected=sorted((item,value) for item,value in items.items() if value==domain)
+    (data/f'{domain}.jsonl').write_text(''.join(json.dumps({'id':item,'domain':value},sort_keys=True)+'\n' for item,value in selected))
+PY
 PYTHONPATH=trunccheck/src .venv/bin/python -m unittest discover -s trunccheck/tests -v
 .venv/bin/python ecosystem_audit/run_executable_audit.py --locked --seed 1729 --check
 .venv/bin/python ecosystem_audit/verify.py --strict

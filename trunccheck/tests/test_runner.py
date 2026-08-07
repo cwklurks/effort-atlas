@@ -1,6 +1,6 @@
 import unittest
 
-from trunccheck import Fixture, run_check
+from trunccheck import Fixture, Result, run_check, summarize_results
 
 
 def truncated(identifier, text="work", gold="7", stratum="real_truncated"):
@@ -88,3 +88,15 @@ class RunnerTests(unittest.TestCase):
         report = run_check(lambda text: "1", fixtures)
         self.assertEqual(report.metric("fabrication_pct_real_truncated").denominator, 1)
         self.assertEqual(report.metric("fabrication_pct_synthetic_truncated").denominator, 1)
+
+    def test_summarize_observed_results_matches_runner_contract(self):
+        observed = (
+            Result("cut", "truncated", "real_truncated", "42", True, scored_correct=True),
+            Result("control", "control_correct", "finished_control", "42", True, scored_correct=False),
+        )
+        report = summarize_results(
+            observed, pipeline="ledger", scorer_measured=True, swallowed_error_measured=False
+        )
+        self.assertEqual(report.status, "control_disqualified")
+        answer = next(metric for metric in report.metrics if metric.name == "answer_returned_after_truncation_pct")
+        self.assertEqual((answer.numerator, answer.denominator, answer.percent), (1, 1, 100.0))

@@ -163,33 +163,53 @@ def run_check(
             )
         )
 
+    name = pipeline or getattr(extractor, "__qualname__", getattr(extractor, "__name__", "extractor"))
+    return summarize_results(
+        results, pipeline=str(name), scorer_measured=scorer is not None,
+        swallowed_error_measured=swallowed_error_hook is not None,
+    )
+
+
+def summarize_results(
+    results: Iterable[Result], *, pipeline: str, scorer_measured: bool,
+    swallowed_error_measured: bool,
+) -> Report:
+    """Summarize observed results with the same metric contract as ``run_check``.
+
+    Applicability filtering must happen before this call. No missing row or error
+    signal is inferred, so this can validate a committed adapter ledger.
+    """
+    if not isinstance(pipeline, str) or not pipeline:
+        raise ValueError("pipeline must be a non-empty string")
+    if type(scorer_measured) is not bool or type(swallowed_error_measured) is not bool:
+        raise TypeError("measurement flags must be bool")
     result_tuple = tuple(results)
+    if not all(isinstance(item, Result) for item in result_tuple):
+        raise TypeError("results must contain Result instances")
+    ids = [item.fixture_id for item in result_tuple]
+    if len(ids) != len(set(ids)):
+        raise ValueError("result fixture IDs must be unique")
     truncated = tuple(result for result in result_tuple if result.kind == "truncated")
     metrics = _metric_group(
-        truncated, suffix="", scorer_measured=scorer is not None,
-        swallowed_measured=swallowed_error_hook is not None,
+        truncated, suffix="", scorer_measured=scorer_measured,
+        swallowed_measured=swallowed_error_measured,
     )
     for stratum in ("real_truncated", "synthetic_truncated"):
         selected = tuple(result for result in truncated if result.stratum == stratum)
         if selected:
-            metrics.extend(
-                _metric_group(
-                    selected, suffix=stratum, scorer_measured=scorer is not None,
-                    swallowed_measured=swallowed_error_hook is not None,
-                )
-            )
+            metrics.extend(_metric_group(
+                selected, suffix=stratum, scorer_measured=scorer_measured,
+                swallowed_measured=swallowed_error_measured,
+            ))
     controls = tuple(result for result in result_tuple if result.kind == "control_correct")
     metrics.append(_metric("control_answer_returned_pct", (r.answer_returned for r in controls)))
     metrics.append(
         _metric("control_pass_pct", (r.scored_correct is True for r in controls))
-        if scorer is not None
-        else _not_measured("control_pass_pct")
+        if scorer_measured else _not_measured("control_pass_pct")
     )
-    disqualified = scorer is not None and any(result.scored_correct is not True for result in controls)
-    name = pipeline or getattr(extractor, "__qualname__", getattr(extractor, "__name__", "extractor"))
+    disqualified = scorer_measured and any(result.scored_correct is not True for result in controls)
     return Report(
-        pipeline=str(name),
+        pipeline=pipeline,
         status="control_disqualified" if disqualified else "ok",
-        metrics=tuple(metrics),
-        results=result_tuple,
+        metrics=tuple(metrics), results=result_tuple,
     )
