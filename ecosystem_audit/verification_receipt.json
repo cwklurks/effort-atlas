@@ -1,0 +1,27 @@
+{
+  "commands": [
+    {
+      "command": "PYTHONPATH=trunccheck/src .venv/bin/python -m unittest discover -s trunccheck/tests -v",
+      "exit_status": 0,
+      "observation": "27 tests passed"
+    },
+    {
+      "command": ".venv/bin/python ecosystem_audit/run_executable_audit.py --locked --seed 1729 --check",
+      "exit_status": 0,
+      "observation": "two independent regenerations were byte-identical and matched committed outputs"
+    },
+    {
+      "command": ".venv/bin/python ecosystem_audit/verify.py --strict",
+      "exit_status": 0,
+      "observation": "10 targets and 2,950 fixture-pipeline rows verified; full-history clones and receipts checked"
+    },
+    {
+      "command": "MPLCONFIGDIR=/tmp/effort-atlas-mpl PYTHONPATH=src .venv/bin/python -m unittest discover -s tests -v",
+      "exit_status": 0,
+      "observation": "40 unittest-style tests passed; pre-existing pytest-style tests/test_rescue_analysis.py was not collected"
+    }
+  ],
+  "completed_at": "2026-08-07T05:11:00.934607+00:00",
+  "compound_gate_exit_status": 0,
+  "schema_version": 1
+}

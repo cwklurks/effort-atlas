@@ -65,8 +65,16 @@ for r in receipts:
               f"Encoding/line endings: `{r['encoding']}` / `{r['line_ending']}`; generated file: `{str(r['generated_file']).lower()}`.",'',
               '````json',json.dumps(r['quote'], ensure_ascii=False),'````','']
 lines += ['## Verification log','',
-'Phase 1 receipt gate: `.venv/bin/python ecosystem_audit/validate_receipts.py` (exit 0).','',
-'Full offline, strict, executable-reproduction, root-suite, and PR gates are recorded here only after they run successfully.','']
+'Phase 1 receipt gate: `.venv/bin/python ecosystem_audit/validate_receipts.py` (exit 0).','']
+verification=ROOT/'verification_receipt.json'
+if verification.exists():
+    gate=json.loads(verification.read_text())
+    lines += [f"Recorded compound gate exit status: `{gate['compound_gate_exit_status']}` at `{gate['completed_at']}`.",'']
+    for result in gate['commands']:
+        lines += [f"- `{result['command']}` — exit `{result['exit_status']}`; {result['observation']}."]
+    lines += ['']
+else:
+    lines += ['Full offline, strict, executable-reproduction, and root-suite gates have not yet been recorded.','']
 # Phase 3 appends generated narrative when available.
 timeline=ROOT/'timeline.csv'
 if timeline.exists():

@@ -1002,7 +1002,12 @@ Encoding/line endings: `utf-8` / `LF`; generated file: `false`.
 
 Phase 1 receipt gate: `.venv/bin/python ecosystem_audit/validate_receipts.py` (exit 0).
 
-Full offline, strict, executable-reproduction, root-suite, and PR gates are recorded here only after they run successfully.
+Recorded compound gate exit status: `0` at `2026-08-07T05:11:00.934607+00:00`.
+
+- `PYTHONPATH=trunccheck/src .venv/bin/python -m unittest discover -s trunccheck/tests -v` — exit `0`; 27 tests passed.
+- `.venv/bin/python ecosystem_audit/run_executable_audit.py --locked --seed 1729 --check` — exit `0`; two independent regenerations were byte-identical and matched committed outputs.
+- `.venv/bin/python ecosystem_audit/verify.py --strict` — exit `0`; 10 targets and 2,950 fixture-pipeline rows verified; full-history clones and receipts checked.
+- `MPLCONFIGDIR=/tmp/effort-atlas-mpl PYTHONPATH=src .venv/bin/python -m unittest discover -s tests -v` — exit `0`; 40 unittest-style tests passed; pre-existing pytest-style tests/test_rescue_analysis.py was not collected.
 
 ## Git archaeology and era comparison
 

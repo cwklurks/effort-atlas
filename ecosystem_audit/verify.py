@@ -6,7 +6,7 @@ from collections import Counter
 from pathlib import Path
 ROOT=Path(__file__).resolve().parents[1];A=ROOT/'ecosystem_audit';REAL=ROOT/'observational/real_truncated_fixtures.jsonl.gz'
 REAL_SHA='b84adb85eccd6b628829cdadb71c29fa25eb4dc0a37d387f554464b312d96f43'
-REQUIRED=['AUDIT.md','audit_data.csv','results_table.md','fixture_results.csv','pipeline_metrics.csv','timeline.csv','GAPS.md','repos.lock.json','receipt_index.json','adapter_manifest.json','execution_log.json','synthetic_fixtures.jsonl','run_executable_audit.py','validate_receipts.py','validate_timeline.py']
+REQUIRED=['AUDIT.md','audit_data.csv','results_table.md','fixture_results.csv','pipeline_metrics.csv','timeline.csv','GAPS.md','repos.lock.json','receipt_index.json','adapter_manifest.json','execution_log.json','synthetic_fixtures.jsonl','run_executable_audit.py','verification_receipt.json','validate_receipts.py','validate_timeline.py']
 
 def command(args,check=True):
     result=subprocess.run(args,cwd=ROOT,capture_output=True,text=True)
