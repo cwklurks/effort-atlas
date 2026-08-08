@@ -1,0 +1,30 @@
+{
+  "schema_version": "grader-v2-acceptance-v1",
+  "derivation": "For each named exploratory archive, select rows where completion_tokens == 4096. Project each selected response to only complete lines beginning with the configured Final answer terminator. The projection is empty for all selected rows. No response, reasoning, prompt, gold-answer, or extracted-answer text is retained.",
+  "sources": [
+    {
+      "path": "results/sweep_real_20260719_154609.jsonl",
+      "sha256": "27cd36d5a44dc428baaeb6dfe8479a3574490ba5b4bb6b328cb6f0d3902eb4fa",
+      "bytes": 1337311,
+      "line_count": 150,
+      "domain": "math",
+      "grader": "numeric",
+      "completion_tokens": 4096,
+      "affected_source_lines": [4, 7, 9, 10, 14, 17, 22, 30, 34, 37, 39, 40, 41, 42, 44, 47, 52, 58, 60, 64, 67, 69, 70, 71, 72, 74, 77, 78, 84, 86, 88, 90, 94, 96, 97, 99, 100, 101, 102, 103, 104, 107, 108, 112, 114, 116, 118, 120, 124, 127, 129, 130, 131, 132, 133, 134, 135, 136, 137, 138, 140, 141, 142, 144, 146, 148, 149, 150],
+      "terminator_projection": "",
+      "legacy_empty_extractions": 0
+    },
+    {
+      "path": "results/sweep_real_20260719_172721.jsonl",
+      "sha256": "c72bcf9a90a3d5d545ad9a3b368256c3edb14addcd4c725b5523862d38e3fcad",
+      "bytes": 443856,
+      "line_count": 150,
+      "domain": "knowledge",
+      "grader": "exact_field",
+      "completion_tokens": 4096,
+      "affected_source_lines": [105, 117, 122, 125, 129, 133, 134, 135, 137, 147],
+      "terminator_projection": "",
+      "legacy_empty_extractions": 0
+    }
+  ]
+}
