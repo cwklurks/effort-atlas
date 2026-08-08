@@ -38,16 +38,25 @@ class RescueAnalysisTests(unittest.TestCase):
         old = [
             old_row("primary", extracted_answer_present=False),
             old_row("grade-transition", extracted_answer_present=True),
+            old_row("not-normal", extracted_answer_present=False),
         ]
-        rescue = [rescue_row("primary"), rescue_row("grade-transition")]
+        rescue = [
+            rescue_row("primary"),
+            rescue_row("grade-transition"),
+            rescue_row("not-normal", finish_reason="tool_calls"),
+        ]
 
         pairs = classify_pairs(old, rescue, "math", "max", 20000)
 
         self.assertEqual(
             [pair["status"] for pair in pairs],
-            ["answer_present_grade_transition", "primary_answer_rescue"],
+            [
+                "answer_present_grade_transition",
+                "other_terminal",
+                "primary_answer_rescue",
+            ],
         )
-        self.assertFalse(pairs[1]["old_extracted_answer_present"])
+        self.assertFalse(pairs[2]["old_extracted_answer_present"])
 
     def test_classify_pairs_separates_unaccounted_and_missing(self):
         old = [old_row(item_id, extracted_answer_present=False) for item_id in ["a", "b", "c"]]

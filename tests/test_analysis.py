@@ -285,6 +285,10 @@ class ConfirmatoryAnalysisTests(unittest.TestCase):
         self.assertEqual(row["absolute_rate_error"], 0.0)
         self.assertEqual(row["calibration_strategy"], KSCommonSupport.name)
         self.assertEqual(row["calibration_error"], 0.0)
+        self.assertEqual(
+            KSCommonSupport().calibration_error([1, 2, 3, 4], [1, 1, 1, 1], 4),
+            0.75,
+        )
 
     def test_cap_invariance_strategy_can_be_swapped_without_changing_callers(self):
         class ExactStrategy:
