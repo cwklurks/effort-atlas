@@ -40,10 +40,13 @@ Panels: P1 Inkling/Tinker (continuous effort scalar — unique), P2 GPT-OSS-120B
 - No paid REAP smoke or confirmatory call has run. Tinker cap semantics, omitted-cap
   cost bounds, sample independence, and OpenAI usage accounting remain unresolved.
 
-Next gates: make governance durable; repair and accept grader v2; integrate the
-analysis layer; repair the dry-run probe; complete the audit; settle supervisor
+Next gates: accept the governance baseline; repair and accept grader v2; integrate
+the analysis layer; repair the dry-run probe; complete the audit; settle supervisor
 decisions; freeze REAP preregistration v2; implement and red-team the runner; then
 allow human-initiated smoke calls. See `../10_PHASE_GATE_PLAN_2026-08-08.md`.
+
+Phase 0 is implemented on `codex/reap-governance` in PR #4, passed a clean-archive
+40-test run and independent Sol XHigh review, and awaits human acceptance.
 
 ## Vocabulary
 

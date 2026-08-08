@@ -32,6 +32,7 @@ Point any new Codex session at this file first: **"Read reap/CODEX_BRIEFING.md a
 
 | Work | State | Blocking issue |
 |---|---|---|
+| Phase 0 — `codex/reap-governance`, PR #4 | clean-archive green; independently approved | awaiting human review/merge; later phases must branch from the accepted governance baseline |
 | A — `codex/ecosystem-audit`, PR #1 | open at reviewed commit `5c31b53` | all 8 blocking fixes remain; rejected headlines are still present |
 | B — `codex/grader-v2`, draft PR #2 | implemented at `fa38093`; independently green | the 78-row test trusts a precomputed empty projection instead of rerunning a defensible archive-derived fixture |
 | C — `codex/tinker-probe` | local implementation at `31d5fb3`; no PR/upstream | 65,536 changes model routes; omitted-cap cost bound is unknown; no live facts are settled |
