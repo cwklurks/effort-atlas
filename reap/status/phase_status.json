@@ -6,7 +6,7 @@
     "repository": "cwklurks/effort-atlas",
     "updated": "2026-08-08",
     "current_phase": 1,
-    "summary": "Task A is in implementation; Tasks B and C have reproducible checkpoints under independent review."
+    "summary": "Task A is in implementation; Tasks B and C are remediating adversarial-review findings."
   },
   "safety": {
     "confirmatory_calls": 0,
@@ -28,8 +28,8 @@
       "id": 1,
       "name": "Close existing workstreams",
       "status": "in_progress",
-      "progress": 55,
-      "summary": "Task A is being repaired; grader-v2 and the fail-closed Tinker probe have reviewable checkpoints.",
+      "progress": 60,
+      "summary": "Task A is being repaired; grader-v2 and Tinker-probe checkpoints are in review remediation.",
       "gate": "A is citable, B is accepted, and C is safe for later human smoke execution."
     },
     {
@@ -98,7 +98,7 @@
       "branch": "codex/grader-v2",
       "pr": 2,
       "owner_model": "gpt-5.6-sol / High",
-      "next": "Independent Sol XHigh review of commit b34d902 and the 78-row archive verifier."
+      "next": "Kill surviving line-anchor/comparator mutations and raise acceptance coverage."
     },
     {
       "id": "C",
@@ -107,7 +107,7 @@
       "branch": "codex/tinker-probe",
       "pr": 5,
       "owner_model": "gpt-5.6-sol / High",
-      "next": "Independent Sol XHigh review of commit 2570778 and the dry-run safety boundary."
+      "next": "Eliminate SDK resubmission risk and add write-ahead, fail-closed attempt evidence."
     },
     {
       "id": "D",
@@ -140,9 +140,19 @@
       "status": "passed"
     },
     {
+      "label": "Grader-v2 adversarial review",
+      "result": "Changes requested: two surviving test mutations",
+      "status": "attention"
+    },
+    {
       "label": "Tinker-probe builder checkpoint",
       "result": "21 / 21 focused checks; 12-call dry-run; independent review pending",
       "status": "passed"
+    },
+    {
+      "label": "Tinker-probe adversarial review",
+      "result": "Changes requested: retry guarantee and write-ahead evidence blockers",
+      "status": "attention"
     },
     {
       "label": "Phase 0 local suite",
@@ -166,6 +176,12 @@
     }
   ],
   "activity": [
+    {
+      "date": "2026-08-08",
+      "phase": 1,
+      "title": "Adversarial reviews requested remediation",
+      "detail": "Task B must kill line-anchor and numeric-comparator mutations. Task C must remove internal SDK resubmission risk and write attempt evidence before any billed call."
+    },
     {
       "date": "2026-08-08",
       "phase": 1,
