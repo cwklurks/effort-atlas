@@ -140,15 +140,18 @@ class TinkerProbeSafetyTests(unittest.TestCase):
 
         with tempfile.TemporaryDirectory() as directory:
             result = tinker_probe.main(
-                ["--live", "--probe", "samples", "--report", str(Path(directory) / "report.jsonl")],
+                ["--live", "--probe", "caps", "--report", str(Path(directory) / "report.jsonl")],
                 environ={"TINKER_API_KEY": "secret"},
                 adapter_factory=lambda _key: adapter,
                 stdout=stdout,
             )
 
         self.assertEqual(result, 0)
-        self.assertEqual([kind for kind, _ in events], ["projection", "call"])
-        self.assertEqual(events[0][1], events[1][1])
+        self.assertEqual(len(events), 16)
+        for index in range(0, len(events), 2):
+            self.assertEqual(events[index][0], "projection")
+            self.assertEqual(events[index + 1][0], "call")
+            self.assertEqual(events[index][1], events[index + 1][1])
 
     def test_sdk_adapter_disables_sdk_and_sampling_retries(self) -> None:
         captured: dict[str, object] = {}
