@@ -173,6 +173,8 @@ class TinkerProbeSafetyTests(unittest.TestCase):
                 return SimpleNamespace(sequences=[sequence], prompt_cache_hit_tokens=1)
 
         class FakeSamplingClient:
+            _sampling_session_id = "sampling-session-test"
+
             def get_tokenizer(self) -> FakeTokenizer:
                 return FakeTokenizer()
 
@@ -213,6 +215,7 @@ class TinkerProbeSafetyTests(unittest.TestCase):
         )
         self.assertEqual(captured["sample_kwargs"]["num_samples"], spec.num_samples)
         self.assertEqual(result.observations[0].completion_tokens, 2)
+        self.assertEqual(result.sampling_session_id, "sampling-session-test")
 
     def test_sdk_adapter_actually_omits_max_tokens_for_default_diagnostic(self) -> None:
         captured: dict[str, object] = {}
@@ -318,6 +321,8 @@ class TinkerProbeReportTests(unittest.TestCase):
         serialized = json.dumps(row)
         self.assertNotIn("sensitive response", serialized)
         self.assertNotIn("response_text", row)
+        self.assertEqual(row["num_samples"], 8)
+        self.assertIn("sampling_session_id", row)
         self.assertEqual(row["usage"]["completion_tokens"], 7)
         self.assertIsNone(row["usage"]["billed_completion_tokens"])
 

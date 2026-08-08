@@ -27,6 +27,8 @@ Every row contains:
 | `requested_cap` | Requested `max_tokens`, or null only for the isolated default-cap diagnostic. |
 | `deliberately_omits_max_tokens` | True only for the labeled exploratory default-cap diagnostic. |
 | `request_params` | The fields passed to `SamplingParams`; ordinary requests include `max_tokens`. |
+| `num_samples` | Client-level sample count passed to `SamplingClient.sample`. |
+| `sampling_session_id` | SDK sampling-session identifier when available, retained for later billing-export joins. |
 | `sample_index` | Zero-based index within `num_samples`, or null for an error. |
 | `response_text_sha256` | SHA-256 of UTF-8 response text; null for an error. Raw text is not recorded. |
 | `usage.prompt_tokens` | Locally tokenized prompt length. |

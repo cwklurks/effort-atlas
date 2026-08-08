@@ -73,6 +73,8 @@ REQUIRED_RECORD_FIELDS = {
     "requested_cap",
     "deliberately_omits_max_tokens",
     "request_params",
+    "num_samples",
+    "sampling_session_id",
     "sample_index",
     "response_text_sha256",
     "usage",
@@ -150,6 +152,7 @@ class CallResult:
     prompt_tokens: int
     prompt_cache_hit_tokens: int
     sdk_version: str
+    sampling_session_id: str | None = None
 
 
 class ProbeAdapter(Protocol):
@@ -301,6 +304,7 @@ class TinkerSDKAdapter:
             prompt_tokens=len(token_ids),
             prompt_cache_hit_tokens=int(getattr(response, "prompt_cache_hit_tokens", 0)),
             sdk_version=str(getattr(self._sdk, "__version__", "unknown")),
+            sampling_session_id=getattr(client, "_sampling_session_id", None),
         )
 
 
@@ -366,6 +370,8 @@ def make_response_records(
                 "requested_cap": spec.max_tokens,
                 "deliberately_omits_max_tokens": spec.deliberately_omits_max_tokens,
                 "request_params": spec.request_params(),
+                "num_samples": spec.num_samples,
+                "sampling_session_id": result.sampling_session_id,
                 "sample_index": sample_index,
                 "response_text_sha256": hash_response_text(observation.text),
                 "usage": {
@@ -415,6 +421,8 @@ def make_error_record(
         "requested_cap": spec.max_tokens,
         "deliberately_omits_max_tokens": spec.deliberately_omits_max_tokens,
         "request_params": spec.request_params(),
+        "num_samples": spec.num_samples,
+        "sampling_session_id": None,
         "sample_index": None,
         "response_text_sha256": None,
         "usage": {
