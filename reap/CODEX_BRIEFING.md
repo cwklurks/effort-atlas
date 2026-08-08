@@ -10,12 +10,12 @@ Point any new Codex session at this file first: **"Read reap/CODEX_BRIEFING.md a
 |---|---|---|
 | 1 | `AGENTS.md` (repo root) | The laws. Frozen files, no paid study calls, explicit max_tokens, no fallback extraction. |
 | 2 | `reap/README.md` | Program charter and governance. |
-| 3 | `reap/PROJECT_BRIEF.md` *(under reap/claude_project/)* | Canonical state: people, history, funding, positioning. |
+| 3 | `reap/claude_project/PROJECT_BRIEF.md` | Canonical state: people, history, funding, positioning. |
 | 4 | `reap/01_EXPERIMENT_OUTLINE_v2.md` | The experiment design under review by the supervisor. |
 | 5 | `reap/08_HYPERPARAMETER_DECISIONS.md` | Every knob, its verified facts, what's UNVERIFIED and must be probed. |
 | 6 | `PREREGISTRATION.md` + `PREREGISTRATION_AMENDMENT_2026-07-22.md` | **FROZEN. Never edit.** Read to understand what is already committed. |
 | 7 | `reap/REVIEW_PR1_ECOSYSTEM_AUDIT.md` | Red-team review of PR #1 and its 8 blocking fixes. |
-| 8 | `observational/RESULTS.md` + `pipeline.py` | The free observational study (done, verified). Pipeline is pinned — agents run it, never rewrite its statistics. |
+| 8 | `observational/RESULTS.md` + `observational/pipeline.py` + `observational/INPUT_PROVENANCE.md` | The free observational study (done, verified). Pipeline is pinned — agents run it, never rewrite its statistics. Input acquisition is not yet clean-checkout reproducible. |
 | 9 | `src/effort_atlas/` + `tests/` | Existing code. Note `confirmatory.py` (offline preflight, ledger, schedules) is solid; `graders.py` is defective (see Task B). |
 
 ## 2. Project state, in one screen

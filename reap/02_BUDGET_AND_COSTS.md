@@ -18,9 +18,24 @@ OpenRouter: gpt-oss-120b $0.037/$0.170 (native `reasoning_effort`).
 
 ## Cost model
 
-Cell cost = items × n × (T_in·p_in + **E[min(L, cap)]**·p_out) / 10⁶ — billed only up to the cap, so tight-cap cells are cheap. Length model from pilot (lognormal, mean 12.5k, p99 ≈ 41k) gives E[min(L,cap)] ≈ 4.1k @4k, 10.8k @16k, 12.3k @32k for high effort.
+The following is a **conditional planning model, not an executable budget gate**.
+Only after a route is empirically verified cap-inclusive may expected cell cost use
 
-**Planned design, priced (per 30-item dataset-equivalent, arms A+B+C = ~24,480 gens/model at 90 items):**
+`items × n × (T_in·p_in + E[min(L, cap)]·p_out) / 10⁶`.
+
+`E[min(L, cap)]` can never exceed `cap`; the earlier rough note of 4.1k at a
+4k cap was invalid and must not enter runner code. Exact values must be recomputed
+from frozen fitted parameters and checked against hand-calculated fixtures before
+the dry-run model is accepted.
+
+Until smoke evidence establishes cap and billing semantics for the exact route,
+no billed call is authorized unless a model-specific maximum billable output or a
+platform hard-spend control supplies a finite fail-closed upper bound. Requested
+tokens alone are not a safe accounting bound: the exploratory route audit already
+observed billing above a requested cap.
+
+**Conditional planning estimates** (per 30-item dataset-equivalent, arms A+B+C =
+~24,480 generations/model at 90 items; not runner gates):
 
 | Panel | Est. cost |
 |---|---|

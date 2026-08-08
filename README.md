@@ -89,6 +89,10 @@ uv sync --python 3.12.8
 For the pinned observational pipeline, install its locked optional dependencies
 with `uv sync --python 3.12.8 --extra observational`.
 
+On the pre-v2 baseline this command collects 40 tests. The bare function in
+`tests/test_rescue_analysis.py` is not collected; Task B owns that known defect.
+Phase 0's green baseline means reproducible current behavior, not complete coverage.
+
 The legacy local `.venv` found before the 2026-08-08 governance pass used Python
 3.9 and is not valid verification evidence. No offline verification command should
 require a provider credential or make a model call.

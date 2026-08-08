@@ -130,35 +130,12 @@ TESTS: gate triggers at ceiling; ledger chain verifies; dry-run cost within 5% o
 hand-computed fixture; a schedule mismatch refuses to run.
 ```
 
-## AGENTS.md (copy this to the repo root — Codex reads it automatically)
+## Root agent instructions
 
-```
-# AGENTS.md — rules for AI agents in this repo
-
-This is a preregistered research project. Scientific validity depends on these rules.
-
-NEVER modify: PREREGISTRATION.md, PREREGISTRATION_AMENDMENT_*.md,
-confirmatory_artifacts/** (frozen schedules/hashes), or any file whose header says
-FROZEN. Propose changes to these only as new dated files for human review.
-
-NEVER make network calls that generate study data or probe a paid provider. All
-runner/probe scripts default to --dry-run. Live execution is human-initiated only.
-An explicitly authorized OpenCode Go development call may assist bounded repository
-work, but receives no secrets, does not use --auto, and is independently reviewed.
-Secrets come from env vars; never read, print, or commit .env.
-
-ALWAYS: explicit max_tokens on every request template (this repo exists because an
-endpoint silently defaulted to 4096); log termination reason + token usage at
-collection time on every row; write tests for silent-failure paths (swallowed
-exceptions, fallback extraction, missing usage fields).
-
-Answer extraction must require an explicit "Final answer:" terminator. No
-last-number-anywhere fallbacks — one already corrupted a study here.
-
-Style: match existing code in src/effort_atlas/. Run
-`PYTHONPATH=src python -m unittest discover -s tests` before opening a PR.
-Every PR description states: what changed, what was verified, what was assumed.
-```
+`AGENTS.md` at the repository root is the only canonical Codex instruction file.
+Never reconstruct or overwrite it from an embedded template. New worktrees must
+receive that tracked file and follow its mandatory briefing, frozen boundaries,
+development-tool exception, model routing, and canonical verification command.
 
 ## Cadence
 
