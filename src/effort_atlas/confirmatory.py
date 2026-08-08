@@ -22,6 +22,7 @@ from typing import Any, Iterable
 import fcntl
 
 from . import ROOT, load_config
+from .analysis import wilson
 
 
 SCHEDULE_SEED = 20260722
@@ -61,7 +62,7 @@ EVENT_FIELDS = SCHEDULE_FIELDS | frozenset({
     "max_tokens", "max_tokens_requested",
     "request_started_at", "request_ended_at", "request_id", "upstream_id",
     "provider_response_id", "endpoint_id", "receipt_created_at", "receipt_fetched_at",
-    "cached", "replayed", "latency_s", "extracted_answer_present", "billed_status",
+    "cached", "replayed", "latency_s", "extracted_answer_present", "extracted_answer", "billed_status",
     "manual_rerun_reason",
 })
 
@@ -463,13 +464,19 @@ def analyze_confirmatory_events(
             for row in rows
         )
         empty_extracted_answers = sum(not row["extracted_answer_present"] for row in rows)
+        accuracy_ci = wilson(k, n)
+        length_stop_ci = wilson(length_stops, n)
+        unanswered_length_stop_ci = wilson(unanswered_length_stops, n)
         cells.append({
             "panel": key[0], "model": key[1], "provider_route": key[2],
             "effort": key[3], "cap": key[4], "n": n, "k": k,
             "accuracy": k / n, "length_stops": length_stops,
+            "accuracy_wilson": accuracy_ci,
             "length_stop_rate": length_stops / n,
+            "length_stop_rate_wilson": length_stop_ci,
             "unanswered_length_stops": unanswered_length_stops,
             "unanswered_length_stop_rate": unanswered_length_stops / n,
+            "unanswered_length_stop_rate_wilson": unanswered_length_stop_ci,
             "answer_present_length_stops": length_stops - unanswered_length_stops,
             "empty_extracted_answers": empty_extracted_answers,
             "accuracy_bound_lo": k / n,

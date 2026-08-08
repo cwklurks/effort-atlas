@@ -13,6 +13,7 @@ from effort_atlas.confirmatory import (
     build_schedule,
     export_schedule_artifacts,
 )
+from effort_atlas.analysis import wilson
 from effort_atlas import ROOT, load_config
 
 
@@ -165,6 +166,12 @@ class ConfirmatoryPreflightTests(unittest.TestCase):
         self.assertEqual(report["cells"][0]["length_stops"], 3)
         self.assertEqual(report["cells"][0]["unanswered_length_stops"], 1)
         self.assertEqual(report["cells"][0]["accuracy_bound_hi"], 2 / 3)
+        self.assertEqual(report["cells"][0]["accuracy_wilson"], wilson(1, 3))
+        self.assertEqual(report["cells"][0]["length_stop_rate_wilson"], wilson(3, 3))
+        self.assertEqual(
+            report["cells"][0]["unanswered_length_stop_rate_wilson"],
+            wilson(1, 3),
+        )
 
     def test_analyzer_requires_reconciled_receipt_expected_provider_and_boolean_grade(self):
         schedule = build_schedule(PANEL, ITEMS[:2])
@@ -207,12 +214,14 @@ class ConfirmatoryPreflightTests(unittest.TestCase):
                 "request_id": "request", "upstream_id": "upstream", "provider_response_id": "response",
                 "endpoint_id": "endpoint", "receipt_created_at": "2026-07-22T00:00:01Z",
                 "receipt_fetched_at": "2026-07-22T00:00:02Z", "cached": True, "replayed": False,
-                "latency_s": 1.0, "extracted_answer_present": False, "billed_status": "not_billed",
+                "latency_s": 1.0, "extracted_answer_present": False, "extracted_answer": None,
+                "billed_status": "not_billed",
                 "manual_rerun_reason": "receipt-confirmed-unbilled",
             })
         self.assertEqual(row["request_id"], "request")
         self.assertEqual(row["latency_s"], 1.0)
         self.assertFalse(row["replayed"])
+        self.assertIsNone(row["extracted_answer"])
 
     def test_exporter_writes_deterministic_main_and_smoke_artifacts_without_prompt_content(self):
         config_path = ROOT / "config_confirmatory.yaml"

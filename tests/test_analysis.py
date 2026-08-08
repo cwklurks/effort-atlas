@@ -79,8 +79,8 @@ class ConfirmatoryAnalysisTests(unittest.TestCase):
     def test_wilson_interval_matches_known_answer(self):
         low, high = wilson(5, 10)
 
-        self.assertAlmostEqual(low, 0.236593, places=6)
-        self.assertAlmostEqual(high, 0.763407, places=6)
+        self.assertAlmostEqual(low, 0.236590, places=6)
+        self.assertAlmostEqual(high, 0.763410, places=6)
         self.assertEqual(wilson(0, 0), (0.0, 0.0))
 
     def test_factorial_effects_and_fixed_seed_clustered_bootstrap(self):
@@ -109,6 +109,7 @@ class ConfirmatoryAnalysisTests(unittest.TestCase):
         slopes = {row["cap"]: row for row in effects["effort_slopes"]}
         boot_slopes = {row["cap"]: row for row in first["effort_slopes"]}
         cap_effects = {row["effort"]: row for row in effects["cap_effects"]}
+        boot_cap_effects = {row["effort"]: row for row in first["cap_effects"]}
         self.assertEqual(slopes[4]["estimate"], expected["slope_at_4"])
         self.assertEqual(slopes[8]["estimate"], expected["slope_at_8"])
         self.assertEqual(cap_effects["low"]["estimate"], expected["low_cap_effect"])
@@ -125,6 +126,14 @@ class ConfirmatoryAnalysisTests(unittest.TestCase):
         self.assertEqual(
             [first["interaction"]["ci_low"], first["interaction"]["ci_high"]],
             expected["interaction_ci"],
+        )
+        self.assertEqual(
+            [boot_cap_effects["low"]["ci_low"], boot_cap_effects["low"]["ci_high"]],
+            [-1.0, 0.0],
+        )
+        self.assertEqual(
+            [boot_cap_effects["high"]["ci_low"], boot_cap_effects["high"]["ci_high"]],
+            [0.0, 1.0],
         )
 
     def test_replicate_variance_components_known_between_and_within_cases(self):
@@ -225,10 +234,10 @@ class ConfirmatoryAnalysisTests(unittest.TestCase):
                 extracted_answer_present=True,
             ),
             result_row("grade-transition", "low", 8, 1, True),
+            result_row("missing-large", "low", 4, 1, False),
         ]
         planned = [
             *rows,
-            planned_row("missing-large", "low", 4, 1),
             planned_row("missing-large", "low", 8, 1),
         ]
 
@@ -334,6 +343,26 @@ class ConfirmatoryAnalysisTests(unittest.TestCase):
                 "dose_response",
                 "cap_invariance",
             },
+        )
+
+    def test_end_to_end_report_keeps_panels_separate(self):
+        first = bootstrap_rows()
+        second = [
+            {**row, "panel": "panel-b", "model": "model-b"}
+            for row in bootstrap_rows()
+        ]
+
+        report = analyze_confirmatory_rows(
+            [*first, *second],
+            planned_rows=[*first, *second],
+            effort_order=["low", "high"],
+            caps=[4, 8],
+            bootstrap_resamples=10,
+        )
+
+        self.assertEqual(
+            [(panel["panel"], panel["model"]) for panel in report["panels"]],
+            [("panel-a", "model-a"), ("panel-b", "model-b")],
         )
 
 

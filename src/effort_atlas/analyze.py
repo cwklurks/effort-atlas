@@ -12,7 +12,6 @@ from __future__ import annotations
 
 import argparse
 import json
-import math
 from pathlib import Path
 
 import matplotlib
@@ -22,16 +21,26 @@ import matplotlib.pyplot as plt  # noqa: E402
 import pandas as pd  # noqa: E402
 
 from . import ROOT, load_config  # noqa: E402
+from .analysis import wilson  # noqa: E402
 
 
-def wilson(k: int, n: int, z: float = 1.96) -> tuple[float, float]:
-    if n == 0:
-        return (0.0, 0.0)
-    p = k / n
-    denom = 1 + z**2 / n
-    center = (p + z**2 / (2 * n)) / denom
-    half = (z / denom) * math.sqrt(p * (1 - p) / n + z**2 / (4 * n**2))
-    return (max(0.0, center - half), min(1.0, center + half))
+class ConfirmatoryRowsUnsupportedError(ValueError):
+    """Raised before the legacy cap-omitting dedup can alter a cap grid."""
+
+
+def reject_confirmatory_rows(rows: list[dict]) -> None:
+    cap_rows = sum("cap" in row and row.get("cap") is not None for row in rows)
+    confirmatory_rows = sum(
+        str(row.get("phase", "")).lower() == "confirmatory"
+        or str(row.get("study_phase", "")).lower() == "confirmatory"
+        for row in rows
+    )
+    if cap_rows or confirmatory_rows:
+        raise ConfirmatoryRowsUnsupportedError(
+            "Legacy analyze.py refuses confirmatory/cap-grid rows because its "
+            "deduplication key omits cap; use effort_atlas.analysis instead "
+            f"(cap_rows={cap_rows}, confirmatory_rows={confirmatory_rows})."
+        )
 
 
 def latest_results(results_dir: Path) -> Path:
@@ -72,7 +81,9 @@ def main(argv: list[str] | None = None) -> None:
     reports_dir.mkdir(parents=True, exist_ok=True)
 
     path = Path(args.results) if args.results else latest_results(results_dir)
-    rows = [json.loads(line) for line in path.open()]
+    with path.open(encoding="utf-8") as handle:
+        rows = [json.loads(line) for line in handle]
+    reject_confirmatory_rows(rows)
     df = pd.DataFrame(rows)
     if "error" in df.columns:
         n_failed = int(df["error"].notna().sum())

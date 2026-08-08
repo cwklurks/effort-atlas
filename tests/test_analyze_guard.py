@@ -1,6 +1,13 @@
+import json
+import tempfile
 import unittest
+from pathlib import Path
 
-from effort_atlas.analyze import ConfirmatoryRowsUnsupportedError, reject_confirmatory_rows
+from effort_atlas.analyze import (
+    ConfirmatoryRowsUnsupportedError,
+    main,
+    reject_confirmatory_rows,
+)
 
 
 class AnalyzeGuardTests(unittest.TestCase):
@@ -17,6 +24,19 @@ class AnalyzeGuardTests(unittest.TestCase):
         reject_confirmatory_rows(
             [{"domain": "math", "item_id": "item-a", "effort": "low", "max_tokens": 4096}]
         )
+
+    def test_analyze_entry_point_invokes_guard(self):
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "confirmatory.jsonl"
+            path.write_text(
+                json.dumps(
+                    {"domain": "math", "item_id": "item-a", "effort": "low", "cap": 4096}
+                )
+                + "\n"
+            )
+
+            with self.assertRaises(ConfirmatoryRowsUnsupportedError):
+                main([str(path)])
 
 
 if __name__ == "__main__":
