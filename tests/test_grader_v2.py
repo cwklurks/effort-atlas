@@ -1,10 +1,17 @@
 from __future__ import annotations
 
+import inspect
 import json
+import os
 import re
 import unittest
+from collections import Counter
 from pathlib import Path
 
+from effort_atlas.grader_acceptance import (
+    build_archive_projection,
+    render_response_projection,
+)
 from effort_atlas.graders import grade, validate_grade_state
 
 
@@ -12,6 +19,15 @@ FIXTURE = Path(__file__).parent / "fixtures" / "grader_v2_acceptance.json"
 
 
 class GraderV2Tests(unittest.TestCase):
+    def test_termination_metadata_is_not_a_grader_input(self):
+        grader_inputs = inspect.signature(grade).parameters
+
+        self.assertTrue(
+            {"finish_reason", "termination", "completion_tokens"}.isdisjoint(
+                grader_inputs
+            )
+        )
+
     def test_terminator_before_later_truncation_remains_answered(self):
         result = grade(
             "numeric",
@@ -95,26 +111,61 @@ class GraderV2Tests(unittest.TestCase):
                 "results/sweep_real_20260719_172721.jsonl",
             ],
         )
+        self.assertEqual(fixture["schema_version"], "grader-v2-acceptance-v2")
+        self.assertEqual(len(fixture["rows"]), 78)
+        expected_by_source = {
+            source["path"]: source["selected_4096_rows"]
+            for source in fixture["sources"]
+        }
+        self.assertEqual(
+            Counter(row["source_path"] for row in fixture["rows"]),
+            expected_by_source,
+        )
+        self.assertEqual(
+            len(
+                {
+                    (row["source_path"], row["source_line"])
+                    for row in fixture["rows"]
+                }
+            ),
+            78,
+        )
+
         unanswered_by_domain: dict[str, int] = {}
         legacy_empty_extractions = 0
-        for source in fixture["sources"]:
-            self.assertEqual(source["completion_tokens"], 4096)
-            self.assertEqual(source["terminator_projection"], "")
-            legacy_empty_extractions += source["legacy_empty_extractions"]
-            for _source_line in source["affected_source_lines"]:
-                result = grade(
-                    source["grader"],
-                    source["terminator_projection"],
-                    "sanitized-gold-not-retained",
+        for row in fixture["rows"]:
+            self.assertEqual(row["completion_tokens"], 4096)
+            self.assertRegex(row["source_row_sha256"], r"^[0-9a-f]{64}$")
+            self.assertRegex(row["response_sha256"], r"^[0-9a-f]{64}$")
+            self.assertNotIn("response_text", row)
+            self.assertNotIn("gold", row)
+            response_projection = render_response_projection(row["response_projection"])
+            result = grade(
+                row["grader"],
+                response_projection,
+                "sanitized-gold-not-retained",
+            )
+            if not result["extracted_answer_present"]:
+                unanswered_by_domain[row["domain"]] = (
+                    unanswered_by_domain.get(row["domain"], 0) + 1
                 )
-                if not result["extracted_answer_present"]:
-                    unanswered_by_domain[source["domain"]] = (
-                        unanswered_by_domain.get(source["domain"], 0) + 1
-                    )
+            legacy_empty_extractions += not row["legacy_extracted_answer_present"]
 
         self.assertEqual(unanswered_by_domain, {"math": 68, "knowledge": 10})
         self.assertEqual(sum(unanswered_by_domain.values()), 78)
         self.assertEqual(legacy_empty_extractions, 0)
+
+    @unittest.skipUnless(
+        os.environ.get("GRADER_V2_ARCHIVE_ROOT"),
+        "set GRADER_V2_ARCHIVE_ROOT to verify the private source archives",
+    )
+    def test_committed_projection_matches_private_archives(self):
+        archive_root = Path(os.environ["GRADER_V2_ARCHIVE_ROOT"])
+
+        self.assertEqual(
+            build_archive_projection(archive_root),
+            json.loads(FIXTURE.read_text()),
+        )
 
 
 if __name__ == "__main__":

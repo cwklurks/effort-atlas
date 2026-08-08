@@ -1,6 +1,7 @@
 {
-  "schema_version": "grader-v2-acceptance-v1",
-  "derivation": "For each named exploratory archive, select rows where completion_tokens == 4096. Project each selected response to only complete lines beginning with the configured Final answer terminator. The projection is empty for all selected rows. No response, reasoning, prompt, gold-answer, or extracted-answer text is retained.",
+  "schema_version": "grader-v2-acceptance-v2",
+  "verification_command": "PYTHONPATH=src python -m effort_atlas.grader_acceptance --archive-root <archive-root> --check tests/fixtures/grader_v2_acceptance.json",
+  "derivation": "Verify the two pinned exploratory archive files by byte count, line count, and SHA-256; select every row with completion_tokens equal to 4096; replace every non-terminator response line with a constant and every complete Final answer line with a canonical redacted terminator; confirm raw and projected grader-v2 answer presence agree. No prompt, response, reasoning, gold-answer, or extracted-answer text is retained.",
   "sources": [
     {
       "path": "results/sweep_real_20260719_154609.jsonl",
@@ -9,10 +10,7 @@
       "line_count": 150,
       "domain": "math",
       "grader": "numeric",
-      "completion_tokens": 4096,
-      "affected_source_lines": [4, 7, 9, 10, 14, 17, 22, 30, 34, 37, 39, 40, 41, 42, 44, 47, 52, 58, 60, 64, 67, 69, 70, 71, 72, 74, 77, 78, 84, 86, 88, 90, 94, 96, 97, 99, 100, 101, 102, 103, 104, 107, 108, 112, 114, 116, 118, 120, 124, 127, 129, 130, 131, 132, 133, 134, 135, 136, 137, 138, 140, 141, 142, 144, 146, 148, 149, 150],
-      "terminator_projection": "",
-      "legacy_empty_extractions": 0
+      "selected_4096_rows": 68
     },
     {
       "path": "results/sweep_real_20260719_172721.jsonl",
@@ -21,10 +19,1101 @@
       "line_count": 150,
       "domain": "knowledge",
       "grader": "exact_field",
+      "selected_4096_rows": 10
+    }
+  ],
+  "rows": [
+    {
+      "source_path": "results/sweep_real_20260719_154609.jsonl",
+      "source_line": 4,
+      "source_row_sha256": "b6d2df8640a53d74944d8e384ccf00f185c819c1acf4afc6ca1d0634d42ddaa3",
+      "response_sha256": "60b7157629b1f7e319dd355538f461997a424354d747e122c3b0c2e15f3a4dab",
+      "domain": "math",
+      "grader": "numeric",
       "completion_tokens": 4096,
-      "affected_source_lines": [105, 117, 122, 125, 129, 133, 134, 135, 137, 147],
-      "terminator_projection": "",
-      "legacy_empty_extractions": 0
+      "response_projection": {
+        "line_count": 235,
+        "terminator_line_numbers": []
+      },
+      "legacy_extracted_answer_present": true
+    },
+    {
+      "source_path": "results/sweep_real_20260719_154609.jsonl",
+      "source_line": 7,
+      "source_row_sha256": "99abcfdc10d550bf2fa232b08b3fc98490ee45a08b0bb1d17370cc4791fc5a0f",
+      "response_sha256": "06bc2550b9f438b76a9cf95f7c15b12905acf6dd318c5e9883b3177057376fc6",
+      "domain": "math",
+      "grader": "numeric",
+      "completion_tokens": 4096,
+      "response_projection": {
+        "line_count": 149,
+        "terminator_line_numbers": []
+      },
+      "legacy_extracted_answer_present": true
+    },
+    {
+      "source_path": "results/sweep_real_20260719_154609.jsonl",
+      "source_line": 9,
+      "source_row_sha256": "34226be9621d0b523b6633abc03b9e296f8434f6092f2fcb0ac7ce29d8b980a3",
+      "response_sha256": "c1beab58aaa70e4aa2107df657bbcdacbdda8cd4cb0958f387fdd967c5cc87db",
+      "domain": "math",
+      "grader": "numeric",
+      "completion_tokens": 4096,
+      "response_projection": {
+        "line_count": 101,
+        "terminator_line_numbers": []
+      },
+      "legacy_extracted_answer_present": true
+    },
+    {
+      "source_path": "results/sweep_real_20260719_154609.jsonl",
+      "source_line": 10,
+      "source_row_sha256": "de269d67c185bd6c055596db2b595ca8e2e8ef8897f36a24b46f81e89293cb4d",
+      "response_sha256": "f3c06e80ccd5d56eb2a33fce9321d487bb36cdea800af8309b2b9b17b2fc24d2",
+      "domain": "math",
+      "grader": "numeric",
+      "completion_tokens": 4096,
+      "response_projection": {
+        "line_count": 305,
+        "terminator_line_numbers": []
+      },
+      "legacy_extracted_answer_present": true
+    },
+    {
+      "source_path": "results/sweep_real_20260719_154609.jsonl",
+      "source_line": 14,
+      "source_row_sha256": "3597f91845ab344b0a0195b8dc58b45b666522b5a48b8b196c13a4d5e64fc787",
+      "response_sha256": "45f57ebcf305006036b3093b76154f49921d6a716474a71f9d99e7382c2052a8",
+      "domain": "math",
+      "grader": "numeric",
+      "completion_tokens": 4096,
+      "response_projection": {
+        "line_count": 233,
+        "terminator_line_numbers": []
+      },
+      "legacy_extracted_answer_present": true
+    },
+    {
+      "source_path": "results/sweep_real_20260719_154609.jsonl",
+      "source_line": 17,
+      "source_row_sha256": "4024326e115c422beee64dfdf7e0f80b90aabb6bbe905c6ceceb407faa03a74e",
+      "response_sha256": "c945fbf5b63087667438f851c49faa1e949a167f44f12e9103d9f9c2e53b74de",
+      "domain": "math",
+      "grader": "numeric",
+      "completion_tokens": 4096,
+      "response_projection": {
+        "line_count": 153,
+        "terminator_line_numbers": []
+      },
+      "legacy_extracted_answer_present": true
+    },
+    {
+      "source_path": "results/sweep_real_20260719_154609.jsonl",
+      "source_line": 22,
+      "source_row_sha256": "403a99519fc5b91b3c6c18f34e90713fc24a155249f3607fc1bb8051f64cdf1f",
+      "response_sha256": "76c38a8aa99f12e59364a66fc55eafc518924ef38c15dedd7a5b193994aac437",
+      "domain": "math",
+      "grader": "numeric",
+      "completion_tokens": 4096,
+      "response_projection": {
+        "line_count": 151,
+        "terminator_line_numbers": []
+      },
+      "legacy_extracted_answer_present": true
+    },
+    {
+      "source_path": "results/sweep_real_20260719_154609.jsonl",
+      "source_line": 30,
+      "source_row_sha256": "db264d5234bcacc0690684b197e0494450bf435a32012426dd4052d005f8ab6d",
+      "response_sha256": "b7f3850e281d19197e6baf52c71d819e8e6cb33ba416acbdb445e4ecc2fe6e2c",
+      "domain": "math",
+      "grader": "numeric",
+      "completion_tokens": 4096,
+      "response_projection": {
+        "line_count": 124,
+        "terminator_line_numbers": []
+      },
+      "legacy_extracted_answer_present": true
+    },
+    {
+      "source_path": "results/sweep_real_20260719_154609.jsonl",
+      "source_line": 34,
+      "source_row_sha256": "a75950c8ef568fe3a8e61dc0e61c4a286a72a382fdeb093493384c90d6c0f5ae",
+      "response_sha256": "2fa55faf3d5906a982060d93f7138354d8e77a3ceaf065854e653542ea9988a2",
+      "domain": "math",
+      "grader": "numeric",
+      "completion_tokens": 4096,
+      "response_projection": {
+        "line_count": 207,
+        "terminator_line_numbers": []
+      },
+      "legacy_extracted_answer_present": true
+    },
+    {
+      "source_path": "results/sweep_real_20260719_154609.jsonl",
+      "source_line": 37,
+      "source_row_sha256": "cdebc3d07899d7ad6fd77c5bba7c560cce2cd16a1b705e8e69d1abface41b81e",
+      "response_sha256": "73cc5d255861a5c10467c7395d8541ede018b81d5ff20fa9e482295aa8cd6d3d",
+      "domain": "math",
+      "grader": "numeric",
+      "completion_tokens": 4096,
+      "response_projection": {
+        "line_count": 190,
+        "terminator_line_numbers": []
+      },
+      "legacy_extracted_answer_present": true
+    },
+    {
+      "source_path": "results/sweep_real_20260719_154609.jsonl",
+      "source_line": 39,
+      "source_row_sha256": "1a2ce3c87bca4e9cf1013716a62a13a825610c1f545dd7b3b283b54108380c90",
+      "response_sha256": "c49cadb1d404f3bc9cf54305cad9d609d16ceba34e7b00acc230c9234614ace1",
+      "domain": "math",
+      "grader": "numeric",
+      "completion_tokens": 4096,
+      "response_projection": {
+        "line_count": 93,
+        "terminator_line_numbers": []
+      },
+      "legacy_extracted_answer_present": true
+    },
+    {
+      "source_path": "results/sweep_real_20260719_154609.jsonl",
+      "source_line": 40,
+      "source_row_sha256": "8e45199f688ef8408a89376a3b60119d5b3205dc73f067176688965a0057d993",
+      "response_sha256": "0eeb1dd1951e24b743da44977eb47fdb7c257d86c48c30c51765e7357e5352f9",
+      "domain": "math",
+      "grader": "numeric",
+      "completion_tokens": 4096,
+      "response_projection": {
+        "line_count": 191,
+        "terminator_line_numbers": []
+      },
+      "legacy_extracted_answer_present": true
+    },
+    {
+      "source_path": "results/sweep_real_20260719_154609.jsonl",
+      "source_line": 41,
+      "source_row_sha256": "53639dce9eb547e9067a1fb66384b5c173bee37822e8db5a8d34f31ef3813101",
+      "response_sha256": "a5fc4ee0445a429a1533b63f91bcecf5b4c42ccb1525374dfe5e560317d685c2",
+      "domain": "math",
+      "grader": "numeric",
+      "completion_tokens": 4096,
+      "response_projection": {
+        "line_count": 151,
+        "terminator_line_numbers": []
+      },
+      "legacy_extracted_answer_present": true
+    },
+    {
+      "source_path": "results/sweep_real_20260719_154609.jsonl",
+      "source_line": 42,
+      "source_row_sha256": "34a9e61d8136d95108329866071872441e46523dfa43b8f3052da88712d9ea6f",
+      "response_sha256": "653ff55067e704e5956210ebc5249a2addf38d9565ed86dd0ed99a12d6eff8cf",
+      "domain": "math",
+      "grader": "numeric",
+      "completion_tokens": 4096,
+      "response_projection": {
+        "line_count": 174,
+        "terminator_line_numbers": []
+      },
+      "legacy_extracted_answer_present": true
+    },
+    {
+      "source_path": "results/sweep_real_20260719_154609.jsonl",
+      "source_line": 44,
+      "source_row_sha256": "1753e8fd838d375391a2922ad58fe2d042decf2a608a8b975ae048dba642dc3e",
+      "response_sha256": "cbae0972c41c4ae6902cb65b5eaf1a4ccb27c29379bfbfd5710e20f61763fee3",
+      "domain": "math",
+      "grader": "numeric",
+      "completion_tokens": 4096,
+      "response_projection": {
+        "line_count": 156,
+        "terminator_line_numbers": []
+      },
+      "legacy_extracted_answer_present": true
+    },
+    {
+      "source_path": "results/sweep_real_20260719_154609.jsonl",
+      "source_line": 47,
+      "source_row_sha256": "d7d4a446679707b563151049ecf9a5684d62d7e6c248624db3518937826f79b7",
+      "response_sha256": "899147001a89555df5a2e15588772bb6ca8a72c86558e6b3ea6a08da7bc4da7b",
+      "domain": "math",
+      "grader": "numeric",
+      "completion_tokens": 4096,
+      "response_projection": {
+        "line_count": 226,
+        "terminator_line_numbers": []
+      },
+      "legacy_extracted_answer_present": true
+    },
+    {
+      "source_path": "results/sweep_real_20260719_154609.jsonl",
+      "source_line": 52,
+      "source_row_sha256": "b51018a2f888f89e10fecdb211e2e372539bd05b93ca46c24bf026f5d643b5cc",
+      "response_sha256": "5aec9c94aa4f718adb0479c8854934281c6b4c0360bb6bd58e6a7bffa3954fd0",
+      "domain": "math",
+      "grader": "numeric",
+      "completion_tokens": 4096,
+      "response_projection": {
+        "line_count": 168,
+        "terminator_line_numbers": []
+      },
+      "legacy_extracted_answer_present": true
+    },
+    {
+      "source_path": "results/sweep_real_20260719_154609.jsonl",
+      "source_line": 58,
+      "source_row_sha256": "f3953c390344bd456bf4755494701e88997bcafd70c7b68e5ee17fd95d8a4cd4",
+      "response_sha256": "2fb1b1ffaeacc9f17b0e9476907d8bcf967144afb6b42d8f907ed6d22244b730",
+      "domain": "math",
+      "grader": "numeric",
+      "completion_tokens": 4096,
+      "response_projection": {
+        "line_count": 228,
+        "terminator_line_numbers": []
+      },
+      "legacy_extracted_answer_present": true
+    },
+    {
+      "source_path": "results/sweep_real_20260719_154609.jsonl",
+      "source_line": 60,
+      "source_row_sha256": "147e330bdd172a033531ebd09a7f782e1438526ab26fa57d3406da6448786446",
+      "response_sha256": "e0391b4c5b10135676b7da8f98102dc4b6ed3eb1b1c07c72e3cc08df0f9745dd",
+      "domain": "math",
+      "grader": "numeric",
+      "completion_tokens": 4096,
+      "response_projection": {
+        "line_count": 127,
+        "terminator_line_numbers": []
+      },
+      "legacy_extracted_answer_present": true
+    },
+    {
+      "source_path": "results/sweep_real_20260719_154609.jsonl",
+      "source_line": 64,
+      "source_row_sha256": "7d69d796e5bb079393fc306cd27577e591db969d3ccdc122cb4404cb78768f66",
+      "response_sha256": "afa5fa88b57e1dfb42ba3dd0e0fe28f283aa9a924869e53699de1d77356184de",
+      "domain": "math",
+      "grader": "numeric",
+      "completion_tokens": 4096,
+      "response_projection": {
+        "line_count": 192,
+        "terminator_line_numbers": []
+      },
+      "legacy_extracted_answer_present": true
+    },
+    {
+      "source_path": "results/sweep_real_20260719_154609.jsonl",
+      "source_line": 67,
+      "source_row_sha256": "8fb67f7e4386b239470319dba49af9fd19ea6b8b93ee0c9efb36a4adf715fdc3",
+      "response_sha256": "089971c85673281e565fd040f91b6300cf36f6d06fb360837a7ee59e0293e4e3",
+      "domain": "math",
+      "grader": "numeric",
+      "completion_tokens": 4096,
+      "response_projection": {
+        "line_count": 162,
+        "terminator_line_numbers": []
+      },
+      "legacy_extracted_answer_present": true
+    },
+    {
+      "source_path": "results/sweep_real_20260719_154609.jsonl",
+      "source_line": 69,
+      "source_row_sha256": "26f5b4cf65cfab3a1b2b4e8c6512f8df2acfbdc9fb255ff8c195e13477677e8b",
+      "response_sha256": "f242cb486273539ae38f3902bc70e24db773eed0453da85eb455928058d27ab0",
+      "domain": "math",
+      "grader": "numeric",
+      "completion_tokens": 4096,
+      "response_projection": {
+        "line_count": 139,
+        "terminator_line_numbers": []
+      },
+      "legacy_extracted_answer_present": true
+    },
+    {
+      "source_path": "results/sweep_real_20260719_154609.jsonl",
+      "source_line": 70,
+      "source_row_sha256": "1db07ca54c7325229faa6065072d369e9c04d5a69096aa6c811895c348398c0a",
+      "response_sha256": "672cedd5129d020b4a3c35075ffdf1ffdf451287aada5bfd412f7a0763949cc7",
+      "domain": "math",
+      "grader": "numeric",
+      "completion_tokens": 4096,
+      "response_projection": {
+        "line_count": 233,
+        "terminator_line_numbers": []
+      },
+      "legacy_extracted_answer_present": true
+    },
+    {
+      "source_path": "results/sweep_real_20260719_154609.jsonl",
+      "source_line": 71,
+      "source_row_sha256": "0431203b85c04ea2091312225ccb2ec899c2517adabf6ea5bf43c8a3f29ad760",
+      "response_sha256": "e5469324c1e70bb38e7031a1169383e748c501a6dd2c3f0d18e178bc9cf0c595",
+      "domain": "math",
+      "grader": "numeric",
+      "completion_tokens": 4096,
+      "response_projection": {
+        "line_count": 195,
+        "terminator_line_numbers": []
+      },
+      "legacy_extracted_answer_present": true
+    },
+    {
+      "source_path": "results/sweep_real_20260719_154609.jsonl",
+      "source_line": 72,
+      "source_row_sha256": "aaa429bc5014dd862c8673acf30fca034ab426b17626620805a110f4f428cf92",
+      "response_sha256": "36fa2235ec5ec616b784e0831214988f5a40d3107b8ee18fddccd64c638846cd",
+      "domain": "math",
+      "grader": "numeric",
+      "completion_tokens": 4096,
+      "response_projection": {
+        "line_count": 143,
+        "terminator_line_numbers": []
+      },
+      "legacy_extracted_answer_present": true
+    },
+    {
+      "source_path": "results/sweep_real_20260719_154609.jsonl",
+      "source_line": 74,
+      "source_row_sha256": "f0a45fee2a35bab49004d73e5341a2e42d9b60f273ccd1366490408b2ad1e1e0",
+      "response_sha256": "bb50e747affcecbbd1ee0f3fa43492fd5f5d3795b7286888c64877d644a88cde",
+      "domain": "math",
+      "grader": "numeric",
+      "completion_tokens": 4096,
+      "response_projection": {
+        "line_count": 169,
+        "terminator_line_numbers": []
+      },
+      "legacy_extracted_answer_present": true
+    },
+    {
+      "source_path": "results/sweep_real_20260719_154609.jsonl",
+      "source_line": 77,
+      "source_row_sha256": "2bec1384eb0618e41d9494d9d27c8e50933ba46c4a30903de949d6df0e3d483e",
+      "response_sha256": "5325d7882824b4beef985d6ee3c2f2b9a02437ba0b93f77b4559db05942a6906",
+      "domain": "math",
+      "grader": "numeric",
+      "completion_tokens": 4096,
+      "response_projection": {
+        "line_count": 194,
+        "terminator_line_numbers": []
+      },
+      "legacy_extracted_answer_present": true
+    },
+    {
+      "source_path": "results/sweep_real_20260719_154609.jsonl",
+      "source_line": 78,
+      "source_row_sha256": "b7a191af44e242e23912be44631141437e496cb7e9e564ec07687ac2338bc903",
+      "response_sha256": "da935ca863d02ed6dad3c8802fd78b32aff010f034de9b55f4e5f606f9f8851b",
+      "domain": "math",
+      "grader": "numeric",
+      "completion_tokens": 4096,
+      "response_projection": {
+        "line_count": 163,
+        "terminator_line_numbers": []
+      },
+      "legacy_extracted_answer_present": true
+    },
+    {
+      "source_path": "results/sweep_real_20260719_154609.jsonl",
+      "source_line": 84,
+      "source_row_sha256": "7e5c414676c8ca7591ea4d679e8a785044629edeb937df9970f1a57ca7583930",
+      "response_sha256": "b04328efc1d7da5e20e12c435348ae2bc4d0733c47924c905928489ff134d3a9",
+      "domain": "math",
+      "grader": "numeric",
+      "completion_tokens": 4096,
+      "response_projection": {
+        "line_count": 284,
+        "terminator_line_numbers": []
+      },
+      "legacy_extracted_answer_present": true
+    },
+    {
+      "source_path": "results/sweep_real_20260719_154609.jsonl",
+      "source_line": 86,
+      "source_row_sha256": "7f4c101ef52affe3bcb4a113e3bb87792e921bb7cd3b988c8c7595c14d54de25",
+      "response_sha256": "04fb3a961b9efb80e5b8c18c44f2cae5f4a25a61b432a5d77b62e0448ec59b94",
+      "domain": "math",
+      "grader": "numeric",
+      "completion_tokens": 4096,
+      "response_projection": {
+        "line_count": 141,
+        "terminator_line_numbers": []
+      },
+      "legacy_extracted_answer_present": true
+    },
+    {
+      "source_path": "results/sweep_real_20260719_154609.jsonl",
+      "source_line": 88,
+      "source_row_sha256": "50f32363bcfa19a22915db7a21588e7427c85125adb8b5211dfadca3ab25f54c",
+      "response_sha256": "a6f5646a53d2ea698ec1afd79844c924a108c769a4ded5e22154aa59e3bcf76e",
+      "domain": "math",
+      "grader": "numeric",
+      "completion_tokens": 4096,
+      "response_projection": {
+        "line_count": 129,
+        "terminator_line_numbers": []
+      },
+      "legacy_extracted_answer_present": true
+    },
+    {
+      "source_path": "results/sweep_real_20260719_154609.jsonl",
+      "source_line": 90,
+      "source_row_sha256": "0191c9df625c345bcf16c129f053e57192cf33052ca469bb82b1dc047a305c34",
+      "response_sha256": "10649348e0c5e6247b2110e9a0ad9fe6aa8155762b970f6c3e38f4b82f612aa4",
+      "domain": "math",
+      "grader": "numeric",
+      "completion_tokens": 4096,
+      "response_projection": {
+        "line_count": 139,
+        "terminator_line_numbers": []
+      },
+      "legacy_extracted_answer_present": true
+    },
+    {
+      "source_path": "results/sweep_real_20260719_154609.jsonl",
+      "source_line": 94,
+      "source_row_sha256": "eef5a94ffe407ea401320120e612764925822116b224175ec6ea4992e8106d92",
+      "response_sha256": "cd323b8606af61c59c8b759d5211bc9894c6901e382aa78ff5887eb0cc9800cb",
+      "domain": "math",
+      "grader": "numeric",
+      "completion_tokens": 4096,
+      "response_projection": {
+        "line_count": 176,
+        "terminator_line_numbers": []
+      },
+      "legacy_extracted_answer_present": true
+    },
+    {
+      "source_path": "results/sweep_real_20260719_154609.jsonl",
+      "source_line": 96,
+      "source_row_sha256": "9fbdb352e95e1a25af60bb81345d93846a59bf3a36961c254cb36d8d369141ed",
+      "response_sha256": "84dbd2542d58c7814688168bba1b424238b0b0d3df95a384ab1dacaf82282a41",
+      "domain": "math",
+      "grader": "numeric",
+      "completion_tokens": 4096,
+      "response_projection": {
+        "line_count": 189,
+        "terminator_line_numbers": []
+      },
+      "legacy_extracted_answer_present": true
+    },
+    {
+      "source_path": "results/sweep_real_20260719_154609.jsonl",
+      "source_line": 97,
+      "source_row_sha256": "223f60684afb11266c9b7934469fddb366bdc79e4db33f02751e800d2b75ad0b",
+      "response_sha256": "a873d1032111cb96b6747af57b25c0e4aff284bbf3e1a1de115b24e4e2a8991d",
+      "domain": "math",
+      "grader": "numeric",
+      "completion_tokens": 4096,
+      "response_projection": {
+        "line_count": 156,
+        "terminator_line_numbers": []
+      },
+      "legacy_extracted_answer_present": true
+    },
+    {
+      "source_path": "results/sweep_real_20260719_154609.jsonl",
+      "source_line": 99,
+      "source_row_sha256": "bc03292e608f2f6fc6aadfd28bb626ac6aa978661a612816574b3580dd78ccb4",
+      "response_sha256": "ba42965d1dad27832879d3c52f1a13ce57d4a61b3043d2bc1ff160162c998f67",
+      "domain": "math",
+      "grader": "numeric",
+      "completion_tokens": 4096,
+      "response_projection": {
+        "line_count": 147,
+        "terminator_line_numbers": []
+      },
+      "legacy_extracted_answer_present": true
+    },
+    {
+      "source_path": "results/sweep_real_20260719_154609.jsonl",
+      "source_line": 100,
+      "source_row_sha256": "ea60fcc4c216ae23747cf9a0f8c8357e3df06d79cf7e8c6fb51d42a9d30fd7b8",
+      "response_sha256": "523304b529b9ebeeebb664cde64b055074472869c9471015dd98f37b795e5059",
+      "domain": "math",
+      "grader": "numeric",
+      "completion_tokens": 4096,
+      "response_projection": {
+        "line_count": 277,
+        "terminator_line_numbers": []
+      },
+      "legacy_extracted_answer_present": true
+    },
+    {
+      "source_path": "results/sweep_real_20260719_154609.jsonl",
+      "source_line": 101,
+      "source_row_sha256": "cec389bc1846104f6cc815df98a9d4f644994f05cb7d83ccf5838af2abefe0de",
+      "response_sha256": "e9bbeee153098dbef91a76bc841079bc9bb47b70eb9361f471b939773c65cd6d",
+      "domain": "math",
+      "grader": "numeric",
+      "completion_tokens": 4096,
+      "response_projection": {
+        "line_count": 161,
+        "terminator_line_numbers": []
+      },
+      "legacy_extracted_answer_present": true
+    },
+    {
+      "source_path": "results/sweep_real_20260719_154609.jsonl",
+      "source_line": 102,
+      "source_row_sha256": "a1592320c58ea224c0156f2c25d8093207a3d6ad791c5ba3707513ae9966f4e2",
+      "response_sha256": "aab03128852706f16b1e5223108160b76608aeb0a7255bc5d2dbb6bd22cde87d",
+      "domain": "math",
+      "grader": "numeric",
+      "completion_tokens": 4096,
+      "response_projection": {
+        "line_count": 139,
+        "terminator_line_numbers": []
+      },
+      "legacy_extracted_answer_present": true
+    },
+    {
+      "source_path": "results/sweep_real_20260719_154609.jsonl",
+      "source_line": 103,
+      "source_row_sha256": "2c8dae873a67d9e8b3223a339d9a1d167c6cb040a2d48e46ca08d3bb167dcead",
+      "response_sha256": "1f83cb472c7bf05b25edf61dd0d895337745c94ecbf1bb9d0dfd020edef2e801",
+      "domain": "math",
+      "grader": "numeric",
+      "completion_tokens": 4096,
+      "response_projection": {
+        "line_count": 147,
+        "terminator_line_numbers": []
+      },
+      "legacy_extracted_answer_present": true
+    },
+    {
+      "source_path": "results/sweep_real_20260719_154609.jsonl",
+      "source_line": 104,
+      "source_row_sha256": "f24f47ad7d3f82858ae9238922b9304e6a53e8723a20682bc5e08405a2edfcf4",
+      "response_sha256": "ecf71caa92dff90556379dde3d48a89ee81e00a91448526bf096e6a9f4d330f2",
+      "domain": "math",
+      "grader": "numeric",
+      "completion_tokens": 4096,
+      "response_projection": {
+        "line_count": 160,
+        "terminator_line_numbers": []
+      },
+      "legacy_extracted_answer_present": true
+    },
+    {
+      "source_path": "results/sweep_real_20260719_154609.jsonl",
+      "source_line": 107,
+      "source_row_sha256": "98fa5596e9c38e0a374e0d2e96ed5e7f3f795787170b4ae3f34ae5032a602d12",
+      "response_sha256": "9ecfc4b43d6df72299ed50056d5c95331209686d88633fb00d88f10b1da4b51d",
+      "domain": "math",
+      "grader": "numeric",
+      "completion_tokens": 4096,
+      "response_projection": {
+        "line_count": 168,
+        "terminator_line_numbers": []
+      },
+      "legacy_extracted_answer_present": true
+    },
+    {
+      "source_path": "results/sweep_real_20260719_154609.jsonl",
+      "source_line": 108,
+      "source_row_sha256": "136e7eb272e33cd5becba0e909d2dbf303102762e9fedd9ce6d72ca2316a06ed",
+      "response_sha256": "4d933ebff37410c0db1cab89a7b7a3c409724a889698c2f34400fe0e0141936a",
+      "domain": "math",
+      "grader": "numeric",
+      "completion_tokens": 4096,
+      "response_projection": {
+        "line_count": 157,
+        "terminator_line_numbers": []
+      },
+      "legacy_extracted_answer_present": true
+    },
+    {
+      "source_path": "results/sweep_real_20260719_154609.jsonl",
+      "source_line": 112,
+      "source_row_sha256": "23ac2b4e4a55194c297d5accd570a7b93a2029d4f9971c4936b4352bf031f455",
+      "response_sha256": "b67c20955dcef6f247488c5aa30faab243d73eef8621eb822128cb1dfb9ac13c",
+      "domain": "math",
+      "grader": "numeric",
+      "completion_tokens": 4096,
+      "response_projection": {
+        "line_count": 171,
+        "terminator_line_numbers": []
+      },
+      "legacy_extracted_answer_present": true
+    },
+    {
+      "source_path": "results/sweep_real_20260719_154609.jsonl",
+      "source_line": 114,
+      "source_row_sha256": "955adf3343e89d963fb76de5d5636f739d189b5a8bee6f8d1152a807f0cf6a18",
+      "response_sha256": "ec4871d6b7237fa24a827a5b5dbcfdc1d0df6dfa5dbd15158cc36df107b64ab1",
+      "domain": "math",
+      "grader": "numeric",
+      "completion_tokens": 4096,
+      "response_projection": {
+        "line_count": 259,
+        "terminator_line_numbers": []
+      },
+      "legacy_extracted_answer_present": true
+    },
+    {
+      "source_path": "results/sweep_real_20260719_154609.jsonl",
+      "source_line": 116,
+      "source_row_sha256": "4d12559f083b6626d647c2807af54d95f67966559d023163fc4b0d4d24aa31ba",
+      "response_sha256": "3b44d9affd23e3a71b2eeb4d1e4527509bc88f67a6d8a0b480c0c0a4aa8a3e0a",
+      "domain": "math",
+      "grader": "numeric",
+      "completion_tokens": 4096,
+      "response_projection": {
+        "line_count": 77,
+        "terminator_line_numbers": []
+      },
+      "legacy_extracted_answer_present": true
+    },
+    {
+      "source_path": "results/sweep_real_20260719_154609.jsonl",
+      "source_line": 118,
+      "source_row_sha256": "f1280f24414cd7ec4e661222d439a058fbbf972172af51594ad3b525b914c6ef",
+      "response_sha256": "1cd6fc98f8dafce867ff1b522768e53f4f9df678d2d9f6d08d0a4fc5c7d4e371",
+      "domain": "math",
+      "grader": "numeric",
+      "completion_tokens": 4096,
+      "response_projection": {
+        "line_count": 147,
+        "terminator_line_numbers": []
+      },
+      "legacy_extracted_answer_present": true
+    },
+    {
+      "source_path": "results/sweep_real_20260719_154609.jsonl",
+      "source_line": 120,
+      "source_row_sha256": "5cf61b59c0beb5f44710a62c98c6b1632807de35084aad9f4247e99d5b7c47c5",
+      "response_sha256": "0ea077de54dac344eabe970fb52fbb77bceb8bd4aa9f962e4a3078b79186d3dd",
+      "domain": "math",
+      "grader": "numeric",
+      "completion_tokens": 4096,
+      "response_projection": {
+        "line_count": 180,
+        "terminator_line_numbers": []
+      },
+      "legacy_extracted_answer_present": true
+    },
+    {
+      "source_path": "results/sweep_real_20260719_154609.jsonl",
+      "source_line": 124,
+      "source_row_sha256": "985cf4a8ee0696a8bc5b82367d5b792026a48338607c2214161824edd0b52cb2",
+      "response_sha256": "5450265c75a09456cbd3bb6860b0c18ea8c85f4c845afe1546d65f06989ae833",
+      "domain": "math",
+      "grader": "numeric",
+      "completion_tokens": 4096,
+      "response_projection": {
+        "line_count": 179,
+        "terminator_line_numbers": []
+      },
+      "legacy_extracted_answer_present": true
+    },
+    {
+      "source_path": "results/sweep_real_20260719_154609.jsonl",
+      "source_line": 127,
+      "source_row_sha256": "a5457059ef4a5888019b96786d8c3714c2d53b4cf58ffc4a100128db882ee473",
+      "response_sha256": "9b9c322cd294fbda872c662bf1c0b8cac0ef7c4564fdaf74bdd14a11a009eabb",
+      "domain": "math",
+      "grader": "numeric",
+      "completion_tokens": 4096,
+      "response_projection": {
+        "line_count": 150,
+        "terminator_line_numbers": []
+      },
+      "legacy_extracted_answer_present": true
+    },
+    {
+      "source_path": "results/sweep_real_20260719_154609.jsonl",
+      "source_line": 129,
+      "source_row_sha256": "25535574390f9ac672d837eb32381256f3f890032bf5a4dd1a2b4718ad4d73e5",
+      "response_sha256": "675635581f59574d257211dbefcab72a5bf1272f7577eedd6e53e6689417b7d6",
+      "domain": "math",
+      "grader": "numeric",
+      "completion_tokens": 4096,
+      "response_projection": {
+        "line_count": 117,
+        "terminator_line_numbers": []
+      },
+      "legacy_extracted_answer_present": true
+    },
+    {
+      "source_path": "results/sweep_real_20260719_154609.jsonl",
+      "source_line": 130,
+      "source_row_sha256": "ec903ec7d8ee60b1aff9814d092f30028b8853fdb5e7da45ddd2487fb99c6b69",
+      "response_sha256": "4ef7ad8062cc8bb3e7ca656d5cfd6ac63dcae5bb0b508c81994134b7864898f9",
+      "domain": "math",
+      "grader": "numeric",
+      "completion_tokens": 4096,
+      "response_projection": {
+        "line_count": 247,
+        "terminator_line_numbers": []
+      },
+      "legacy_extracted_answer_present": true
+    },
+    {
+      "source_path": "results/sweep_real_20260719_154609.jsonl",
+      "source_line": 131,
+      "source_row_sha256": "7931c9779f7b7465340d21c084502c1d70f73d16510087896cdb2ea5eab784bf",
+      "response_sha256": "9798e49420d3841186e6dee624ab801c5c5180d5970c1a8b525130faec306b88",
+      "domain": "math",
+      "grader": "numeric",
+      "completion_tokens": 4096,
+      "response_projection": {
+        "line_count": 195,
+        "terminator_line_numbers": []
+      },
+      "legacy_extracted_answer_present": true
+    },
+    {
+      "source_path": "results/sweep_real_20260719_154609.jsonl",
+      "source_line": 132,
+      "source_row_sha256": "e4b7036a0b2a3c9261dc641de51611e767b25924b01ae346dd1ff685602853ad",
+      "response_sha256": "2300bc3fb10f39cc9ced3abd2e526044f112df2a6ac80b6de9fef262fe57556e",
+      "domain": "math",
+      "grader": "numeric",
+      "completion_tokens": 4096,
+      "response_projection": {
+        "line_count": 157,
+        "terminator_line_numbers": []
+      },
+      "legacy_extracted_answer_present": true
+    },
+    {
+      "source_path": "results/sweep_real_20260719_154609.jsonl",
+      "source_line": 133,
+      "source_row_sha256": "28662445a7d9c1e5fe74be0c7b2d19316d1fda3d1860d400bc85169ed2b0cfcb",
+      "response_sha256": "cd2019684978ffdcd8483466f9bec5afd11e1eb873982ab1b12a72ade72cd629",
+      "domain": "math",
+      "grader": "numeric",
+      "completion_tokens": 4096,
+      "response_projection": {
+        "line_count": 107,
+        "terminator_line_numbers": []
+      },
+      "legacy_extracted_answer_present": true
+    },
+    {
+      "source_path": "results/sweep_real_20260719_154609.jsonl",
+      "source_line": 134,
+      "source_row_sha256": "841e09a9f2027679da7b88ac7de8a0c5f9d95c74b82f7a2560eaf48e0de308d3",
+      "response_sha256": "cdfda31c24326995206afba004a11060addc0848a52789d013a31bf67df7736d",
+      "domain": "math",
+      "grader": "numeric",
+      "completion_tokens": 4096,
+      "response_projection": {
+        "line_count": 114,
+        "terminator_line_numbers": []
+      },
+      "legacy_extracted_answer_present": true
+    },
+    {
+      "source_path": "results/sweep_real_20260719_154609.jsonl",
+      "source_line": 135,
+      "source_row_sha256": "67bd0f914194dbb3006c359e4e7a5aa3aa7111b57303b621b24ce86dc0b604a8",
+      "response_sha256": "f2a784069cef0c314c334de7de1a4606522ce255d72d2df5db0203bd49e02429",
+      "domain": "math",
+      "grader": "numeric",
+      "completion_tokens": 4096,
+      "response_projection": {
+        "line_count": 124,
+        "terminator_line_numbers": []
+      },
+      "legacy_extracted_answer_present": true
+    },
+    {
+      "source_path": "results/sweep_real_20260719_154609.jsonl",
+      "source_line": 136,
+      "source_row_sha256": "cc997fd2f6c231d3175baf0ba0ff90c6986f7330e0e5123b97e49572e6d5a3ca",
+      "response_sha256": "3034a9a1fab2392538020f1854859cf5409c191ab8cd32e2e3519d71fef95550",
+      "domain": "math",
+      "grader": "numeric",
+      "completion_tokens": 4096,
+      "response_projection": {
+        "line_count": 187,
+        "terminator_line_numbers": []
+      },
+      "legacy_extracted_answer_present": true
+    },
+    {
+      "source_path": "results/sweep_real_20260719_154609.jsonl",
+      "source_line": 137,
+      "source_row_sha256": "342e911dc56b32ee263af5b8c0bafc6f5c3c8a30d3ca1e3f7e77968e3bd6b0e5",
+      "response_sha256": "d64bd707ef9343c8bc6d909d064d67fe65380be147141be57184db53f0005f95",
+      "domain": "math",
+      "grader": "numeric",
+      "completion_tokens": 4096,
+      "response_projection": {
+        "line_count": 151,
+        "terminator_line_numbers": []
+      },
+      "legacy_extracted_answer_present": true
+    },
+    {
+      "source_path": "results/sweep_real_20260719_154609.jsonl",
+      "source_line": 138,
+      "source_row_sha256": "9d272d75b8a2c2077f62f88e4d70821837b0fc4d012bcdac32e36990a0b4617f",
+      "response_sha256": "af27c4c66f73d4dc7d9c962e04b4d8dc1c245fa17ae5a11b2e0e4c905f598da7",
+      "domain": "math",
+      "grader": "numeric",
+      "completion_tokens": 4096,
+      "response_projection": {
+        "line_count": 157,
+        "terminator_line_numbers": []
+      },
+      "legacy_extracted_answer_present": true
+    },
+    {
+      "source_path": "results/sweep_real_20260719_154609.jsonl",
+      "source_line": 140,
+      "source_row_sha256": "21ef9fba8a86cd14bb687f9cc500245ac96ced810dc8a5d556bc27f7d109ae7b",
+      "response_sha256": "9075105bb08b9abc915b77cd27d4ebca85b9b3930112b040aa4f07d39010d6c2",
+      "domain": "math",
+      "grader": "numeric",
+      "completion_tokens": 4096,
+      "response_projection": {
+        "line_count": 72,
+        "terminator_line_numbers": []
+      },
+      "legacy_extracted_answer_present": true
+    },
+    {
+      "source_path": "results/sweep_real_20260719_154609.jsonl",
+      "source_line": 141,
+      "source_row_sha256": "ec509b7293608a7ffeecf46f18145dfc191ae767fd2df576f602be1c45d0e264",
+      "response_sha256": "940be3d62470907648a2f9d232d97553c42ba2aadbe9d980d97adac566b93d9c",
+      "domain": "math",
+      "grader": "numeric",
+      "completion_tokens": 4096,
+      "response_projection": {
+        "line_count": 159,
+        "terminator_line_numbers": []
+      },
+      "legacy_extracted_answer_present": true
+    },
+    {
+      "source_path": "results/sweep_real_20260719_154609.jsonl",
+      "source_line": 142,
+      "source_row_sha256": "7d268556367ff3565847fc321b61b616a35414091e201dce54f442402011fa6e",
+      "response_sha256": "4714146c0fff04edc6946d66883a4eee55d346540d827d02d5cb7cc291fb3f77",
+      "domain": "math",
+      "grader": "numeric",
+      "completion_tokens": 4096,
+      "response_projection": {
+        "line_count": 194,
+        "terminator_line_numbers": []
+      },
+      "legacy_extracted_answer_present": true
+    },
+    {
+      "source_path": "results/sweep_real_20260719_154609.jsonl",
+      "source_line": 144,
+      "source_row_sha256": "b6ae6884ec38f5c49f6b3639c4249a6bdfb43bcbb4206de177b3b70025d53084",
+      "response_sha256": "4e5fae102c9b1a9b0107a890d7d4b8174c5e7c55d2302cf0b71dbc4b3d66d2d2",
+      "domain": "math",
+      "grader": "numeric",
+      "completion_tokens": 4096,
+      "response_projection": {
+        "line_count": 177,
+        "terminator_line_numbers": []
+      },
+      "legacy_extracted_answer_present": true
+    },
+    {
+      "source_path": "results/sweep_real_20260719_154609.jsonl",
+      "source_line": 146,
+      "source_row_sha256": "b238710b11aaff67052c1e78a86f1a2dca7a4824accf3324e77f5ea0bfa32b06",
+      "response_sha256": "53341d2318dba889fa208c13c258cf7801d3daab76404e37e5f4307564805cef",
+      "domain": "math",
+      "grader": "numeric",
+      "completion_tokens": 4096,
+      "response_projection": {
+        "line_count": 103,
+        "terminator_line_numbers": []
+      },
+      "legacy_extracted_answer_present": true
+    },
+    {
+      "source_path": "results/sweep_real_20260719_154609.jsonl",
+      "source_line": 148,
+      "source_row_sha256": "ab26229f0ada47035ab644474a25283fcd9fc2f31678a9ea0b2b35d066caaad2",
+      "response_sha256": "f5741d1e08bfa55618dfe3e19efdab70ba355f2bd094ef466f38fcbc824e1d57",
+      "domain": "math",
+      "grader": "numeric",
+      "completion_tokens": 4096,
+      "response_projection": {
+        "line_count": 87,
+        "terminator_line_numbers": []
+      },
+      "legacy_extracted_answer_present": true
+    },
+    {
+      "source_path": "results/sweep_real_20260719_154609.jsonl",
+      "source_line": 149,
+      "source_row_sha256": "696e5a84c373ede676c4d8bcabe9dea539461049902ef90419b9bce5d13f9640",
+      "response_sha256": "ca03362acbe3589fe13adec0f377d37f3d303c84500c931dbc5cc40d142dcb9e",
+      "domain": "math",
+      "grader": "numeric",
+      "completion_tokens": 4096,
+      "response_projection": {
+        "line_count": 200,
+        "terminator_line_numbers": []
+      },
+      "legacy_extracted_answer_present": true
+    },
+    {
+      "source_path": "results/sweep_real_20260719_154609.jsonl",
+      "source_line": 150,
+      "source_row_sha256": "19f8c38ebb50730a58fdcbcad699397e07a2ce981085a5b04c0db968e937d216",
+      "response_sha256": "a70088cad92647bd5605be0152d906d13076c3f7669bc8c96da99329aecd49bd",
+      "domain": "math",
+      "grader": "numeric",
+      "completion_tokens": 4096,
+      "response_projection": {
+        "line_count": 133,
+        "terminator_line_numbers": []
+      },
+      "legacy_extracted_answer_present": true
+    },
+    {
+      "source_path": "results/sweep_real_20260719_172721.jsonl",
+      "source_line": 105,
+      "source_row_sha256": "814978faa67cc02a6a7d2ee2e293f69a53d20613fee3b82870763aef80dc4e06",
+      "response_sha256": "f4cb722c62416c699e90451327a0872b20c0e8aab6c6c3803829818dd5be19c0",
+      "domain": "knowledge",
+      "grader": "exact_field",
+      "completion_tokens": 4096,
+      "response_projection": {
+        "line_count": 90,
+        "terminator_line_numbers": []
+      },
+      "legacy_extracted_answer_present": true
+    },
+    {
+      "source_path": "results/sweep_real_20260719_172721.jsonl",
+      "source_line": 117,
+      "source_row_sha256": "4c711037bade9e13011b6bc8c0fc0bb4b59e95dbf1b6395007169c2196589c32",
+      "response_sha256": "9e42898d88cfce4e9841017619ba10add82cca3d28e9b835c38b3b508d3572bf",
+      "domain": "knowledge",
+      "grader": "exact_field",
+      "completion_tokens": 4096,
+      "response_projection": {
+        "line_count": 105,
+        "terminator_line_numbers": []
+      },
+      "legacy_extracted_answer_present": true
+    },
+    {
+      "source_path": "results/sweep_real_20260719_172721.jsonl",
+      "source_line": 122,
+      "source_row_sha256": "2a67de3764094f1fffa89434a65cddd8dea52191c2e8947fa8bc7342b0a502cf",
+      "response_sha256": "deb7acab213f266cc694b7bef1295f714d9c841efd18191bda7da4d8598497a4",
+      "domain": "knowledge",
+      "grader": "exact_field",
+      "completion_tokens": 4096,
+      "response_projection": {
+        "line_count": 158,
+        "terminator_line_numbers": []
+      },
+      "legacy_extracted_answer_present": true
+    },
+    {
+      "source_path": "results/sweep_real_20260719_172721.jsonl",
+      "source_line": 125,
+      "source_row_sha256": "4659479a31d846765e25beee127b308a2d7535684eedff6bb85c854687ae26d8",
+      "response_sha256": "5ab3e5431c04bde6af2508a092c687b7ff07ebd5bdc3178fc12e5d242d4acdb4",
+      "domain": "knowledge",
+      "grader": "exact_field",
+      "completion_tokens": 4096,
+      "response_projection": {
+        "line_count": 107,
+        "terminator_line_numbers": []
+      },
+      "legacy_extracted_answer_present": true
+    },
+    {
+      "source_path": "results/sweep_real_20260719_172721.jsonl",
+      "source_line": 129,
+      "source_row_sha256": "d2c77f924a8885cdc2c3ccdf1df77b30ba0676aef454b5371f1850fb1ff79b9a",
+      "response_sha256": "a26d2880d9e86d888d99cc788c9b5a916a9b42f28a2d36a28063c97dce03ce19",
+      "domain": "knowledge",
+      "grader": "exact_field",
+      "completion_tokens": 4096,
+      "response_projection": {
+        "line_count": 161,
+        "terminator_line_numbers": []
+      },
+      "legacy_extracted_answer_present": true
+    },
+    {
+      "source_path": "results/sweep_real_20260719_172721.jsonl",
+      "source_line": 133,
+      "source_row_sha256": "40f74b13960f8343f1964722c6912edc3dc8731998dab5192c13247553e73628",
+      "response_sha256": "4035d487627d2e1dcc14752ab5e4e13d8e53dd9a2ad5493308046bde7b316efd",
+      "domain": "knowledge",
+      "grader": "exact_field",
+      "completion_tokens": 4096,
+      "response_projection": {
+        "line_count": 147,
+        "terminator_line_numbers": []
+      },
+      "legacy_extracted_answer_present": true
+    },
+    {
+      "source_path": "results/sweep_real_20260719_172721.jsonl",
+      "source_line": 134,
+      "source_row_sha256": "9356a381b3e3bc81628855e67e2b6fec852250360f28ab7a967663324b3a307b",
+      "response_sha256": "4ab3d2a037870764208d6e6ae86ba098bf78811493b35f3f6f76b72f62aa8c86",
+      "domain": "knowledge",
+      "grader": "exact_field",
+      "completion_tokens": 4096,
+      "response_projection": {
+        "line_count": 181,
+        "terminator_line_numbers": []
+      },
+      "legacy_extracted_answer_present": true
+    },
+    {
+      "source_path": "results/sweep_real_20260719_172721.jsonl",
+      "source_line": 135,
+      "source_row_sha256": "2c62dc96157e19ee528492821f13216a32fe24bb763805761481e5e1912e4df7",
+      "response_sha256": "8b620e598b63f7ef4c21cd053b52b52b40246b595271814d9061ebfc327aaab5",
+      "domain": "knowledge",
+      "grader": "exact_field",
+      "completion_tokens": 4096,
+      "response_projection": {
+        "line_count": 86,
+        "terminator_line_numbers": []
+      },
+      "legacy_extracted_answer_present": true
+    },
+    {
+      "source_path": "results/sweep_real_20260719_172721.jsonl",
+      "source_line": 137,
+      "source_row_sha256": "cbffed0457cfe150a46b5cee5b0da139fccc13c0d9aaf8281a1947847ca8179d",
+      "response_sha256": "374ca4b3b6b46f713f6355e0812494a09f33d61d6aba86102f772b17b795d6c0",
+      "domain": "knowledge",
+      "grader": "exact_field",
+      "completion_tokens": 4096,
+      "response_projection": {
+        "line_count": 115,
+        "terminator_line_numbers": []
+      },
+      "legacy_extracted_answer_present": true
+    },
+    {
+      "source_path": "results/sweep_real_20260719_172721.jsonl",
+      "source_line": 147,
+      "source_row_sha256": "1f23ead237678c683842e396818559eeccfb13705e595ed11346f2dd085390f2",
+      "response_sha256": "f6329eb65248f9bf2628c7f0f7f7992099d974ed99d20ec9f43dfea78185d7d3",
+      "domain": "knowledge",
+      "grader": "exact_field",
+      "completion_tokens": 4096,
+      "response_projection": {
+        "line_count": 153,
+        "terminator_line_numbers": []
+      },
+      "legacy_extracted_answer_present": true
     }
   ]
 }
