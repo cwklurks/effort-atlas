@@ -6,7 +6,7 @@
     "repository": "cwklurks/effort-atlas",
     "updated": "2026-08-08",
     "current_phase": 1,
-    "summary": "Closing the grader, ecosystem-audit, and dry-run probe workstreams before integration."
+    "summary": "Task A is in implementation; Tasks B and C have reproducible checkpoints under independent review."
   },
   "safety": {
     "confirmatory_calls": 0,
@@ -28,8 +28,8 @@
       "id": 1,
       "name": "Close existing workstreams",
       "status": "in_progress",
-      "progress": 5,
-      "summary": "Repair Task A, strengthen grader-v2 acceptance, and make Task C route-consistent and fail-closed.",
+      "progress": 55,
+      "summary": "Task A is being repaired; grader-v2 and the fail-closed Tinker probe have reviewable checkpoints.",
       "gate": "A is citable, B is accepted, and C is safe for later human smoke execution."
     },
     {
@@ -98,16 +98,16 @@
       "branch": "codex/grader-v2",
       "pr": 2,
       "owner_model": "gpt-5.6-sol / High",
-      "next": "Replace the precomputed projection with archive-derived 78-row evidence."
+      "next": "Independent Sol XHigh review of commit b34d902 and the 78-row archive verifier."
     },
     {
       "id": "C",
       "name": "Tinker probe safety",
       "status": "in_progress",
       "branch": "codex/tinker-probe",
-      "pr": null,
+      "pr": 5,
       "owner_model": "gpt-5.6-sol / High",
-      "next": "Remove route confounding, add finite bounds, pin dependencies, and open a PR."
+      "next": "Independent Sol XHigh review of commit 2570778 and the dry-run safety boundary."
     },
     {
       "id": "D",
@@ -135,6 +135,16 @@
       "status": "passed"
     },
     {
+      "label": "Grader-v2 builder checkpoint",
+      "result": "78 archive rows verified; 12 / 12 focused checks passed",
+      "status": "passed"
+    },
+    {
+      "label": "Tinker-probe builder checkpoint",
+      "result": "21 / 21 focused checks; 12-call dry-run; independent review pending",
+      "status": "passed"
+    },
+    {
       "label": "Phase 0 local suite",
       "result": "40 / 40 passed",
       "status": "passed"
@@ -156,6 +166,12 @@
     }
   ],
   "activity": [
+    {
+      "date": "2026-08-08",
+      "phase": 1,
+      "title": "B and C entered independent review",
+      "detail": "Grader-v2 commit b34d902 and Tinker-probe commit 2570778 were pushed to draft PRs #2 and #5. Root replayed both focused verification paths without provider calls."
+    },
     {
       "date": "2026-08-08",
       "phase": 1,
