@@ -1,19 +1,18 @@
 from __future__ import annotations
 
+import hashlib
 import inspect
 import json
 import os
 import re
+import tempfile
 import unittest
 from collections import Counter
 from pathlib import Path
+from unittest.mock import patch
 
-from effort_atlas.grader_acceptance import (
-    build_archive_projection,
-    render_response_projection,
-)
-from effort_atlas.graders import grade, validate_grade_state
-
+from effort_atlas import grader_acceptance
+from effort_atlas.graders import extract_final_answer, grade, validate_grade_state
 
 FIXTURE = Path(__file__).parent / "fixtures" / "grader_v2_acceptance.json"
 
@@ -91,6 +90,78 @@ class GraderV2Tests(unittest.TestCase):
         self.assertTrue(present["correct"])
         self.assertEqual(present["extracted_answer"], "7")
 
+    def test_unanchored_custom_pattern_rejects_embedded_markers(self):
+        custom = re.compile(r"RESULT\s*=\s*(?P<answer>\d+)", re.IGNORECASE)
+
+        for response in (
+            "prefix RESULT=7 suffix",
+            "Reasoning mentions RESULT=7 as an intermediate value.",
+        ):
+            with self.subTest(response=response):
+                result = grade("numeric", response, "7", pattern=custom)
+                self.assertFalse(result["extracted_answer_present"])
+                self.assertFalse(result["correct"])
+
+        embedded_default = grade(
+            "numeric",
+            "Reasoning mentions Final answer: 7 as an example.",
+            "7",
+        )
+        complete_line = grade("numeric", "work\nRESULT=7", "7", pattern=custom)
+
+        self.assertFalse(embedded_default["extracted_answer_present"])
+        self.assertTrue(complete_line["correct"])
+
+    def test_numeric_comparator_preserves_pre_v2_field_parity(self):
+        cases = (
+            (r"Final answer: \boxed{42}", "42"),
+            ("Final answer: $1,234$", "1234"),
+            ("Final answer: 42.00", "42"),
+            ("Final answer: -29", "-29"),
+            ("Final answer: candidates 17 then 29", "29"),
+        )
+
+        for response, gold in cases:
+            with self.subTest(response=response, gold=gold):
+                result = grade("numeric", response, gold)
+                self.assertTrue(result["extracted_answer_present"])
+                self.assertTrue(result["correct"])
+
+    def test_custom_capture_group_validation_and_first_group_support(self):
+        first_group = grade(
+            "numeric",
+            "result=42",
+            "42",
+            pattern=r"RESULT\s*=\s*(\d+)",
+        )
+        optional_group = extract_final_answer(
+            "RESULT=",
+            pattern=re.compile(r"RESULT=(?P<answer>\d+)?"),
+        )
+
+        self.assertTrue(first_group["correct"])
+        self.assertIsNone(optional_group)
+        with self.assertRaisesRegex(ValueError, "must capture the answer"):
+            grade(
+                "numeric",
+                "RESULT=42",
+                "42",
+                pattern=re.compile(r"RESULT=\d+"),
+            )
+
+    def test_non_numeric_and_other_comparator_paths(self):
+        self.assertFalse(grade("numeric", "Final answer: unknown", "42")["correct"])
+        self.assertTrue(
+            grade("multiple_choice", "Final answer: option C", "C")["correct"]
+        )
+        self.assertFalse(
+            grade("multiple_choice", "Final answer: option D", "C")["correct"]
+        )
+        self.assertTrue(grade("exact_field", "Final answer: $ 42.00", "42")["correct"])
+        self.assertFalse(
+            grade("exact_field", "Final answer: unknown", "known")["correct"]
+        )
+
     def test_correct_without_answer_is_flagged_internally_inconsistent(self):
         self.assertEqual(
             validate_grade_state(
@@ -100,6 +171,126 @@ class GraderV2Tests(unittest.TestCase):
             ),
             "grade_extraction_inconsistent",
         )
+
+    def test_grade_state_validation_rejects_all_malformed_shapes(self):
+        cases = (
+            (
+                {
+                    "correct": 1,
+                    "extracted_answer_present": False,
+                    "extracted_answer": None,
+                },
+                "malformed_correct",
+            ),
+            (
+                {
+                    "correct": False,
+                    "extracted_answer_present": None,
+                    "extracted_answer": None,
+                },
+                "malformed_extracted_answer_presence",
+            ),
+            (
+                {
+                    "correct": False,
+                    "extracted_answer_present": True,
+                    "extracted_answer": None,
+                },
+                "grade_extraction_inconsistent",
+            ),
+            (
+                {
+                    "correct": False,
+                    "extracted_answer_present": False,
+                    "extracted_answer": "",
+                },
+                "grade_extraction_inconsistent",
+            ),
+            (
+                {
+                    "correct": False,
+                    "extracted_answer_present": False,
+                    "extracted_answer": None,
+                },
+                None,
+            ),
+            (
+                {
+                    "correct": True,
+                    "extracted_answer_present": True,
+                    "extracted_answer": "42",
+                },
+                None,
+            ),
+        )
+
+        for grade_state, expected in cases:
+            with self.subTest(grade_state=grade_state):
+                self.assertEqual(validate_grade_state(**grade_state), expected)
+
+    def test_response_projection_rejects_malformed_structures(self):
+        malformed = (
+            {},
+            {"line_count": True, "terminator_line_numbers": []},
+            {"line_count": -1, "terminator_line_numbers": []},
+            {"line_count": 1, "terminator_line_numbers": "1"},
+            {"line_count": 1, "terminator_line_numbers": [0]},
+            {"line_count": 1, "terminator_line_numbers": [2]},
+            {"line_count": 1, "terminator_line_numbers": [True]},
+            {"line_count": 1, "terminator_line_numbers": [1, 1]},
+        )
+
+        for projection in malformed:
+            with self.subTest(projection=projection), self.assertRaises(ValueError):
+                grader_acceptance.render_response_projection(projection)
+
+    def test_archive_integrity_validation_rejects_each_mismatch(self):
+        payload = b'{"row": 1}\n'
+        spec = {
+            "path": "results/source.jsonl",
+            "sha256": hashlib.sha256(payload).hexdigest(),
+            "bytes": len(payload),
+            "line_count": 1,
+            "domain": "math",
+            "grader": "numeric",
+        }
+
+        malformed_specs = (
+            {**spec, "bytes": len(payload) + 1},
+            {**spec, "sha256": "0" * 64},
+            {**spec, "line_count": 2},
+        )
+        for malformed_spec in malformed_specs:
+            with self.subTest(spec=malformed_spec), self.assertRaises(ValueError):
+                grader_acceptance._validate_source(malformed_spec, payload)
+
+    def test_archive_projection_rejects_malformed_grade_fields(self):
+        row = {
+            "completion_tokens": 4096,
+            "domain": "math",
+            "response_text": 42,
+            "gold": "42",
+            "extracted": "42",
+        }
+        payload = (json.dumps(row) + "\n").encode()
+        spec = {
+            "path": "results/source.jsonl",
+            "sha256": hashlib.sha256(payload).hexdigest(),
+            "bytes": len(payload),
+            "line_count": 1,
+            "domain": "math",
+            "grader": "numeric",
+        }
+
+        with tempfile.TemporaryDirectory() as temp_dir:
+            source = Path(temp_dir) / spec["path"]
+            source.parent.mkdir()
+            source.write_bytes(payload)
+            with (
+                patch.object(grader_acceptance, "ARCHIVE_SPECS", (spec,)),
+                self.assertRaisesRegex(TypeError, "grading fields malformed"),
+            ):
+                grader_acceptance.build_archive_projection(Path(temp_dir))
 
     def test_sanitized_archives_have_exactly_78_unanswered_4096_rows(self):
         fixture = json.loads(FIXTURE.read_text())
@@ -122,12 +313,7 @@ class GraderV2Tests(unittest.TestCase):
             expected_by_source,
         )
         self.assertEqual(
-            len(
-                {
-                    (row["source_path"], row["source_line"])
-                    for row in fixture["rows"]
-                }
-            ),
+            len({(row["source_path"], row["source_line"]) for row in fixture["rows"]}),
             78,
         )
 
@@ -139,7 +325,9 @@ class GraderV2Tests(unittest.TestCase):
             self.assertRegex(row["response_sha256"], r"^[0-9a-f]{64}$")
             self.assertNotIn("response_text", row)
             self.assertNotIn("gold", row)
-            response_projection = render_response_projection(row["response_projection"])
+            response_projection = grader_acceptance.render_response_projection(
+                row["response_projection"]
+            )
             result = grade(
                 row["grader"],
                 response_projection,
@@ -163,7 +351,7 @@ class GraderV2Tests(unittest.TestCase):
         archive_root = Path(os.environ["GRADER_V2_ARCHIVE_ROOT"])
 
         self.assertEqual(
-            build_archive_projection(archive_root),
+            grader_acceptance.build_archive_projection(archive_root),
             json.loads(FIXTURE.read_text()),
         )
 

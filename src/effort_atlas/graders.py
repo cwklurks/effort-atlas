@@ -7,8 +7,8 @@ terminator pattern. Termination metadata is deliberately absent from this API.
 from __future__ import annotations
 
 import re
-from typing import Callable, TypedDict
-
+from collections.abc import Callable
+from typing import TypedDict
 
 DEFAULT_FINAL_ANSWER_PATTERN = re.compile(
     r"[ \t]*Final answer[ \t]*:[ \t]*(?P<answer>\S(?:[^\r\n]*\S)?)[ \t]*",
@@ -57,6 +57,8 @@ def extract_final_answer(
                 "terminator pattern must capture the answer in group 'answer' "
                 "or its first capture group"
             )
+        if candidate is None:
+            continue
         candidate = candidate.strip()
         if candidate:
             extracted = candidate
@@ -81,7 +83,7 @@ def _compare_multiple_choice(extracted: str, gold: str) -> bool:
 
 
 def _compare_exact_field(extracted: str, gold: str) -> bool:
-    norm = lambda value: re.sub(r"[\s$]", "", value).strip(".").lower()  # noqa: E731
+    norm = lambda value: re.sub(r"[\s$]", "", value).strip(".").lower()
     if norm(extracted) == norm(gold):
         return True
     try:
@@ -98,10 +100,15 @@ def _grade_with_comparator(
     pattern: TerminatorPattern = DEFAULT_FINAL_ANSWER_PATTERN,
 ) -> GradeResult:
     extracted = extract_final_answer(response, pattern=pattern)
-    present = extracted is not None
+    if extracted is None:
+        return {
+            "correct": False,
+            "extracted_answer_present": False,
+            "extracted_answer": None,
+        }
     return {
-        "correct": present and comparator(extracted, gold),
-        "extracted_answer_present": present,
+        "correct": comparator(extracted, gold),
+        "extracted_answer_present": True,
         "extracted_answer": extracted,
     }
 
@@ -132,9 +139,7 @@ def grade_exact_field(
     *,
     pattern: TerminatorPattern = DEFAULT_FINAL_ANSWER_PATTERN,
 ) -> GradeResult:
-    return _grade_with_comparator(
-        _compare_exact_field, response, gold, pattern=pattern
-    )
+    return _grade_with_comparator(_compare_exact_field, response, gold, pattern=pattern)
 
 
 GRADERS = {

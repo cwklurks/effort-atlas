@@ -17,7 +17,6 @@ from typing import TypedDict
 
 from .graders import DEFAULT_FINAL_ANSWER_PATTERN, grade
 
-
 ACCEPTANCE_COMPLETION_TOKENS = 4096
 PROJECTION_SCHEMA_VERSION = "grader-v2-acceptance-v2"
 
@@ -123,7 +122,7 @@ def build_archive_projection(archive_root: Path) -> dict[str, object]:
             response = source_row.get("response_text")
             gold = source_row.get("gold")
             if not isinstance(response, str) or not isinstance(gold, str):
-                raise ValueError(
+                raise TypeError(
                     f"archive grading fields malformed: {spec['path']}:{source_line}"
                 )
 
