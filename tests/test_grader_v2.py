@@ -55,6 +55,13 @@ class GraderV2Tests(unittest.TestCase):
         self.assertTrue(result["extracted_answer_present"])
         self.assertEqual(result["extracted_answer"], "42")
 
+    def test_explicit_but_unparseable_answer_is_present_and_wrong(self):
+        result = grade("numeric", "Final answer: unknown", "42")
+
+        self.assertFalse(result["correct"])
+        self.assertTrue(result["extracted_answer_present"])
+        self.assertEqual(result["extracted_answer"], "unknown")
+
     def test_terminator_pattern_is_configurable_and_line_anchored(self):
         custom = re.compile(
             r"^[ \t]*RESULT[ \t]*=[ \t]*(?P<answer>\S(?:[^\r\n]*\S)?)[ \t]*$",

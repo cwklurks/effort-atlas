@@ -90,10 +90,57 @@ def _compare_exact_field(extracted: str, gold: str) -> bool:
         return False
 
 
-COMPARATORS: dict[str, Comparator] = {
-    "numeric": _compare_numeric,
-    "multiple_choice": _compare_multiple_choice,
-    "exact_field": _compare_exact_field,
+def _grade_with_comparator(
+    comparator: Comparator,
+    response: str,
+    gold: str,
+    *,
+    pattern: TerminatorPattern = DEFAULT_FINAL_ANSWER_PATTERN,
+) -> GradeResult:
+    extracted = extract_final_answer(response, pattern=pattern)
+    present = extracted is not None
+    return {
+        "correct": present and comparator(extracted, gold),
+        "extracted_answer_present": present,
+        "extracted_answer": extracted,
+    }
+
+
+def grade_numeric(
+    response: str,
+    gold: str,
+    *,
+    pattern: TerminatorPattern = DEFAULT_FINAL_ANSWER_PATTERN,
+) -> GradeResult:
+    return _grade_with_comparator(_compare_numeric, response, gold, pattern=pattern)
+
+
+def grade_multiple_choice(
+    response: str,
+    gold: str,
+    *,
+    pattern: TerminatorPattern = DEFAULT_FINAL_ANSWER_PATTERN,
+) -> GradeResult:
+    return _grade_with_comparator(
+        _compare_multiple_choice, response, gold, pattern=pattern
+    )
+
+
+def grade_exact_field(
+    response: str,
+    gold: str,
+    *,
+    pattern: TerminatorPattern = DEFAULT_FINAL_ANSWER_PATTERN,
+) -> GradeResult:
+    return _grade_with_comparator(
+        _compare_exact_field, response, gold, pattern=pattern
+    )
+
+
+GRADERS = {
+    "numeric": grade_numeric,
+    "multiple_choice": grade_multiple_choice,
+    "exact_field": grade_exact_field,
 }
 
 
@@ -104,13 +151,7 @@ def grade(
     *,
     pattern: TerminatorPattern = DEFAULT_FINAL_ANSWER_PATTERN,
 ) -> GradeResult:
-    extracted = extract_final_answer(response, pattern=pattern)
-    present = extracted is not None
-    return {
-        "correct": present and COMPARATORS[grader](extracted, gold),
-        "extracted_answer_present": present,
-        "extracted_answer": extracted,
-    }
+    return GRADERS[grader](response, gold, pattern=pattern)
 
 
 def validate_grade_state(
