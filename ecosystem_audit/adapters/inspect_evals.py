@@ -47,7 +47,7 @@ def function_builder(imported: dict[str, Any]):
 
     async def score(row: dict[str, Any]) -> dict[str, Any]:
         gold = row.get("gold_answer")
-        if row.get("stratum") != "synthetic_truncated" and row.get("dataset") != "aime_2026_outputs":
+        if row.get("stratum") == "real_truncated" and row.get("dataset") != "aime_2026_outputs":
             return {
                 "adapter_status": "not_applicable",
                 "status_reason": "real fixture is not from the frozen AIME 2026 dataset",

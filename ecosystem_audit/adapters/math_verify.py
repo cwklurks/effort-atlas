@@ -5,7 +5,7 @@ import logging
 import sys
 from pathlib import Path
 
-from common import main, serialize
+from common import main, marshal_math_gold, serialize
 
 
 class _Capture(logging.Handler):
@@ -58,12 +58,7 @@ def function_builder(math_verify):
             logger.setLevel(logging.DEBUG)
         try:
             prediction = math_verify.parse(row["text"])
-            gold_text = str(row["gold_answer"])
-            # Gold fields are answers rather than model prose. Bare LaTeX commands need
-            # only a math-environment delimiter so the real default LaTeX parser can
-            # see the complete expression; no expression text is rewritten.
-            if "\\" in gold_text and "$" not in gold_text and not gold_text.startswith((r"\(", r"\[")):
-                gold_text = f"${gold_text}$"
+            gold_text = marshal_math_gold(row["gold_answer"])
             gold = math_verify.parse(gold_text)
             if not gold:
                 result = {

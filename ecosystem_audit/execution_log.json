@@ -11,12 +11,26 @@
     },
     {
       "adapter_status_counts": {
-        "import_failed": 295
+        "not_applicable": 119,
+        "ok": 176
+      },
+      "command": "ecosystem_audit/_envs/lm_eval/bin/python ecosystem_audit/adapters/lm_eval_aime.py --input <canonical-fixtures.jsonl> --output <results.jsonl> --repo ecosystem_audit/_repos/lm-evaluation-harness",
+      "pipeline_id": "aime_process_results",
+      "status_reasons": [
+        "answer_returned not measured: upstream process_results returns only a score",
+        "gold_answer is not an integer (AIME task schema)"
+      ],
+      "target": "lm-evaluation-harness"
+    },
+    {
+      "adapter_status_counts": {
+        "not_applicable": 119,
+        "ok": 176
       },
       "command": "ecosystem_audit/_envs/opencompass/bin/python ecosystem_audit/adapters/opencompass.py --input <canonical-fixtures.jsonl> --output <results.jsonl> --repo ecosystem_audit/_repos/opencompass",
       "pipeline_id": "gsm8k_last_number",
       "status_reasons": [
-        "ModuleNotFoundError: No module named 'rouge_score'"
+        "non-numeric gold_answer"
       ],
       "target": "opencompass"
     },
@@ -43,12 +57,13 @@
     },
     {
       "adapter_status_counts": {
-        "not_applicable": 182,
-        "ok": 113
+        "not_applicable": 160,
+        "ok": 135
       },
       "command": "ecosystem_audit/_envs/inspect/bin/python ecosystem_audit/adapters/inspect_evals.py --input <canonical-fixtures.jsonl> --output <results.jsonl> --repo ecosystem_audit/_repos/inspect_evals",
       "pipeline_id": "aime_last_line_numeric",
       "status_reasons": [
+        "gold_answer is not an integer (AIME scorer schema)",
         "real fixture is not from the frozen AIME 2026 dataset"
       ],
       "target": "inspect_evals"
@@ -76,7 +91,20 @@
         "not_applicable": 119,
         "ok": 176
       },
-      "command": ".venv/bin/python ecosystem_audit/adapters/livebench.py --input <canonical-fixtures.jsonl> --output <results.jsonl> --repo ecosystem_audit/_repos/livebench",
+      "command": "ecosystem_audit/_envs/livebench/bin/python ecosystem_audit/adapters/livebench_aime.py --input <canonical-fixtures.jsonl> --output <results.jsonl> --repo ecosystem_audit/_repos/livebench",
+      "pipeline_id": "aime_last50",
+      "status_reasons": [
+        "answer_returned not measured: upstream AIME task path returns only a score",
+        "gold_answer is not an integer (AIME task schema)"
+      ],
+      "target": "livebench"
+    },
+    {
+      "adapter_status_counts": {
+        "not_applicable": 119,
+        "ok": 176
+      },
+      "command": "ecosystem_audit/_envs/livebench/bin/python ecosystem_audit/adapters/livebench.py --input <canonical-fixtures.jsonl> --output <results.jsonl> --repo ecosystem_audit/_repos/livebench",
       "pipeline_id": "olympiad_expression",
       "status_reasons": [
         "non-integer gold_answer"
@@ -102,5 +130,5 @@
       "target": "matharena"
     }
   ],
-  "schema_version": 1
+  "schema_version": 2
 }

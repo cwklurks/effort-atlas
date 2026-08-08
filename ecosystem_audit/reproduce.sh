@@ -38,6 +38,8 @@ for domain in ('math','extraction'):
     (data/f'{domain}.jsonl').write_text(''.join(json.dumps({'id':item,'domain':value},sort_keys=True)+'\n' for item,value in selected))
 PY
 PYTHONPATH=trunccheck/src .venv/bin/python -m unittest discover -s trunccheck/tests -v
+.venv/bin/python -m unittest ecosystem_audit/test_round2_contract.py -v
 .venv/bin/python ecosystem_audit/run_executable_audit.py --locked --seed 1729 --check
+.venv/bin/python ecosystem_audit/independent_recompute.py
 .venv/bin/python ecosystem_audit/verify.py --strict
 MPLCONFIGDIR=/tmp/effort-atlas-mpl PYTHONPATH=src .venv/bin/python -m unittest discover -s tests -v

@@ -5,7 +5,7 @@ import sys
 from pathlib import Path
 from typing import Any
 
-from common import main, serialize
+from common import main, marshal_math_gold, serialize
 
 
 def importer(repo: Path) -> dict[str, Any]:
@@ -52,7 +52,7 @@ def function_builder(imported: dict[str, Any]):
 
     def evaluate(row: dict[str, Any]) -> dict[str, Any]:
         text = row["text"]
-        gold = str(row["gold_answer"])
+        gold = marshal_math_gold(row["gold_answer"])
 
         # These arguments are the ones bound by Metrics.expr_gold_metric.
         extracted = extract_target_from_pred(

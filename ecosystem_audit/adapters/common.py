@@ -24,6 +24,13 @@ def serialize(value):
         return f"<{type(value).__module__}.{type(value).__qualname__}>"
     return rendered
 
+def marshal_math_gold(value):
+    """Apply the audit's one non-semantic math-environment wrapper to gold text."""
+    gold=str(value)
+    if "\\" in gold and "$" not in gold and not gold.startswith((r"\(",r"\[")):
+        return f"${gold}$"
+    return gold
+
 def run_rows(rows, function):
     out=[]; timings=[]
     for row in rows:

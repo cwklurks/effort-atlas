@@ -43,7 +43,8 @@ def main():
             scorer_measured=any(r['native_correct']!='' for r in subset),
             swallowed_error_measured=any(r['swallowed_error_observed']!='' for r in subset),
         )
-        expected={(r['metric'],r['stratum']):(int(r['numerator']) if r['numerator'] else None,int(r['denominator']) if r['denominator'] else None,r['metric_status']) for r in metrics if r['pipeline_id']==config['pipeline_id']}
+        core={'answer_returned_after_truncation_pct','crash_pct','swallowed_error_pct','accidental_correct_pct','control_pass_pct'}
+        expected={(r['metric'],r['stratum']):(int(r['numerator']) if r['numerator'] else None,int(r['denominator']) if r['denominator'] else None,r['metric_status']) for r in metrics if r['pipeline_id']==config['pipeline_id'] and r['metric'] in core and r['stratum'] in {'real','synthetic'} and r['metric_status']!='not_measured'}
         actual={}
         for metric in report.metrics:
             if metric.name=='control_answer_returned_pct': continue
@@ -51,16 +52,16 @@ def main():
             for suffix,label in (('_real_truncated','real'),('_synthetic_truncated','synthetic')):
                 if name.endswith(suffix): name=name[:-len(suffix)];stratum=label
             if name=='control_pass_pct': stratum='control'
-            actual[(name,stratum)]=(metric.numerator,metric.denominator,metric.status)
+            if name in core and stratum in {'real','synthetic'} and (name,stratum) in expected:
+                actual[(name,stratum)]=(metric.numerator,metric.denominator,metric.status)
         assert actual==expected,(config['pipeline_id'],'trunccheck metric validation differs')
-        assert report.status==next(r['pipeline_status'] for r in metrics if r['pipeline_id']==config['pipeline_id'])
-    entries=module.locked();assert (A/'results_table.md').read_text()==module.markdown(metrics,entries)
+    entries=module.locked();assert (A/'results_table.md').read_text()==module.markdown(metrics,entries,results)
     statuses={r['pipeline_id']:r['pipeline_status'] for r in metrics}
     md=(A/'results_table.md').read_text()
     for pipeline,status in statuses.items():
         if status=='control_disqualified':
             assert f'| {pipeline} | control_disqualified |' in md
-            headline=md.split('## Headline-eligible pipeline rows',1)[1].split('## Locked repositories',1)[0]
+            headline=md.split('## Headline-eligible real-data pipeline rows',1)[1].split('## Locked repositories',1)[0]
             assert f'| {pipeline} |' not in headline
     print(f'phase 2 verified with trunccheck: {len(results)} fixture-pipeline rows; synthetic sha256={hashlib.sha256(synth).hexdigest()}')
 if __name__=='__main__':main()

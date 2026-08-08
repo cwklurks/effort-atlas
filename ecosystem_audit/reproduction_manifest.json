@@ -1,64 +1,74 @@
 {
   "adapter_environments": {
     "helm": {
-      "install_command": "uv venv --python 3.12 ecosystem_audit/_envs/helm && uv pip install --python ecosystem_audit/_envs/helm/bin/python -r ecosystem_audit/environments/helm.requirements.txt && uv pip install --python ecosystem_audit/_envs/helm/bin/python --no-deps -e ecosystem_audit/_repos/helm",
+      "install_command": "uv venv --python 3.12.8 ecosystem_audit/_envs/helm && uv pip install --python ecosystem_audit/_envs/helm/bin/python -r ecosystem_audit/environments/helm.requirements.txt && uv pip install --python ecosystem_audit/_envs/helm/bin/python --no-deps -e ecosystem_audit/_repos/helm",
       "interpreter": "ecosystem_audit/_envs/helm/bin/python",
       "lock_file": "ecosystem_audit/environments/helm.requirements.txt",
-      "lock_sha256": "20f53789496b1cca7a6e8787c17c9928507d0ff9c9b4801b43711a0f3a7cd1c1"
+      "lock_sha256": "20f53789496b1cca7a6e8787c17c9928507d0ff9c9b4801b43711a0f3a7cd1c1",
+      "python": "3.12.8"
     },
     "inspect_ai": {
-      "install_command": "uv venv --python 3.12 ecosystem_audit/_envs/inspect && uv pip install --python ecosystem_audit/_envs/inspect/bin/python -r ecosystem_audit/environments/inspect.requirements.txt && uv pip install --python ecosystem_audit/_envs/inspect/bin/python --no-deps -e ecosystem_audit/_repos/inspect_ai",
+      "install_command": "uv venv --python 3.12.8 ecosystem_audit/_envs/inspect && uv pip install --python ecosystem_audit/_envs/inspect/bin/python -r ecosystem_audit/environments/inspect.requirements.txt && uv pip install --python ecosystem_audit/_envs/inspect/bin/python --no-deps -e ecosystem_audit/_repos/inspect_ai -e ecosystem_audit/_repos/inspect_evals",
       "interpreter": "ecosystem_audit/_envs/inspect/bin/python",
       "lock_file": "ecosystem_audit/environments/inspect.requirements.txt",
-      "lock_sha256": "3e15913683bdd7cc3861ea5a487165e247e8a68d7bb9e14e9c4b109b9556ade4"
+      "lock_sha256": "3e15913683bdd7cc3861ea5a487165e247e8a68d7bb9e14e9c4b109b9556ade4",
+      "python": "3.12.8"
     },
     "inspect_evals": {
-      "install_command": "uv venv --python 3.12 ecosystem_audit/_envs/inspect && uv pip install --python ecosystem_audit/_envs/inspect/bin/python -r ecosystem_audit/environments/inspect.requirements.txt && uv pip install --python ecosystem_audit/_envs/inspect/bin/python --no-deps -e ecosystem_audit/_repos/inspect_ai -e ecosystem_audit/_repos/inspect_evals",
+      "install_command": "uv venv --python 3.12.8 ecosystem_audit/_envs/inspect && uv pip install --python ecosystem_audit/_envs/inspect/bin/python -r ecosystem_audit/environments/inspect.requirements.txt && uv pip install --python ecosystem_audit/_envs/inspect/bin/python --no-deps -e ecosystem_audit/_repos/inspect_ai -e ecosystem_audit/_repos/inspect_evals",
       "interpreter": "ecosystem_audit/_envs/inspect/bin/python",
       "lock_file": "ecosystem_audit/environments/inspect.requirements.txt",
-      "lock_sha256": "3e15913683bdd7cc3861ea5a487165e247e8a68d7bb9e14e9c4b109b9556ade4"
+      "lock_sha256": "3e15913683bdd7cc3861ea5a487165e247e8a68d7bb9e14e9c4b109b9556ade4",
+      "python": "3.12.8"
     },
     "lighteval": {
-      "install_command": "uv venv --python 3.12 ecosystem_audit/_envs/lighteval && uv pip install --python ecosystem_audit/_envs/lighteval/bin/python -r ecosystem_audit/environments/lighteval.requirements.txt && uv pip install --python ecosystem_audit/_envs/lighteval/bin/python --no-deps -e ecosystem_audit/_repos/lighteval",
+      "install_command": "uv venv --python 3.12.8 ecosystem_audit/_envs/lighteval && uv pip install --python ecosystem_audit/_envs/lighteval/bin/python -r ecosystem_audit/environments/lighteval.requirements.txt && uv pip install --python ecosystem_audit/_envs/lighteval/bin/python --no-deps -e ecosystem_audit/_repos/lighteval",
       "interpreter": "ecosystem_audit/_envs/lighteval/bin/python",
       "lock_file": "ecosystem_audit/environments/lighteval.requirements.txt",
-      "lock_sha256": "5dd26674f3abf6518c866092a5a8b6a1b673af396cbc4bf25b115f137b79a044"
+      "lock_sha256": "5dd26674f3abf6518c866092a5a8b6a1b673af396cbc4bf25b115f137b79a044",
+      "python": "3.12.8"
     },
     "livebench": {
-      "install_command": "uv pip install --python .venv/bin/python -r requirements.txt",
-      "interpreter": ".venv/bin/python",
-      "lock_file": "requirements.txt",
-      "lock_sha256": "d795fe06fbd4f827928275767e2f812273d2db4cf2e774771ee90310209e376f"
+      "install_command": "uv venv --python 3.12.8 ecosystem_audit/_envs/livebench",
+      "interpreter": "ecosystem_audit/_envs/livebench/bin/python",
+      "lock_file": "ecosystem_audit/environments/livebench.requirements.txt",
+      "lock_sha256": "d17f96a43cb0a156e58e0c62363571315c690760f5428e1ffdb016d0991936ca",
+      "python": "3.12.8"
     },
     "lm-evaluation-harness": {
-      "install_command": "uv venv --python 3.12 ecosystem_audit/_envs/lm_eval && uv pip install --python ecosystem_audit/_envs/lm_eval/bin/python -r ecosystem_audit/environments/lm_eval.requirements.txt && uv pip install --python ecosystem_audit/_envs/lm_eval/bin/python --no-deps -e ecosystem_audit/_repos/lm-evaluation-harness",
+      "install_command": "uv venv --python 3.12.8 ecosystem_audit/_envs/lm_eval && uv pip install --python ecosystem_audit/_envs/lm_eval/bin/python -r ecosystem_audit/environments/lm_eval.requirements.txt && uv pip install --python ecosystem_audit/_envs/lm_eval/bin/python --no-deps -e ecosystem_audit/_repos/lm-evaluation-harness",
       "interpreter": "ecosystem_audit/_envs/lm_eval/bin/python",
       "lock_file": "ecosystem_audit/environments/lm_eval.requirements.txt",
-      "lock_sha256": "536d0974b700b7cf11c150cb0993469f7670f1b40485aedf403223e44af3e490"
+      "lock_sha256": "536d0974b700b7cf11c150cb0993469f7670f1b40485aedf403223e44af3e490",
+      "python": "3.12.8"
     },
     "math-verify": {
-      "install_command": "uv venv --python 3.12 ecosystem_audit/_envs/math_verify && uv pip install --python ecosystem_audit/_envs/math_verify/bin/python -r ecosystem_audit/environments/math_verify.requirements.txt && uv pip install --python ecosystem_audit/_envs/math_verify/bin/python --no-deps -e ecosystem_audit/_repos/math-verify",
+      "install_command": "uv venv --python 3.12.8 ecosystem_audit/_envs/math_verify && uv pip install --python ecosystem_audit/_envs/math_verify/bin/python -r ecosystem_audit/environments/math_verify.requirements.txt && uv pip install --python ecosystem_audit/_envs/math_verify/bin/python --no-deps -e ecosystem_audit/_repos/math-verify",
       "interpreter": "ecosystem_audit/_envs/math_verify/bin/python",
       "lock_file": "ecosystem_audit/environments/math_verify.requirements.txt",
-      "lock_sha256": "2f369364c734b9177aa85870f11a2aa50f092125c6d9a5a5e21f2838a50b5cac"
+      "lock_sha256": "2f369364c734b9177aa85870f11a2aa50f092125c6d9a5a5e21f2838a50b5cac",
+      "python": "3.12.8"
     },
     "matharena": {
-      "install_command": "uv venv --python 3.12 ecosystem_audit/_envs/matharena && uv pip install --python ecosystem_audit/_envs/matharena/bin/python -r ecosystem_audit/environments/matharena.requirements.txt",
+      "install_command": "uv venv --python 3.12.8 ecosystem_audit/_envs/matharena && uv pip install --python ecosystem_audit/_envs/matharena/bin/python -r ecosystem_audit/environments/matharena.requirements.txt",
       "interpreter": "ecosystem_audit/_envs/matharena/bin/python",
       "lock_file": "ecosystem_audit/environments/matharena.requirements.txt",
-      "lock_sha256": "5a8feb9f12c4aef27e7b482e83537c9c2c6420ea0235ed45790f2ea49ef28ff4"
+      "lock_sha256": "5a8feb9f12c4aef27e7b482e83537c9c2c6420ea0235ed45790f2ea49ef28ff4",
+      "python": "3.12.8"
     },
     "opencompass": {
-      "install_command": "uv venv --python 3.12 ecosystem_audit/_envs/opencompass && uv pip install --python ecosystem_audit/_envs/opencompass/bin/python -r ecosystem_audit/environments/opencompass.requirements.txt && uv pip install --python ecosystem_audit/_envs/opencompass/bin/python --no-deps -e ecosystem_audit/_repos/opencompass",
+      "install_command": "uv venv --python 3.12.8 ecosystem_audit/_envs/opencompass && uv pip install --python ecosystem_audit/_envs/opencompass/bin/python -r ecosystem_audit/environments/opencompass.requirements.txt && uv pip install --python ecosystem_audit/_envs/opencompass/bin/python --no-deps -e ecosystem_audit/_repos/opencompass",
       "interpreter": "ecosystem_audit/_envs/opencompass/bin/python",
       "lock_file": "ecosystem_audit/environments/opencompass.requirements.txt",
-      "lock_sha256": "1bbea84fc9aacff6eb90b6dd84836e3e108c6f2edc052d2a84331a79ff4bc3f3"
+      "lock_sha256": "f0f2b426bc2153d159decf8de16c0fd66cfa92df2d351c9088cb0877ff78bcbc",
+      "python": "3.12.8"
     },
     "simple-evals": {
-      "install_command": "uv venv --python 3.12 ecosystem_audit/_envs/simple && uv pip install --python ecosystem_audit/_envs/simple/bin/python -r ecosystem_audit/environments/simple.requirements.txt",
+      "install_command": "uv venv --python 3.12.8 ecosystem_audit/_envs/simple && uv pip install --python ecosystem_audit/_envs/simple/bin/python -r ecosystem_audit/environments/simple.requirements.txt",
       "interpreter": "ecosystem_audit/_envs/simple/bin/python",
       "lock_file": "ecosystem_audit/environments/simple.requirements.txt",
-      "lock_sha256": "cbee1d8569567c4bdc1c124c6799818713f6d87b906d797c01acf7f4afd97ac6"
+      "lock_sha256": "cbee1d8569567c4bdc1c124c6799818713f6d87b906d797c01acf7f4afd97ac6",
+      "python": "3.12.8"
     }
   },
   "adapter_manifest": "ecosystem_audit/adapter_manifest.json",
@@ -404,7 +414,7 @@
   "root_environment": ".venv",
   "root_requirements": "requirements.txt",
   "root_requirements_check": "MPLBACKEND=Agg .venv/bin/python -c \"import openai,yaml,pandas,matplotlib,dotenv\"",
-  "schema_version": 1,
+  "schema_version": 2,
   "synthetic_fixture_sha256": "80329fcd2cbc3cf0056c813b931e4b20ee1e222649c52058fc9b66b875c5e834",
   "task_start_commit": "da183fc9cba84fb866be757ec0158c79ed28571c"
 }

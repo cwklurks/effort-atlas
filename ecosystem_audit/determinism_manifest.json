@@ -2,12 +2,12 @@
   "byte_identical": true,
   "command": ".venv/bin/python ecosystem_audit/run_executable_audit.py --locked --seed 1729 --check",
   "independent_runs_compared": 2,
-  "schema_version": 1,
+  "schema_version": 2,
   "seed": 1729,
   "sha256": {
-    "fixture_results.csv": "43e8c136cd7c3267258afe4b639d845baefbac9b6a1983c1e121b5bc63926a46",
-    "pipeline_metrics.csv": "fb5022ee5e0f21a5e70e6e6f23e40e2b82ffda0d63fd879f333b722511160ce8",
-    "results_table.md": "232d4395c1838544bb60017103afebaea3965ead372d79ec99b7d9bcbd0e323e",
+    "fixture_results.csv": "765cfcc49feb6a533deb411fd6d14c4e48ce90bb2dc25813be2c53bbee824286",
+    "pipeline_metrics.csv": "818e326b62a6f7ad6519caa88ec8e4d97382158c15399da93decced7cce5e805",
+    "results_table.md": "0be057203c53cb8c6df3bdab2134067bc1b527d3de557e082559b627ee331753",
     "synthetic_fixtures.jsonl": "80329fcd2cbc3cf0056c813b931e4b20ee1e222649c52058fc9b66b875c5e834"
   }
 }

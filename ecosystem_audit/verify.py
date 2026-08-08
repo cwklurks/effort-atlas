@@ -6,7 +6,7 @@ from collections import Counter
 from pathlib import Path
 ROOT=Path(__file__).resolve().parents[1];A=ROOT/'ecosystem_audit';REAL=ROOT/'observational/real_truncated_fixtures.jsonl.gz'
 REAL_SHA='b84adb85eccd6b628829cdadb71c29fa25eb4dc0a37d387f554464b312d96f43'
-REQUIRED=['AUDIT.md','audit_data.csv','results_table.md','fixture_results.csv','pipeline_metrics.csv','timeline.csv','GAPS.md','repos.lock.json','receipt_index.json','adapter_manifest.json','execution_log.json','synthetic_fixtures.jsonl','run_executable_audit.py','verification_receipt.json','validate_receipts.py','validate_timeline.py']
+REQUIRED=['AUDIT.md','audit_data.csv','results_table.md','fixture_results.csv','pipeline_metrics.csv','timeline.csv','GAPS.md','repos.lock.json','receipt_index.json','adapter_manifest.json','execution_log.json','synthetic_fixtures.jsonl','run_executable_audit.py','build_adapter_manifest.py','verification_receipt.json','validate_receipts.py','validate_timeline.py','independent_recomputation.json']
 
 def command(args,check=True):
     result=subprocess.run(args,cwd=ROOT,capture_output=True,text=True)
@@ -18,7 +18,7 @@ def table(path):
 
 def verify_files():
     missing=[name for name in REQUIRED if not (A/name).is_file()];assert not missing,f'missing files: {missing}'
-    result_required={'target','pipeline_id','repository_sha','fixture_id','kind','stratum','shape','applicable','adapter_status','applicability_reason','status_reason','extracted_answer','answer_returned','native_correct','exception_class','exception_message','swallowed_error_observed','swallowed_error_detail','duration_status'}
+    result_required={'target','pipeline_id','repository_sha','fixture_id','kind','stratum','shape','dataset','problem_idx','text_empty','control_gold_eligible','pre_truncation_answer_present','applicable','adapter_status','applicability_reason','status_reason','extracted_answer','answer_returned','answer_is_numeric','native_correct','exception_class','exception_message','swallowed_error_observed','swallowed_error_detail','duration_status'}
     metric_required={'target','pipeline_id','pipeline_status','stratum','metric','numerator','denominator','percent','metric_status'}
     timeline_required={'harness','pipeline_or_task','setting','value','introduced_commit','introduced_date','remediated_value','remediated_commit','remediated_date','era_relation','evidence_command','status'}
     for path,required in [(A/'fixture_results.csv',result_required),(A/'pipeline_metrics.csv',metric_required),(A/'timeline.csv',timeline_required)]:
@@ -29,6 +29,11 @@ def verify_corpora():
     raw=gzip.decompress(compressed);lines=raw.splitlines(keepends=True);assert len(lines)==195 and raw.endswith(b'\n')
     records=[json.loads(line) for line in lines];assert Counter(r['kind'] for r in records)=={'truncated':131,'control_correct':64}
     assert sum(r['kind']=='truncated' and r['text']=='' for r in records)==12
+    truncated=[r for r in records if r['kind']=='truncated']
+    marker=re.compile(r'\\boxed\{.+?\}',re.DOTALL)
+    assert Counter(bool(marker.search(r['text'])) for r in truncated)=={False:105,True:26}
+    integer_controls=[r for r in records if r['kind']=='control_correct' and re.fullmatch(r'[+-]?\d+',str(r['gold_answer']).strip())]
+    assert len(integer_controls)==28
     sys.path.insert(0,str(ROOT/'trunccheck/src'))
     from trunccheck import fixtures_to_jsonl,generate_synthetic_fixtures
     synthetic=(A/'synthetic_fixtures.jsonl').read_bytes();generated=fixtures_to_jsonl(generate_synthetic_fixtures(1729));assert synthetic==generated
@@ -48,7 +53,7 @@ def verify_results():
     assert {r['pipeline_id'] for r in manifest['pipelines']}==pipelines and manifest['no_model_calls'] is True
     for pipeline in manifest['pipelines']:
         env=pipeline['environment'];path=ROOT/env['lock_file'];assert path.is_file() and hashlib.sha256(path.read_bytes()).hexdigest()==env['lock_sha256']
-        assert pipeline['source_receipts'] and pipeline['status'] in {'ok','control_disqualified','import_failed','install_failed','not_runnable'}
+        assert pipeline['source_receipts'] and pipeline['dispatch_receipt_ids'] and pipeline['status'] in {'ok','insufficient_power','wrong_task_dispatch','control_disqualified','import_failed','install_failed','not_runnable'}
     deterministic=json.loads((A/'determinism_manifest.json').read_text());assert deterministic['seed']==1729 and deterministic['independent_runs_compared']==2 and deterministic['byte_identical'] is True
     for name,digest in deterministic['sha256'].items():assert hashlib.sha256((A/name).read_bytes()).hexdigest()==digest
 
@@ -96,5 +101,6 @@ def main():
     if args.strict:verify_strict_repositories()
     elif not args.offline:print('note: repository receipt/history checks require --strict')
     verify_git_contract()
-    print(f"ecosystem audit verified ({'strict' if args.strict else 'offline' if args.offline else 'standard'}): 10 targets, 2950 fixture-pipeline rows")
+    results=table(A/'fixture_results.csv')
+    print(f"ecosystem audit verified ({'strict' if args.strict else 'offline' if args.offline else 'standard'}): {len({r['target'] for r in results})} targets, {len({r['pipeline_id'] for r in results})} pipelines, {len(results)} fixture-pipeline rows")
 if __name__=='__main__':main()

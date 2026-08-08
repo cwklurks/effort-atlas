@@ -77,8 +77,28 @@ Not applicable means the repository is an extractor/scorer library rather than a
 | opencompass | GSM8K postprocessor returns the last number or registered NULL sentinel and its evaluator scores numeric equality. | [F065](#f065) |
 | opencompass | Canonical GSM8K dataset config wires gsm8k_postprocess to Gsm8kEvaluator. | [F066](#f066) |
 | livebench | Olympiad scorer calls the real multi-stage extractor then native edit-distance or positional comparison. | [F067](#f067) |
+| lm-evaluation-harness | The lm-eval AIME task initializes a dollar-span fallback before optional boxed extraction and returns exact-match scoring. | [F069](#f069) |
 
 Extraction is reported separately from correctness. A returned nonempty value on a truncated fixture is the operational answer-returned event; it is not by itself evidence that answer text was newly invented. Native correctness is used only where the actual downstream path is runnable.
+
+## Executable task-path dispatch receipts
+
+| Target | Pipeline | Registered/dispatch path | Receipts | Headline eligible |
+|---|---|---|---|---|
+| lm-evaluation-harness | gsm8k_flexible_extract | lm_eval/tasks/gsm8k/gsm8k-cot.yaml flexible-extract | [F004](#f004), [F005](#f005) | yes |
+| lm-evaluation-harness | aime_process_results | lm_eval/tasks/aime/aime.yaml | [F068](#f068), [F069](#f069) | yes |
+| opencompass | gsm8k_last_number | configs/datasets/gsm8k/gsm8k_gen_1d7fe4.py | [F066](#f066) | yes |
+| helm | math_chain_of_thought | src/helm/benchmark/run_specs/lite_run_specs.py MATH CoT | [F056](#f056), [F058](#f058) | yes |
+| inspect_ai | gsm8k_numeric_match | inspect_evals/gsm8k | [F064](#f064) | yes |
+| inspect_evals | aime_last_line_numeric | inspect_evals/aime2026 | [F019](#f019), [F020](#f020) | yes |
+| simple-evals | mgsm_answer_prefix | mgsm_eval English Answer: prefix | [F060](#f060) | yes |
+| lighteval | math_extractive_match | Metrics.expr_gold_metric extraction configuration | [F027](#f027), [F029](#f029) | yes |
+| livebench | aime_last50 | gen_ground_truth_judgment.py AIME dispatch | [F031](#f031), [F070](#f070) | yes |
+| livebench | olympiad_expression | LiveBench IMO/USAMO-only olympiad dispatch | [F067](#f067), [F070](#f070) | no |
+| math-verify | default_parse_verify | public default Latex+Expr parser; generic isolated utility | [F040](#f040) | yes |
+| matharena | competition_extract_and_grade | dataset-matched AIME/BRUMO/HMMT configs, strict_parsing=false | [F039](#f039), [F043](#f043) | yes |
+
+Every executed pipeline is tied to a pinned task registration or dispatch receipt. The demoted LiveBench olympiad pipeline remains in this table as non-headline audit history; F070 proves that AIME-shaped data dispatches elsewhere.
 
 ## Truncation visibility
 
@@ -118,8 +138,8 @@ These issue facts corroborate but do not replace code evidence. Retrieval metada
 | inspect_ai | 5 |
 | inspect_evals | 4 |
 | lighteval | 10 |
-| livebench | 6 |
-| lm-evaluation-harness | 5 |
+| livebench | 7 |
+| lm-evaluation-harness | 7 |
 | math-verify | 4 |
 | matharena | 9 |
 | opencompass | 8 |
@@ -996,6 +1016,45 @@ Encoding/line endings: `utf-8` / `LF`; generated file: `false`.
 
 ````json
 "def extract_expression_completions_from_generation(generation, debug):\n    numbers = None\n    if 'answer:' in generation.lower():\n        lines = generation.lower().strip().split('\\n')\n        answer_str = None\n        answer_line = None\n        answer_index = None\n        for i, line in enumerate(lines):\n            if 'answer:' in line:\n                answer_line = line\n                answer_index = i\n        answer_str = answer_line.split('answer:')[1].replace('answer:', '').replace('**', '').replace('.', '').strip()\n        if answer_str == '' and answer_index < len(lines) - 1:\n            answer_str = lines[answer_index+1].replace('answer:', '').replace('**', '').replace('.', '').strip()\n        if numbers is None:\n            numbers = []\n        for n in answer_str.split(','):\n            n = n.strip().split(' ')[-1].replace('$', '').replace('{', '').replace('}', '').replace('\\\\', '').replace('boxed', '').replace('<', '').replace('>', '')\n            try:\n                numbers.append(int(n))\n            except:\n                if debug:\n                    print('ERROR', n)\n                numbers.append('NO ANSWER')\n        if len(numbers) == 0 or set(numbers) == {'NO ANSWER'}:\n            numbers = None\n\n    if numbers is None and '\\\\boxed' in generation:\n        boxed = last_boxed_only_string(generation)\n        if boxed is not None:\n            no_box = remove_boxed(boxed)\n            string = no_box\n        else:\n            string = generation\n        string = string.replace('\\\\text{', '').replace('}', '').replace('\\\\', '')\n        numbers = []\n        for n in string.strip().split(','):\n            try:\n                numbers.append(int(n.strip()))\n            except:\n                numbers.append('NO ANSWER')\n        if len(numbers) == 0 or set(numbers) == {'NO ANSWER'}:\n            numbers = None\n\n    if numbers is None:\n        # try just the very last line of the generation\n        last_line = generation.strip().lower().split('\\n')[-1]\n        numbers = []\n        for n in last_line.strip().split(','):\n            n, _ = remove_nonnumeric_chars_at_ends(n)\n            if len(n.strip()) == 0:\n                continue\n            try:\n                numbers.append(int(n.strip()))\n            except:\n                numbers.append('NO ANSWER')\n        if len(numbers) == 0 or set(numbers) == {'NO ANSWER'}:\n            numbers = None\n\n    if numbers is None:\n        # generation has Answer: comma separated list of numbers. I want to extract the last such comma separated list\n        split_string = \"answer:\"\n        numbers = [k.strip() for k in generation.lower().split(split_string)[-1].split(',')]\n\n        # the last number may have some extra non-numeric characters at the end. Those need to be removed\n        new_numbers = []\n        for i, n in enumerate(numbers):\n            n, num_removed = remove_nonnumeric_chars_at_ends(n)\n            if n != '' and n != \"₂\":\n                new_numbers.append(int(n))\n            if (i > 0) and (num_removed > 0):\n                break\n\n        numbers = new_numbers\n    \n    return numbers\n\ndef proof_rearrangement_process_results(ground_truth: str, llm_answer: str, edit_distance=False, debug=False) -> int:\n    ground_truth = [int(n) for n in ground_truth.split(',')]\n\n    completions = extract_expression_completions_from_generation(llm_answer, debug)\n\n    if edit_distance:\n        # `completions` and `ground_truth` are lists of ints (with possible\n        # 'NO ANSWER' sentinels). Use the pure-Python edit distance rather than the\n        # `Levenshtein` package: modern `Levenshtein` (>=0.21) raises\n        # \"TypeError: distance expected two Strings or two Unicodes\" on int lists,\n        # which previously turned every imo/usamo question into an eval_error (score 0).\n        match = levenshtein_distance(completions, ground_truth)\n        # Fraction of the longer sequence that is already correct; guard the empty case.\n        denom = max(len(completions), len(ground_truth))\n        frac_matches = 1 - (match / denom) if denom else 0\n    else:\n        match = [(completions[i] == ground_truth[i]) if i < len(ground_truth) else 0 for i in range(len(completions))]\n        frac_matches = sum(match)/len(match) if len(match) > 0 else 0\n\n    if debug and frac_matches < 1:\n        print('INCORRECT', frac_matches)\n        print('GROUND TRUTH', ground_truth)\n        print('SOLUTION', completions)\n        print('END OF OUTPUT', llm_answer[-1500:])\n\n    return frac_matches\n"
+````
+
+### F068
+
+The shipped lm-eval AIME task registers process_results and an explicit 32768-token generation cap.
+
+Repository: `EleutherAI/lm-evaluation-harness` at `f4d4b3de3ee6741a7151a9fe74945ee515262f4c`
+Path: `lm_eval/tasks/aime/aime.yaml` lines 1-25
+Permalink: https://github.com/EleutherAI/lm-evaluation-harness/blob/f4d4b3de3ee6741a7151a9fe74945ee515262f4c/lm_eval/tasks/aime/aime.yaml#L1-L25
+Encoding/line endings: `utf-8` / `LF`; generated file: `false`.
+
+````json
+"tag:\n  - math_word_problems\ntask: aime\ndataset_path: gneubig/aime-1983-2024\n# dataset_name: null\noutput_type: generate_until\ntraining_split: train\nfewshot_split: train\ntest_split: train\ndoc_to_text: \"Question: {{Question}}\\nAnswer:\"\ndoc_to_target: \"{{Answer}}\"\nprocess_results: !function utils.process_results\nmetric_list:\n  - metric: exact_match\n    aggregation: mean\n    higher_is_better: true\ngeneration_kwargs:\n  until:\n    - \"Question:\"\n    - \"</s>\"\n    - \"<|im_end|>\"\n    - \"<|eot_id|>\"\n  do_sample: false\n  temperature: 0.0\n  max_gen_toks: 32768\n"
+````
+
+### F069
+
+The lm-eval AIME task initializes a dollar-span fallback before optional boxed extraction and returns exact-match scoring.
+
+Repository: `EleutherAI/lm-evaluation-harness` at `f4d4b3de3ee6741a7151a9fe74945ee515262f4c`
+Path: `lm_eval/tasks/aime/utils.py` lines 1-32
+Permalink: https://github.com/EleutherAI/lm-evaluation-harness/blob/f4d4b3de3ee6741a7151a9fe74945ee515262f4c/lm_eval/tasks/aime/utils.py#L1-L32
+Encoding/line endings: `utf-8` / `LF`; generated file: `false`.
+
+````json
+"import re\nfrom typing import Dict, List\n\n\ndef process_results(doc: dict, results: List[str]) -> Dict[str, int]:\n    retval = 0\n    response = results[0]\n\n    # Try to extract answer from $...$ format first\n    indices = [pos for pos, char in enumerate(response) if char == \"$\"]\n    if len(indices) <= 1:\n        answer = response\n    else:\n        answer = response[indices[0] + 1 : indices[-1]]\n\n    # Extract from \\\\boxed{} if present\n    boxed_answer = last_boxed_only_string(response)\n    if boxed_answer is not None:\n        try:\n            boxed_content = remove_boxed(boxed_answer)\n            if boxed_content is not None:\n                answer = boxed_content\n        except (AssertionError, IndexError):\n            pass\n\n    # Check if answer matches target\n    answer_key = next(k for k in doc.keys() if k.lower() == \"answer\")\n    target = str(doc[answer_key])\n    if is_equiv(answer, target):\n        retval = 1\n\n    return {\"exact_match\": retval}\n"
+````
+
+### F070
+
+LiveBench dispatches AIME-shaped tasks to aime_process_results and reserves proof_rearrangement_process_results for IMO and USAMO.
+
+Repository: `LiveBench/LiveBench` at `00eae856aa1c1a9e9d058a65a9a94d85884034c4`
+Path: `livebench/gen_ground_truth_judgment.py` lines 119-131
+Permalink: https://github.com/LiveBench/LiveBench/blob/00eae856aa1c1a9e9d058a65a9a94d85884034c4/livebench/gen_ground_truth_judgment.py#L119-L131
+Encoding/line endings: `utf-8` / `LF`; generated file: `false`.
+
+````json
+"            score = ifbench_process_results(question, llm_answer, debug)\n            category = \"instruction_following\"\n        elif len(splits) > 0 and (splits[0] in [\"amc\", \"smc\", \"aime\", \"imo\", \"usamo\"] or (len(splits) > 1 and splits[1] == \"amc\")):\n            category = \"math\"\n            if splits[0] in [\"amc\", \"smc\"] or (len(splits) > 1 and splits[1] == \"amc\"):\n                score = mathcontest_process_results(ground_truth, llm_answer, question_text, debug)\n                category = \"math\"\n            elif splits[0] == \"aime\":\n                score = aime_process_results(ground_truth, llm_answer, debug)\n                category = \"math\"\n            elif splits[0] in [\"imo\", \"usamo\"]:\n                score = proof_rearrangement_process_results(ground_truth, llm_answer, edit_distance=True, debug=debug)\n            else:\n"
 ````
 
 ## Verification log

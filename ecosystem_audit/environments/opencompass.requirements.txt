@@ -82,6 +82,7 @@ regex==2026.7.19
 requests==2.34.2
 rich==15.0.0
 rouge-chinese==1.0.3
+rouge-score==0.1.2
 rouge==1.0.1
 rpds-py==2026.6.3
 safetensors==0.8.0

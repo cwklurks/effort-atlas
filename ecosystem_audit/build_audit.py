@@ -23,6 +23,18 @@ def refs(categories):
             rows.append((r['target'],r['claim'],f"[{r['finding_id']}](#{r['finding_id'].lower()})"))
     return table(rows,['Target','Finding','Receipt'])
 
+def dispatch_table():
+    receipt_ids={r['finding_id'] for r in receipts}
+    with (ROOT/'applicability.csv').open(newline='',encoding='utf-8') as handle:
+        pipelines=list(csv.DictReader(handle))
+    rows=[]
+    for pipeline in pipelines:
+        ids=[item.strip() for item in pipeline['dispatch_receipt_ids'].split(';') if item.strip()]
+        missing=set(ids)-receipt_ids
+        if missing: raise ValueError(f"{pipeline['pipeline_id']}: missing dispatch receipts {sorted(missing)}")
+        rows.append((pipeline['target'],pipeline['pipeline_id'],pipeline['task_or_config'],', '.join(f"[{fid}](#{fid.lower()})" for fid in ids),'yes' if pipeline['headline_eligible']=='true' else 'no'))
+    return table(rows,['Target','Pipeline','Registered/dispatch path','Receipts','Headline eligible'])
+
 lines=['# Ecosystem audit','','## Scope and method','',
 'This is a source-code audit and an isolated post-generation diagnostic, not an end-to-end model evaluation. External repositories are frozen in `repos.lock.json`; code receipts are UTF-8 decoded without whitespace normalization and use 1-indexed inclusive line ranges. No model or paid API call is part of the workflow.','',
 'All code claims below resolve to the literal quote in the receipt ledger. Absence claims and exact searches are recorded in `GAPS.md`. Issue facts are kept separate from code claims.','',
@@ -31,6 +43,8 @@ lines=['# Ecosystem audit','','## Scope and method','',
 'Not applicable means the repository is an extractor/scorer library rather than a generation harness. An unset value is not converted here into a guessed provider default. Adapter-specific defaults are scoped to the adapter named in the receipt.','',
 '## Extraction, normalization, and scoring','',refs({'extraction','extraction_call','extraction_fallback','extraction_incomplete','extraction_scoring','scoring','scoring_call'}),'',
 'Extraction is reported separately from correctness. A returned nonempty value on a truncated fixture is the operational answer-returned event; it is not by itself evidence that answer text was newly invented. Native correctness is used only where the actual downstream path is runnable.','',
+'## Executable task-path dispatch receipts','',dispatch_table(),'',
+'Every executed pipeline is tied to a pinned task registration or dispatch receipt. The demoted LiveBench olympiad pipeline remains in this table as non-headline audit history; F070 proves that AIME-shaped data dispatches elsewhere.','',
 '## Truncation visibility','']
 visibility=[
 ('lm-evaluation-harness','No','No','No','No','not found; see GAPS.md'),

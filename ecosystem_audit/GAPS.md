@@ -13,7 +13,7 @@
 ## 2026-08-07 Phase 1 search gaps
 
 - `lm-evaluation-harness`: `not found at <lm_eval/**/*.py paths searched>` for `finish_reason`, `stop_reason`, or `incomplete_details` capture/persistence/scorer use; search: `rg -n 'finish_reason|stop_reason|incomplete_details' lm_eval`.
-- `lm-evaluation-harness`: AIME task `not found at <lm_eval/tasks paths searched>`; MATH and GPQA task cap omissions/default paths were searched with `rg -ni 'aime|max_gen_toks' lm_eval/tasks` and are not converted into guessed values.
+- `lm-evaluation-harness`: the earlier AIME `not found` statement is retracted. The pinned tree contains `lm_eval/tasks/aime/aime.yaml` with `max_gen_toks: 32768` and `utils.py` with the task's dollar-span/boxed extraction path; see F068-F069 and the executable `aime_process_results` pipeline.
 - `opencompass`: scorer logic using captured finish reason to distinguish truncation from wrong was `not found at <opencompass/evaluator, opencompass/datasets, opencompass/tasks paths searched>`; search pattern `finish_reason|stop_reason|incomplete_details`.
 - `helm`: AIME task `not found at <src/helm paths searched>` using `rg -ni '\baime\b' src/helm`. A correctness scorer condition on finish reason was `not found at <src/helm/benchmark/metrics/gpqa_chain_of_thought_metric.py, src/helm/benchmark/metrics/evaluate_reference_metrics.py paths searched>`.
 - `inspect_ai` / `inspect_evals`: AIME scorer use of `stop_reason` was `not found at <src/inspect_evals/utils/aime_common.py and src/inspect_ai/scorer paths searched>`; the signal remains present on ModelOutput but is not a scorer input in this path.
@@ -28,10 +28,10 @@
 
 Before any measured execution, candidate callables were narrowed to task-traced functions found during Phase 1. No rates had been observed. The amended `applicability.csv` preserves all ten named targets. Registered no-answer sentinels `[invalid]` (lm-eval) and `NULL` (OpenCompass) are classified as empty/no answer before measurement because the harnesses themselves use them for failed extraction. MathArena uses each real row's named competition config with `strict_parsing=false`; Inspect Evals is scoped to AIME real rows plus numeric synthetic rows; nonapplicable fixture rows remain explicit.
 
-## 2026-08-07 Phase 2 execution statuses
+## 2026-08-07 Phase 2 execution statuses (historical, superseded by round 2)
 
-- OpenCompass remained `import_failed`: importing the real registered dataset module through the pinned package ended at `ModuleNotFoundError: No module named 'rouge_score'` after the frozen dependency attempt. No percentage was synthesized.
-- The Inspect Evals AIME and LiveBench olympiad rows passed every applicable control and remain headline-eligible. lm-eval, HELM, Inspect AI, simple-evals, LightEval, math-verify, and MathArena each failed at least one applicable control; their measurements remain in `fixture_results.csv` with `control_disqualified` status and are excluded from the headline section.
+- At reviewed commit `5c31b53`, OpenCompass remained `import_failed`: importing the real registered dataset module through the pinned package ended at `ModuleNotFoundError: No module named 'rouge_score'`. Round 2 fixes and reruns this audit-owned environment defect.
+- At reviewed commit `5c31b53`, the Inspect Evals AIME and LiveBench olympiad rows were incorrectly treated as headline-eligible. Round 2 marks Inspect Evals `insufficient_power`, dispatches LiveBench AIME data through its real AIME scorer, demotes the olympiad path, and recomputes every control under the uniform frozen schema.
 - Swallowed-error rates are `not_measured` except where the adapter manifest declares concrete logger/sentinel instrumentation. Per-fixture wall time is captured in ephemeral adapter timing logs; timing is excluded from committed deterministic result bytes.
 - The isolated environments and exact frozen package sets are under `ecosystem_audit/environments/`; install commands and dependency-lock hashes are in `adapter_manifest.json`.
 
@@ -40,3 +40,12 @@ Before any measured execution, candidate callables were narrowed to task-traced 
 - `timeline.csv` records commit author timestamps (`%aI`), not merge or release dates. `validate_timeline.py` verifies each traced commit is in the pinned snapshot ancestry and the historical blob contains the cited setting.
 - OpenCompass AIME and GPQA task-local numeric caps are `not_traceable` in the pinned configuration tree. Exact zero-result `git grep` commands are preserved in `timeline_evidence.json`; no model/provider default is guessed.
 - A setting's presence in history does not establish that every downstream invocation used it. Each timeline scope distinguishes shared defaults, provider defaults, and task-local caps.
+
+## 2026-08-08 round-2 corrections
+
+- Real and constructed synthetic rows are now reported in separate tables and metric strata; no combined denominator remains.
+- Control eligibility is frozen uniformly to the 28 finished-correct rows with base-10 integer golds (`^[+-]?\d+$`), representing four unique dataset/problem/gold items. Task-specific applicability still scopes the real truncated result, not the control gate.
+- `inspect_evals/aime_last_line_numeric` has only seven applicable real truncated rows, five empty texts, and one unique problem. It is `insufficient_power` and is not headline-eligible.
+- LiveBench's `olympiad_expression` result is retained only as a wrong-dispatch diagnostic. AIME-shaped rows execute `aime_process_results`, the scorer selected by the pinned dispatch site.
+- OpenCompass's prior `import_failed` status was caused by the audit environment omitting `rouge-score`; round 2 pins that dependency and reruns the actual registered task module.
+- The 26/105 `pre_truncation_answer_present` split is a frozen syntactic marker stratification, not a claim that the marker contains the correct answer.
