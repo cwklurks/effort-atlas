@@ -14,6 +14,9 @@ from effort_atlas.openrouter_receipts import build_receipt
 from effort_atlas.sweep import dry_run, load_items
 
 
+FIXTURES = ROOT / "tests" / "fixtures"
+
+
 class _FakeCompletions:
     def __init__(self, chunks: list[SimpleNamespace]):
         self.chunks = chunks
@@ -370,8 +373,8 @@ class OpenRouterSupportTests(unittest.TestCase):
 
     def test_load_items_can_select_an_explicit_ordered_subset(self):
         items = load_items(
-            ROOT / "data",
-            ["math"],
+            FIXTURES,
+            ["confirmatory_math_items"],
             limit=50,
             item_ids=["math_0015", "math_0003"],
         )
