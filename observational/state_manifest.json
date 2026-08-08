@@ -1,0 +1,41 @@
+{
+ "last_cycle": "2026-08-07",
+ "pipeline_sha256": "b86660bfbfe56aee9469d7097d6aa57c3cfcf294593b0344043c99cffc82d66e",
+ "datasets": {
+  "MathArena/hmmt_feb_2025_outputs": {
+   "revision": "bac3e9b78124aa8811c4aae3d590f03b467643f4",
+   "processed": "2026-08-07",
+   "headline": "see RESULTS.md"
+  },
+  "MathArena/hmmt_feb_2026_outputs": {
+   "revision": "1e888131281fc0fca080fd220e8bc6d830937564",
+   "processed": "2026-08-07",
+   "headline": "see RESULTS.md"
+  },
+  "MathArena/aime_2026_outputs": {
+   "revision": "76ce7a0aa77f0710f3cfb818ff1193e6dea56210",
+   "processed": "2026-08-07",
+   "headline": "see RESULTS.md"
+  },
+  "MathArena/brumo_2025_outputs": {
+   "revision": "12ca8f115d73526d25a36b72e4bfefb18b76d6be",
+   "processed": "2026-08-07",
+   "headline": "see RESULTS.md"
+  },
+  "helm_capabilities_v1.15.0_gpqa_cot": {
+   "runs": [
+    "google_gemini-3-pro-preview",
+    "anthropic_claude-haiku-4-5-20251001",
+    "openai_gpt-5.1-2025-11-13"
+   ],
+   "processed": "2026-08-07",
+   "headline_gemini": {
+    "n": 446,
+    "finish_length": 42,
+    "acc_length": 0.0,
+    "acc_other": 0.886
+   }
+  }
+ },
+ "spot_checks": "7/7 PASS (see RUN_LOG.md 2026-08-07)"
+}
