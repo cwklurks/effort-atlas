@@ -75,7 +75,8 @@ class PublicArtifactTests(unittest.TestCase):
                 {
                     "item_id": "math_0003",
                     "generation_id": "gen-public-link",
-                    "extracted": "42",
+                    "extracted_answer_present": True,
+                    "extracted_answer": "42",
                 },
             ],
         )

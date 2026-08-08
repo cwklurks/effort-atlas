@@ -127,8 +127,12 @@ def _public_result(source_id: str, source_line: int, row: dict) -> dict:
     }
     public.update({field: row.get(field) for field in _RESULT_FIELDS})
     public["error_present"] = "error" in row and row.get("error") is not None
-    extracted = row.get("extracted")
-    public["extracted_answer_present"] = extracted is not None and extracted != ""
+    explicit_presence = row.get("extracted_answer_present")
+    if type(explicit_presence) is bool:
+        public["extracted_answer_present"] = explicit_presence
+    else:
+        extracted = row.get("extracted")
+        public["extracted_answer_present"] = extracted is not None and extracted != ""
     return public
 
 
