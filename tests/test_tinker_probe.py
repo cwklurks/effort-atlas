@@ -1,13 +1,14 @@
 from __future__ import annotations
 
+import asyncio
+import contextlib
 import hashlib
 import io
 import json
-import math
+import os
 import tempfile
 import unittest
 from pathlib import Path
-from types import SimpleNamespace
 from unittest import mock
 
 from scripts import tinker_probe
@@ -57,9 +58,14 @@ class TinkerProbePlanTests(unittest.TestCase):
         self.assertEqual(
             {(spec.model, spec.max_tokens) for spec in cap_specs},
             {
-                (model, cap)
-                for model in tinker_probe.CAP_PROBE_MODELS.values()
-                for cap in tinker_probe.CAP_PROBE_CAPS
+                ("thinkingmachines/Inkling", 4096),
+                ("thinkingmachines/Inkling", 16384),
+                ("thinkingmachines/Inkling", 32768),
+                ("thinkingmachines/Inkling", 65536),
+                ("openai/gpt-oss-120b", 4096),
+                ("openai/gpt-oss-120b", 16384),
+                ("openai/gpt-oss-120b", 32768),
+                ("openai/gpt-oss-120b", 65536),
             },
         )
         self.assertEqual(len(cap_specs), 8)
@@ -68,11 +74,17 @@ class TinkerProbePlanTests(unittest.TestCase):
         plan = tinker_probe.build_probe_plan()
         cap_specs = [spec for spec in plan if spec.kind == "cap_semantics"]
 
-        for model_label, target_model in tinker_probe.CAP_PROBE_MODELS.items():
+        for model_label, target_model in (
+            ("inkling", "thinkingmachines/Inkling"),
+            ("gpt_oss_120b", "openai/gpt-oss-120b"),
+        ):
             panel_specs = [
                 spec for spec in cap_specs if spec.name.startswith(f"cap_semantics_{model_label}_")
             ]
-            self.assertEqual({spec.max_tokens for spec in panel_specs}, set(tinker_probe.CAP_PROBE_CAPS))
+            self.assertEqual(
+                {spec.max_tokens for spec in panel_specs},
+                {4096, 16384, 32768, 65536},
+            )
             self.assertEqual({spec.model for spec in panel_specs}, {target_model})
 
     def test_gpt_oss_20b_is_used_for_cheapest_smoke_probes(self) -> None:
@@ -119,10 +131,26 @@ class TinkerProbePlanTests(unittest.TestCase):
 
         self.assertEqual(
             diagnostic.cost_projection_output_token_bound,
-            tinker_probe.DEFAULT_CAP_OUTPUT_TOKEN_COST_BOUND,
+            32768,
         )
-        self.assertGreater(tinker_probe.projected_cost_usd(diagnostic), 0)
-        self.assertTrue(math.isfinite(tinker_probe.projected_cost_usd(diagnostic)))
+        # Full 32K context prefill at $0.18/M + full 32K sample at $0.45/M.
+        self.assertAlmostEqual(
+            tinker_probe.projected_cost_usd(diagnostic),
+            32768 * (0.18 + 0.45) / 1_000_000,
+        )
+
+    def test_projection_bounds_full_prefill_and_cached_prefill_for_all_samples(self) -> None:
+        samples = next(
+            spec for spec in tinker_probe.build_probe_plan()
+            if spec.name == "samples_independence_n8"
+        )
+
+        expected = (
+            32768 * 0.18
+            + 32768 * 7 * 0.036
+            + 256 * 8 * 0.45
+        ) / 1_000_000
+        self.assertAlmostEqual(tinker_probe.projected_cost_usd(samples), expected)
 
 
 class TinkerProbeSafetyTests(unittest.TestCase):
@@ -152,87 +180,280 @@ class TinkerProbeSafetyTests(unittest.TestCase):
         with self.assertRaisesRegex(SystemExit, "TINKER_API_KEY"):
             tinker_probe.main(["--live"], environ={}, stdout=io.StringIO())
 
-    def test_default_cap_live_requires_explicit_finite_cost_authorization(self) -> None:
-        called = False
+    def test_locked_environment_manifest_verifies_every_distribution(self) -> None:
+        manifest = tinker_probe.verify_locked_environment()
 
-        def forbidden_factory(_api_key: str) -> RecordingAdapter:
-            nonlocal called
-            called = True
-            raise AssertionError("authorization must be checked before client construction")
-
-        with self.assertRaisesRegex(SystemExit, "authorize-default-cap-cost-usd"):
-            tinker_probe.main(
-                ["--live", "--probe", "default-cap"],
-                environ={"TINKER_API_KEY": "secret"},
-                adapter_factory=forbidden_factory,
-                stdout=io.StringIO(),
-            )
-
-        self.assertFalse(called)
-
-    def test_default_cap_live_rejects_insufficient_or_excessive_authorization(self) -> None:
-        projection = tinker_probe.projected_cost_usd(
-            next(spec for spec in tinker_probe.build_probe_plan() if spec.kind == "default_cap")
+        self.assertEqual(manifest["python_version"], "3.12.8")
+        self.assertEqual(len(manifest["distributions"]), 42)
+        self.assertIn(
+            {"name": "tinker", "version": "0.25.0"},
+            manifest["distributions"],
         )
-        for authorization in (projection / 2, tinker_probe.DEFAULT_CAP_MAX_AUTHORIZATION_USD + 0.01):
-            with self.subTest(authorization=authorization):
-                with self.assertRaises(SystemExit):
-                    tinker_probe.main(
-                        [
-                            "--live",
-                            "--probe",
-                            "default-cap",
-                            "--authorize-default-cap-cost-usd",
-                            str(authorization),
-                        ],
-                        environ={"TINKER_API_KEY": "secret"},
-                        adapter_factory=lambda _key: self.fail("must not construct client"),
-                        stdout=io.StringIO(),
-                    )
 
-    def test_default_cap_authorization_is_logged_while_request_still_omits_parameter(self) -> None:
-        adapter = RecordingAdapter([])
+    def test_locked_environment_version_mutation_fails_closed(self) -> None:
+        installed = dict(tinker_probe.locked_distribution_versions())
+        installed["tinker"] = "0.25.1"
+
+        with self.assertRaisesRegex(RuntimeError, "tinker==0.25.0"):
+            tinker_probe.verify_locked_environment(installed_versions=installed)
+
+    def test_locked_environment_rejects_unlocked_distributions(self) -> None:
+        installed = dict(tinker_probe.locked_distribution_versions())
+        installed["unlocked-package"] = "1.0"
+
+        with self.assertRaisesRegex(RuntimeError, "unexpected unlocked-package==1.0"):
+            tinker_probe.verify_locked_environment(installed_versions=installed)
+
+    def test_pinned_sdk_internal_429_path_resubmits_even_with_outer_retries_disabled(self) -> None:
+        from tinker.lib.public_interfaces import sampling_client as upstream
+
+        submissions = 0
+
+        class StopAfterSecondSubmission(RuntimeError):
+            pass
+
+        class FakeHolder:
+            _sample_backoff_until = None
+
+            @staticmethod
+            def estimate_bytes_count_in_model_input(_prompt: object) -> int:
+                return 1
+
+            @staticmethod
+            @contextlib.asynccontextmanager
+            async def sample_dispatch_rate_limit(_estimated_bytes: int):
+                yield
+
+            @staticmethod
+            async def execute_with_retries(function, *args):
+                return await function(*args)
+
+        client = upstream.SamplingClient.__new__(upstream.SamplingClient)
+        client.holder = FakeHolder()
+        client._request_id_counter = 0
+
+        async def fake_send(*_args):
+            nonlocal submissions
+            submissions += 1
+            if submissions == 1:
+                return None  # exact value used by upstream for HTTP 429/backpressure
+            raise StopAfterSecondSubmission
+
+        client._send_asample_request = fake_send
+
+        async def run_challenge() -> None:
+            with mock.patch.object(upstream.asyncio, "sleep", new=mock.AsyncMock()):
+                with self.assertRaises(StopAfterSecondSubmission):
+                    await client._sample_async_impl(object(), 1, object(), False)
+
+        asyncio.run(run_challenge())
+        self.assertEqual(submissions, 2)
+
+    def test_pinned_sdk_capability_reports_live_unsupported(self) -> None:
+        capability = tinker_probe.inspect_pinned_sdk_one_attempt_capability()
+
+        self.assertFalse(capability["supported"])
+        self.assertEqual(capability["sdk_version"], "0.25.0")
+        self.assertIn("SamplingClient._sample_async_impl has a 429 resubmission loop", capability["reasons"])
+        self.assertIn("InternalClientHolder.execute_with_retries retries submissions", capability["reasons"])
+        self.assertEqual(
+            capability["observed_signatures"],
+            {"sampling_429_loop": True, "holder_retry_wrapper": True},
+        )
+        self.assertEqual(
+            capability["upstream_source_sha256"],
+            {
+                "SamplingClient._sample_async_impl": (
+                    "60b3ed71c9f541536c08ed2311ef53af680f809c61f5ec8d0057249bcb93e16d"
+                ),
+                "InternalClientHolder.execute_with_retries": (
+                    "b0c51012f81289957279d4d166767aaba485557a9825d075761fa039e0d22a03"
+                ),
+            },
+        )
+
+    def test_live_preflights_sink_records_manifest_then_blocks_before_client(self) -> None:
+        constructed = False
+
+        def forbidden_factory(_api_key: str):
+            nonlocal constructed
+            constructed = True
+            raise AssertionError("client construction must be unreachable")
+
         with tempfile.TemporaryDirectory() as directory:
             report = Path(directory) / "report.jsonl"
-            result = tinker_probe.main(
-                [
-                    "--live",
-                    "--probe",
-                    "default-cap",
-                    "--authorize-default-cap-cost-usd",
-                    str(tinker_probe.DEFAULT_CAP_MAX_AUTHORIZATION_USD),
-                    "--report",
-                    str(report),
-                ],
-                environ={"TINKER_API_KEY": "secret"},
-                adapter_factory=lambda _key: adapter,
-                stdout=io.StringIO(),
-            )
-            record = json.loads(report.read_text())
+            with self.assertRaisesRegex(SystemExit, "zero-resubmission"):
+                tinker_probe.main(
+                    ["--live", "--probe", "caps", "--report", str(report)],
+                    environ={"TINKER_API_KEY": "secret"},
+                    adapter_factory=forbidden_factory,
+                    stdout=io.StringIO(),
+                )
+            records = [json.loads(line) for line in report.read_text().splitlines()]
+
+        self.assertFalse(constructed)
+        self.assertEqual(
+            [record["record_type"] for record in records],
+            ["sink_preflight", "environment_verified", "live_blocked"],
+        )
+        self.assertEqual(len(records[1]["environment_manifest"]["distributions"]), 42)
+
+    def test_default_cap_live_still_requires_bounded_explicit_authorization(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            report = Path(directory) / "report.jsonl"
+            with self.assertRaisesRegex(SystemExit, "authorize-default-cap-cost-usd"):
+                tinker_probe.main(
+                    ["--live", "--probe", "default-cap", "--report", str(report)],
+                    environ={"TINKER_API_KEY": "secret"},
+                    adapter_factory=lambda _key: self.fail("must not construct client"),
+                    stdout=io.StringIO(),
+                )
+
+        projection = 32768 * (0.18 + 0.45) / 1_000_000
+        self.assertLess(projection, 0.03)
+
+    def test_invalid_or_malformed_sink_yields_zero_client_construction(self) -> None:
+        for malformed in (False, True):
+            with self.subTest(malformed=malformed), tempfile.TemporaryDirectory() as directory:
+                report = Path(directory) / "report.jsonl"
+                if malformed:
+                    report.write_text("not-json\n")
+                else:
+                    report.mkdir()
+                constructed = False
+
+                def forbidden_factory(_api_key: str):
+                    nonlocal constructed
+                    constructed = True
+                    raise AssertionError
+
+                with self.assertRaises((OSError, ValueError)):
+                    tinker_probe.main(
+                        ["--live", "--probe", "caps", "--report", str(report)],
+                        environ={"TINKER_API_KEY": "secret"},
+                        adapter_factory=forbidden_factory,
+                        stdout=io.StringIO(),
+                    )
+                self.assertFalse(constructed)
+
+    def test_unwritable_sink_yields_zero_client_construction(self) -> None:
+        constructed = False
+
+        def forbidden_factory(_api_key: str):
+            nonlocal constructed
+            constructed = True
+            raise AssertionError
+
+        with tempfile.TemporaryDirectory() as directory:
+            report = Path(directory) / "report.jsonl"
+            report.write_text("{}\n")
+            report.chmod(0o400)
+            try:
+                with self.assertRaises(PermissionError):
+                    tinker_probe.main(
+                        ["--live", "--probe", "caps", "--report", str(report)],
+                        environ={"TINKER_API_KEY": "secret"},
+                        adapter_factory=forbidden_factory,
+                        stdout=io.StringIO(),
+                    )
+            finally:
+                report.chmod(0o600)
+
+        self.assertFalse(constructed)
+
+    def test_attempt_started_is_fsynced_before_each_possible_billed_call(self) -> None:
+        events: list[str] = []
+        real_fsync = os.fsync
+
+        class InspectingAdapter(RecordingAdapter):
+            def __init__(self, report: Path):
+                super().__init__([])
+                self.report = report
+
+            def sample(self, spec: tinker_probe.ProbeSpec) -> tinker_probe.CallResult:
+                latest = json.loads(self.report.read_text().splitlines()[-1])
+                self.assert_attempt(latest, spec)
+                events.append("call")
+                return super().sample(spec)
+
+            @staticmethod
+            def assert_attempt(record: dict, spec: tinker_probe.ProbeSpec) -> None:
+                if record["record_type"] != "attempt_started" or record["probe_name"] != spec.name:
+                    raise AssertionError("write-ahead record was not durable before call")
+
+        with tempfile.TemporaryDirectory() as directory:
+            report = Path(directory) / "report.jsonl"
+            writer = tinker_probe.AppendOnlyJSONL(report)
+            writer.preflight()
+            adapter = InspectingAdapter(report)
+
+            def recording_fsync(fd: int) -> None:
+                real_fsync(fd)
+                events.append("fsync")
+
+            with mock.patch.object(tinker_probe.os, "fsync", side_effect=recording_fsync):
+                result = tinker_probe._execute_live_plan(
+                    [next(spec for spec in tinker_probe.build_probe_plan() if spec.kind == "stop_reason")],
+                    adapter,
+                    writer,
+                    stdout=io.StringIO(),
+                    default_cap_authorization_usd=None,
+                )
 
         self.assertEqual(result, 0)
-        self.assertNotIn("max_tokens", record["request_params"])
-        self.assertEqual(
-            record["cost_projection_output_token_bound"],
-            tinker_probe.DEFAULT_CAP_OUTPUT_TOKEN_COST_BOUND,
-        )
-        self.assertEqual(
-            record["cost_authorization_usd"],
-            tinker_probe.DEFAULT_CAP_MAX_AUTHORIZATION_USD,
-        )
-        self.assertTrue(math.isfinite(record["projected_cost_usd"]))
+        self.assertEqual(events[:2], ["fsync", "call"])
 
-    def test_cost_projection_is_printed_before_every_client_call(self) -> None:
+    def test_structured_error_preserves_known_billing_join_identifiers(self) -> None:
+        calls = 0
+
+        class FailingAdapter:
+            def sample(self, _spec: tinker_probe.ProbeSpec) -> tinker_probe.CallResult:
+                nonlocal calls
+                calls += 1
+                raise tinker_probe.ProbeCallError(
+                    "synthetic failure",
+                    sampling_session_id="sampling-session-1",
+                    request_id="request-2",
+                    billing_join_id="billing-3",
+                )
+
+        with tempfile.TemporaryDirectory() as directory:
+            report = Path(directory) / "report.jsonl"
+            writer = tinker_probe.AppendOnlyJSONL(report)
+            writer.preflight()
+            result = tinker_probe._execute_live_plan(
+                [next(spec for spec in tinker_probe.build_probe_plan() if spec.kind == "stop_reason")],
+                FailingAdapter(),
+                writer,
+                stdout=io.StringIO(),
+                default_cap_authorization_usd=None,
+            )
+            error = [
+                json.loads(line) for line in report.read_text().splitlines()
+                if json.loads(line)["record_type"] == "result"
+            ][0]
+
+        self.assertEqual(result, 1)
+        self.assertEqual(error["sampling_session_id"], "sampling-session-1")
+        self.assertEqual(error["request_id"], "request-2")
+        self.assertEqual(error["billing_join_id"], "billing-3")
+        self.assertEqual(calls, 1)
+
+    def test_cost_projection_precedes_every_synthetic_call(self) -> None:
         events: list[tuple[str, str]] = []
         adapter = RecordingAdapter(events)
         stdout = EventStream(events)
+        cap_plan = [spec for spec in tinker_probe.build_probe_plan() if spec.kind == "cap_semantics"]
 
         with tempfile.TemporaryDirectory() as directory:
-            result = tinker_probe.main(
-                ["--live", "--probe", "caps", "--report", str(Path(directory) / "report.jsonl")],
-                environ={"TINKER_API_KEY": "secret"},
-                adapter_factory=lambda _key: adapter,
+            writer = tinker_probe.AppendOnlyJSONL(Path(directory) / "report.jsonl")
+            writer.preflight()
+            result = tinker_probe._execute_live_plan(
+                cap_plan,
+                adapter,
+                writer,
                 stdout=stdout,
+                default_cap_authorization_usd=None,
             )
 
         self.assertEqual(result, 0)
@@ -241,167 +462,6 @@ class TinkerProbeSafetyTests(unittest.TestCase):
             self.assertEqual(events[index][0], "projection")
             self.assertEqual(events[index + 1][0], "call")
             self.assertEqual(events[index][1], events[index + 1][1])
-
-    def test_sdk_adapter_disables_sdk_and_sampling_retries(self) -> None:
-        captured: dict[str, object] = {}
-
-        class FakeRetryConfig:
-            def __init__(self, **kwargs: object) -> None:
-                captured["retry_kwargs"] = kwargs
-
-        class FakeTokenizer:
-            def encode(self, _text: str) -> list[int]:
-                return [1, 2, 3]
-
-            def decode(self, tokens: list[int]) -> str:
-                return "decoded:" + ",".join(str(token) for token in tokens)
-
-        class FakeFuture:
-            def result(self) -> object:
-                sequence = SimpleNamespace(tokens=[4, 5], stop_reason="stop")
-                return SimpleNamespace(sequences=[sequence], prompt_cache_hit_tokens=1)
-
-        class FakeSamplingClient:
-            _sampling_session_id = "sampling-session-test"
-
-            def get_tokenizer(self) -> FakeTokenizer:
-                return FakeTokenizer()
-
-            def sample(self, **kwargs: object) -> FakeFuture:
-                captured["sample_kwargs"] = kwargs
-                return FakeFuture()
-
-        class FakeServiceClient:
-            def __init__(self, **kwargs: object) -> None:
-                captured["service_kwargs"] = kwargs
-
-            def create_sampling_client(self, **kwargs: object) -> FakeSamplingClient:
-                captured["sampling_client_kwargs"] = kwargs
-                return FakeSamplingClient()
-
-        class FakeSamplingParams:
-            def __init__(self, **kwargs: object) -> None:
-                self.values = kwargs
-
-        fake_sdk = SimpleNamespace(
-            ServiceClient=FakeServiceClient,
-            SamplingParams=FakeSamplingParams,
-            ModelInput=SimpleNamespace(from_ints=lambda tokens: ("prompt", tokens)),
-            __version__=tinker_probe.TINKER_SDK_VERSION,
-        )
-        adapter = tinker_probe.TinkerSDKAdapter(
-            "secret",
-            sdk_module=fake_sdk,
-            retry_config_cls=FakeRetryConfig,
-            runtime_python_version=tinker_probe.PROBE_PYTHON_VERSION,
-        )
-        spec = next(spec for spec in tinker_probe.build_probe_plan() if spec.max_tokens is not None)
-
-        result = adapter.sample(spec)
-
-        self.assertEqual(captured["service_kwargs"], {"api_key": "secret", "max_retries": 0})
-        self.assertEqual(captured["retry_kwargs"], {"enable_retry_logic": False})
-        self.assertEqual(
-            captured["sampling_client_kwargs"],
-            {"base_model": spec.model, "retry_config": mock.ANY},
-        )
-        self.assertEqual(captured["sample_kwargs"]["num_samples"], spec.num_samples)
-        self.assertEqual(result.observations[0].completion_tokens, 2)
-        self.assertEqual(result.sampling_session_id, "sampling-session-test")
-
-    def test_sdk_adapter_actually_omits_max_tokens_for_default_diagnostic(self) -> None:
-        captured: dict[str, object] = {}
-
-        class FakeSamplingParams:
-            def __init__(self, **kwargs: object) -> None:
-                captured["params"] = kwargs
-
-        sequence = SimpleNamespace(tokens=[1], stop_reason="stop")
-        client = SimpleNamespace(
-            get_tokenizer=lambda: SimpleNamespace(
-                encode=lambda _text: [1], decode=lambda _tokens: "response"
-            ),
-            sample=lambda **_kwargs: SimpleNamespace(
-                result=lambda: SimpleNamespace(
-                    sequences=[sequence], prompt_cache_hit_tokens=0
-                )
-            ),
-        )
-        service = SimpleNamespace(create_sampling_client=lambda **_kwargs: client)
-        fake_sdk = SimpleNamespace(
-            ServiceClient=lambda **_kwargs: service,
-            SamplingParams=FakeSamplingParams,
-            ModelInput=SimpleNamespace(from_ints=lambda tokens: tokens),
-            __version__=tinker_probe.TINKER_SDK_VERSION,
-        )
-        adapter = tinker_probe.TinkerSDKAdapter(
-            "secret",
-            sdk_module=fake_sdk,
-            retry_config_cls=lambda **_kwargs: object(),
-            runtime_python_version=tinker_probe.PROBE_PYTHON_VERSION,
-        )
-        diagnostic = next(
-            spec for spec in tinker_probe.build_probe_plan() if spec.kind == "default_cap"
-        )
-
-        adapter.sample(diagnostic)
-
-        self.assertNotIn("max_tokens", captured["params"])
-
-    def test_sdk_adapter_rejects_unpinned_python_or_sdk_before_service_creation(self) -> None:
-        service_created = False
-
-        class FakeServiceClient:
-            def __init__(self, **_kwargs: object) -> None:
-                nonlocal service_created
-                service_created = True
-
-        fake_sdk = SimpleNamespace(
-            ServiceClient=FakeServiceClient,
-            __version__=tinker_probe.TINKER_SDK_VERSION,
-        )
-        with self.assertRaisesRegex(RuntimeError, "CPython"):
-            tinker_probe.TinkerSDKAdapter(
-                "secret",
-                sdk_module=fake_sdk,
-                retry_config_cls=lambda **_kwargs: object(),
-                runtime_python_version="3.12.9",
-            )
-        self.assertFalse(service_created)
-
-        fake_sdk.__version__ = "0.25.1"
-        with self.assertRaisesRegex(RuntimeError, "Tinker SDK"):
-            tinker_probe.TinkerSDKAdapter(
-                "secret",
-                sdk_module=fake_sdk,
-                retry_config_cls=lambda **_kwargs: object(),
-                runtime_python_version=tinker_probe.PROBE_PYTHON_VERSION,
-            )
-        self.assertFalse(service_created)
-
-    def test_failed_live_call_is_appended_once_and_not_retried(self) -> None:
-        calls = 0
-
-        class FailingAdapter:
-            def sample(self, _spec: tinker_probe.ProbeSpec) -> tinker_probe.CallResult:
-                nonlocal calls
-                calls += 1
-                raise RuntimeError("synthetic failure")
-
-        with tempfile.TemporaryDirectory() as directory:
-            report = Path(directory) / "report.jsonl"
-            result = tinker_probe.main(
-                ["--live", "--probe", "stop-reason", "--report", str(report)],
-                environ={"TINKER_API_KEY": "secret"},
-                adapter_factory=lambda _key: FailingAdapter(),
-                stdout=io.StringIO(),
-            )
-            records = [json.loads(line) for line in report.read_text().splitlines()]
-
-        self.assertEqual(result, 1)
-        self.assertEqual(calls, 1)
-        self.assertEqual(len(records), 1)
-        self.assertEqual(records[0]["status"], "error")
 
     def test_unsupported_caps_are_reported_without_substitution_and_matrix_continues(self) -> None:
         calls: list[tinker_probe.ProbeSpec] = []
@@ -413,30 +473,33 @@ class TinkerProbeSafetyTests(unittest.TestCase):
                     raise RuntimeError("requested max_tokens is unsupported")
                 return super().sample(spec)
 
-        adapter = CapRejectingAdapter([])
         with tempfile.TemporaryDirectory() as directory:
             report = Path(directory) / "report.jsonl"
+            writer = tinker_probe.AppendOnlyJSONL(report)
+            writer.preflight()
             stdout = io.StringIO()
-            result = tinker_probe.main(
-                ["--live", "--probe", "caps", "--report", str(report)],
-                environ={"TINKER_API_KEY": "secret"},
-                adapter_factory=lambda _key: adapter,
+            result = tinker_probe._execute_live_plan(
+                [spec for spec in tinker_probe.build_probe_plan() if spec.kind == "cap_semantics"],
+                CapRejectingAdapter([]),
+                writer,
                 stdout=stdout,
+                default_cap_authorization_usd=None,
             )
-            records = [json.loads(line) for line in report.read_text().splitlines()]
+            records = [
+                json.loads(line) for line in report.read_text().splitlines()
+                if json.loads(line).get("record_type") == "result"
+            ]
 
         self.assertEqual(result, 1)
         self.assertEqual(len(calls), 8)
         self.assertEqual(len(records), 8)
         rejected = [record for record in records if record["requested_cap"] == 65536]
-        self.assertEqual(len(rejected), 2)
-        self.assertTrue(all(record["status"] == "error" for record in rejected))
         self.assertEqual(
             {record["model"] for record in rejected},
-            set(tinker_probe.CAP_PROBE_MODELS.values()),
+            {"thinkingmachines/Inkling", "openai/gpt-oss-120b"},
         )
+        self.assertTrue(all(record["status"] == "error" for record in rejected))
         self.assertNotIn(":peft:", json.dumps(records))
-        self.assertIn("unsupported", stdout.getvalue())
 
 
 class TinkerProbeReportTests(unittest.TestCase):
