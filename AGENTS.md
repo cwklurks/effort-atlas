@@ -53,6 +53,9 @@ budget gates, and the REAP preregistration are complete and frozen.
 - Add or identify failing tests before behavior changes when practical. Run focused
   tests, then the relevant broader suite. Never claim verification that was not run.
 - Make a checkpoint commit for each coherent unit. Open or update a PR; never merge.
+- At each phase checkpoint, update `reap/status/phase_status.json`, regenerate
+  `reap/status/index.html`, and commit both together. The dashboard reports state;
+  it never authorizes a paid or confirmatory call.
 - In every PR description, distinguish what changed, what was verified, and what was
   assumed. Expect an adversarial review that recomputes headline numbers from raw
   data and mutation-tests the tests.
@@ -78,9 +81,10 @@ budget gates, and the REAP preregistration are complete and frozen.
 
 ## Current priority and ownership boundaries
 
-The current critical path is Phase 0 governance, Task B acceptance, B/D integration,
-REAP preregistration freeze, and Task E's runner/budget gates. Task A and the
-dry-run-only Task C repair may proceed independently where ownership is isolated.
+Phase 0 governance is independently approved in PR #4 and awaits human merge. The
+current Phase 1 gate closes Task A, Task B acceptance, and the dry-run-only Task C
+repair in isolated branches. The later critical path is B/D integration, REAP
+preregistration freeze, and Task E's runner/budget gates.
 Do not begin E until the grader-v2 interfaces it depends on are accepted; do not
 run any smoke or confirmatory call until the later human gate opens.
 

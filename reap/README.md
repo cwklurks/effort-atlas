@@ -34,3 +34,12 @@ When higher native reasoning effort lowers benchmark accuracy, how much of the d
 | `05_RELATED_WORK_ALERT.md` | Coupling Tax finding and repositioning (read first) |
 | `06_PREREG_V2_SKELETON.md` | Superseding preregistration, to be completed and frozen |
 | `10_PHASE_GATE_PLAN_2026-08-08.md` | Current serial gates, development-model routing, and completion criteria |
+| [`status/index.html`](status/index.html) | Generated phase dashboard, safety counters, branch ownership, and verification ledger |
+
+## Phase dashboard
+
+The status dashboard is a generated, self-contained HTML file. Update
+`status/phase_status.json`, run `python scripts/render_phase_status.py`, and commit
+both the source data and rendered `status/index.html` at every phase checkpoint.
+The canonical offline suite fails when the rendered page is stale. The dashboard
+reports project state; it never authorizes a paid or confirmatory call.
