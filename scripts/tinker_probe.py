@@ -13,6 +13,7 @@ import hashlib
 import json
 import math
 import os
+import platform
 import sys
 import time
 import uuid
@@ -23,31 +24,24 @@ from pathlib import Path
 from typing import Any, Callable, Iterable, Mapping, Protocol, Sequence, TextIO
 
 
-SCHEMA_VERSION = 1
+SCHEMA_VERSION = 2
+PROBE_PYTHON_VERSION = "3.12.8"
+TINKER_SDK_VERSION = "0.25.0"
 SMOKE_MODEL = "openai/gpt-oss-20b"
 CAP_PROBE_CAPS = (4096, 16384, 32768, 65536)
-# Probe the intended standard routes wherever their context permits it. The
-# 65,536-token cap requires an extended-context ID: base GPT-OSS-120B has a 32K
-# context, and base Inkling's 64K context cannot fit a nonempty prompt plus a
-# 65,536-token completion. That route change is scientifically material and is
-# therefore explicit in every plan/report row.
-CAP_PROBE_MODEL_IDS = {
-    "inkling": {
-        4096: "thinkingmachines/Inkling",
-        16384: "thinkingmachines/Inkling",
-        32768: "thinkingmachines/Inkling",
-        65536: "thinkingmachines/Inkling:peft:262144",
-    },
-    "gpt_oss_120b": {
-        4096: "openai/gpt-oss-120b",
-        16384: "openai/gpt-oss-120b",
-        32768: "openai/gpt-oss-120b",
-        65536: "openai/gpt-oss-120b:peft:131072",
-    },
+# Every requested cap is sent to the same exact target model ID. In particular,
+# a 65,536 rejection is evidence that this cap is unsupported on that target;
+# substituting a PEFT or extended-context route would answer a different question.
+CAP_PROBE_MODELS = {
+    "inkling": "thinkingmachines/Inkling",
+    "gpt_oss_120b": "openai/gpt-oss-120b",
 }
 DEFAULT_REPORT_PATH = Path("reports/tinker_probe.jsonl")
+ENVIRONMENT_LOCK_PATH = Path(__file__).with_name("tinker_probe_requirements.lock")
 PRICING_SOURCE = "https://tinker-docs.thinkingmachines.ai/tinker/models/"
 PRICING_AS_OF = "2026-08-08"
+DEFAULT_CAP_OUTPUT_TOKEN_COST_BOUND = 32768
+DEFAULT_CAP_MAX_AUTHORIZATION_USD = 0.02
 
 # USD per million tokens. These are used only for an upper-bound projection
 # printed before a human-authorized live call; actual billing must be reconciled
@@ -55,9 +49,7 @@ PRICING_AS_OF = "2026-08-08"
 MODEL_PRICING = {
     "openai/gpt-oss-20b": {"prefill": 0.18, "sample": 0.45},
     "openai/gpt-oss-120b": {"prefill": 0.33, "sample": 0.84},
-    "openai/gpt-oss-120b:peft:131072": {"prefill": 0.78, "sample": 1.94},
     "thinkingmachines/Inkling": {"prefill": 1.87, "sample": 4.68},
-    "thinkingmachines/Inkling:peft:262144": {"prefill": 3.74, "sample": 9.36},
 }
 
 REQUIRED_RECORD_FIELDS = {
@@ -82,9 +74,13 @@ REQUIRED_RECORD_FIELDS = {
     "latency_seconds",
     "returned_tokens_exceed_requested_cap",
     "projected_cost_usd",
+    "cost_projection_output_token_bound",
+    "cost_authorization_usd",
     "pricing_source",
     "pricing_as_of",
     "sdk_version",
+    "python_version",
+    "environment_lock_sha256",
     "error",
 }
 
@@ -120,6 +116,18 @@ class ProbeSpec:
     stop: tuple[str, ...] | None
     deliberately_omits_max_tokens: bool = False
 
+    @property
+    def cost_projection_output_token_bound(self) -> int:
+        """Finite completion-token bound used only for cost authorization."""
+        if self.max_tokens is not None:
+            return self.max_tokens
+        if self.kind == "default_cap" and self.deliberately_omits_max_tokens:
+            # GPT-OSS-20B's published maximum sequence length is 32K. Using the
+            # full context as output is conservative because the prompt also
+            # consumes context. This value is never sent as max_tokens.
+            return DEFAULT_CAP_OUTPUT_TOKEN_COST_BOUND
+        raise ValueError("a finite cost-projection output-token bound is required")
+
     def request_params(self) -> dict[str, Any]:
         """Return exactly the fields passed to ``tinker.SamplingParams``."""
         params: dict[str, Any] = {
@@ -153,6 +161,7 @@ class CallResult:
     prompt_cache_hit_tokens: int
     sdk_version: str
     sampling_session_id: str | None = None
+    python_version: str = PROBE_PYTHON_VERSION
 
 
 class ProbeAdapter(Protocol):
@@ -218,9 +227,8 @@ def build_probe_plan(
             **common,
         ),
     ]
-    for model_label, model_ids in CAP_PROBE_MODEL_IDS.items():
+    for model_label, model in CAP_PROBE_MODELS.items():
         for cap in CAP_PROBE_CAPS:
-            model = model_ids[cap]
             plan.append(
                 ProbeSpec(
                     name=f"cap_semantics_{model_label}_{cap}",
@@ -249,7 +257,14 @@ class TinkerSDKAdapter:
         *,
         sdk_module: Any | None = None,
         retry_config_cls: type[Any] | None = None,
+        runtime_python_version: str | None = None,
     ) -> None:
+        observed_python = runtime_python_version or platform.python_version()
+        if observed_python != PROBE_PYTHON_VERSION:
+            raise RuntimeError(
+                f"Tinker probe requires CPython {PROBE_PYTHON_VERSION}; "
+                f"observed {observed_python}. Refusing an unpinned live environment."
+            )
         if sdk_module is None:
             try:
                 import tinker as sdk_module  # type: ignore[no-redef]
@@ -258,6 +273,12 @@ class TinkerSDKAdapter:
                     "The Tinker SDK is required for --live. Install the project-pinned "
                     "SDK in the human execution environment."
                 ) from exc
+        observed_sdk = str(getattr(sdk_module, "__version__", "unknown"))
+        if observed_sdk != TINKER_SDK_VERSION:
+            raise RuntimeError(
+                f"Tinker SDK {TINKER_SDK_VERSION} is required; observed "
+                f"{observed_sdk}. Install the hash-locked probe environment."
+            )
         if retry_config_cls is None:
             try:
                 from tinker.lib.retry_handler import RetryConfig as retry_config_cls
@@ -305,6 +326,7 @@ class TinkerSDKAdapter:
             prompt_cache_hit_tokens=int(getattr(response, "prompt_cache_hit_tokens", 0)),
             sdk_version=str(getattr(self._sdk, "__version__", "unknown")),
             sampling_session_id=getattr(client, "_sampling_session_id", None),
+            python_version=platform.python_version(),
         )
 
 
@@ -345,6 +367,10 @@ def hash_response_text(text: str) -> str:
     return hashlib.sha256(text.encode("utf-8")).hexdigest()
 
 
+def environment_lock_sha256() -> str:
+    return hashlib.sha256(ENVIRONMENT_LOCK_PATH.read_bytes()).hexdigest()
+
+
 def make_response_records(
     spec: ProbeSpec,
     result: CallResult,
@@ -352,7 +378,8 @@ def make_response_records(
     call_id: str,
     latency_seconds: float,
     timestamp: str,
-    projected_cost_usd: float | None,
+    projected_cost_usd: float,
+    cost_authorization_usd: float | None = None,
 ) -> list[dict[str, Any]]:
     records = []
     for sample_index, observation in enumerate(result.observations):
@@ -390,9 +417,13 @@ def make_response_records(
                     else None
                 ),
                 "projected_cost_usd": projected_cost_usd,
+                "cost_projection_output_token_bound": spec.cost_projection_output_token_bound,
+                "cost_authorization_usd": cost_authorization_usd,
                 "pricing_source": PRICING_SOURCE,
                 "pricing_as_of": PRICING_AS_OF,
                 "sdk_version": result.sdk_version,
+                "python_version": result.python_version,
+                "environment_lock_sha256": environment_lock_sha256(),
                 "error": None,
             }
         )
@@ -406,7 +437,8 @@ def make_error_record(
     call_id: str,
     latency_seconds: float,
     timestamp: str,
-    projected_cost_usd: float | None,
+    projected_cost_usd: float,
+    cost_authorization_usd: float | None = None,
 ) -> dict[str, Any]:
     return {
         "schema_version": SCHEMA_VERSION,
@@ -435,30 +467,39 @@ def make_error_record(
         "latency_seconds": latency_seconds,
         "returned_tokens_exceed_requested_cap": None,
         "projected_cost_usd": projected_cost_usd,
+        "cost_projection_output_token_bound": spec.cost_projection_output_token_bound,
+        "cost_authorization_usd": cost_authorization_usd,
         "pricing_source": PRICING_SOURCE,
         "pricing_as_of": PRICING_AS_OF,
         "sdk_version": None,
+        "python_version": platform.python_version(),
+        "environment_lock_sha256": environment_lock_sha256(),
         "error": {"type": type(error).__name__, "message": str(error)},
     }
 
 
-def projected_cost_usd(spec: ProbeSpec) -> float | None:
-    """Return a conservative request upper bound, or None for default-cap."""
-    if spec.max_tokens is None:
-        return None
+def projected_cost_usd(spec: ProbeSpec) -> float:
+    """Return the finite conservative upper bound used for authorization."""
     prices = MODEL_PRICING[spec.model]
     estimated_prompt_tokens = max(1, math.ceil(len(spec.prompt.encode("utf-8")) / 4))
     prefill = estimated_prompt_tokens * prices["prefill"] / 1_000_000
-    sample = spec.max_tokens * spec.num_samples * prices["sample"] / 1_000_000
+    sample = (
+        spec.cost_projection_output_token_bound
+        * spec.num_samples
+        * prices["sample"]
+        / 1_000_000
+    )
     return prefill + sample
 
 
-def print_cost_projection(spec: ProbeSpec, stream: TextIO) -> float | None:
+def print_cost_projection(spec: ProbeSpec, stream: TextIO) -> float:
     projection = projected_cost_usd(spec)
-    if projection is None:
-        detail = "upper_bound_usd=UNKNOWN reason=intentional_max_tokens_omission"
-    else:
-        detail = f"upper_bound_usd={projection:.6f}"
+    detail = (
+        f"upper_bound_usd={projection:.6f} "
+        f"output_token_cost_bound={spec.cost_projection_output_token_bound}"
+    )
+    if spec.deliberately_omits_max_tokens:
+        detail += " bound_basis=published_model_context max_tokens_parameter=OMITTED"
     stream.write(
         f"COST PROJECTION probe={spec.name} model={spec.model} {detail} "
         f"pricing_as_of={PRICING_AS_OF}\n"
@@ -536,7 +577,16 @@ def render_summary_table(summary: Sequence[Mapping[str, Any]]) -> str:
 
 
 def render_plan_table(plan: Sequence[ProbeSpec]) -> str:
-    headers = ("probe", "kind", "class", "model", "max_tokens", "num_samples")
+    headers = (
+        "probe",
+        "kind",
+        "class",
+        "model",
+        "max_tokens",
+        "num_samples",
+        "cost_bound_tokens",
+        "projected_cost_usd",
+    )
     rows = [
         (
             spec.name,
@@ -545,6 +595,8 @@ def render_plan_table(plan: Sequence[ProbeSpec]) -> str:
             spec.model,
             "OMITTED" if spec.deliberately_omits_max_tokens else str(spec.max_tokens),
             str(spec.num_samples),
+            str(spec.cost_projection_output_token_bound),
+            f"{projected_cost_usd(spec):.6f}",
         )
         for spec in plan
     ]
@@ -591,7 +643,40 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--top-p", type=float, default=1.0)
     parser.add_argument("--top-k", type=int, default=-1)
     parser.add_argument("--stop", action="append", default=None, help="repeat for multiple stop strings")
+    parser.add_argument(
+        "--authorize-default-cap-cost-usd",
+        type=float,
+        default=None,
+        help=(
+            "explicit authorization for the isolated max_tokens-omission diagnostic; "
+            f"must cover its projection and may not exceed ${DEFAULT_CAP_MAX_AUTHORIZATION_USD:.2f}"
+        ),
+    )
     return parser
+
+
+def _validate_default_cap_authorization(
+    plan: Sequence[ProbeSpec], authorization_usd: float | None
+) -> None:
+    diagnostics = [spec for spec in plan if spec.deliberately_omits_max_tokens]
+    if not diagnostics:
+        return
+    if authorization_usd is None or not math.isfinite(authorization_usd):
+        raise SystemExit(
+            "live default-cap diagnostic requires --authorize-default-cap-cost-usd "
+            "with a finite amount"
+        )
+    required = sum(projected_cost_usd(spec) for spec in diagnostics)
+    if authorization_usd < required:
+        raise SystemExit(
+            f"default-cap authorization ${authorization_usd:.6f} is below the "
+            f"projected upper bound ${required:.6f}"
+        )
+    if authorization_usd > DEFAULT_CAP_MAX_AUTHORIZATION_USD:
+        raise SystemExit(
+            f"default-cap authorization may not exceed "
+            f"${DEFAULT_CAP_MAX_AUTHORIZATION_USD:.2f}"
+        )
 
 
 def main(
@@ -627,11 +712,13 @@ def main(
     api_key = environ.get("TINKER_API_KEY")
     if not api_key:
         raise SystemExit("--live requires TINKER_API_KEY in the environment")
+    _validate_default_cap_authorization(plan, args.authorize_default_cap_cost_usd)
 
     factory = TinkerSDKAdapter if adapter_factory is None else adapter_factory
     adapter = factory(api_key)
     writer = AppendOnlyJSONL(args.report)
     run_records: list[dict[str, Any]] = []
+    had_error = False
     for spec in plan:
         projection = print_cost_projection(spec, stdout)
         call_id = str(uuid.uuid4())
@@ -647,10 +734,22 @@ def main(
                 latency_seconds=latency,
                 timestamp=_utc_now(),
                 projected_cost_usd=projection,
+                cost_authorization_usd=(
+                    args.authorize_default_cap_cost_usd
+                    if spec.deliberately_omits_max_tokens
+                    else None
+                ),
             )
             writer.append(record)
             run_records.append(record)
             stdout.write(f"ERROR probe={spec.name} type={type(error).__name__}: {error}\n")
+            had_error = True
+            if spec.kind == "cap_semantics":
+                stdout.write(
+                    "FAIL CLOSED: exact target model/cap retained; no route or cap "
+                    "substitution. Continuing the remaining independent cap probes.\n"
+                )
+                continue
             stdout.write(render_summary_table(summarize_records(run_records)) + "\n")
             return 1
         latency = time.perf_counter() - started
@@ -661,10 +760,21 @@ def main(
             latency_seconds=latency,
             timestamp=_utc_now(),
             projected_cost_usd=projection,
+            cost_authorization_usd=(
+                args.authorize_default_cap_cost_usd
+                if spec.deliberately_omits_max_tokens
+                else None
+            ),
         )
         for record in records:
             writer.append(record)
         run_records.extend(records)
+        if any(record["returned_tokens_exceed_requested_cap"] is True for record in records):
+            had_error = True
+            stdout.write(
+                f"CAP VIOLATION probe={spec.name}: returned tokens exceeded the exact "
+                "requested cap; no substitution or retry will be attempted.\n"
+            )
 
     stdout.write(render_summary_table(summarize_records(run_records)) + "\n")
     stdout.write(
@@ -676,7 +786,7 @@ def main(
         "OUTSTANDING: OpenAI gpt-5.6-terra usage-accounting sanity is not part of "
         "this Tinker tool and remains a preregistration blocker.\n"
     )
-    return 0
+    return 1 if had_error else 0
 
 
 if __name__ == "__main__":
