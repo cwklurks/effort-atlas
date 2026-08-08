@@ -1,0 +1,30 @@
+{
+  "bootstrap": {
+    "effort_order": ["low", "high"],
+    "caps": [4, 8],
+    "items": {
+      "item-a": {
+        "low|4": [true, true],
+        "high|4": [false, false],
+        "low|8": [false, false],
+        "high|8": [true, true]
+      },
+      "item-b": {
+        "low|4": [false, false],
+        "high|4": [false, false],
+        "low|8": [false, false],
+        "high|8": [false, false]
+      }
+    },
+    "expected": {
+      "slope_at_4": -0.5,
+      "slope_at_8": 0.5,
+      "low_cap_effect": -0.5,
+      "high_cap_effect": 0.5,
+      "interaction": 1.0,
+      "slope_at_4_ci": [-1.0, 0.0],
+      "slope_at_8_ci": [0.0, 1.0],
+      "interaction_ci": [0.0, 2.0]
+    }
+  }
+}
