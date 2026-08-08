@@ -56,11 +56,24 @@ class TinkerProbePlanTests(unittest.TestCase):
         self.assertEqual(
             {(spec.model, spec.max_tokens) for spec in cap_specs},
             {
-                (model, cap)
-                for model in tinker_probe.CAP_PROBE_MODELS
+                (model_ids[cap], cap)
+                for model_ids in tinker_probe.CAP_PROBE_MODEL_IDS.values()
                 for cap in tinker_probe.CAP_PROBE_CAPS
             },
         )
+        self.assertEqual(len(cap_specs), 8)
+
+    def test_65536_routes_are_explicit_extended_context_variants(self) -> None:
+        plan = tinker_probe.build_probe_plan()
+        high_cap = [
+            spec for spec in plan if spec.kind == "cap_semantics" and spec.max_tokens == 65536
+        ]
+        lower_caps = [
+            spec for spec in plan if spec.kind == "cap_semantics" and spec.max_tokens != 65536
+        ]
+
+        self.assertTrue(all(":peft:" in spec.model for spec in high_cap))
+        self.assertTrue(all(":peft:" not in spec.model for spec in lower_caps))
 
     def test_gpt_oss_20b_is_used_for_cheapest_smoke_probes(self) -> None:
         non_cap_specs = [spec for spec in tinker_probe.build_probe_plan() if spec.kind != "cap_semantics"]

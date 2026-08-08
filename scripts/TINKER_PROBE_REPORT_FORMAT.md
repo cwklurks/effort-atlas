@@ -54,6 +54,10 @@ Every row contains:
 - `returned_tokens_exceed_requested_cap=false` is not evidence that billed tokens
   respected the cap. The SDK response has no per-call billing receipt, so billing
   reconciliation remains outstanding.
+- The 65,536-token probes use extended-context model IDs. Smaller caps use the
+  intended standard routes. Results are route-specific and must not silently be
+  pooled across those IDs; the route change itself must be resolved in the REAP
+  panel design before preregistration freezes.
 - `reap/08_HYPERPARAMETER_DECISIONS.md` separately requires OpenAI
   gpt-5.6-terra usage-accounting sanity. This Tinker-only report does not address
   or clear that preregistration blocker.

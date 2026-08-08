@@ -25,14 +25,26 @@ from typing import Any, Callable, Iterable, Mapping, Protocol, Sequence, TextIO
 
 SCHEMA_VERSION = 1
 SMOKE_MODEL = "openai/gpt-oss-20b"
-# The extended-context IDs are deliberate: the base GPT-OSS-120B route has a
-# 32K context and base Inkling has a 64K context, so a nonempty prompt plus a
-# 65,536-token requested completion requires their longer-context variants.
-CAP_PROBE_MODELS = (
-    "thinkingmachines/Inkling:peft:262144",
-    "openai/gpt-oss-120b:peft:131072",
-)
 CAP_PROBE_CAPS = (4096, 16384, 32768, 65536)
+# Probe the intended standard routes wherever their context permits it. The
+# 65,536-token cap requires an extended-context ID: base GPT-OSS-120B has a 32K
+# context, and base Inkling's 64K context cannot fit a nonempty prompt plus a
+# 65,536-token completion. That route change is scientifically material and is
+# therefore explicit in every plan/report row.
+CAP_PROBE_MODEL_IDS = {
+    "inkling": {
+        4096: "thinkingmachines/Inkling",
+        16384: "thinkingmachines/Inkling",
+        32768: "thinkingmachines/Inkling",
+        65536: "thinkingmachines/Inkling:peft:262144",
+    },
+    "gpt_oss_120b": {
+        4096: "openai/gpt-oss-120b",
+        16384: "openai/gpt-oss-120b",
+        32768: "openai/gpt-oss-120b",
+        65536: "openai/gpt-oss-120b:peft:131072",
+    },
+}
 DEFAULT_REPORT_PATH = Path("reports/tinker_probe.jsonl")
 PRICING_SOURCE = "https://tinker-docs.thinkingmachines.ai/tinker/models/"
 PRICING_AS_OF = "2026-08-08"
@@ -42,7 +54,9 @@ PRICING_AS_OF = "2026-08-08"
 # separately. Values match the exact model IDs above on PRICING_AS_OF.
 MODEL_PRICING = {
     "openai/gpt-oss-20b": {"prefill": 0.18, "sample": 0.45},
+    "openai/gpt-oss-120b": {"prefill": 0.33, "sample": 0.84},
     "openai/gpt-oss-120b:peft:131072": {"prefill": 0.78, "sample": 1.94},
+    "thinkingmachines/Inkling": {"prefill": 1.87, "sample": 4.68},
     "thinkingmachines/Inkling:peft:262144": {"prefill": 3.74, "sample": 9.36},
 }
 
@@ -201,9 +215,9 @@ def build_probe_plan(
             **common,
         ),
     ]
-    for model in CAP_PROBE_MODELS:
-        model_label = "inkling" if model.startswith("thinkingmachines/Inkling") else "gpt_oss_120b"
+    for model_label, model_ids in CAP_PROBE_MODEL_IDS.items():
         for cap in CAP_PROBE_CAPS:
+            model = model_ids[cap]
             plan.append(
                 ProbeSpec(
                     name=f"cap_semantics_{model_label}_{cap}",
