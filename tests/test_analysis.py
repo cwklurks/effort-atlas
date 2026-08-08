@@ -49,6 +49,8 @@ def result_row(
         "finish_reason": finish_reason,
         "completion_tokens": completion_tokens,
         "reasoning_tokens": max(0, completion_tokens - 1),
+        "latency_s": 1.0,
+        "receipt_cost_usd": 0.01,
     }
 
 
@@ -201,6 +203,8 @@ class ConfirmatoryAnalysisTests(unittest.TestCase):
         )
         self.assertEqual(low["proportions"]["accuracy"]["wilson"], wilson(1, 2))
         self.assertEqual(low["proportions"]["unanswered_length_stop"]["wilson"], wilson(1, 2))
+        self.assertEqual(low["latency_s"], {"n": 2, "median": 1.0, "minimum": 1.0, "maximum": 1.0})
+        self.assertEqual(low["receipt_cost_usd"], {"n": 2, "total": 0.02})
 
     def test_paired_transition_table_and_amended_rescue_taxonomy(self):
         rows = [

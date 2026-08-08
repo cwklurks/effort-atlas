@@ -139,6 +139,18 @@ def validate_analysis_rows(rows: Iterable[dict[str, Any]]) -> list[dict[str, Any
             type(row["reasoning_tokens"]) is not int or row["reasoning_tokens"] < 0
         ):
             raise ValueError(f"Analysis row {index} has invalid reasoning_tokens.")
+        if "latency_s" in row and (
+            type(row["latency_s"]) not in (int, float)
+            or not math.isfinite(row["latency_s"])
+            or row["latency_s"] < 0
+        ):
+            raise ValueError(f"Analysis row {index} has invalid latency_s.")
+        if "receipt_cost_usd" in row and (
+            type(row["receipt_cost_usd"]) not in (int, float)
+            or not math.isfinite(row["receipt_cost_usd"])
+            or row["receipt_cost_usd"] < 0
+        ):
+            raise ValueError(f"Analysis row {index} has invalid receipt_cost_usd.")
         identity = tuple(row[key] for key in identity_keys)
         if identity in seen:
             raise ValueError(f"Duplicate immutable analysis row: {identity!r}")
@@ -283,7 +295,7 @@ def summarize_cells(
 ) -> list[dict[str, Any]]:
     records = validate_analysis_rows(rows)
     planned = _validate_planned_rows(planned_rows or [])
-    identity_source = records or planned
+    identity_source = [*records, *planned]
     if not identity_source:
         return []
     _panel_identity(identity_source)
@@ -323,6 +335,12 @@ def summarize_cells(
                 row["reasoning_tokens"]
                 for row in cell_rows
                 if "reasoning_tokens" in row
+            ]
+            latencies = [row["latency_s"] for row in cell_rows if "latency_s" in row]
+            receipt_costs = [
+                row["receipt_cost_usd"]
+                for row in cell_rows
+                if "receipt_cost_usd" in row
             ]
             proportions = {
                 "accuracy": _proportion(k, n),
@@ -365,6 +383,16 @@ def summarize_cells(
                         "n": len(reasoning_tokens),
                         "mean": _mean(reasoning_tokens),
                         "median": statistics.median(reasoning_tokens) if reasoning_tokens else None,
+                    },
+                    "latency_s": {
+                        "n": len(latencies),
+                        "median": statistics.median(latencies) if latencies else None,
+                        "minimum": min(latencies) if latencies else None,
+                        "maximum": max(latencies) if latencies else None,
+                    },
+                    "receipt_cost_usd": {
+                        "n": len(receipt_costs),
+                        "total": sum(receipt_costs) if receipt_costs else None,
                     },
                     "variance_components": replicate_variance_components(cell_rows),
                 }
@@ -576,7 +604,7 @@ def paired_cap_transitions(
 ) -> list[dict[str, Any]]:
     records = validate_analysis_rows(rows)
     planned = _validate_planned_rows(planned_rows or [])
-    identity_source = records or planned
+    identity_source = [*records, *planned]
     if not identity_source:
         return []
     _panel_identity(identity_source)
@@ -705,12 +733,15 @@ def cap_invariance_calibration(
     *,
     reference_cap: int,
     caps: Sequence[int] | None = None,
+    effort_order: Sequence[Any] | None = None,
     strategy: CalibrationStrategy | None = None,
 ) -> list[dict[str, Any]]:
     records = validate_analysis_rows(rows)
     if records:
         _panel_identity(records)
-    efforts = _ordered_efforts(records)
+    efforts = list(effort_order) if effort_order is not None else _ordered_efforts(records)
+    if {row["effort"] for row in records} - set(efforts):
+        raise ValueError("Rows contain effort values outside the configured calibration grid.")
     target_caps = list(caps) if caps is not None else sorted(
         {row["cap"] for row in records if row["cap"] < reference_cap}
     )
@@ -845,6 +876,7 @@ def analyze_confirmatory_rows(
                     panel_rows,
                     reference_cap=ordered_caps[-1],
                     caps=ordered_caps[:-1],
+                    effort_order=efforts,
                     strategy=calibration_strategy,
                 ),
             }
