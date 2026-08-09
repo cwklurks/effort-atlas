@@ -83,8 +83,18 @@ the canonical offline suite:
 
 ```bash
 uv sync --python 3.12.8
+uv venv --no-project --python 3.12.8 .venv/tinker-probe
+uv pip sync --python .venv/tinker-probe/bin/python \
+  --require-hashes --strict scripts/tinker_probe_requirements.lock
 ./scripts/verify_offline.sh
 ```
+
+The canonical verifier runs two mandatory, structurally separate lanes: ordinary
+project tests in `.venv`, then the Tinker probe suite in the exact 42-distribution
+SDK environment at `.venv/tinker-probe`. It fails if the second interpreter is
+missing, is the project interpreter, or differs from the hash-locked manifest.
+Set `TINKER_PYTHON` only to select another independently provisioned exact-lock
+interpreter.
 
 For the pinned observational pipeline, install its locked optional dependencies
 with `uv sync --python 3.12.8 --extra observational`.

@@ -103,10 +103,15 @@ their artifact hashes; new report rows record that lock's SHA-256. Create the
 environment without making any provider call:
 
 ```sh
-uv venv --python 3.12.8 .venv-tinker-probe
-uv pip sync --python .venv-tinker-probe/bin/python \
-  --require-hashes scripts/tinker_probe_requirements.lock
+uv venv --no-project --python 3.12.8 .venv/tinker-probe
+uv pip sync --python .venv/tinker-probe/bin/python \
+  --require-hashes --strict scripts/tinker_probe_requirements.lock
 ```
+
+The ordinary project environment and this exact-lock environment must remain
+distinct. `./scripts/verify_offline.sh` runs project discovery first and then
+explicitly runs `tests/tinker_probe_suite.py` with this interpreter; either lane
+failing makes the canonical verifier fail.
 
 Before live client construction, the tool verifies CPython plus the exact set of
 42 installed distribution versions against the lock (missing, changed, and

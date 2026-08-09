@@ -65,7 +65,9 @@ budget gates, and the REAP preregistration are complete and frozen.
 - Use Python 3.12 or another interpreter satisfying `pyproject.toml`; do not use the
   repository's legacy Python 3.9 virtual environment as evidence of correctness.
 - The canonical offline suite is `./scripts/verify_offline.sh` after
-  `uv sync --python 3.12.8`.
+  `uv sync --python 3.12.8` and provisioning the separate exact-lock Tinker test
+  environment documented in `README.md`. The verifier requires both interpreters
+  and runs both suites; never install the Tinker lock into the project environment.
 - No verification command may make a model-provider call. A branch-specific suite
   may extend the canonical command but may not replace it silently.
 
