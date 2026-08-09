@@ -83,16 +83,29 @@ the canonical offline suite:
 
 ```bash
 uv sync --python 3.12.8
+uv venv --no-project --python 3.12.8 .venv/tinker-probe
+uv pip sync --python .venv/tinker-probe/bin/python \
+  --require-hashes --strict scripts/tinker_probe_requirements.lock
 ./scripts/verify_offline.sh
 ```
+
+The canonical verifier runs two mandatory, structurally separate lanes: ordinary
+project tests in `.venv`, then the Tinker probe suite in the exact 42-distribution
+SDK environment at `.venv/tinker-probe`. It fails if the second interpreter is
+missing, is the project interpreter, or differs from the hash-locked manifest.
+Set `TINKER_PYTHON` only to select another independently provisioned exact-lock
+interpreter.
 
 For the pinned observational pipeline, install its locked optional dependencies
 with `uv sync --python 3.12.8 --extra observational`.
 
-The Phase 0 code baseline contributed 40 tests; the generated phase dashboard adds
-four governance checks, so the current suite collects 44. The bare function in
-`tests/test_rescue_analysis.py` is not collected; Task B owns that known defect.
-The green baseline means reproducible current behavior, not complete coverage.
+The current canonical verifier collects 89 ordinary project tests and 26 exact-lock
+Tinker tests. The ordinary lane includes collected rescue-analysis tests enforcing
+the amended answer-rescue definition and shared grader-v2 state validation. One
+archive-backed grader test requires `GRADER_V2_ARCHIVE_ROOT`; the committed
+sanitized 78-row acceptance fixture remains covered when that private source path
+is unavailable. A green suite means reproducible current behavior, not complete
+coverage.
 
 The legacy local `.venv` found before the 2026-08-08 governance pass used Python
 3.9 and is not valid verification evidence. No offline verification command should

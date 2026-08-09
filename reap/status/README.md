@@ -10,8 +10,9 @@ At each phase checkpoint:
 2. Keep all safety counters literal and evidence-backed. A zero must never be
    inferred from missing data.
 3. Render the page with `python scripts/render_phase_status.py`.
-4. Run `./scripts/verify_offline.sh`; it checks that `index.html` is current before
-   running the offline test suite.
+4. Provision both offline environments as documented in the root `README.md`, then
+   run `./scripts/verify_offline.sh`; it checks that `index.html` is current before
+   running the ordinary project suite and mandatory exact-lock Tinker suite.
 5. Commit the JSON source and generated HTML together.
 
 The page is self-contained and can be opened directly in a browser. It is a

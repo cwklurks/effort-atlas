@@ -3,53 +3,70 @@ import unittest
 from effort_atlas.rescue_analysis import classify_pairs
 
 
+def old_row(item_id, *, extracted_answer_present):
+    return {
+        "item_id": item_id,
+        "domain": "math",
+        "effort": "max",
+        "finish_reason": "length",
+        "completion_tokens": 20000,
+        "correct": False,
+        "extracted_answer_present": extracted_answer_present,
+        "extracted_answer": "17" if extracted_answer_present else None,
+        "error": None,
+    }
+
+
+def rescue_row(item_id, *, correct=True, finish_reason="stop"):
+    return {
+        "item_id": item_id,
+        "domain": "math",
+        "effort": "max",
+        "finish_reason": finish_reason,
+        "completion_tokens": 30000,
+        "prompt_tokens": 100,
+        "correct": correct,
+        "extracted_answer_present": True,
+        "extracted_answer": "42" if correct else "17",
+        "reported_cost_usd": 0.1,
+        "error": None,
+    }
+
+
 class RescueAnalysisTests(unittest.TestCase):
-    def test_classify_pairs_separates_rescue_unaccounted_and_missing(self):
+    def test_amended_rescue_requires_unanswered_smaller_cap_length_stop(self):
         old = [
-            {
-                "item_id": "math_0001",
-                "domain": "math",
-                "effort": "max",
-                "completion_tokens": 20000,
-                "finish_reason": "length",
-                "correct": False,
-            },
-            {
-                "item_id": "math_0002",
-                "domain": "math",
-                "effort": "max",
-                "completion_tokens": 20000,
-                "finish_reason": "length",
-                "correct": False,
-            },
-            {
-                "item_id": "math_0003",
-                "domain": "math",
-                "effort": "max",
-                "completion_tokens": 20000,
-                "finish_reason": "length",
-                "correct": False,
-            },
+            old_row("primary", extracted_answer_present=False),
+            old_row("grade-transition", extracted_answer_present=True),
+            old_row("not-normal", extracted_answer_present=False),
         ]
         rescue = [
+            rescue_row("primary"),
+            rescue_row("grade-transition"),
+            rescue_row("not-normal", finish_reason="tool_calls"),
+        ]
+
+        pairs = classify_pairs(old, rescue, "math", "max", 20000)
+
+        self.assertEqual(
+            [pair["status"] for pair in pairs],
+            [
+                "answer_present_grade_transition",
+                "other_terminal",
+                "primary_answer_rescue",
+            ],
+        )
+        self.assertFalse(pairs[2]["old_extracted_answer_present"])
+
+    def test_classify_pairs_separates_unaccounted_and_missing(self):
+        old = [old_row(item_id, extracted_answer_present=False) for item_id in ["a", "b", "c"]]
+        rescue = [
+            rescue_row("a"),
             {
-                "item_id": "math_0001",
-                "domain": "math",
-                "effort": "max",
-                "completion_tokens": 30000,
-                "prompt_tokens": 100,
-                "finish_reason": "stop",
-                "correct": True,
-                "reported_cost_usd": 0.12,
-            },
-            {
-                "item_id": "math_0002",
-                "domain": "math",
-                "effort": "max",
+                **rescue_row("b"),
+                "finish_reason": None,
                 "completion_tokens": -1,
                 "prompt_tokens": -1,
-                "finish_reason": "",
-                "correct": False,
             },
         ]
 
@@ -57,10 +74,32 @@ class RescueAnalysisTests(unittest.TestCase):
 
         self.assertEqual(
             [pair["status"] for pair in pairs],
-            ["rescued", "unaccounted_stream", "missing"],
+            ["primary_answer_rescue", "unaccounted_stream", "missing"],
         )
-        self.assertEqual(pairs[0]["new_completion_tokens"], 30000)
-        self.assertIsNone(pairs[1]["new_completion_tokens"])
+
+    def test_smaller_cap_rows_reject_non_boolean_grades_before_classification(self):
+        for malformed in (1, None, "false"):
+            with self.subTest(correct=malformed):
+                old = old_row("a", extracted_answer_present=True)
+                old["correct"] = malformed
+
+                with self.assertRaisesRegex(ValueError, "malformed_correct"):
+                    classify_pairs([old], [rescue_row("a")], "math", "max", 20000)
+
+    def test_larger_cap_rows_reject_non_boolean_grades_before_classification(self):
+        for malformed in (1, None, "true"):
+            with self.subTest(correct=malformed):
+                rescue = rescue_row("a")
+                rescue["correct"] = malformed
+
+                with self.assertRaisesRegex(ValueError, "malformed_correct"):
+                    classify_pairs(
+                        [old_row("a", extracted_answer_present=False)],
+                        [rescue],
+                        "math",
+                        "max",
+                        20000,
+                    )
 
 
 if __name__ == "__main__":

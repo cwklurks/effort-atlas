@@ -32,21 +32,22 @@ Panels: P1 Inkling/Tinker (continuous effort scalar — unique), P2 GPT-OSS-120B
 
 - The $0 MathArena/HELM observational study is complete and verified; it remains
   exploratory and separate from all future confirmatory estimates.
-- Grader v2, Tinker probe tooling, and the pre-data analysis layer have separate
-  implementation branches. They pass independently under supported Python but are
-  not yet an accepted integrated baseline.
-- The ecosystem audit still requires its eight red-team fixes. The runner and
-  executable budget gates do not exist yet.
+- Grader v2, Tinker probe tooling, the ecosystem audit, and governance are merged
+  to main. The pre-data analysis branch now integrates accepted grader v2, uses
+  item-level transition mass rather than replicate-index pairing, and passes the
+  mandatory ordinary plus exact-lock Tinker offline suites. Initial review blockers
+  in calibration reference accounting and rescue validation were remediated, and
+  the final independent re-review passed; human merge of PR #3 remains.
+- DeepSeek V4 Flash is selected through Fireworks ZDR for bounded development only,
+  but remains disabled until its configuration and hard dollar ceiling are committed.
+- The runner and executable budget gates do not exist yet.
 - No paid REAP smoke or confirmatory call has run. Tinker cap semantics, omitted-cap
   cost bounds, sample independence, and OpenAI usage accounting remain unresolved.
 
-Next gates: accept the governance baseline; repair and accept grader v2; integrate
-the analysis layer; repair the dry-run probe; complete the audit; settle supervisor
-decisions; freeze REAP preregistration v2; implement and red-team the runner; then
-allow human-initiated smoke calls. See `../10_PHASE_GATE_PLAN_2026-08-08.md`.
-
-Phase 0 is implemented on `codex/reap-governance` in PR #4, passed a clean-archive
-40-test run and independent Sol XHigh review, and awaits human acceptance.
+Next gates: human-merge the independently approved analysis layer; settle supervisor
+decisions; freeze REAP preregistration v2; implement and red-team
+the runner; then allow human-initiated smoke calls. See
+`../10_PHASE_GATE_PLAN_2026-08-08.md`.
 
 ## Vocabulary
 

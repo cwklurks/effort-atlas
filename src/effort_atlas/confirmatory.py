@@ -22,6 +22,7 @@ from typing import Any, Iterable
 import fcntl
 
 from . import ROOT, load_config
+from .analysis import wilson
 from .graders import validate_grade_state
 
 
@@ -466,13 +467,19 @@ def analyze_confirmatory_events(
             for row in rows
         )
         empty_extracted_answers = sum(not row["extracted_answer_present"] for row in rows)
+        accuracy_ci = wilson(k, n)
+        length_stop_ci = wilson(length_stops, n)
+        unanswered_length_stop_ci = wilson(unanswered_length_stops, n)
         cells.append({
             "panel": key[0], "model": key[1], "provider_route": key[2],
             "effort": key[3], "cap": key[4], "n": n, "k": k,
             "accuracy": k / n, "length_stops": length_stops,
+            "accuracy_wilson": accuracy_ci,
             "length_stop_rate": length_stops / n,
+            "length_stop_rate_wilson": length_stop_ci,
             "unanswered_length_stops": unanswered_length_stops,
             "unanswered_length_stop_rate": unanswered_length_stops / n,
+            "unanswered_length_stop_rate_wilson": unanswered_length_stop_ci,
             "answer_present_length_stops": length_stops - unanswered_length_stops,
             "empty_extracted_answers": empty_extracted_answers,
             "accuracy_bound_lo": k / n,

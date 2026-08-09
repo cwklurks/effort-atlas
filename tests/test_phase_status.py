@@ -38,6 +38,39 @@ class PhaseStatusTests(unittest.TestCase):
         self.assertEqual(data["safety"]["paid_smoke_calls"], 0)
         self.assertEqual(data["safety"]["frozen_artifact_changes"], 0)
 
+    def test_status_records_phase_two_approval_checkpoint_and_zdr_gate(self):
+        data = json.loads(SOURCE.read_text())
+        checkpoint = next(
+            row
+            for row in data["verification"]
+            if row["label"] == "Phase 2 approved canonical suite"
+        )
+        phase = next(row for row in data["phases"] if row["id"] == 2)
+        fireworks_entry = next(
+            row
+            for row in data["verification"]
+            if row["label"] == "DeepSeek V4 Flash development lane"
+        )
+        fireworks_decision = next(
+            decision for decision in data["decisions"] if "Fireworks ZDR" in decision
+        )
+
+        self.assertEqual(
+            checkpoint["result"],
+            "89 ordinary tests plus 26 exact-lock Tinker tests passed; "
+            "private 78-row archives verified",
+        )
+        self.assertEqual(phase["status"], "awaiting_merge")
+        self.assertEqual(phase["progress"], 100)
+        self.assertIn("Independent statistical re-review passed", phase["gate"])
+        self.assertIn("human review and merge", phase["gate"])
+        for statement in (fireworks_entry["result"], fireworks_decision):
+            self.assertIn("Fireworks ZDR", statement)
+            self.assertIn("development-only", statement)
+            self.assertIn("disabled", statement)
+            self.assertIn("route configuration", statement)
+            self.assertIn("hard dollar ceiling", statement)
+
     def test_rendered_page_is_current_self_contained_and_accessible_by_landmark(self):
         rendered = render()
         parser = _StatusHTMLParser()

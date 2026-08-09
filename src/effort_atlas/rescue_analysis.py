@@ -15,6 +15,20 @@ from collections import Counter
 from pathlib import Path
 
 from . import ROOT
+from .graders import validate_grade_state
+
+
+NORMAL_FINISH_REASONS = {"stop", "complete", "completed"}
+
+
+def _validate_extraction_contract(row: dict, *, label: str) -> None:
+    reason = validate_grade_state(
+        correct=row.get("correct"),
+        extracted_answer_present=row.get("extracted_answer_present"),
+        extracted_answer=row.get("extracted_answer"),
+    )
+    if reason is not None:
+        raise ValueError(f"{label} row violates grader-v2 contract: {reason}")
 
 
 def read_real_rows(directory: Path) -> list[dict]:
@@ -34,13 +48,15 @@ def classify_pairs(
 ) -> list[dict]:
     candidates: dict[str, dict] = {}
     for row in old_rows:
-        if (
+        eligible = (
             row.get("error") is None
             and row.get("domain") == domain
             and str(row.get("effort")) == str(effort)
             and row.get("finish_reason") == "length"
             and row.get("completion_tokens") == old_cap
-        ):
+        )
+        if eligible:
+            _validate_extraction_contract(row, label="smaller-cap")
             candidates[row["item_id"]] = row
 
     attempts: dict[str, list[dict]] = {}
@@ -63,6 +79,8 @@ def classify_pairs(
             and row.get("prompt_tokens", -1) >= 0
             and bool(row.get("finish_reason"))
         ]
+        for row in valid:
+            _validate_extraction_contract(row, label="larger-cap")
         new = valid[-1] if valid else None
         if new is None:
             status = (
@@ -76,9 +94,25 @@ def classify_pairs(
             )
         elif new.get("finish_reason") == "length":
             status = "still_censored"
-        elif bool(new.get("correct")):
-            status = "rescued"
-        elif new.get("finish_reason") == "stop":
+        elif (
+            str(new.get("finish_reason")).lower() in NORMAL_FINISH_REASONS
+            and new["correct"]
+            and not old["extracted_answer_present"]
+        ):
+            status = "primary_answer_rescue"
+        elif (
+            str(new.get("finish_reason")).lower() in NORMAL_FINISH_REASONS
+            and new["correct"]
+            and old["extracted_answer_present"]
+            and not old["correct"]
+        ):
+            status = "answer_present_grade_transition"
+        elif (
+            str(new.get("finish_reason")).lower() in NORMAL_FINISH_REASONS
+            and new["correct"]
+        ):
+            status = "completed_correct_no_rescue"
+        elif str(new.get("finish_reason")).lower() in NORMAL_FINISH_REASONS:
             status = "completed_wrong"
         else:
             status = "other_terminal"
@@ -86,9 +120,17 @@ def classify_pairs(
             {
                 "item_id": item_id,
                 "status": status,
-                "old_correct": bool(old.get("correct")),
+                "old_correct": old["correct"],
+                "old_extracted_answer_present": old["extracted_answer_present"],
+                "old_extracted_answer": old["extracted_answer"],
                 "old_completion_tokens": old.get("completion_tokens"),
-                "new_correct": None if new is None else bool(new.get("correct")),
+                "new_correct": None if new is None else new["correct"],
+                "new_extracted_answer_present": (
+                    None if new is None else new["extracted_answer_present"]
+                ),
+                "new_extracted_answer": (
+                    None if new is None else new["extracted_answer"]
+                ),
                 "new_completion_tokens": (
                     None if new is None else new.get("completion_tokens")
                 ),
@@ -124,12 +166,19 @@ def main() -> None:
         args.old_cap,
     )
     counts = Counter(pair["status"] for pair in pairs)
-    paired = len(pairs) - counts["missing"] - counts["unaccounted_stream"]
-    rescued = counts["rescued"]
+    primary_eligible = sum(
+        not pair["old_extracted_answer_present"]
+        and pair["status"] not in {"missing", "unaccounted_stream"}
+        for pair in pairs
+    )
+    rescued = counts["primary_answer_rescue"]
 
     print(f"historically capped={len(pairs)}")
+    print(f"primary_answer_rescue_eligible={primary_eligible}")
     for status in [
-        "rescued",
+        "primary_answer_rescue",
+        "answer_present_grade_transition",
+        "completed_correct_no_rescue",
         "completed_wrong",
         "still_censored",
         "other_terminal",
@@ -138,8 +187,12 @@ def main() -> None:
     ]:
         print(f"{status}={counts[status]}")
     print(
-        "cap_rescue_rate="
-        + (f"{rescued}/{paired} ({rescued / paired:.1%})" if paired else "missing")
+        "primary_answer_rescue_rate="
+        + (
+            f"{rescued}/{primary_eligible} ({rescued / primary_eligible:.1%})"
+            if primary_eligible
+            else "missing"
+        )
     )
     known_cost = sum(
         float(pair["reported_cost_usd"] or 0)

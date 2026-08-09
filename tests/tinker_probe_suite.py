@@ -1,3 +1,5 @@
+"""Exact-lock Tinker probe suite, intentionally outside test_*.py discovery."""
+
 from __future__ import annotations
 
 import asyncio
