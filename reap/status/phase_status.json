@@ -46,7 +46,8 @@
       "status": "in_progress",
       "progress": 30,
       "summary": "The advisory decision packet passed independent review; its exact scientific, route, budget, and activation defaults are ready for human selection.",
-      "gate": "Explicit human choices for D01-D15; packet recommendations authorize no call and no route substitution."
+      "gate": "Explicit human choices for D01-D15; packet recommendations authorize no call and no route substitution.",
+      "url": "https://github.com/cwklurks/effort-atlas/pull/6"
     },
     {
       "id": 4,
@@ -195,7 +196,7 @@
       "date": "2026-08-08",
       "phase": 3,
       "title": "Phase 3 decision packet technical review passed",
-      "detail": "The advisory D01-D15 packet passed independent technical review with exact cost recomputation and 19/19 killed mutations. Human choices remain pending; no provider, paid smoke, or confirmatory call was authorized."
+      "detail": "The advisory D01-D15 packet passed independent technical review with exact cost recomputation and 19/19 killed mutations and is published in draft PR #6. Human choices remain pending; no provider, paid smoke, or confirmatory call was authorized."
     },
     {
       "date": "2026-08-08",

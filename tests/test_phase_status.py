@@ -76,6 +76,10 @@ class PhaseStatusTests(unittest.TestCase):
         self.assertEqual(data["project"]["current_phase"], 3)
         self.assertEqual(phase_three["status"], "in_progress")
         self.assertEqual(phase_three["progress"], 30)
+        self.assertEqual(
+            phase_three["url"],
+            "https://github.com/cwklurks/effort-atlas/pull/6",
+        )
         self.assertIn("D01-D15", phase_three["gate"])
         self.assertIn("human", phase_three["gate"].lower())
         self.assertIn("2b9b161", phase_three_checkpoint["result"])
