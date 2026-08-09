@@ -6,7 +6,7 @@
     "repository": "cwklurks/effort-atlas",
     "updated": "2026-08-08",
     "current_phase": 2,
-    "summary": "Phase 1 passed adversarial review; grader-analysis integration is next but remains blocked on human merge decisions."
+    "summary": "Phase 2 grader-analysis integration is implemented and offline-green; independent statistical review remains before acceptance."
   },
   "safety": {
     "confirmatory_calls": 0,
@@ -18,10 +18,10 @@
     {
       "id": 0,
       "name": "Governance and baseline",
-      "status": "awaiting_merge",
+      "status": "complete",
       "progress": 100,
       "summary": "Durable instructions, locked Python 3.12 environment, clean-checkout tests, and observational provenance.",
-      "gate": "PR #4 is independently approved and awaits human merge.",
+      "gate": "Accepted governance baseline merged to main.",
       "url": "https://github.com/cwklurks/effort-atlas/pull/4"
     },
     {
@@ -35,10 +35,10 @@
     {
       "id": 2,
       "name": "Grader and analysis integration",
-      "status": "blocked",
-      "progress": 0,
-      "summary": "Rebase the analysis layer, resolve shared files, and correct the item-level transition estimand.",
-      "gate": "Human merge/rebase decisions, then one clean and reproducible grader-plus-analysis baseline."
+      "status": "in_progress",
+      "progress": 90,
+      "summary": "Grader v2 and analysis are integrated; paired transitions now use one expected-mass contribution per item.",
+      "gate": "Independent statistical review and mutation challenge, then human review of PR #3."
     },
     {
       "id": 3,
@@ -89,7 +89,7 @@
       "branch": "codex/ecosystem-audit",
       "pr": 1,
       "owner_model": "gpt-5.6-sol / XHigh",
-      "next": "Human review and merge of independently approved PR #1 at 303263e."
+      "next": "Merged to main at the accepted 303263e implementation; retain headline limitations in reporting."
     },
     {
       "id": "B",
@@ -98,7 +98,7 @@
       "branch": "codex/grader-v2",
       "pr": 2,
       "owner_model": "gpt-5.6-sol / High",
-      "next": "Human review and merge of independently approved PR #2 at 9a54f17."
+      "next": "Merged to main and integrated with the analysis layer without fallback extraction."
     },
     {
       "id": "C",
@@ -107,16 +107,16 @@
       "branch": "codex/tinker-probe",
       "pr": 5,
       "owner_model": "gpt-5.6-sol / High",
-      "next": "Human review of PR #5; live stays blocked until an upstream one-attempt SDK path exists."
+      "next": "Merged to main; live stays blocked until an upstream one-attempt SDK path exists."
     },
     {
       "id": "D",
       "name": "Pre-data analysis layer",
-      "status": "blocked",
+      "status": "in_progress",
       "branch": "codex/analysis-layer",
       "pr": 3,
-      "owner_model": "unassigned until Phase 2",
-      "next": "After human merges, rebase onto grader v2 and correct the item-level transition estimand."
+      "owner_model": "gpt-5.6-sol / XHigh",
+      "next": "Independent statistical review of the integrated branch, then human review of PR #3."
     },
     {
       "id": "E",
@@ -129,6 +129,11 @@
     }
   ],
   "verification": [
+    {
+      "label": "Phase 2 integrated canonical suite",
+      "result": "85 ordinary tests plus 26 exact-lock Tinker tests passed; 1 private-archive check skipped",
+      "status": "passed"
+    },
     {
       "label": "Current offline suite",
       "result": "44 / 44 passed; dashboard freshness enforced",
@@ -181,6 +186,12 @@
     }
   ],
   "activity": [
+    {
+      "date": "2026-08-08",
+      "phase": 2,
+      "title": "Grader and analysis integration implemented",
+      "detail": "Accepted main was merged into the analysis branch; strict grader state validation, item-level transition mass, and mandatory two-environment offline verification are green. Independent review remains."
+    },
     {
       "date": "2026-08-08",
       "phase": 1,
@@ -237,9 +248,9 @@
     }
   ],
   "decisions": [
-    "Human review and merge of PRs #4, #1, #2, and #5 remains pending; Codex will not merge them.",
+    "PRs #4, #1, #2, and #5 were human-merged before Phase 2 integration; Codex did not merge them.",
     "Tinker 0.25.0 live probes are blocked because the pinned SDK resubmits internally.",
     "DeepSeek V4 Flash remains disabled unless China-hosting is explicitly accepted.",
-    "Transition aggregation, calibration metric, cap grid, and final ceilings remain supervisor decisions."
+    "The implementation exposes item-level sufficient statistics and expected independent-draw transition mass; supervisor freeze of final analysis choices, calibration metric, cap grid, and ceilings remains pending."
   ]
 }
