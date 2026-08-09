@@ -1,0 +1,67 @@
+{
+  "control_rule": "one frozen base-10 integer gold schema is applied to exactly 28 finished-correct rows for every runnable pipeline; any failed or unavailable selected control disqualifies the pipeline",
+  "control_schema": {
+    "gold_regex": "^[+-]?\\d+$",
+    "n": 28,
+    "n_eff_dataset_problem_gold": 4
+  },
+  "fallback_origin_rule": "report only when call tracing proves origin",
+  "frozen_at": "2026-08-08T00:00:00+00:00",
+  "minimum_real_n": 20,
+  "metrics": {
+    "accidental_correct_pct": {
+      "denominator": "applicable rows within the separately reported stratum",
+      "numerator": "rows scored correct by the harness-native downstream path",
+      "unavailable": "not_measured"
+    },
+    "answer_is_numeric_pct": {
+      "denominator": "rows with a returned answer within the separately reported stratum",
+      "numerator": "returned-answer strings containing at least one Unicode digit"
+    },
+    "answer_returned_after_truncation_pct": {
+      "denominator": "applicable rows within the separately reported real or constructed-synthetic stratum",
+      "numerator": "rows with a non-null, non-empty extracted answer"
+    },
+    "control_pass_pct": {
+      "denominator": "the same 28 frozen integer-gold controls for every runnable pipeline",
+      "numerator": "selected controls scored correct by the actual pipeline"
+    },
+    "crash_pct": {
+      "denominator": "applicable rows within the separately reported stratum",
+      "numerator": "rows with an exception escaping the adapter invocation"
+    },
+    "swallowed_error_pct": {
+      "denominator": "applicable rows within the separately reported stratum",
+      "numerator": "rows with a defined observable suppressed-error event",
+      "unavailable": "not_measured, never inferred zero"
+    }
+  },
+  "pre_truncation_answer_present": {
+    "definition": "text contains the frozen nonempty syntactic marker regex \\\\boxed\\{.+?\\}",
+    "real_false": 105,
+    "real_true": 26
+  },
+  "reporting_separation": "real and constructed synthetic results never share a metric row, table cell, denominator, or headline",
+  "schema_version": 2,
+  "seed": 1729,
+  "statuses": [
+    "ok",
+    "insufficient_power",
+    "wrong_task_dispatch",
+    "not_runnable",
+    "install_failed",
+    "import_failed",
+    "control_disqualified",
+    "not_applicable",
+    "not_traceable",
+    "not_measured"
+  ],
+  "strata": {
+    "finished_control": 64,
+    "frozen_integer_controls": 28,
+    "real_truncated": 131,
+    "real_truncated_pre_answer": 26,
+    "real_truncated_without_pre_answer": 105,
+    "synthetic_truncated_constructed": 100
+  }
+}

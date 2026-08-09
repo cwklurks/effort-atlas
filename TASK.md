@@ -1,0 +1,511 @@
+# TASK: Ecosystem audit and executable truncation diagnostic for REAP
+
+## Objective
+
+Build the ecosystem-evidence contribution for REAP, the study behind *Thinking
+Cut Short*. Establish with commit-pinned source receipts whether evaluation
+infrastructure defaults can cut off reasoning before an answer exists, then
+measure the behavior by executing the harnesses' real extraction/filter/scoring
+code against a fixed corpus. Package the reusable measurement core as
+`trunccheck/`, publish all required audit artifacts, and open a PR without
+merging it.
+
+This is source-code research, not a model-evaluation run. Make no paid API calls.
+
+## Read before editing
+
+1. `README.md`
+2. `TRUNCATION_STUDY.md`
+3. `CAP_SEMANTICS.md`
+4. `RESEARCH_LOG.md`
+
+If the operator's clean worktree also contains `reap/` or the other
+`observational/` files, read their README/results documents as optional context;
+they were untracked in the setup checkout and are not required task inputs.
+Treat all local research files as context only. Independently verify every
+ecosystem claim against the pinned external source repository. Do not repeat a
+claim merely because an existing REAP document says it.
+
+## Starting facts to verify in preflight
+
+- The base repository is `cwklurks/effort-atlas`.
+- At task setup, tracked `main` was commit
+  `7451f1c0bd650201bb59cbf2ad90a8d2c4adffdd` (abbreviated locally as
+  `7451f1c`). Record the actual merge base used by the task rather than assuming
+  it is unchanged.
+- `observational/real_truncated_fixtures.jsonl.gz` is the required read-only
+  real corpus. At setup its SHA-256 was
+  `b84adb85eccd6b628829cdadb71c29fa25eb4dc0a37d387f554464b312d96f43`.
+- That gzip contained 195 JSONL rows: 131 `kind="truncated"` and 64
+  `kind="control_correct"`. Twelve truncated rows had empty `text`; preserve
+  them and report them rather than silently dropping them.
+- The current checkout used to prepare this task was dirty and contained many
+  unrelated untracked files. The operator must create a dedicated worktree and
+  make a seed commit containing only `TASK.md` and the byte-identical fixture
+  before starting Prime. At task start, require an empty `git status --short`;
+  record that seed commit as `task_start_commit` and stop if the worktree is not
+  clean.
+- No `ecosystem_audit/` or `trunccheck/` implementation existed at setup.
+
+If any starting fact is false, report the exact observation and stop only when
+it materially prevents a valid result. When a requested source or symbol cannot
+be located, write exactly `not found at <paths searched>` and list the paths or
+search patterns. Never guess.
+
+## Scope and non-negotiable constraints
+
+1. Work on branch `codex/ecosystem-audit` (or the operator-created equivalent),
+   open a PR, and never merge it.
+2. Repository edits are limited to:
+   - `ecosystem_audit/**` for the audit, adapters, manifests, generated evidence,
+     verification code, and ignored external checkouts;
+   - `trunccheck/**` because the requested reusable artifact is explicitly a
+     top-level deliverable;
+   - the seed-committed `TASK.md` and
+     `observational/real_truncated_fixtures.jsonl.gz`, which are setup inputs.
+     Their byte-identical addition is authorized only in the operator's seed
+     commit; Prime must not modify them.
+   Do not edit source code, tests, REAP documents, the site, frozen artifacts,
+   root packaging, or any other path.
+3. Make no paid API calls and no model-generation calls. Public Git/GitHub and
+   package-index access for source checkout and dependency installation is
+   allowed. Do not read, print, or commit secrets or `.env` files.
+4. End each numbered phase with a checkpoint commit. Do not squash, amend, or
+   discard earlier phase checkpoints. Use commit messages without em dashes.
+5. Preserve the real corpus byte-for-byte. Synthetic data must be generated
+   deterministically with seed `1729`.
+6. Do not reimplement a harness extractor, answer filter, normalizer, or scorer
+   and call it a measurement of that harness. Import and execute the pinned
+   harness code. Adapter code may only marshal fixture fields into the harness's
+   public/internal call shape, invoke the real code, capture outputs/exceptions,
+   and serialize results. Record the exact imported callable and pinned lines.
+7. If a harness cannot be installed or does not expose an applicable executable
+   pipeline, retain it in the static audit and emit a `not_runnable` result row
+   with the concrete reason. Do not synthesize a percentage. Continue with the
+   other harnesses.
+8. A static code claim is admissible only when it includes all of:
+   repository, full commit SHA, file path, exact line range, a GitHub permalink
+   of the form `.../blob/<full-sha>/<path>#Lx-Ly`, and the actual code quoted
+   verbatim. Issue-tracker facts instead use the canonical issue URL, issue
+   state, and retrieval date. Keep code claims and issue claims distinct.
+9. Every reported number must be generated by committed code, from committed or
+   content-hashed inputs, and reproducible with a fixed seed. Never hand-edit a
+   generated CSV or results table.
+10. Distinguish extraction from correctness. A non-empty extracted answer on a
+    truncated fixture is a fabrication event for this diagnostic even when the
+    text happens to contain an earlier correct final answer. Accidental
+    correctness must use the harness's actual downstream normalizer/scorer when
+    available; otherwise report `not_measured`, not a homemade equivalence rule.
+
+## External repositories
+
+Clone each repository into ignored `ecosystem_audit/_repos/` storage, resolve
+its current HEAD once at the beginning, and freeze the full SHA in
+`ecosystem_audit/repos.lock.json` before auditing. Do not update a checkout after
+the lock is written. Record remote URL, default branch, full SHA, commit date,
+clone date, and license. Use full-history clones for archaeology; shallow clones
+are not acceptable. Record canonical remote URL, resolved remote HEAD/ref, clone
+protocol, submodule/LFS policy and state, platform, interpreter, per-adapter
+dependency-lock hash, and exact environment installation command in a
+machine-readable reproduction manifest. Do not commit nested repositories or
+vendored source.
+
+Create `ecosystem_audit/.gitignore` before cloning and ignore `_repos/`, virtual
+environments, caches, temporary results, and build products. Use only public,
+credential-free allowlisted remotes; reject credential-bearing URLs and set
+`GIT_TERMINAL_PROMPT=0`. Inspect dependency metadata before installation and
+record any required build/install hooks. Never run model, dataset, or arbitrary
+project demo scripts as part of setup. Missing LFS objects, submodules, public
+datasets, incompatible dependencies, or install failures are explicit statuses,
+not permission to substitute an implementation.
+
+Audit these targets:
+
+1. EleutherAI `lm-evaluation-harness`
+2. `open-compass/opencompass`
+3. `stanford-crfm/helm`
+4. `inspect_ai` and `inspect_evals` (begin with the UKGovernmentBEIS/AISI
+   locations named in the research prompt; if repositories moved, record the
+   attempted URLs and the canonical repositories discovered)
+5. `openai/simple-evals`
+6. `huggingface/lighteval`
+7. LiveBench
+8. `huggingface/math-verify`
+9. MathArena grading code, beginning with `eth-sri/matharena` and recording any
+   canonical replacement discovered
+
+If two named components are separate repositories, lock and audit both. Do not
+collapse them into a single receipt.
+
+## Phase 0: preflight and research contract
+
+Before source research:
+
+1. Confirm branch, clean worktree, remotes, merge base, Python version, GitHub
+   access, authenticated `gh`/push permission, branch ownership, and that no
+   paid-provider key or live-run step is needed. A missing canonical origin,
+   unavailable push permission, or occupied branch is an early explicit blocker
+   to PR completion; do not claim the PR deliverable can pass without it.
+   Require the operator-prepared ignored `.venv` to use Python 3.12 and to have
+   the root `requirements.txt` dependencies installed; fail fast with the exact
+   missing dependency rather than changing root packaging.
+2. Validate the real gzip hash, row count, kind counts, required fields, empty
+   text count, and gzip readability without altering it.
+3. Assign stable fixture IDs. For duplicate records, include an ordinal in the
+   ID so no row is deduplicated accidentally.
+4. Create `repos.lock.json`, a reproduction/environment manifest, a
+   machine-readable metric contract, and an initial `GAPS.md`.
+5. Define the exact denominators and status vocabulary before running an
+   extractor: `ok`, `not_runnable`, `install_failed`, `import_failed`,
+   `control_disqualified`, `not_applicable`, `not_traceable`, and
+   `not_measured`.
+6. Freeze `ecosystem_audit/applicability.csv` before execution. It must map every
+   named target to each selected post-generation task/config/callable, fixture
+   schema requirements, inclusion rule, enumerated exclusion reason, timeout,
+   and resource ceiling. Attempt at least one candidate extraction/scoring path
+   for every named target that contains such code. If none exists, prove that
+   with search receipts and retain a non-numeric row. Do not add or remove a
+   candidate after seeing its measured rate without a dated amendment recorded
+   in `GAPS.md`.
+
+Do not count Phase 0 as one of the four requested phase checkpoints, but commit a
+small setup checkpoint if needed to freeze the locks and contract.
+
+## Phase 1: static audit with receipts
+
+For every locked target, inspect and record:
+
+### A. Output-token settings
+
+- The default maximum output/generation tokens when a task sets none: constant,
+  exact value, resolution path, and pinned code receipts.
+- Whether the default comes from task config, model/provider adapter, CLI,
+  generation config, schema, or a downstream fallback.
+- Explicit caps on GSM8K, MATH, AIME, GPQA, and the closest available
+  math/reasoning equivalents.
+- Tasks that omit an explicit cap and therefore inherit a default. Prove the
+  inheritance path with receipts; do not infer it from a lone task file.
+
+### B. Answer-extraction and fallback behavior
+
+Find every relevant fallback that can return an answer from an incomplete
+response, including last-number regexes, `group_select: -1`, first/last-delimiter
+spans, `\boxed{...}` recovery, and single-letter grabs. Quote the exact regex,
+index, slice, or selection code plus its call site. Separate extraction,
+normalization, and scoring.
+
+### C. Truncation visibility
+
+Trace `finish_reason`, stop reason, incomplete details, or equivalent from
+provider response through capture, persistence, logs/reports, and scorer input.
+Answer separately whether the signal is captured, logged, user-visible, and used
+by any scorer to distinguish truncated from wrong. Missing stages require exact
+`not found at <paths searched>` entries.
+
+### D. Issue receipts
+
+Search issues for `truncation`, `max_gen_toks`, `token limit`, `max output`,
+`finish_reason`, and `reasoning cut off`. Include and independently verify these
+anchors when accessible:
+
+- EleutherAI/lm-evaluation-harness #3382, #3044, #3391
+- inspect_ai #3582
+
+For each issue record URL, title, state, created/closed dates, retrieval date,
+and which static finding it corroborates. Do not describe an issue you could not
+open.
+
+### Phase 1 outputs
+
+- `ecosystem_audit/AUDIT.md`
+- `ecosystem_audit/audit_data.csv`
+- updated `ecosystem_audit/GAPS.md`
+- any supporting machine-readable receipt index under `ecosystem_audit/`
+
+`audit_data.csv` must have one row per atomic finding, not one prose summary per
+repository. Run a receipt validator that checks full SHAs, URL shape, line ranges,
+and exact quote equality against the locked checkout. Receipt line ranges are
+1-indexed and inclusive; quotes are UTF-8 decoded source lines with no whitespace
+normalization; CRLF/LF handling and generated files must be recorded explicitly;
+and paths must be relative, normalized, and traversal-free. Store the quote
+literal in the receipt index. For issue receipts, save minimal fetched metadata
+(not whole pages), its retrieval timestamp, source URL, and content hash; if it
+cannot be fetched, mark it unavailable. Commit the Phase 1 checkpoint only after
+the validator passes.
+
+## Phase 2: executable audit and results table
+
+### Fixture corpus
+
+Load all 195 real rows without modification. Generate exactly 100 synthetic
+truncated fixtures using seed `1729`, balanced as 20 fixtures for each shape:
+
+1. cut mid-`\boxed{`
+2. cut mid-enumeration of multiple-choice options
+3. cut immediately after a correct `Final answer:` line
+4. degeneration loops ending in a plausible number
+5. cut mid-LaTeX expression
+
+Each synthetic record must include a stable ID, shape, seed, gold answer, text,
+truncation marker, and generation parameters. Tests must prove byte-for-byte
+determinism and coverage of all five shapes. Clearly separate real, synthetic,
+and finished-control strata in every result.
+
+### Execute actual harness code
+
+For every candidate frozen in the Phase 0 applicability matrix:
+
+1. Build a thin adapter in `ecosystem_audit/adapters/`.
+2. Import the callable from the locked external checkout. Do not copy its logic.
+3. Record repository SHA, callable, source permalink, task/config used, dependency
+   environment, and any non-semantic input marshaling. Add pinned call-graph
+   receipts proving the callable is used on a generated response in the harness's
+   real task path.
+4. Run all applicable real rows, all 100 synthetic rows, and all 64 controls.
+5. Capture separately:
+   - returned extracted answer, including empty/null;
+   - escaped exception class/message;
+   - a swallowed-error signal when observable from logging, sentinel return,
+     fallback path, or instrumentation around the real call;
+   - harness-native normalized/scored correctness when available;
+   - duration and adapter status.
+6. Never call a model, download a paid/gated dataset, or substitute a local
+   extractor. Isolate incompatible harness dependencies in separate environments
+   and lock their versions.
+
+This audit executes imported post-generation extractor, filter, normalizer, and
+scorer callables in isolation. It does not execute model generation and must not
+be described as an end-to-end harness evaluation. Label an isolated utility call
+as such unless the call-graph receipts establish its task-path role.
+
+### Metrics
+
+For each runnable harness pipeline, calculate from committed code:
+
+- `answer_returned_after_truncation_pct`: truncated rows returning a non-empty
+  answer / all applicable truncated rows. The requested results table may retain
+  `fabrication_pct` as an explicitly documented alias for this operational
+  diagnostic, but it is not by itself proof that the harness invented answer
+  text.
+- `accidental_correct_pct`: truncated rows the harness's own downstream
+  normalizer/scorer marks correct / all applicable truncated rows. Use
+  `not_measured` when no actual downstream correctness path is runnable.
+- `crash_pct`: truncated rows with an exception escaping the adapter / all
+  applicable truncated rows.
+- `swallowed_error_pct`: truncated rows where the actual harness suppresses an
+  exception/error and continues / all applicable truncated rows, when observable.
+- `control_pass_pct`: finished-correct controls the actual pipeline scores
+  correct / applicable controls.
+
+Primary percentages combine the 131 real truncated rows and 100 synthetic
+truncated rows only when the pipeline applies to both. Also emit separate real
+and synthetic rates so corpus composition is visible. Empty real texts remain in
+the denominator when applicable. Stratify fixtures where a valid final answer
+already precedes truncation from fixtures where any returned answer must come
+from fallback-like behavior. Report a separate fallback-origin rate only when
+call tracing proves the origin. A swallowed error is `not_measured`, never zero,
+unless the adapter manifest defines a concrete observable event. Report integer
+numerators and denominators next to every percentage.
+
+If a pipeline fails any applicable finished-correct control, mark the row
+`control_disqualified`, retain its measurements for auditability, and exclude it
+from cross-harness headline comparisons. A harness may have multiple pipeline
+rows when task-specific extractors differ; do not hide that variation behind an
+unjustified average. `results_table.md` may include a clearly specified harness
+summary only when its aggregation is generated and lossless pipeline rows remain
+available. `not_runnable` and related status rows have no percentage denominator.
+Do not make a cross-ecosystem aggregate claim or write “X of Y ecosystems” unless
+Y includes every locked target under an explicit, pre-frozen criterion.
+
+### Phase 2 outputs
+
+- `ecosystem_audit/results_table.md`
+- `ecosystem_audit/fixture_results.csv` with one row per
+  fixture × harness pipeline
+- `ecosystem_audit/run_executable_audit.py`, the single deterministic
+  orchestrator for all locked adapters
+- generated synthetic fixture file under `ecosystem_audit/`
+- adapter manifests/logs and reproducible run commands under
+  `ecosystem_audit/`
+- updated `ecosystem_audit/GAPS.md`
+
+Regenerate both result files from scratch twice and require identical outputs.
+Commit the Phase 2 checkpoint only after fixture counts, determinism, metric
+recalculation, and control-disqualification tests pass.
+
+## Phase 3: git archaeology and timeline
+
+For every default cap and every reasoning-task cap in Phase 1:
+
+1. Use `git blame --line-porcelain`, `git log -L`, `git log -S`, and/or
+   `git log -G` against the locked repository history.
+2. Record the introducing commit, author date, exact old/new value, and evidence
+   command.
+3. Record remediation commit/date/value when one exists. If none is found, use
+   the required `not found at <paths searched>` form.
+4. Compare dates to fixed public era markers: OpenAI o1 = `2024-09` and DeepSeek
+   R1 = `2025-01`. Label these as contextual markers, not causal proof.
+5. Test rather than assume the proposed story that caps predate reasoning models
+   and remediation lags or undershoots. Include the already observed REAP context
+   that o4-mini(high) p90 is 38,125 only as a separately sourced local contextual
+observation, never as proof of an external repository's behavior.
+
+Some inherited/dynamic settings may not have a single introducing line. Mark
+those `not_traceable` or `not_applicable` and preserve the exact commands, refs,
+date range, and paths searched. Do not claim remediation is absent from a shallow
+or incomplete history. Treat the o1 and R1 dates above as supplied contextual
+markers unless separately sourced; they are not causal evidence.
+
+### Phase 3 output
+
+Generate `ecosystem_audit/timeline.csv` with at least:
+
+`harness,pipeline_or_task,setting,value,introduced_commit,introduced_date,remediated_value,remediated_commit,remediated_date,era_relation,evidence_command,status`
+
+Add a generated narrative section to `AUDIT.md`, validate all referenced commits
+and dates against the locked clones, update `GAPS.md`, and commit the Phase 3
+checkpoint.
+
+## Phase 4: reusable `trunccheck` artifact
+
+Create a small pip-installable project entirely under `trunccheck/` with its own
+`pyproject.toml`, `src/trunccheck/`, tests, and README. Do not edit the root
+`pyproject.toml`.
+
+The package must provide:
+
+- a Python API that accepts an extraction callable plus fixtures and emits the
+  same fabrication/crash/control report;
+- a CLI supporting a documented import-path callable and JSONL/JSONL.GZ corpus;
+- the seeded synthetic generator (default seed `1729`);
+- the real-fixture loader with hash/count validation;
+- stable fixture/result schemas and deterministic CSV/Markdown serialization;
+- separate escaped-exception and swallowed-error instrumentation hooks;
+- examples that use local dummy callables only and make no network/model calls;
+- tests for empty text, duplicate rows, mid-box truncation, post-final-answer
+  truncation, exceptions, swallowed errors, controls, determinism, and schema
+  validation.
+
+The README must include concise installation/usage instructions and this
+positioning, in substance: maintainers can run `trunccheck` in CI against their
+real extraction function to detect when truncated responses are converted into
+apparently valid answers. Do not claim it can detect truncation from text alone;
+the fixture metadata supplies the truncation label.
+
+Use `trunccheck` itself to regenerate or independently validate the Phase 2
+headline metrics. Commit the Phase 4 checkpoint only after package tests and the
+full offline audit verification pass.
+
+## Required final tree
+
+At minimum, the PR must contain:
+
+```text
+TASK.md
+observational/real_truncated_fixtures.jsonl.gz
+ecosystem_audit/
+  AUDIT.md
+  audit_data.csv
+  results_table.md
+  fixture_results.csv
+  timeline.csv
+  GAPS.md
+  repos.lock.json
+  verify.py
+  adapters/
+trunccheck/
+  pyproject.toml
+  README.md
+  src/trunccheck/
+  tests/
+```
+
+Additional generated manifests, receipts, logs, schemas, and tests may live
+inside the two allowed output roots. External clones and virtual environments
+must be ignored and must not be committed.
+
+## Verification contract
+
+Create `ecosystem_audit/verify.py` as a stdlib-only, offline verifier. It must
+exit nonzero when any of these fail:
+
+- required output files and columns exist;
+- real corpus hash and 131/64 counts match;
+- synthetic corpus has exactly 100 rows, five balanced shapes, seed 1729, and is
+  reproducible byte-for-byte;
+- in `--strict` mode, every locked repository checkout is present, its canonical
+  credential-free remote matches the lock, its full HEAD SHA matches, required
+  history is available, and declared submodule/LFS state matches;
+- every static code receipt has a full SHA permalink and its quote exactly
+  matches the locked file/line range;
+- every numeric Markdown result recomputes from `fixture_results.csv`;
+- every runnable pipeline has complete fixture coverage or an explicit,
+  machine-readable applicability reason;
+- disqualified controls are clearly labeled and excluded from headlines;
+- timeline commits/dates/settings validate against all locked histories;
+- no generated result changes on a second fixed-seed run;
+- committed changes since the merge base are confined to `TASK.md`, the setup
+  fixture, `ecosystem_audit/**`, and `trunccheck/**`; `TASK.md` and the fixture
+  remain byte-identical to `task_start_commit`, and the fixture retains its
+  supplied SHA-256;
+- `git diff --check` passes and status contains no untracked clone, environment,
+  cache, temporary-output, or unexpected file.
+
+`--offline` may validate committed schemas, hashes, and metrics without external
+checkouts. `--strict` must never downgrade missing checkouts, receipt sources, or
+histories to warnings.
+
+The final local gate, run from repository root, is:
+
+```bash
+PYTHONPATH=trunccheck/src .venv/bin/python -m unittest discover -s trunccheck/tests -v &&
+.venv/bin/python ecosystem_audit/run_executable_audit.py --locked --seed 1729 --check &&
+.venv/bin/python ecosystem_audit/verify.py --strict &&
+MPLCONFIGDIR=/tmp/effort-atlas-mpl PYTHONPATH=src .venv/bin/python -m unittest discover -s tests -v
+```
+
+`run_executable_audit.py --check` must execute the real harness imports against
+the locked clones, regenerate outputs twice in separate temporary directories,
+require those runs to be byte-identical, compare them to the committed
+`fixture_results.csv` and `results_table.md`, and exit nonzero on a difference.
+A non-check mode may write the committed outputs. The strict verifier may validate
+cached committed outputs offline; the reproduction command is the
+evidence-producing gate.
+
+The existing root unittest command currently collects 40 tests and does not
+collect the pytest-style `tests/test_rescue_analysis.py`. Do not claim a complete
+root suite unless that pre-existing limitation changes, and do not change it in
+this task.
+
+## PR and completion report
+
+Before opening the PR:
+
+1. Inspect `git diff` and `git status`; ensure nested clones, environments,
+   caches, and secrets are absent.
+2. Run the full verification contract and record commands plus exit status in
+   `AUDIT.md`.
+3. Confirm the Phase 1, 2, 3, and 4 checkpoint commits exist.
+4. Push the branch and open a PR. Never merge it.
+
+The autonomous completion gate must additionally require the remote PR to be
+open and to use the expected head branch, for example:
+
+```bash
+test "$(gh pr view --json state --jq .state)" = OPEN &&
+test "$(gh pr view --json headRefName --jq .headRefName)" = codex/ecosystem-audit
+```
+
+The PR description must state what was verified, what was assumed, what was not
+found, and any rows disqualified or not runnable. It must end with these three
+sections in this exact order:
+
+1. `## Repositories at commits`
+2. `## Finding counts by phase` (include the fabrication-rate table inline)
+3. `## Three most consequential code quotes`
+
+Every quote in the final section needs its commit-pinned permalink. Finish only
+when the PR exists and the gates pass. If network, dependency, source ambiguity,
+licensing, or incompatible harness behavior prevents a valid result, preserve
+the latest checkpoint and report the concrete blocker instead of fabricating a
+completion claim.

@@ -1,0 +1,661 @@
+{
+  "corpus": {
+    "frozen_integer_controls": 28,
+    "frozen_integer_controls_n_eff": 4,
+    "real_truncated": 131,
+    "real_truncated_pre_answer": 26,
+    "real_truncated_without_pre_answer": 105
+  },
+  "generated_at": "2026-08-08T00:00:00+00:00",
+  "identical_real_answer_returned_fixture_sets": [
+    {
+      "pipelines": [
+        "competition_extract_and_grade",
+        "default_parse_verify",
+        "gsm8k_flexible_extract",
+        "math_extractive_match"
+      ],
+      "returned_fixture_count": 111
+    },
+    {
+      "pipelines": [
+        "gsm8k_last_number",
+        "gsm8k_numeric_match"
+      ],
+      "returned_fixture_count": 37
+    }
+  ],
+  "lm_eval_non_numeric_returned_values": {
+    "$$": 3,
+    "$,": 1,
+    "$.": 2
+  },
+  "method": "standard-library recomputation from the compressed corpus plus committed fixture_results.csv; does not import run_executable_audit or any adapter",
+  "pipelines": [
+    {
+      "pipeline_id": "aime_last50",
+      "pipeline_status": "ok",
+      "real": {
+        "accidental_correct": {
+          "denominator": 48,
+          "numerator": 0,
+          "status": "ok"
+        },
+        "answer_is_numeric_among_returned": {
+          "denominator": 0,
+          "numerator": 0,
+          "status": "not_measured"
+        },
+        "answer_returned": {
+          "denominator": 0,
+          "numerator": 0,
+          "status": "not_measured"
+        },
+        "empty_text": 11,
+        "marker_absent": {
+          "denominator": 0,
+          "numerator": 0,
+          "status": "not_measured"
+        },
+        "marker_present": {
+          "denominator": 0,
+          "numerator": 0,
+          "status": "not_measured"
+        },
+        "n": 48,
+        "n_eff_dataset_problem": 24
+      },
+      "synthetic_constructed": {
+        "accidental_correct": {
+          "denominator": 100,
+          "numerator": 40,
+          "status": "ok"
+        },
+        "answer_returned": {
+          "denominator": 0,
+          "numerator": 0,
+          "status": "not_measured"
+        },
+        "n": 100
+      },
+      "uniform_controls": {
+        "denominator": 28,
+        "numerator": 28,
+        "status": "ok"
+      }
+    },
+    {
+      "pipeline_id": "aime_last_line_numeric",
+      "pipeline_status": "insufficient_power",
+      "real": {
+        "accidental_correct": {
+          "denominator": 7,
+          "numerator": 0,
+          "status": "ok"
+        },
+        "answer_is_numeric_among_returned": {
+          "denominator": 0,
+          "numerator": 0,
+          "status": "not_measured"
+        },
+        "answer_returned": {
+          "denominator": 7,
+          "numerator": 0,
+          "status": "ok"
+        },
+        "empty_text": 5,
+        "marker_absent": {
+          "denominator": 7,
+          "numerator": 0,
+          "status": "ok"
+        },
+        "marker_present": {
+          "denominator": 0,
+          "numerator": 0,
+          "status": "not_measured"
+        },
+        "n": 7,
+        "n_eff_dataset_problem": 3
+      },
+      "synthetic_constructed": {
+        "accidental_correct": {
+          "denominator": 100,
+          "numerator": 20,
+          "status": "ok"
+        },
+        "answer_returned": {
+          "denominator": 100,
+          "numerator": 40,
+          "status": "ok"
+        },
+        "n": 100
+      },
+      "uniform_controls": {
+        "denominator": 28,
+        "numerator": 15,
+        "status": "ok"
+      }
+    },
+    {
+      "pipeline_id": "aime_process_results",
+      "pipeline_status": "ok",
+      "real": {
+        "accidental_correct": {
+          "denominator": 48,
+          "numerator": 1,
+          "status": "ok"
+        },
+        "answer_is_numeric_among_returned": {
+          "denominator": 0,
+          "numerator": 0,
+          "status": "not_measured"
+        },
+        "answer_returned": {
+          "denominator": 0,
+          "numerator": 0,
+          "status": "not_measured"
+        },
+        "empty_text": 11,
+        "marker_absent": {
+          "denominator": 0,
+          "numerator": 0,
+          "status": "not_measured"
+        },
+        "marker_present": {
+          "denominator": 0,
+          "numerator": 0,
+          "status": "not_measured"
+        },
+        "n": 48,
+        "n_eff_dataset_problem": 24
+      },
+      "synthetic_constructed": {
+        "accidental_correct": {
+          "denominator": 100,
+          "numerator": 0,
+          "status": "ok"
+        },
+        "answer_returned": {
+          "denominator": 0,
+          "numerator": 0,
+          "status": "not_measured"
+        },
+        "n": 100
+      },
+      "uniform_controls": {
+        "denominator": 28,
+        "numerator": 28,
+        "status": "ok"
+      }
+    },
+    {
+      "pipeline_id": "competition_extract_and_grade",
+      "pipeline_status": "ok",
+      "real": {
+        "accidental_correct": {
+          "denominator": 131,
+          "numerator": 3,
+          "status": "ok"
+        },
+        "answer_is_numeric_among_returned": {
+          "denominator": 111,
+          "numerator": 110,
+          "status": "ok"
+        },
+        "answer_returned": {
+          "denominator": 131,
+          "numerator": 111,
+          "status": "ok"
+        },
+        "empty_text": 12,
+        "marker_absent": {
+          "denominator": 105,
+          "numerator": 85,
+          "status": "ok"
+        },
+        "marker_present": {
+          "denominator": 26,
+          "numerator": 26,
+          "status": "ok"
+        },
+        "n": 131,
+        "n_eff_dataset_problem": 48
+      },
+      "synthetic_constructed": {
+        "accidental_correct": {
+          "denominator": 100,
+          "numerator": 40,
+          "status": "ok"
+        },
+        "answer_returned": {
+          "denominator": 100,
+          "numerator": 100,
+          "status": "ok"
+        },
+        "n": 100
+      },
+      "uniform_controls": {
+        "denominator": 28,
+        "numerator": 28,
+        "status": "ok"
+      }
+    },
+    {
+      "pipeline_id": "default_parse_verify",
+      "pipeline_status": "generic_utility_only",
+      "real": {
+        "accidental_correct": {
+          "denominator": 131,
+          "numerator": 3,
+          "status": "ok"
+        },
+        "answer_is_numeric_among_returned": {
+          "denominator": 111,
+          "numerator": 109,
+          "status": "ok"
+        },
+        "answer_returned": {
+          "denominator": 131,
+          "numerator": 111,
+          "status": "ok"
+        },
+        "empty_text": 12,
+        "marker_absent": {
+          "denominator": 105,
+          "numerator": 85,
+          "status": "ok"
+        },
+        "marker_present": {
+          "denominator": 26,
+          "numerator": 26,
+          "status": "ok"
+        },
+        "n": 131,
+        "n_eff_dataset_problem": 48
+      },
+      "synthetic_constructed": {
+        "accidental_correct": {
+          "denominator": 100,
+          "numerator": 40,
+          "status": "ok"
+        },
+        "answer_returned": {
+          "denominator": 100,
+          "numerator": 100,
+          "status": "ok"
+        },
+        "n": 100
+      },
+      "uniform_controls": {
+        "denominator": 28,
+        "numerator": 28,
+        "status": "ok"
+      }
+    },
+    {
+      "pipeline_id": "gsm8k_flexible_extract",
+      "pipeline_status": "control_disqualified",
+      "real": {
+        "accidental_correct": {
+          "denominator": 131,
+          "numerator": 0,
+          "status": "ok"
+        },
+        "answer_is_numeric_among_returned": {
+          "denominator": 111,
+          "numerator": 105,
+          "status": "ok"
+        },
+        "answer_returned": {
+          "denominator": 131,
+          "numerator": 111,
+          "status": "ok"
+        },
+        "empty_text": 12,
+        "marker_absent": {
+          "denominator": 105,
+          "numerator": 85,
+          "status": "ok"
+        },
+        "marker_present": {
+          "denominator": 26,
+          "numerator": 26,
+          "status": "ok"
+        },
+        "n": 131,
+        "n_eff_dataset_problem": 48
+      },
+      "synthetic_constructed": {
+        "accidental_correct": {
+          "denominator": 100,
+          "numerator": 40,
+          "status": "ok"
+        },
+        "answer_returned": {
+          "denominator": 100,
+          "numerator": 100,
+          "status": "ok"
+        },
+        "n": 100
+      },
+      "uniform_controls": {
+        "denominator": 28,
+        "numerator": 24,
+        "status": "ok"
+      }
+    },
+    {
+      "pipeline_id": "gsm8k_last_number",
+      "pipeline_status": "ok",
+      "real": {
+        "accidental_correct": {
+          "denominator": 48,
+          "numerator": 0,
+          "status": "ok"
+        },
+        "answer_is_numeric_among_returned": {
+          "denominator": 37,
+          "numerator": 37,
+          "status": "ok"
+        },
+        "answer_returned": {
+          "denominator": 48,
+          "numerator": 37,
+          "status": "ok"
+        },
+        "empty_text": 11,
+        "marker_absent": {
+          "denominator": 42,
+          "numerator": 31,
+          "status": "ok"
+        },
+        "marker_present": {
+          "denominator": 6,
+          "numerator": 6,
+          "status": "ok"
+        },
+        "n": 48,
+        "n_eff_dataset_problem": 24
+      },
+      "synthetic_constructed": {
+        "accidental_correct": {
+          "denominator": 100,
+          "numerator": 40,
+          "status": "ok"
+        },
+        "answer_returned": {
+          "denominator": 100,
+          "numerator": 100,
+          "status": "ok"
+        },
+        "n": 100
+      },
+      "uniform_controls": {
+        "denominator": 28,
+        "numerator": 28,
+        "status": "ok"
+      }
+    },
+    {
+      "pipeline_id": "gsm8k_numeric_match",
+      "pipeline_status": "control_disqualified",
+      "real": {
+        "accidental_correct": {
+          "denominator": 48,
+          "numerator": 0,
+          "status": "ok"
+        },
+        "answer_is_numeric_among_returned": {
+          "denominator": 37,
+          "numerator": 37,
+          "status": "ok"
+        },
+        "answer_returned": {
+          "denominator": 48,
+          "numerator": 37,
+          "status": "ok"
+        },
+        "empty_text": 11,
+        "marker_absent": {
+          "denominator": 42,
+          "numerator": 31,
+          "status": "ok"
+        },
+        "marker_present": {
+          "denominator": 6,
+          "numerator": 6,
+          "status": "ok"
+        },
+        "n": 48,
+        "n_eff_dataset_problem": 24
+      },
+      "synthetic_constructed": {
+        "accidental_correct": {
+          "denominator": 100,
+          "numerator": 40,
+          "status": "ok"
+        },
+        "answer_returned": {
+          "denominator": 100,
+          "numerator": 100,
+          "status": "ok"
+        },
+        "n": 100
+      },
+      "uniform_controls": {
+        "denominator": 28,
+        "numerator": 24,
+        "status": "ok"
+      }
+    },
+    {
+      "pipeline_id": "math_chain_of_thought",
+      "pipeline_status": "ok",
+      "real": {
+        "accidental_correct": {
+          "denominator": 131,
+          "numerator": 1,
+          "status": "ok"
+        },
+        "answer_is_numeric_among_returned": {
+          "denominator": 23,
+          "numerator": 20,
+          "status": "ok"
+        },
+        "answer_returned": {
+          "denominator": 131,
+          "numerator": 23,
+          "status": "ok"
+        },
+        "empty_text": 12,
+        "marker_absent": {
+          "denominator": 105,
+          "numerator": 0,
+          "status": "ok"
+        },
+        "marker_present": {
+          "denominator": 26,
+          "numerator": 23,
+          "status": "ok"
+        },
+        "n": 131,
+        "n_eff_dataset_problem": 48
+      },
+      "synthetic_constructed": {
+        "accidental_correct": {
+          "denominator": 100,
+          "numerator": 0,
+          "status": "ok"
+        },
+        "answer_returned": {
+          "denominator": 100,
+          "numerator": 0,
+          "status": "ok"
+        },
+        "n": 100
+      },
+      "uniform_controls": {
+        "denominator": 28,
+        "numerator": 28,
+        "status": "ok"
+      }
+    },
+    {
+      "pipeline_id": "math_extractive_match",
+      "pipeline_status": "ok",
+      "real": {
+        "accidental_correct": {
+          "denominator": 131,
+          "numerator": 2,
+          "status": "ok"
+        },
+        "answer_is_numeric_among_returned": {
+          "denominator": 111,
+          "numerator": 109,
+          "status": "ok"
+        },
+        "answer_returned": {
+          "denominator": 131,
+          "numerator": 111,
+          "status": "ok"
+        },
+        "empty_text": 12,
+        "marker_absent": {
+          "denominator": 105,
+          "numerator": 85,
+          "status": "ok"
+        },
+        "marker_present": {
+          "denominator": 26,
+          "numerator": 26,
+          "status": "ok"
+        },
+        "n": 131,
+        "n_eff_dataset_problem": 48
+      },
+      "synthetic_constructed": {
+        "accidental_correct": {
+          "denominator": 100,
+          "numerator": 40,
+          "status": "ok"
+        },
+        "answer_returned": {
+          "denominator": 100,
+          "numerator": 100,
+          "status": "ok"
+        },
+        "n": 100
+      },
+      "uniform_controls": {
+        "denominator": 28,
+        "numerator": 28,
+        "status": "ok"
+      }
+    },
+    {
+      "pipeline_id": "mgsm_answer_prefix",
+      "pipeline_status": "control_disqualified",
+      "real": {
+        "accidental_correct": {
+          "denominator": 131,
+          "numerator": 0,
+          "status": "ok"
+        },
+        "answer_is_numeric_among_returned": {
+          "denominator": 2,
+          "numerator": 2,
+          "status": "ok"
+        },
+        "answer_returned": {
+          "denominator": 131,
+          "numerator": 2,
+          "status": "ok"
+        },
+        "empty_text": 12,
+        "marker_absent": {
+          "denominator": 105,
+          "numerator": 0,
+          "status": "ok"
+        },
+        "marker_present": {
+          "denominator": 26,
+          "numerator": 2,
+          "status": "ok"
+        },
+        "n": 131,
+        "n_eff_dataset_problem": 48
+      },
+      "synthetic_constructed": {
+        "accidental_correct": {
+          "denominator": 100,
+          "numerator": 0,
+          "status": "ok"
+        },
+        "answer_returned": {
+          "denominator": 100,
+          "numerator": 0,
+          "status": "ok"
+        },
+        "n": 100
+      },
+      "uniform_controls": {
+        "denominator": 28,
+        "numerator": 1,
+        "status": "ok"
+      }
+    },
+    {
+      "pipeline_id": "olympiad_expression",
+      "pipeline_status": "wrong_task_dispatch",
+      "real": {
+        "accidental_correct": {
+          "denominator": 48,
+          "numerator": 1,
+          "status": "ok"
+        },
+        "answer_is_numeric_among_returned": {
+          "denominator": 35,
+          "numerator": 35,
+          "status": "ok"
+        },
+        "answer_returned": {
+          "denominator": 48,
+          "numerator": 35,
+          "status": "ok"
+        },
+        "empty_text": 11,
+        "marker_absent": {
+          "denominator": 42,
+          "numerator": 29,
+          "status": "ok"
+        },
+        "marker_present": {
+          "denominator": 6,
+          "numerator": 6,
+          "status": "ok"
+        },
+        "n": 48,
+        "n_eff_dataset_problem": 24
+      },
+      "synthetic_constructed": {
+        "accidental_correct": {
+          "denominator": 100,
+          "numerator": 20,
+          "status": "ok"
+        },
+        "answer_returned": {
+          "denominator": 100,
+          "numerator": 100,
+          "status": "ok"
+        },
+        "n": 100
+      },
+      "uniform_controls": {
+        "denominator": 28,
+        "numerator": 28,
+        "status": "ok"
+      }
+    }
+  ],
+  "schema_version": 1
+}

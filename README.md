@@ -10,7 +10,7 @@ stops, and how much remains among completed responses.
 
 ## Study status
 
-As of 2026-07-22:
+As of 2026-08-08:
 
 - Earlier Tinker and OpenRouter measurements are exploratory only.
 - The confirmatory hypotheses and design were frozen in
@@ -24,6 +24,11 @@ As of 2026-07-22:
 - No confirmatory result has been collected and confirmatory-study spend is $0.00.
 - The confirmatory validator is offline-only. It is not yet connected to a paid
   runner, so no command in the confirmatory artifact path can initiate model calls.
+- The funded REAP Phase-II design is in implementation. Grader v2, probe tooling,
+  and the pre-data analysis layer exist on separate branches but are not yet an
+  accepted integrated baseline. The runner and executable budget gates do not yet
+  exist. See [the Codex briefing](reap/CODEX_BRIEFING.md) and
+  [dated phase-gate plan](reap/10_PHASE_GATE_PLAN_2026-08-08.md).
 
 The intended submission is the EACL 2027 Industry Track. That is an intention, not
 an acceptance or affiliation.
@@ -73,12 +78,25 @@ the research log.
 
 ## Offline verification
 
-Install the package and run the full offline suite:
+Use Python 3.12 (or another supported Python >=3.10), install the package, and run
+the canonical offline suite:
 
 ```bash
-python -m pip install -e .
-PYTHONPATH=src python -m unittest discover -s tests -v
+uv sync --python 3.12.8
+./scripts/verify_offline.sh
 ```
+
+For the pinned observational pipeline, install its locked optional dependencies
+with `uv sync --python 3.12.8 --extra observational`.
+
+The Phase 0 code baseline contributed 40 tests; the generated phase dashboard adds
+four governance checks, so the current suite collects 44. The bare function in
+`tests/test_rescue_analysis.py` is not collected; Task B owns that known defect.
+The green baseline means reproducible current behavior, not complete coverage.
+
+The legacy local `.venv` found before the 2026-08-08 governance pass used Python
+3.9 and is not valid verification evidence. No offline verification command should
+require a provider credential or make a model call.
 
 The confirmatory schedule exporter is also offline. It reads audited item IDs,
 creates deterministic schedules, and hashes protocol, amendment, configuration,

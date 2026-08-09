@@ -172,7 +172,9 @@ def run(mock: bool, config_path: str | Path | None = None) -> None:
                                 return
                             time.sleep(30)
                             continue
-                        ok, extracted = grade(item["grader"], comp.text, item["answer"])
+                        grade_result = grade(
+                            item["grader"], comp.text, item["answer"]
+                        )
                         row = {
                             "item_id": item["id"], "domain": item["domain"],
                             "effort": effort, "seed": seed,
@@ -181,7 +183,12 @@ def run(mock: bool, config_path: str | Path | None = None) -> None:
                                 if budget is not None
                                 else cfg["provider"]["max_completion_tokens"]
                             ),
-                            "correct": ok, "extracted": extracted, "gold": item["answer"],
+                            "correct": grade_result["correct"],
+                            "extracted_answer_present": grade_result[
+                                "extracted_answer_present"
+                            ],
+                            "extracted_answer": grade_result["extracted_answer"],
+                            "gold": item["answer"],
                             "completion_tokens": comp.completion_tokens,
                             "reasoning_tokens": comp.reasoning_tokens,
                             "prompt_tokens": comp.prompt_tokens,
@@ -198,7 +205,9 @@ def run(mock: bool, config_path: str | Path | None = None) -> None:
                         }
                         fh.write(json.dumps(row) + "\n")
                         fh.flush()
-                        correct_by_domain.setdefault(item["domain"], []).append(ok)
+                        correct_by_domain.setdefault(item["domain"], []).append(
+                            grade_result["correct"]
+                        )
                         n_done += 1
                         total = len(items) * len(levels) * len(budgets) * len(seeds)
                         if total <= 10 or n_done % 25 == 0:
