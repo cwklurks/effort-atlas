@@ -6,6 +6,8 @@ import tempfile
 import unittest
 from pathlib import Path
 
+import yaml
+
 from effort_atlas.confirmatory import (
     AttemptLedger,
     ReplicateDecisionRequired,
@@ -22,6 +24,20 @@ PANEL = {
     "caps": [20000, 49152], "replicates": 1,
 }
 ITEMS = [{"id": f"math_{number:04d}", "domain": "math"} for number in range(1, 4)]
+MATH_ITEMS_FIXTURE = ROOT / "tests" / "fixtures" / "confirmatory_math_items.jsonl"
+EXTRACTION_ITEMS_FIXTURE = ROOT / "tests" / "fixtures" / "confirmatory_extraction_items.jsonl"
+
+
+def fixture_confirmatory_config(directory: str) -> Path:
+    config = load_config(ROOT / "config_confirmatory.yaml")
+    config["study"]["main_dataset_path"] = str(MATH_ITEMS_FIXTURE.relative_to(ROOT))
+    config["study"]["audited_dataset_paths"] = [
+        str(MATH_ITEMS_FIXTURE.relative_to(ROOT)),
+        str(EXTRACTION_ITEMS_FIXTURE.relative_to(ROOT)),
+    ]
+    config_path = Path(directory) / "config_confirmatory_fixture.yaml"
+    config_path.write_text(yaml.safe_dump(config, sort_keys=False))
+    return config_path
 
 
 def accounted_success(job, **overrides):
@@ -215,8 +231,8 @@ class ConfirmatoryPreflightTests(unittest.TestCase):
         self.assertFalse(row["replayed"])
 
     def test_exporter_writes_deterministic_main_and_smoke_artifacts_without_prompt_content(self):
-        config_path = ROOT / "config_confirmatory.yaml"
         with tempfile.TemporaryDirectory() as directory:
+            config_path = fixture_confirmatory_config(directory)
             output = Path(directory) / "artifacts"
             commit = "a" * 40
             manifest = export_schedule_artifacts(config_path, output, exporter_code_commit=commit)
