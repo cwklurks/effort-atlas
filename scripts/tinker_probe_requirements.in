@@ -1,0 +1,2 @@
+# Compile for CPython 3.12.8. See TINKER_PROBE_REPORT_FORMAT.md.
+tinker==0.25.0
