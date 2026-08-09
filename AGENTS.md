@@ -22,10 +22,11 @@ budget gates, and the REAP preregistration are complete and frozen.
 2. Never make paid study-generation, smoke, or provider-probe calls. Scripts must
    default to `--dry-run`; live execution is human-initiated. Read secrets only
    from environment variables and fail loudly when a required variable is unset.
-   The only development-tool exception is an explicitly user-authorized OpenCode
-   Go call used for repository analysis or implementation. It must not generate
-   research data, receive secrets, use `--auto`, or serve as final scientific or
-   financial verification.
+   No development-model provider exception is currently active. The selected
+   DeepSeek V4 Flash development-only lane through Fireworks ZDR remains disabled
+   until its route configuration and hard dollar ceiling are committed. The
+   separate user-triggered on-demand Kimi rule remains unchanged and does not
+   authorize the Fireworks lane.
 3. Set `max_tokens` explicitly on every ordinary request template. Also set effort
    explicitly wherever the platform supports it. The only allowed omission is the
    controlled default-cap diagnostic specified in Task C; keep it isolated, label
@@ -75,20 +76,25 @@ budget gates, and the REAP preregistration are complete and frozen.
 
 - Keep one Sol integration owner for each phase. Use Terra for fast, read-only
   repository exploration and Sol XHigh for independent high-consequence review.
-- OpenCode Go with `opencode-go/deepseek-v4-flash` may handle bounded mechanical
-  work after the exception above is in force. Give it explicit file ownership and
-  measurable checks; Codex reviews every diff and reruns every claimed test.
+- DeepSeek V4 Flash through Fireworks ZDR is selected for bounded mechanical
+  development work but remains disabled until its development-only route
+  configuration and hard dollar ceiling are committed. If that gate later opens,
+  give it explicit file ownership and measurable checks; never send secrets or
+  research data, and have Codex review every diff and rerun every claimed test.
+- Preserve the distinct on-demand Kimi instruction: it applies only when the user
+  explicitly requests Kimi and does not enable or substitute for Fireworks.
 - Builders do not approve their own work. Paid experiment execution and
   preregistration freeze remain human decisions.
 
 ## Current priority and ownership boundaries
 
-Phase 0 governance is independently approved in PR #4 and awaits human merge. The
-current Phase 1 gate closes Task A, Task B acceptance, and the dry-run-only Task C
-repair in isolated branches. The later critical path is B/D integration, REAP
-preregistration freeze, and Task E's runner/budget gates.
-Do not begin E until the grader-v2 interfaces it depends on are accepted; do not
-run any smoke or confirmatory call until the later human gate opens.
+Phase 0 governance and Phase 1 Tasks A-C are merged. Phase 2 has integrated grader
+v2 with the analysis layer and remediated the initial review blockers; independent
+statistical re-review and human review of PR #3 remain. The later critical path is
+REAP preregistration freeze and Task E's runner/budget gates. Do not begin E until
+the integrated grader-analysis interfaces are accepted and the required design
+inputs are frozen; do not run any smoke or confirmatory call until the later human
+gate opens.
 
 The canonical project/task state lives in `reap/CODEX_BRIEFING.md`; update that file
 when the state materially changes, without rewriting frozen historical records.

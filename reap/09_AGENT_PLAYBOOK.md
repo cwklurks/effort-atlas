@@ -1,13 +1,13 @@
 # Agent playbook — running parallel agents on REAP without wrecking it
 
-**Principle: parallel lanes, serial gates.** Agents work branches and open PRs; nothing merges without tests green + one cross-review; Connor is the only merger. No agent touches frozen artifacts (PREREGISTRATION.md, amendments, committed schedules, frozen grader/analysis commits). No agent makes paid study or provider-probe calls. Explicitly user-authorized OpenCode Go development calls follow the bounded exception in `AGENTS.md`. No keys in prompts — env vars only.
+**Principle: parallel lanes, serial gates.** Agents work branches and open PRs; nothing merges without tests green + one cross-review; Connor is the only merger. No agent touches frozen artifacts (PREREGISTRATION.md, amendments, committed schedules, frozen grader/analysis commits). No agent makes paid study or provider-probe calls. The selected DeepSeek V4 Flash development-only lane through Fireworks ZDR is disabled until its route configuration and hard dollar ceiling are committed. The distinct user-triggered on-demand Kimi rule remains governed by `AGENTS.md`. No keys in prompts — env vars only.
 
 ## Lane map
 
 | Lane | Tool | Work |
 |---|---|---|
 | Harness engineering | Codex | grader v2, smoke/probe scripts, runner + budget gates, tests |
-| Mechanical support | DeepSeek V4 Flash / Fireworks ZDR | selected but disabled pending committed development-only config and hard ceiling; never final verification |
+| Mechanical support | DeepSeek V4 Flash / Fireworks ZDR | development-only; disabled pending committed route configuration and hard dollar ceiling; never final verification |
 | Data studies | Claude (Cowork) | MathArena/HELM analyses, length priors, power calc, figures |
 | Research & lit | Claude Project / subagents | license checks, author emails, weekly arXiv monitor, citation forward-search |
 | Red-team | Claude (Cowork) | adversarial review of every PR/doc/analysis before it counts as done |
@@ -24,8 +24,10 @@ Read reap/README.md and reap/08_HYPERPARAMETER_DECISIONS.md before acting.
 RULES: (1) Never fabricate — mark everything as verified / assumed / TODO.
 (2) Never edit PREREGISTRATION*.md, committed schedules, or any file marked frozen.
 (3) Never make paid study-generation, smoke, or provider-probe calls; write scripts
-with a --dry-run default and explicit max_tokens on every request template. A
-user-authorized OpenCode Go call may only assist development under AGENTS.md.
+with a --dry-run default and explicit max_tokens on every request template. The
+Fireworks ZDR development-only lane remains disabled pending its committed route
+configuration and hard dollar ceiling; on-demand Kimi remains separately
+user-triggered under AGENTS.md.
 (4) Work on a branch; open a PR; do not merge.
 (5) All secrets via environment variables; fail loudly if unset.
 (6) End your work with a report: what you did, what you verified, what you assumed,

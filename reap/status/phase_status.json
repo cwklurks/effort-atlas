@@ -181,7 +181,7 @@
     },
     {
       "label": "DeepSeek V4 Flash development lane",
-      "result": "Fireworks ZDR selected; disabled until development-only config and hard dollar ceiling are committed",
+      "result": "Fireworks ZDR development-only lane selected but disabled until its route configuration and hard dollar ceiling are committed",
       "status": "attention"
     }
   ],
@@ -256,7 +256,7 @@
   "decisions": [
     "PRs #4, #1, #2, and #5 were human-merged before Phase 2 integration; Codex did not merge them.",
     "Tinker 0.25.0 live probes are blocked because the pinned SDK resubmits internally.",
-    "DeepSeek V4 Flash is selected through Fireworks ZDR for development only and remains disabled until its route configuration and hard dollar ceiling are committed.",
+    "DeepSeek V4 Flash is selected through the Fireworks ZDR development-only lane but remains disabled until its route configuration and hard dollar ceiling are committed.",
     "The implementation exposes item-level sufficient statistics and expected independent-draw transition mass; supervisor freeze of final analysis choices, calibration metric, cap grid, and ceilings remains pending."
   ]
 }
