@@ -609,54 +609,122 @@ def paired_cap_transitions(
         return []
     _panel_identity(identity_source)
     efforts, ordered_caps = _require_dimensions(identity_source, effort_order, caps)
-    lookup = {
-        (row["item_id"], row["replicate"], row["effort"], row["cap"]): row
-        for row in records
+    observed_by_cell: defaultdict[tuple[Any, Any, int], list[dict[str, Any]]] = defaultdict(list)
+    for row in records:
+        observed_by_cell[(row["item_id"], row["effort"], row["cap"])].append(row)
+    planned_by_cell: Counter[tuple[Any, Any, int]] = Counter(
+        (row["item_id"], row["effort"], row["cap"]) for row in planned
+    )
+    item_keys = {
+        (row["item_id"], row["effort"], row["cap"])
+        for row in [*records, *planned]
     }
-    planned_keys = {
-        (row["item_id"], row["replicate"], row["effort"], row["cap"])
-        for row in planned
-    } or set(lookup)
     tables = []
     for effort in efforts:
         for small_cap, large_cap in itertools.combinations(ordered_caps, 2):
-            pairs = sorted(
+            item_ids = sorted(
                 {
-                    (item_id, replicate)
-                    for item_id, replicate, row_effort, cap in planned_keys
+                    item_id
+                    for item_id, row_effort, cap in item_keys
                     if row_effort == effort and cap in {small_cap, large_cap}
                 },
-                key=lambda value: (str(value[0]), value[1]),
+                key=str,
             )
-            outcomes = Counter(
-                {
-                    "wrong_to_wrong": 0,
-                    "wrong_to_correct": 0,
-                    "correct_to_wrong": 0,
-                    "correct_to_correct": 0,
-                }
-            )
-            rescue_taxonomy: Counter[str] = Counter()
+            expected_mass = {
+                "wrong_to_wrong": 0.0,
+                "wrong_to_correct": 0.0,
+                "correct_to_wrong": 0.0,
+                "correct_to_correct": 0.0,
+            }
+            exact_states: Counter[tuple[int, int, int, int]] = Counter()
+            item_statistics = []
             missing_small = missing_large = missing_both = 0
-            paired_items: set[Any] = set()
-            for item_id, replicate in pairs:
-                small = lookup.get((item_id, replicate, effort, small_cap))
-                large = lookup.get((item_id, replicate, effort, large_cap))
-                if small is None and large is None:
+            rescue_evidence_items = 0
+            paired_items = 0
+            for item_id in item_ids:
+                small_rows = observed_by_cell[(item_id, effort, small_cap)]
+                large_rows = observed_by_cell[(item_id, effort, large_cap)]
+                small_observed = len(small_rows)
+                large_observed = len(large_rows)
+                small_correct = sum(row["correct"] for row in small_rows)
+                large_correct = sum(row["correct"] for row in large_rows)
+                small_planned = planned_by_cell[(item_id, effort, small_cap)] or small_observed
+                large_planned = planned_by_cell[(item_id, effort, large_cap)] or large_observed
+                if small_observed > small_planned or large_observed > large_planned:
+                    raise ValueError(
+                        "Observed item-level transition replicates exceed the planned count."
+                    )
+                if not small_observed and not large_observed:
                     missing_both += 1
-                    continue
-                if small is None:
+                elif not small_observed:
                     missing_small += 1
-                    continue
-                if large is None:
+                elif not large_observed:
                     missing_large += 1
+                small_unanswered = sum(
+                    _is_length_stop(row) and not row["extracted_answer_present"]
+                    for row in small_rows
+                )
+                large_normal_correct = sum(
+                    _is_normal_stop(row) and row["correct"] for row in large_rows
+                )
+                rescue_evidence_present = bool(
+                    small_unanswered and large_normal_correct
+                )
+                rescue_evidence_items += rescue_evidence_present
+                item_statistics.append(
+                    {
+                        "item_id": item_id,
+                        "small_correct_n": small_correct,
+                        "small_observed_n": small_observed,
+                        "small_planned_n": small_planned,
+                        "small_missing_n": small_planned - small_observed,
+                        "small_accuracy": (
+                            small_correct / small_observed if small_observed else None
+                        ),
+                        "large_correct_n": large_correct,
+                        "large_observed_n": large_observed,
+                        "large_planned_n": large_planned,
+                        "large_missing_n": large_planned - large_observed,
+                        "large_accuracy": (
+                            large_correct / large_observed if large_observed else None
+                        ),
+                        "small_unanswered_length_n": small_unanswered,
+                        "large_normal_correct_n": large_normal_correct,
+                        "rescue_evidence_present": rescue_evidence_present,
+                        "rescue_evidence_interpretation": (
+                            "descriptive_independent_draw_evidence_not_a_continuation"
+                        ),
+                    }
+                )
+                if not small_observed or not large_observed:
                     continue
-                paired_items.add(item_id)
-                outcomes[
-                    f"{'correct' if small['correct'] else 'wrong'}_to_"
-                    f"{'correct' if large['correct'] else 'wrong'}"
+                paired_items += 1
+                exact_states[
+                    (small_correct, small_observed, large_correct, large_observed)
                 ] += 1
-                rescue_taxonomy[_rescue_status(small, large)] += 1
+                p_small = small_correct / small_observed
+                p_large = large_correct / large_observed
+                expected_mass["wrong_to_wrong"] += (1 - p_small) * (1 - p_large)
+                expected_mass["wrong_to_correct"] += (1 - p_small) * p_large
+                expected_mass["correct_to_wrong"] += p_small * (1 - p_large)
+            expected_mass["correct_to_correct"] = float(paired_items) - math.fsum(
+                expected_mass[key]
+                for key in (
+                    "wrong_to_wrong",
+                    "wrong_to_correct",
+                    "correct_to_wrong",
+                )
+            )
+            exact_state_rows = [
+                {
+                    "small_correct_n": state[0],
+                    "small_observed_n": state[1],
+                    "large_correct_n": state[2],
+                    "large_observed_n": state[3],
+                    "item_n": item_n,
+                }
+                for state, item_n in sorted(exact_states.items())
+            ]
             tables.append(
                 {
                     "effort": effort,
@@ -666,14 +734,18 @@ def paired_cap_transitions(
                     "is_primary_endpoint_contrast": (
                         small_cap == ordered_caps[0] and large_cap == ordered_caps[-1]
                     ),
-                    "pairing_unit": "item_id_x_replicate",
-                    "n_item_clusters": len(paired_items),
-                    "n_paired": sum(outcomes.values()),
-                    "outcomes": dict(outcomes),
-                    "rescue_taxonomy": dict(sorted(rescue_taxonomy.items())),
-                    "missing_smaller_cap": missing_small,
-                    "missing_larger_cap": missing_large,
-                    "missing_both_caps": missing_both,
+                    "pairing_unit": "item_id",
+                    "independent_draws": True,
+                    "interpretation": "expected_item_mass_not_observed_continuations",
+                    "n_items": len(item_ids),
+                    "n_paired_items": paired_items,
+                    "expected_item_mass": expected_mass,
+                    "exact_state_transitions": exact_state_rows,
+                    "item_sufficient_statistics": item_statistics,
+                    "n_rescue_evidence_items": rescue_evidence_items,
+                    "missing_smaller_cap_items": missing_small,
+                    "missing_larger_cap_items": missing_large,
+                    "missing_both_caps_items": missing_both,
                 }
             )
     return tables
@@ -898,7 +970,8 @@ def analyze_confirmatory_rows(
             "bootstrap_interval": "percentile",
             "variance_components": "one_way_random_intercept_method_of_moments",
             "negative_between_item_variance": "clamped_to_zero",
-            "cap_transition_pairing": "item_id_x_replicate_independent_draws",
+            "cap_transition_pairing": "item_id_empirical_marginal_outer_product",
+            "cap_transition_interpretation": "expected_item_mass_not_observed_continuations",
             "cap_transition_scope": "all_ordered_cap_pairs",
             "reference_length_distribution": "empirical_completed_lengths_at_largest_cap",
             "reference_length_stops": "excluded_and_counted",

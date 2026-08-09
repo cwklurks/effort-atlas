@@ -248,13 +248,123 @@ class ConfirmatoryAnalysisTests(unittest.TestCase):
         tables = paired_cap_transitions(rows, planned_rows=planned, effort_order=["low"], caps=[4, 8])
         table = tables[0]
 
-        self.assertEqual(table["outcomes"]["wrong_to_correct"], 3)
-        self.assertEqual(table["outcomes"]["correct_to_wrong"], 1)
-        self.assertEqual(table["outcomes"]["correct_to_correct"], 1)
-        self.assertEqual(table["outcomes"]["wrong_to_wrong"], 1)
-        self.assertEqual(table["missing_larger_cap"], 1)
-        self.assertEqual(table["rescue_taxonomy"]["primary_answer_rescue"], 1)
-        self.assertEqual(table["rescue_taxonomy"]["answer_present_grade_transition"], 1)
+        self.assertEqual(table["pairing_unit"], "item_id")
+        self.assertTrue(table["independent_draws"])
+        self.assertEqual(table["expected_item_mass"]["wrong_to_correct"], 3.0)
+        self.assertEqual(table["expected_item_mass"]["correct_to_wrong"], 1.0)
+        self.assertEqual(table["expected_item_mass"]["correct_to_correct"], 1.0)
+        self.assertEqual(table["expected_item_mass"]["wrong_to_wrong"], 1.0)
+        self.assertEqual(table["missing_larger_cap_items"], 1)
+        self.assertEqual(table["n_paired_items"], 6)
+        self.assertEqual(sum(table["expected_item_mass"].values()), 6.0)
+        evidence = {
+            row["item_id"]: row for row in table["item_sufficient_statistics"]
+        }
+        self.assertTrue(evidence["rescue"]["rescue_evidence_present"])
+        self.assertEqual(evidence["rescue"]["small_unanswered_length_n"], 1)
+        self.assertEqual(evidence["rescue"]["large_normal_correct_n"], 1)
+        self.assertFalse(evidence["grade-transition"]["rescue_evidence_present"])
+
+    def test_item_level_transitions_ignore_replicate_identity_and_order(self):
+        rows = [
+            result_row("a", "low", 4, 1, False),
+            result_row("a", "low", 4, 2, True),
+            result_row("a", "low", 8, 1, True),
+            result_row("a", "low", 8, 2, False),
+            result_row("b", "low", 4, 1, False),
+            result_row("b", "low", 4, 2, False),
+            result_row("b", "low", 8, 1, True),
+            result_row("b", "low", 8, 2, True),
+        ]
+        relabeled = [
+            {**row, "replicate": {1: 12, 2: 11}[row["replicate"]]}
+            for row in reversed(rows)
+        ]
+
+        first = paired_cap_transitions(rows, effort_order=["low"], caps=[4, 8])
+        second = paired_cap_transitions(relabeled, effort_order=["low"], caps=[4, 8])
+
+        self.assertEqual(first, second)
+        table = first[0]
+        self.assertEqual(table["n_paired_items"], 2)
+        self.assertEqual(
+            table["expected_item_mass"],
+            {
+                "wrong_to_wrong": 0.25,
+                "wrong_to_correct": 1.25,
+                "correct_to_wrong": 0.25,
+                "correct_to_correct": 0.25,
+            },
+        )
+        self.assertEqual(sum(table["expected_item_mass"].values()), 2.0)
+        self.assertEqual(
+            table["exact_state_transitions"],
+            [
+                {
+                    "small_correct_n": 0,
+                    "small_observed_n": 2,
+                    "large_correct_n": 2,
+                    "large_observed_n": 2,
+                    "item_n": 1,
+                },
+                {
+                    "small_correct_n": 1,
+                    "small_observed_n": 2,
+                    "large_correct_n": 1,
+                    "large_observed_n": 2,
+                    "item_n": 1,
+                },
+            ],
+        )
+
+    def test_item_level_transitions_handle_unequal_n_duplication_and_missingness(self):
+        base = [
+            result_row("unequal", "low", 4, 1, True),
+            result_row("unequal", "low", 8, 1, False),
+            result_row("unequal", "low", 8, 2, True),
+            result_row("missing-large", "low", 4, 1, False),
+        ]
+        plan = [
+            planned_row("unequal", "low", 4, 1),
+            planned_row("unequal", "low", 8, 1),
+            planned_row("unequal", "low", 8, 2),
+            planned_row("missing-large", "low", 4, 1),
+            planned_row("missing-large", "low", 8, 1),
+        ]
+        duplicated = [
+            *base,
+            *[
+                {**row, "replicate": row["replicate"] + 10}
+                for row in base
+                if row["item_id"] == "unequal"
+            ],
+        ]
+
+        table = paired_cap_transitions(
+            base, planned_rows=plan, effort_order=["low"], caps=[4, 8]
+        )[0]
+        duplicated_table = paired_cap_transitions(
+            duplicated, effort_order=["low"], caps=[4, 8]
+        )[0]
+
+        self.assertEqual(table["n_paired_items"], 1)
+        self.assertEqual(table["missing_larger_cap_items"], 1)
+        self.assertEqual(table["missing_smaller_cap_items"], 0)
+        self.assertEqual(table["missing_both_caps_items"], 0)
+        self.assertEqual(
+            table["expected_item_mass"],
+            {
+                "wrong_to_wrong": 0.0,
+                "wrong_to_correct": 0.0,
+                "correct_to_wrong": 0.5,
+                "correct_to_correct": 0.5,
+            },
+        )
+        self.assertEqual(
+            table["expected_item_mass"], duplicated_table["expected_item_mass"]
+        )
+        with self.assertRaisesRegex(ValueError, "Duplicate immutable analysis row"):
+            paired_cap_transitions([*base, base[0]], effort_order=["low"], caps=[4, 8])
 
     def test_dose_response_summarizes_effort_and_cap_profiles(self):
         rows = bootstrap_rows()
