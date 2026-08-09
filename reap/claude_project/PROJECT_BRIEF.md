@@ -36,16 +36,16 @@ Panels: P1 Inkling/Tinker (continuous effort scalar — unique), P2 GPT-OSS-120B
   to main. The pre-data analysis branch now integrates accepted grader v2, uses
   item-level transition mass rather than replicate-index pairing, and passes the
   mandatory ordinary plus exact-lock Tinker offline suites. Initial review blockers
-  in calibration reference accounting and rescue validation are remediated;
-  independent re-review and human merge of PR #3 remain before acceptance.
+  in calibration reference accounting and rescue validation were remediated, and
+  the final independent re-review passed; human merge of PR #3 remains.
 - DeepSeek V4 Flash is selected through Fireworks ZDR for bounded development only,
   but remains disabled until its configuration and hard dollar ceiling are committed.
 - The runner and executable budget gates do not exist yet.
 - No paid REAP smoke or confirmatory call has run. Tinker cap semantics, omitted-cap
   cost bounds, sample independence, and OpenAI usage accounting remain unresolved.
 
-Next gates: independently review and human-merge the integrated analysis layer;
-settle supervisor decisions; freeze REAP preregistration v2; implement and red-team
+Next gates: human-merge the independently approved analysis layer; settle supervisor
+decisions; freeze REAP preregistration v2; implement and red-team
 the runner; then allow human-initiated smoke calls. See
 `../10_PHASE_GATE_PLAN_2026-08-08.md`.
 

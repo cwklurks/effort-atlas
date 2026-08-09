@@ -89,8 +89,8 @@ budget gates, and the REAP preregistration are complete and frozen.
 ## Current priority and ownership boundaries
 
 Phase 0 governance and Phase 1 Tasks A-C are merged. Phase 2 has integrated grader
-v2 with the analysis layer and remediated the initial review blockers; independent
-statistical re-review and human review of PR #3 remain. The later critical path is
+v2 with the analysis layer, remediated the initial review blockers, and passed
+independent statistical re-review; human review and merge of PR #3 remain. The later critical path is
 REAP preregistration freeze and Task E's runner/budget gates. Do not begin E until
 the integrated grader-analysis interfaces are accepted and the required design
 inputs are frozen; do not run any smoke or confirmatory call until the later human

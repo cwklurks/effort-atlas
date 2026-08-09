@@ -6,7 +6,7 @@
     "repository": "cwklurks/effort-atlas",
     "updated": "2026-08-08",
     "current_phase": 2,
-    "summary": "Phase 2 review blockers are remediated and offline-green; independent re-review remains before acceptance."
+    "summary": "Phase 2 is independently approved after remediation and awaits human review and merge of PR #3."
   },
   "safety": {
     "confirmatory_calls": 0,
@@ -35,10 +35,10 @@
     {
       "id": 2,
       "name": "Grader and analysis integration",
-      "status": "in_progress",
-      "progress": 90,
-      "summary": "Grader v2 and analysis are integrated; transition, cap-calibration, and rescue-validation blockers are remediated.",
-      "gate": "Independent statistical re-review and mutation challenge, then human review of PR #3."
+      "status": "awaiting_merge",
+      "progress": 100,
+      "summary": "Grader v2 and analysis are integrated and independently approved after transition, calibration, and rescue-validation remediation.",
+      "gate": "Independent statistical re-review passed; human review and merge of PR #3 remain."
     },
     {
       "id": 3,
@@ -112,11 +112,11 @@
     {
       "id": "D",
       "name": "Pre-data analysis layer",
-      "status": "in_progress",
+      "status": "awaiting_merge",
       "branch": "codex/analysis-layer",
       "pr": 3,
       "owner_model": "gpt-5.6-sol / XHigh",
-      "next": "Independent re-review of the remediated integrated branch, then human review of PR #3."
+      "next": "Human review and merge of independently approved PR #3."
     },
     {
       "id": "E",
@@ -130,7 +130,7 @@
   ],
   "verification": [
     {
-      "label": "Phase 2 remediation canonical suite",
+      "label": "Phase 2 approved canonical suite",
       "result": "89 ordinary tests plus 26 exact-lock Tinker tests passed; private 78-row archives verified",
       "status": "passed"
     },
@@ -189,8 +189,14 @@
     {
       "date": "2026-08-08",
       "phase": 2,
+      "title": "Phase 2 independently approved",
+      "detail": "Final adversarial review at a4818de found no critical or warning findings after calibration, rescue-validation, governance, and mutation-test remediation. Human review and merge of PR #3 remain."
+    },
+    {
+      "date": "2026-08-08",
+      "phase": 2,
       "title": "Integration review blockers remediated",
-      "detail": "Large-cap length stops now remain in calibration reference denominators, rescue rows use shared grader-v2 validation, and stale verification and development-routing records are corrected. Re-review remains."
+      "detail": "Large-cap length stops now remain in calibration reference denominators, rescue rows use shared grader-v2 validation, and stale verification and development-routing records are corrected."
     },
     {
       "date": "2026-08-08",
