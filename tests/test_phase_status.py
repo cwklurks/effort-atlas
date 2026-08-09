@@ -25,16 +25,14 @@ class _StatusHTMLParser(HTMLParser):
 
 
 class PhaseStatusTests(unittest.TestCase):
-    def test_status_data_has_one_active_phase_and_zero_paid_activity(self):
+    def test_status_data_has_at_most_one_current_active_phase_and_zero_paid_activity(self):
         data = json.loads(SOURCE.read_text())
 
         validate_status(data)
-        self.assertEqual(data["project"]["current_phase"], 1)
         self.assertEqual([phase["id"] for phase in data["phases"]], list(range(8)))
-        self.assertEqual(
-            [phase["id"] for phase in data["phases"] if phase["status"] == "in_progress"],
-            [1],
-        )
+        current_phase = data["project"]["current_phase"]
+        active = [phase["id"] for phase in data["phases"] if phase["status"] == "in_progress"]
+        self.assertIn(active, ([], [current_phase]))
         self.assertEqual(data["safety"]["confirmatory_calls"], 0)
         self.assertEqual(data["safety"]["confirmatory_spend_usd"], 0)
         self.assertEqual(data["safety"]["paid_smoke_calls"], 0)
@@ -55,6 +53,7 @@ class PhaseStatusTests(unittest.TestCase):
 
     def test_renderer_rejects_multiple_active_phases(self):
         data = json.loads(SOURCE.read_text())
+        data["phases"][1]["status"] = "in_progress"
         data["phases"][2]["status"] = "in_progress"
 
         with self.assertRaisesRegex(ValueError, "at most one phase"):

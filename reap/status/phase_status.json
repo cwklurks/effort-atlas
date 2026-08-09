@@ -5,8 +5,8 @@
     "paper": "Thinking Cut Short",
     "repository": "cwklurks/effort-atlas",
     "updated": "2026-08-08",
-    "current_phase": 1,
-    "summary": "All three workstreams have checkpoints; A is fixing receipt provenance while B and C are in re-review."
+    "current_phase": 2,
+    "summary": "Phase 1 passed adversarial review; grader-analysis integration is next but remains blocked on human merge decisions."
   },
   "safety": {
     "confirmatory_calls": 0,
@@ -27,10 +27,10 @@
     {
       "id": 1,
       "name": "Close existing workstreams",
-      "status": "in_progress",
-      "progress": 78,
-      "summary": "B and C remediations are pushed; A is correcting its last receipt-to-path provenance defect.",
-      "gate": "A is citable, B is accepted, and C is safe for later human smoke execution."
+      "status": "complete",
+      "progress": 100,
+      "summary": "A is citable with stated limits, B is accepted, and C is safely live-blocked on the pinned SDK.",
+      "gate": "Passed after independent recomputation, mutation testing, and remediation."
     },
     {
       "id": 2,
@@ -38,7 +38,7 @@
       "status": "blocked",
       "progress": 0,
       "summary": "Rebase the analysis layer, resolve shared files, and correct the item-level transition estimand.",
-      "gate": "One clean, reproducible grader-plus-analysis baseline."
+      "gate": "Human merge/rebase decisions, then one clean and reproducible grader-plus-analysis baseline."
     },
     {
       "id": 3,
@@ -85,29 +85,29 @@
     {
       "id": "A",
       "name": "Ecosystem audit round 2",
-      "status": "in_progress",
+      "status": "complete",
       "branch": "codex/ecosystem-audit",
       "pr": 1,
       "owner_model": "gpt-5.6-sol / XHigh",
-      "next": "Correct two receipt-to-path mappings, add a mutation-killing contract test, and re-review."
+      "next": "Human review and merge of independently approved PR #1 at 303263e."
     },
     {
       "id": "B",
       "name": "Grader v2 acceptance",
-      "status": "in_progress",
+      "status": "complete",
       "branch": "codex/grader-v2",
       "pr": 2,
       "owner_model": "gpt-5.6-sol / High",
-      "next": "Independent re-review of remediation commit 9a54f17."
+      "next": "Human review and merge of independently approved PR #2 at 9a54f17."
     },
     {
       "id": "C",
       "name": "Tinker probe safety",
-      "status": "in_progress",
+      "status": "complete",
       "branch": "codex/tinker-probe",
       "pr": 5,
       "owner_model": "gpt-5.6-sol / High",
-      "next": "Independent re-review of fail-closed remediation commit 3331dc1."
+      "next": "Human review of PR #5; live stays blocked until an upstream one-attempt SDK path exists."
     },
     {
       "id": "D",
@@ -116,7 +116,7 @@
       "branch": "codex/analysis-layer",
       "pr": 3,
       "owner_model": "unassigned until Phase 2",
-      "next": "Wait for accepted grader interfaces."
+      "next": "After human merges, rebase onto grader v2 and correct the item-level transition estimand."
     },
     {
       "id": "E",
@@ -146,7 +146,7 @@
     },
     {
       "label": "Tinker-probe builder checkpoint",
-      "result": "21 / 21 focused checks; 12-call dry-run; independent review pending",
+      "result": "26 / 26 focused checks; 12-call dry-run; live blocked before client construction",
       "status": "passed"
     },
     {
@@ -156,8 +156,8 @@
     },
     {
       "label": "Ecosystem-audit adversarial review",
-      "result": "Changes requested: two receipt-to-path provenance mappings",
-      "status": "attention"
+      "result": "Approved at 303263e: 71 receipts, 6 / 6 contract tests, 3,540-row strict verification",
+      "status": "passed"
     },
     {
       "label": "Phase 0 local suite",
@@ -181,6 +181,12 @@
     }
   ],
   "activity": [
+    {
+      "date": "2026-08-08",
+      "phase": 1,
+      "title": "Phase 1 passed",
+      "detail": "A, B, and C were independently approved after remediation. PRs #1, #2, and #5 remain open and unmerged; no provider call occurred."
+    },
     {
       "date": "2026-08-08",
       "phase": 1,
@@ -231,7 +237,8 @@
     }
   ],
   "decisions": [
-    "Human review and merge of PR #4 remains pending.",
+    "Human review and merge of PRs #4, #1, #2, and #5 remains pending; Codex will not merge them.",
+    "Tinker 0.25.0 live probes are blocked because the pinned SDK resubmits internally.",
     "DeepSeek V4 Flash remains disabled unless China-hosting is explicitly accepted.",
     "Transition aggregation, calibration metric, cap grid, and final ceilings remain supervisor decisions."
   ]
