@@ -1,7 +1,9 @@
 # REAP Phase 3 supervisor decision packet
 
-**Dated:** 2026-08-08  
-**Status: HUMAN DECISIONS REQUIRED**  
+**Dated:** 2026-08-08
+
+**Status: HUMAN DECISIONS REQUIRED**
+
 **Purpose:** decision aid for Connor Klann and Chirag Nagpal; not a preregistration,
 approval record, route activation, spending authorization, or claim that a gate has
 passed.
@@ -180,7 +182,7 @@ built safely until the human owner acts.
 | D12 | **Seeds, replicates, schedule, and batching.** Options: one master seed or panel seeds; individual calls or Tinker `num_samples`; row order and restart policy. | Master seed 20260722; derive each request seed from SHA-256 of canonical panel/arm/item/effort/cap identity; predeclare sample indices; deterministic item-block randomization; append-only attempts; `num_samples=n` activates only if frozen independence smoke passes, otherwise omit that Tinker panel. | Connor | HUMAN DECISION REQUIRED; current exporter is 2x2 with one replicate and cannot represent A/B/C. | Build schedule schema v2, arm-aware job IDs, n>1 exporter, manifest hashes, deterministic restart, and zero generation retries. |
 | D13 | **Ceilings and accounting.** Options: reduce scope/n or raise written ceilings; choose panel subceilings and reconciliation cadence. | Keep the first-pass Tinker hard ceiling at $2,000: P1 $1,650, P2 $250, all Tinker smoke/probes $100; OpenAI P3 including smoke $200; P0 $50; reserve inaccessible. Recalculate every subceiling from exact frozen schedules, current snapshotted prices, full prompt bounds, and cap-bounded output before freeze. | Connor | HUMAN DECISION REQUIRED; existing expected-cost notes are not executable worst-case gates. | Runner rejects any panel whose remaining worst-case exposure does not fit, polls receipts between blocks, and hard-stops at each pool ceiling. |
 | D14 | **Cross-platform anchors.** Options: no shared anchor; shared dataset only; shared items, caps, and endpoint contrast where controls permit. | Use the same 30 HMMT-2026 items and 4096/16384 caps in P1 A, P2 A, and P3 A. Use each model's frozen low/high endpoint effort pair; report directional replication separately and never pool effect sizes. | both | HUMAN DECISION REQUIRED; the meaning and limits of “replication” are not frozen. | Add shared item-manifest hash and cap labels; reports show panels side by side with route-specific effort semantics. |
-| D15 | **DeepSeek V4 Flash development gate.** Options: leave disabled; enable direct Fireworks; enable a verified brokered OpenRouter+Fireworks route. | Leave disabled until exact requested and served route IDs, Fireworks ZDR, fallbacks-off behavior, receipt fields, and a cumulative $10 development hard ceiling are committed and human-approved. Never send secrets or research data; never use this lane for scientific or financial verification. | Connor | HUMAN DECISION REQUIRED; exact route, ZDR, and spend-control configuration remain unverified. | A separate development-only config and ledger are required; any mismatch disables the lane with NO SUBSTITUTION. |
+| D15 | **DeepSeek V4 Flash development gate.** Options: leave disabled; enable direct Fireworks; enable a verified brokered OpenRouter+Fireworks route. | Leave disabled until exact requested and served route IDs, Fireworks ZDR, fallbacks-off behavior, receipt fields, and a cumulative $10 development hard ceiling are committed and receive human confirmation. Never send secrets or research data; never use this lane for scientific or financial verification. | Connor | HUMAN DECISION REQUIRED; exact route, ZDR, and spend-control configuration remain unverified. | A separate development-only config and ledger are required; any mismatch disables the lane, and any alternate lane requires a new human decision. |
 
 ## Why these defaults are conservative
 
@@ -199,17 +201,41 @@ built safely until the human owner acts.
   falsifiable tolerance, while KS remains available as a diagnostic rather than
   being misrepresented as a rate-error threshold.
 
-An offline upper-bound recomputation of these recommended schedules, using every
-generation's requested cap, the full prompt bound even when batching could share
-prefill, and the official prices retrieved above, gives P1 $1,492.18, P2 $187.03,
-and P3 $125.83 before its five-call smoke. These are **INFERENCES**, not executable
-authorization: they must be reproduced from frozen schedule rows, and the Tinker
-figures are unusable for paid activation until exact-route cap/billing semantics
-and one-submission behavior pass the frozen smoke gate.
+## Auditable schedule and cost derivation
+
+This table expands the D03-D06 recommended defaults. Each output bound charges every
+generation at its requested cap. Each prompt bound charges the full per-generation
+prompt allowance even though verified batching could later share prefill. Formulas
+use multiplication before addition; commas in displayed integers are separators.
+
+| Panel | Arm | Items | Efforts | Caps | n | Prompt bound | Generation/output formulas | Generations | Prompt token bound | Output token bound |
+|---|---|---:|---:|---|---:|---:|---|---:|---:|---:|
+| P1 | A | 60 | 2 | 4096,16384 | 20 | 8192 | `g=60*2*2*20; out=60*2*20*(4096+16384)` | 4,800 | 39,321,600 | 49,152,000 |
+| P1 | B | 60 | 4 | 2048,4096,8192,16384,32768 | 8 | 8192 | `g=60*4*5*8; out=60*4*8*(2048+4096+8192+16384+32768)` | 9,600 | 78,643,200 | 121,896,960 |
+| P1 | C | 60 | 4 | 49152 | 8 | 8192 | `g=60*4*1*8; out=60*4*8*49152` | 1,920 | 15,728,640 | 94,371,840 |
+| P2 | A | 60 | 2 | 4096,16384 | 20 | 8192 | `g=60*2*2*20; out=60*2*20*(4096+16384)` | 4,800 | 39,321,600 | 49,152,000 |
+| P2 | B | 60 | 4 | 2048,4096,8192,12288,16384 | 8 | 8192 | `g=60*4*5*8; out=60*4*8*(2048+4096+8192+12288+16384)` | 9,600 | 78,643,200 | 82,575,360 |
+| P2 | C | 60 | 4 | 20000 | 8 | 8192 | `g=60*4*1*8; out=60*4*8*20000` | 1,920 | 15,728,640 | 38,400,000 |
+| P3 | A | 30 | 2 | 4096,16384 | 8 | 4096 | `g=30*2*2*8; out=30*2*8*(4096+16384)` | 960 | 3,932,160 | 9,830,400 |
+
+Rates are USD per million tokens as retrieved on 2026-08-08. Tinker uses
+prefill/sample rates; OpenAI P3 uses input/output rates in the same two columns.
+
+| Panel | Total generations | Prompt token bound | Output token bound | Prefill/input rate | Sample/output rate | Exact cost formula | Total | Stage |
+|---|---:|---:|---:|---:|---:|---|---:|---|
+| P1 | 16,320 | 133,693,440 | 265,420,800 | 1.87 | 4.68 | `((133693440*1.87)+(265420800*4.68))/1000000` | $1,492.1761 | before smoke |
+| P2 | 16,320 | 133,693,440 | 170,127,360 | 0.33 | 0.84 | `((133693440*0.33)+(170127360*0.84))/1000000` | $187.0258 | before smoke |
+| P3 | 960 | 3,932,160 | 9,830,400 | 2 | 12 | `((3932160*2)+(9830400*12))/1000000` | $125.8291 | before smoke |
+
+The exact totals are **INFERENCES**, not executable authority. They must be
+reproduced from frozen schedule rows. The Tinker figures remain unusable for paid
+activation until exact-route cap/billing semantics and one-submission behavior pass
+the frozen smoke gate. P3's total is before its five-call smoke, which must fit
+inside the same $200 pool.
 
 ## Proposed exact first-pass prompt
 
-This is the **RECOMMENDATION** for D11. The approved text must be stored as exact
+This is the **RECOMMENDATION** for D11. The selected text must be stored as exact
 UTF-8 bytes and hashed; `problem_text` is the only render variable.
 
 ```text
@@ -225,7 +251,7 @@ formats are added. If a route requires wrapper tokens or a renderer, those exact
 bytes and versions belong in the prompt/renderer manifest and count against the
 panel's frozen prompt bound.
 
-## Frozen activation predicates to write after approval
+## Frozen activation predicates to write after decisions
 
 Each route predicate must be executable and return only `activate`, `omit`, or
 `indeterminate`; `indeterminate` is treated as `omit`.
@@ -247,9 +273,10 @@ schedule:
 9. cumulative worst-case remaining exposure fits below the pool and panel ceilings;
 10. prompt, grader, schedule, route, dataset, and analysis hashes match exactly.
 
-Failure of any predicate causes omission of that entire frozen panel. The project
-must not lower n, change a cap, replace a provider, switch standard and PEFT routes,
-or use a different effort pair after inspecting smoke response content.
+Failure of any predicate causes omission of that entire frozen panel. **NO SUBSTITUTION**
+means the project must not lower n, change a cap, replace a provider, switch standard
+and PEFT routes, or use a different effort pair after inspecting smoke response
+content.
 
 ## Required artifacts and code after decisions
 
@@ -271,7 +298,7 @@ The following work starts only after the relevant human choices are recorded:
    deterministic restart, and manifest mismatch refusal. Replace neither the old
    frozen schedule nor Phase-I history.
 6. **Analysis acceptance update:** require arm filtering/identity; freeze transition
-   and rescue names; label MoM descriptive; add the approved H5 checker/test and H6
+   and rescue names; label MoM descriptive; add the selected H5 checker/test and H6
    tolerance evaluator; preserve reference-stop floors and all denominators.
 7. **Executable budget model:** compute prompt plus cap-bounded output exposure from
    every scheduled row at snapshotted prices; include smoke inside ceilings; unit-test
@@ -324,7 +351,7 @@ Explicit confirmations:
 - Exact activation predicates freeze before smoke: PENDING
 - Human smoke occurs only after runner review: PENDING
 - Smoke failure action is whole-panel omission with NO SUBSTITUTION: PENDING
-- Tinker first-pass hard ceiling and subceilings approved: PENDING
+- Tinker first-pass hard ceiling and subceilings selected: PENDING
 - OpenAI ceiling includes all P3 smoke and confirmatory rows: PENDING
 - Phase-I frozen artifacts remain untouched: PENDING
 - New dated REAP preregistration may now be drafted: PENDING
@@ -333,5 +360,4 @@ Connor sign-off and timestamp: PENDING
 Chirag sign-off and timestamp: PENDING
 ```
 
-Approval of this form authorizes drafting and offline implementation only. It does
-not authorize smoke, confirmatory collection, a paid provider probe, or spending.
+This packet is advisory only. It does not authorize drafting, offline implementation, smoke, confirmatory collection, a paid provider probe, or spending.
