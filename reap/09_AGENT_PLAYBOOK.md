@@ -7,7 +7,7 @@
 | Lane | Tool | Work |
 |---|---|---|
 | Harness engineering | Codex | grader v2, smoke/probe scripts, runner + budget gates, tests |
-| Mechanical support | OpenCode Go / DeepSeek V4 Flash | bounded fixtures, repetitive tests, schemas, docs; never final verification |
+| Mechanical support | DeepSeek V4 Flash / Fireworks ZDR | selected but disabled pending committed development-only config and hard ceiling; never final verification |
 | Data studies | Claude (Cowork) | MathArena/HELM analyses, length priors, power calc, figures |
 | Research & lit | Claude Project / subagents | license checks, author emails, weekly arXiv monitor, citation forward-search |
 | Red-team | Claude (Cowork) | adversarial review of every PR/doc/analysis before it counts as done |

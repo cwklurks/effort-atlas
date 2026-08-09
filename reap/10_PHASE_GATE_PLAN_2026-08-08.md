@@ -15,11 +15,13 @@ only person who may initiate paid study calls.
 | Integration owner | `gpt-5.6-sol`, High | requirements, implementation, conflict resolution, evidence synthesis |
 | Independent gate reviewer | `gpt-5.6-sol`, XHigh | scientific, statistical, financial, and final verification |
 | Fast repository explorer | `gpt-5.6-terra`, Medium | read-only inventories and broad dependency mapping |
-| Bounded mechanical worker | `opencode-go/deepseek-v4-flash` | fixtures, repetitive tests, schemas, docs, deterministic checks |
+| Bounded mechanical worker | DeepSeek V4 Flash via Fireworks ZDR | fixtures, repetitive tests, schemas, docs, deterministic checks after its gate opens |
 | Final authority | human / supervisor | merges, methodology approval, preregistration freeze, paid execution |
 
-DeepSeek Flash never receives secrets, uses `--auto`, generates research data, or
-approves its own work. Codex reviews its diffs and reruns every claimed check.
+The Fireworks ZDR development lane remains disabled until its development-only
+configuration and hard dollar ceiling are committed. If enabled, DeepSeek Flash
+never receives secrets, generates research data, or approves its own work. Codex
+reviews its diffs and reruns every claimed check.
 
 ## Phase 0 — durable governance and baseline
 

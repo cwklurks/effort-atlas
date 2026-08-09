@@ -35,8 +35,11 @@ Panels: P1 Inkling/Tinker (continuous effort scalar — unique), P2 GPT-OSS-120B
 - Grader v2, Tinker probe tooling, the ecosystem audit, and governance are merged
   to main. The pre-data analysis branch now integrates accepted grader v2, uses
   item-level transition mass rather than replicate-index pairing, and passes the
-  mandatory ordinary plus exact-lock Tinker offline suites. Independent review and
-  human merge of PR #3 remain before this becomes the accepted integrated baseline.
+  mandatory ordinary plus exact-lock Tinker offline suites. Initial review blockers
+  in calibration reference accounting and rescue validation are remediated;
+  independent re-review and human merge of PR #3 remain before acceptance.
+- DeepSeek V4 Flash is selected through Fireworks ZDR for bounded development only,
+  but remains disabled until its configuration and hard dollar ceiling are committed.
 - The runner and executable budget gates do not exist yet.
 - No paid REAP smoke or confirmatory call has run. Tinker cap semantics, omitted-cap
   cost bounds, sample independence, and OpenAI usage accounting remain unresolved.

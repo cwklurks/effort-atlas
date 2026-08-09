@@ -6,7 +6,7 @@
     "repository": "cwklurks/effort-atlas",
     "updated": "2026-08-08",
     "current_phase": 2,
-    "summary": "Phase 2 grader-analysis integration is implemented and offline-green; independent statistical review remains before acceptance."
+    "summary": "Phase 2 review blockers are remediated and offline-green; independent re-review remains before acceptance."
   },
   "safety": {
     "confirmatory_calls": 0,
@@ -37,8 +37,8 @@
       "name": "Grader and analysis integration",
       "status": "in_progress",
       "progress": 90,
-      "summary": "Grader v2 and analysis are integrated; paired transitions now use one expected-mass contribution per item.",
-      "gate": "Independent statistical review and mutation challenge, then human review of PR #3."
+      "summary": "Grader v2 and analysis are integrated; transition, cap-calibration, and rescue-validation blockers are remediated.",
+      "gate": "Independent statistical re-review and mutation challenge, then human review of PR #3."
     },
     {
       "id": 3,
@@ -116,7 +116,7 @@
       "branch": "codex/analysis-layer",
       "pr": 3,
       "owner_model": "gpt-5.6-sol / XHigh",
-      "next": "Independent statistical review of the integrated branch, then human review of PR #3."
+      "next": "Independent re-review of the remediated integrated branch, then human review of PR #3."
     },
     {
       "id": "E",
@@ -130,13 +130,13 @@
   ],
   "verification": [
     {
-      "label": "Phase 2 integrated canonical suite",
-      "result": "85 ordinary tests plus 26 exact-lock Tinker tests passed; 1 private-archive check skipped",
+      "label": "Phase 2 remediation canonical suite",
+      "result": "89 ordinary tests plus 26 exact-lock Tinker tests passed; private 78-row archives verified",
       "status": "passed"
     },
     {
-      "label": "Current offline suite",
-      "result": "44 / 44 passed; dashboard freshness enforced",
+      "label": "Current verifier orchestration",
+      "result": "Both project and exact-lock Tinker lanes mandatory; dashboard freshness enforced",
       "status": "passed"
     },
     {
@@ -180,12 +180,18 @@
       "status": "passed"
     },
     {
-      "label": "DeepSeek V4 Flash lane",
-      "result": "Disabled: China-hosting opt-in required",
+      "label": "DeepSeek V4 Flash development lane",
+      "result": "Fireworks ZDR selected; disabled until development-only config and hard dollar ceiling are committed",
       "status": "attention"
     }
   ],
   "activity": [
+    {
+      "date": "2026-08-08",
+      "phase": 2,
+      "title": "Integration review blockers remediated",
+      "detail": "Large-cap length stops now remain in calibration reference denominators, rescue rows use shared grader-v2 validation, and stale verification and development-routing records are corrected. Re-review remains."
+    },
     {
       "date": "2026-08-08",
       "phase": 2,
@@ -250,7 +256,7 @@
   "decisions": [
     "PRs #4, #1, #2, and #5 were human-merged before Phase 2 integration; Codex did not merge them.",
     "Tinker 0.25.0 live probes are blocked because the pinned SDK resubmits internally.",
-    "DeepSeek V4 Flash remains disabled unless China-hosting is explicitly accepted.",
+    "DeepSeek V4 Flash is selected through Fireworks ZDR for development only and remains disabled until its route configuration and hard dollar ceiling are committed.",
     "The implementation exposes item-level sufficient statistics and expected independent-draw transition mass; supervisor freeze of final analysis choices, calibration metric, cap grid, and ceilings remains pending."
   ]
 }

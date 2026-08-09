@@ -24,11 +24,13 @@ Point any new Codex session at this file first: **"Read reap/CODEX_BRIEFING.md a
 
 **What exists and works:** the frozen Phase-I preregistration + one dated amendment ($0 confirmatory spend, ever); the offline confirmatory preflight (hash-chained AttemptLedger, seeded/hashed schedules, receipt reconciliation); the cap-semantics and observational studies; and independently reviewed Phase-1 implementations for the ecosystem audit, strict grader v2, and fail-closed Tinker probe. Grader v2 reproducibly identifies all 78 archived 4,096-token rows as unanswered with no raw response text committed. The ecosystem audit's real-only table, uniform control gate, receipts, and synthetic separation are independently recomputed. The Tinker probe's dry-run plan is safe, but pinned SDK 0.25.0 is proven to resubmit and its live path therefore blocks before client construction.
 
-**What is integrated but not yet accepted:** the Phase-2 grader + analysis baseline on PR #3. It preserves strict terminator-only grading, replaces replicate-index transition pairing with item-level sufficient statistics and independent-draw expected mass, and requires separate ordinary and exact-lock Tinker verification environments. It still needs independent statistical review and human merge.
+**What is integrated but not yet accepted:** the Phase-2 grader + analysis baseline on PR #3. It preserves strict terminator-only grading, replaces replicate-index transition pairing with item-level sufficient statistics and independent-draw expected mass, includes every valid large-cap completion length in cap-calibration references, validates rescue rows through grader v2, and requires separate ordinary and exact-lock Tinker verification environments. Initial review blockers are remediated; independent re-review and human merge remain.
 
 **What does NOT exist yet:** a paid runner; executable budget gates; a frozen REAP preregistration; or settled live Tinker/OpenAI smoke facts. Nothing confirmatory can run until those gates close. No current Tinker SDK path satisfies the zero-resubmission rule, so human smoke is blocked rather than merely unscheduled.
 
 **Funding:** $5,000 Tinker credits + ~$200 OpenAI (supervisor) + <$100 OpenRouter. Platform-scoped pools, never mixed. Cost model and gates in `reap/02_BUDGET_AND_COSTS.md`.
+
+**Development model routing:** DeepSeek V4 Flash is selected through Fireworks ZDR for bounded development work, but remains disabled until a development-only configuration and hard dollar ceiling are committed. It never supplies scientific or financial verification.
 
 **Branch / PR state as of 2026-08-08:**
 
@@ -38,7 +40,7 @@ Point any new Codex session at this file first: **"Read reap/CODEX_BRIEFING.md a
 | A — `codex/ecosystem-audit`, PR #1 | merged at accepted `303263e` implementation | headline limitations remain mandatory reporting context |
 | B — `codex/grader-v2`, PR #2 | merged at accepted `9a54f17`; 78-row archive verifier passes | integrated with D without weakening extraction semantics |
 | C — `codex/tinker-probe`, PR #5 | merged at accepted `3331dc1`; dry-run safe | live intentionally blocked because Tinker 0.25.0 cannot guarantee one submission; no empirical fact is settled |
-| D — `codex/analysis-layer`, PR #3 | merged main locally; item-level transition correction and split verifier implemented | independent statistical review and human merge |
+| D — `codex/analysis-layer`, PR #3 | initial review blockers remediated; item-level transitions, complete reference denominators, shared rescue validation, and split verifier implemented | independent statistical re-review and human merge |
 | E — `codex/runner` | not implemented | waits on accepted grader interfaces, frozen design inputs, and corrected budget math |
 
 The current phase-gate and model-routing plan is in
@@ -58,7 +60,7 @@ The current phase-gate and model-routing plan is in
 
 ## 4. Task queue
 
-Phase 1 is merged. Current gate order: **independent B/D integration review → human merge of PR #3 → preregistration freeze → E runner → human smoke → confirmatory collection**. The original task specifications remain below as historical acceptance contracts.
+Phase 1 is merged. Current gate order: **independent B/D integration re-review → human merge of PR #3 → preregistration freeze → E runner → human smoke → confirmatory collection**. The original task specifications remain below as historical acceptance contracts.
 
 Rationale: B, C, D, E are the critical path to the study being *allowed to run*; A is a parallel paper contribution whose Phase-1 half is already citable.
 
@@ -106,9 +108,10 @@ The archived acceptance corpus is the union of
 `results/sweep_real_20260719_154609.jsonl` (68 affected math rows) and
 `results/sweep_real_20260719_172721.jsonl` (10 affected knowledge rows). Do not use
 `results/combined_real.jsonl` for the 78-row assertion; it contains other historical
-runs and has 177 rows at 4096 tokens. The current pre-v2 baseline command is
-`PYTHONPATH=src python3 -m unittest discover -s tests -v`: 40 tests pass, while the
-bare function in `tests/test_rescue_analysis.py` is not collected.
+runs and has 177 rows at 4096 tokens. At assignment time, the pre-v2 baseline
+command was `PYTHONPATH=src python3 -m unittest discover -s tests -v`: 40 tests
+passed, while `tests/test_rescue_analysis.py` still used an uncollected bare
+function.
 
 Both acceptance-corpus paths are currently ignored by the broad `results/` rule in
 `.gitignore`. A Task B integration test must not depend on those local-only files in

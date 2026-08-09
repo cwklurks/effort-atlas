@@ -99,10 +99,13 @@ interpreter.
 For the pinned observational pipeline, install its locked optional dependencies
 with `uv sync --python 3.12.8 --extra observational`.
 
-The Phase 0 code baseline contributed 40 tests; the generated phase dashboard adds
-four governance checks, so the current suite collects 44. The bare function in
-`tests/test_rescue_analysis.py` is not collected; Task B owns that known defect.
-The green baseline means reproducible current behavior, not complete coverage.
+The current canonical verifier collects 89 ordinary project tests and 26 exact-lock
+Tinker tests. The ordinary lane includes collected rescue-analysis tests enforcing
+the amended answer-rescue definition and shared grader-v2 state validation. One
+archive-backed grader test requires `GRADER_V2_ARCHIVE_ROOT`; the committed
+sanitized 78-row acceptance fixture remains covered when that private source path
+is unavailable. A green suite means reproducible current behavior, not complete
+coverage.
 
 The legacy local `.venv` found before the 2026-08-08 governance pass used Python
 3.9 and is not valid verification evidence. No offline verification command should
