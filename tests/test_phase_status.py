@@ -8,6 +8,9 @@ from pathlib import Path
 
 from scripts.render_phase_status import MARKER, OUTPUT, SOURCE, TEMPLATE, render, validate_status
 
+ROOT = Path(__file__).resolve().parents[1]
+PROJECT_BRIEF = ROOT / "reap" / "claude_project" / "PROJECT_BRIEF.md"
+
 
 class _StatusHTMLParser(HTMLParser):
     def __init__(self) -> None:
@@ -85,12 +88,29 @@ class PhaseStatusTests(unittest.TestCase):
         )
         self.assertIn("advisory", decision_record)
         self.assertIn("authorize no calls", decision_record)
+        activity = next(
+            row for row in data["activity"] if row["phase"] == 3
+        )
+        self.assertEqual(activity["title"], "Phase 3 decision packet technical review passed")
         for statement in (fireworks_entry["result"], fireworks_decision):
             self.assertIn("Fireworks ZDR", statement)
             self.assertIn("development-only", statement)
             self.assertIn("disabled", statement)
             self.assertIn("route configuration", statement)
             self.assertIn("hard dollar ceiling", statement)
+
+    def test_canonical_brief_does_not_repeat_superseded_route_or_budget_summary(self):
+        text = PROJECT_BRIEF.read_text()
+        design_summary = text.split("## REAP (Phase II) design summary", 1)[1].split(
+            "## Positioning", 1
+        )[0]
+        normalized_summary = " ".join(design_summary.split())
+
+        self.assertNotIn("uncapped reference (64k", normalized_summary)
+        self.assertNotIn("Estimated cost ≈ $1,030", normalized_summary)
+        self.assertIn("large-cap reference", normalized_summary)
+        self.assertIn("human-pending", normalized_summary)
+        self.assertIn("11_PHASE3_DECISION_PACKET_2026-08-08.md", normalized_summary)
 
     def test_rendered_page_is_current_self_contained_and_accessible_by_landmark(self):
         rendered = render()

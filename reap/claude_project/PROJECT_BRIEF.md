@@ -22,7 +22,18 @@ Benchmarks impose output-token walls. Walls delete final answers mid-reasoning; 
 
 ## REAP (Phase II) design summary
 
-Panels: P1 Inkling/Tinker (continuous effort scalar — unique), P2 GPT-OSS-120B/Tinker (discrete efforts, cheap), P3 gpt-5.6-terra/OpenAI (documented-inclusive caps; Chirag's $200), P0 OpenRouter (debug only). Arms per Tinker panel: **A** replicated 2×2 (2 efforts × 2 caps × n=20); **B** dose-response (4 efforts × 5 caps × n=8); **C** uncapped reference (64k, n=8). **Cap-invariance validation** (novel): predict Arm B truncation rates from Arm C length distributions; verify. Estimated cost ≈ $1,030 of $5,000; committed ceiling $2,000, reserve untouchable without written scope note. Datasets: HMMT Feb 2025+2026 core (MathArena; their public outputs already show 0% at-cap vs 92% below-cap), AIME 25/26 continuity, GPQA-Diamond + HARP-hardest as scoped extensions, GSM8K negative control. Prereg v2 must freeze before any confirmatory call.
+The current proposal is advisory and human-pending; exact choices D01-D15 are in
+`../11_PHASE3_DECISION_PACKET_2026-08-08.md`. It keeps P1 Inkling/Tinker, P2
+GPT-OSS-120B/Tinker, P3 gpt-5.6-terra/OpenAI, and P0 OpenRouter debug-only, but
+samples Arms A/B/C independently and requires `arm_key` everywhere. P1/P2 use 60
+HMMT 2025+2026 items; P3 uses the overlapping 30 HMMT-2026 items. Arm A is the
+replicated 2×2, Arm B is dose-response, and Arm C is a panel-specific large-cap
+reference: 49,152 for standard Inkling and 20,000 for standard GPT-OSS-120B. P3
+currently includes Arm A only. Recomputed pre-smoke maxima are $1,492.1761 for P1,
+$187.0258 for P2, and $125.8291 for P3, subject to frozen route, price, prompt, and
+schedule evidence. Earlier 64K-output and approximately $1,030 sketches are
+superseded and are not execution or budget gates. Preregistration v2 must freeze
+before any confirmatory call.
 
 ## Positioning (updated 2026-08)
 
