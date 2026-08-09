@@ -41,7 +41,7 @@ def fixture_confirmatory_config(directory: str) -> Path:
 
 
 def accounted_success(job, **overrides):
-    return {
+    row = {
         **job, "event_type": "success", "route_status": "expected",
         "accounting_status": "valid", "served_provider": job["requested_provider"],
         "request_id": f"request-{job['job_id']}",
@@ -53,6 +53,11 @@ def accounted_success(job, **overrides):
         "completion_tokens": 20, "prompt_tokens": 10, "finish_reason": "stop",
         "correct": False, "extracted_answer_present": True, **overrides,
     }
+    if "extracted_answer" not in overrides:
+        row["extracted_answer"] = (
+            "fixture-answer" if row.get("extracted_answer_present") is True else None
+        )
+    return row
 
 
 class ConfirmatoryPreflightTests(unittest.TestCase):

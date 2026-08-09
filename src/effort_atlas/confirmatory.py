@@ -22,6 +22,7 @@ from typing import Any, Iterable
 import fcntl
 
 from . import ROOT, load_config
+from .graders import validate_grade_state
 
 
 SCHEDULE_SEED = 20260722
@@ -61,7 +62,8 @@ EVENT_FIELDS = SCHEDULE_FIELDS | frozenset({
     "max_tokens", "max_tokens_requested",
     "request_started_at", "request_ended_at", "request_id", "upstream_id",
     "provider_response_id", "endpoint_id", "receipt_created_at", "receipt_fetched_at",
-    "cached", "replayed", "latency_s", "extracted_answer_present", "billed_status",
+    "cached", "replayed", "latency_s", "extracted_answer_present",
+    "extracted_answer", "billed_status",
     "manual_rerun_reason",
 })
 
@@ -377,12 +379,13 @@ def _ineligibility_reason(row: dict[str, Any]) -> str | None:
         for key in ("reasoning_tokens", "native_reasoning_tokens")
     ):
         return "reasoning_tokens_invalid"
-    if type(row.get("correct")) is not bool:
-        return "malformed_correct"
-    if type(row.get("extracted_answer_present")) is not bool:
-        return "malformed_extracted_answer_presence"
-    if row["correct"] and not row["extracted_answer_present"]:
-        return "grade_extraction_inconsistent"
+    grade_error = validate_grade_state(
+        correct=row.get("correct"),
+        extracted_answer_present=row.get("extracted_answer_present"),
+        extracted_answer=row.get("extracted_answer"),
+    )
+    if grade_error is not None:
+        return grade_error
     return None
 
 
