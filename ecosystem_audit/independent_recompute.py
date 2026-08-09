@@ -145,6 +145,7 @@ def recompute() -> dict:
     inspect = by_pipeline["aime_last_line_numeric"]
     assert inspect["pipeline_status"] == "insufficient_power"
     assert inspect["real"]["n"] == 7 and inspect["real"]["empty_text"] == 5
+    assert by_pipeline["default_parse_verify"]["pipeline_status"] == "generic_utility_only"
     identical = [
         {"pipelines": sorted(ids), "returned_fixture_count": len(answer_ids)}
         for answer_ids, ids in answer_sets.items()

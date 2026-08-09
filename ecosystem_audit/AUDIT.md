@@ -78,12 +78,13 @@ Not applicable means the repository is an extractor/scorer library rather than a
 | opencompass | Canonical GSM8K dataset config wires gsm8k_postprocess to Gsm8kEvaluator. | [F066](#f066) |
 | livebench | Olympiad scorer calls the real multi-stage extractor then native edit-distance or positional comparison. | [F067](#f067) |
 | lm-evaluation-harness | The lm-eval AIME task initializes a dollar-span fallback before optional boxed extraction and returns exact-match scoring. | [F069](#f069) |
+| lighteval | LightEval extract_target_from_pred executes configured regex targets with explicit fallback and extraction modes. | [F071](#f071) |
 
 Extraction is reported separately from correctness. A returned nonempty value on a truncated fixture is the operational answer-returned event; it is not by itself evidence that answer text was newly invented. Native correctness is used only where the actual downstream path is runnable.
 
 ## Executable task-path dispatch receipts
 
-| Target | Pipeline | Registered/dispatch path | Receipts | Headline eligible |
+| Target | Pipeline | Registered/dispatch or demoted utility path | Receipts | Headline eligible |
 |---|---|---|---|---|
 | lm-evaluation-harness | gsm8k_flexible_extract | lm_eval/tasks/gsm8k/gsm8k-cot.yaml flexible-extract | [F004](#f004), [F005](#f005) | yes |
 | lm-evaluation-harness | aime_process_results | lm_eval/tasks/aime/aime.yaml | [F068](#f068), [F069](#f069) | yes |
@@ -92,13 +93,13 @@ Extraction is reported separately from correctness. A returned nonempty value on
 | inspect_ai | gsm8k_numeric_match | inspect_evals/gsm8k | [F064](#f064) | yes |
 | inspect_evals | aime_last_line_numeric | inspect_evals/aime2026 | [F019](#f019), [F020](#f020) | yes |
 | simple-evals | mgsm_answer_prefix | mgsm_eval English Answer: prefix | [F060](#f060) | yes |
-| lighteval | math_extractive_match | Metrics.expr_gold_metric extraction configuration | [F027](#f027), [F029](#f029) | yes |
+| lighteval | math_extractive_match | src/lighteval/tasks/tasks/gsm8k.py Metrics.expr_gold_metric | [F044](#f044), [F071](#f071) | yes |
 | livebench | aime_last50 | gen_ground_truth_judgment.py AIME dispatch | [F031](#f031), [F070](#f070) | yes |
 | livebench | olympiad_expression | LiveBench IMO/USAMO-only olympiad dispatch | [F067](#f067), [F070](#f070) | no |
-| math-verify | default_parse_verify | public default Latex+Expr parser; generic isolated utility | [F040](#f040) | yes |
+| math-verify | default_parse_verify | generic public utility; no task registration executed | [F034](#f034), [F035](#f035), [F036](#f036) | no |
 | matharena | competition_extract_and_grade | dataset-matched AIME/BRUMO/HMMT configs, strict_parsing=false | [F039](#f039), [F043](#f043) | yes |
 
-Every executed pipeline is tied to a pinned task registration or dispatch receipt. The demoted LiveBench olympiad pipeline remains in this table as non-headline audit history; F070 proves that AIME-shaped data dispatches elsewhere.
+Every headline-eligible pipeline is tied to an exact pinned task registration or dispatch receipt. The demoted LiveBench olympiad pipeline remains as wrong-dispatch audit history; F070 proves that AIME-shaped data dispatches elsewhere. The demoted Math-Verify row is explicitly a generic public-utility diagnostic backed by its parser/verifier receipts, not a task registration.
 
 ## Truncation visibility
 
@@ -137,7 +138,7 @@ These issue facts corroborate but do not replace code evidence. Retrieval metada
 | helm | 9 |
 | inspect_ai | 5 |
 | inspect_evals | 4 |
-| lighteval | 10 |
+| lighteval | 11 |
 | livebench | 7 |
 | lm-evaluation-harness | 7 |
 | math-verify | 4 |
@@ -1055,6 +1056,19 @@ Encoding/line endings: `utf-8` / `LF`; generated file: `false`.
 
 ````json
 "            score = ifbench_process_results(question, llm_answer, debug)\n            category = \"instruction_following\"\n        elif len(splits) > 0 and (splits[0] in [\"amc\", \"smc\", \"aime\", \"imo\", \"usamo\"] or (len(splits) > 1 and splits[1] == \"amc\")):\n            category = \"math\"\n            if splits[0] in [\"amc\", \"smc\"] or (len(splits) > 1 and splits[1] == \"amc\"):\n                score = mathcontest_process_results(ground_truth, llm_answer, question_text, debug)\n                category = \"math\"\n            elif splits[0] == \"aime\":\n                score = aime_process_results(ground_truth, llm_answer, debug)\n                category = \"math\"\n            elif splits[0] in [\"imo\", \"usamo\"]:\n                score = proof_rearrangement_process_results(ground_truth, llm_answer, edit_distance=True, debug=debug)\n            else:\n"
+````
+
+### F071
+
+LightEval extract_target_from_pred executes configured regex targets with explicit fallback and extraction modes.
+
+Repository: `huggingface/lighteval` at `64f4f5ae173626509fad6e477ca4ee56ebb26129`
+Path: `src/lighteval/metrics/utils/extractive_match_utils.py` lines 563-632
+Permalink: https://github.com/huggingface/lighteval/blob/64f4f5ae173626509fad6e477ca4ee56ebb26129/src/lighteval/metrics/utils/extractive_match_utils.py#L563-L632
+Encoding/line endings: `utf-8` / `LF`; generated file: `false`.
+
+````json
+"def extract_target_from_pred(\n    pred: str,\n    target_res: list[tuple[list[tuple[re.Pattern[str], int]], ExtractionTarget]],\n    fallback_mode: Literal[\"no_fallback\", \"first_match\"] = \"no_fallback\",\n    extraction_mode: Literal[\"first_match\", \"any_match\"] = \"any_match\",\n    timeout_seconds: int = 5,\n):\n    \"\"\"Extracts targets from a prediction string using regex patterns.\n    Returns first sucesffuly extracted match.\n\n    Args:\n        pred (str): The prediction string to extract from\n        target_res (list[tuple[list[tuple[re.Pattern[str], int]], ExtractionTarget]]): List of regex patterns and their priorities for each target type\n        fallback_mode (Literal[\"no_fallback\", \"first_match\"], optional): How to handle extraction failures. Defaults to \"no_fallback\".\n            - \"no_fallback\": Return only successfully parsed match\n            - \"first_match\": Additionaly Include the first string match no matter how parsing finished\n        extraction_mode (Literal[\"first_match\", \"any_match\"], optional): How to handle extraction failures. Defaults to \"any_match\".\n            - \"first_match\": Only tries to extract the first match\n            - \"any_match\": Tries to extract any match\n        timeout_seconds (int, optional): Maximum time in seconds to spend parsing each expression. Defaults to 5.\n\n    Returns:\n        list: List of extracted predictions, with first fallbac string appended if fallback_mode is \"first_match\"\n    \"\"\"\n    extracted_predictions = []\n    fallbacks = []\n\n    # Get all patterns and sort by priority\n    all_patterns = [\n        (pattern, target_type, priority)\n        for target_patterns, target_type in target_res\n        for pattern, priority in target_patterns\n    ]\n    match_found = False\n\n    # Group patterns by priority using itertools.groupby\n    for _, patterns_group in groupby(sorted(all_patterns, key=lambda x: x[2]), key=lambda x: x[2]):\n        # Find all matches for each pattern in this priority group\n        matches_with_pos = (\n            (match, match.start(), match.end(), target_type)\n            for pattern, target_type, _ in patterns_group\n            for match in pattern.finditer(pred)\n        )\n\n        # Sort matches by end position (rightmost first) and then by start position (leftmost first)\n        matches_with_pos = sorted(matches_with_pos, key=lambda x: (x[2], -x[1]), reverse=True)\n\n        # Try to extract from each match, starting from rightmost\n        for match, _, _, target_type in matches_with_pos:\n            extracted_match, str_fallback = extract_match(match, target_type, timeout_seconds)\n            match_found = True\n\n            if str_fallback:\n                fallbacks.append(str_fallback)\n\n            if extracted_match is not None:\n                extracted_predictions.append(extracted_match)\n                break\n\n            if extraction_mode == \"first_match\":\n                break\n\n        # If we found something and we're in first_match mode, stop processing other priorities\n        if extracted_predictions or (match_found and extraction_mode == \"first_match\"):\n            break\n\n    if fallback_mode == \"first_match\" and fallbacks:\n        extracted_predictions += [fallbacks[0]]\n\n    return extracted_predictions\n"
 ````
 
 ## Verification log

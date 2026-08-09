@@ -150,7 +150,8 @@ def calculate_metrics(results,app):
         control_measured=(len(controls)==28 and all(r['adapter_status']=='ok' and r['native_correct']!='' for r in controls))
         control_failed=bool(applicable) and (not control_measured or any(parsebool(r['native_correct']) is not True for r in controls))
         real=[r for r in applicable if r['stratum']=='real_truncated']
-        if config['headline_eligible']!='true': status='wrong_task_dispatch'
+        if config['headline_eligible']!='true':
+            status=config.get('non_headline_status') or 'non_headline_diagnostic'
         elif not applicable: status=(fatal.most_common(1)[0][0] if fatal else 'not_applicable')
         elif len(real)<MINIMUM_REAL_N: status='insufficient_power'
         elif control_failed: status='control_disqualified'
@@ -210,9 +211,10 @@ def markdown(metrics,entries,results):
         synthetic=[x for x in results if x['pipeline_id']==p and x['stratum']=='synthetic_truncated' and x['adapter_status']=='ok']
         lines.append('| '+' | '.join([r['target'],p,str(len(synthetic)),format_metric(idx,p,'answer_returned_after_truncation_pct','synthetic'),format_metric(idx,p,'accidental_correct_pct','synthetic'),format_metric(idx,p,'crash_pct','synthetic')])+' |')
     demoted=[r for r in app if r['headline_eligible']!='true']
-    lines += ['','## Demoted wrong-dispatch diagnostics','']
+    lines += ['','## Demoted non-headline diagnostics','']
     for r in demoted:
-        lines.append(f"- `{r['pipeline_id']}` is retained for audit history but is `wrong_task_dispatch`: {r['exclusion_reason']}")
+        demotion_status=r.get('non_headline_status') or 'non_headline_diagnostic'
+        lines.append(f"- `{r['pipeline_id']}` is retained for audit history but is `{demotion_status}`: {r['exclusion_reason']}")
     lines += ['','## Headline-eligible real-data pipeline rows','']
     eligible=[r for r in app if status.get(r['pipeline_id'])=='ok' and r['headline_eligible']=='true']
     if eligible:

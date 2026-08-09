@@ -58,10 +58,18 @@ def main():
     entries=module.locked();assert (A/'results_table.md').read_text()==module.markdown(metrics,entries,results)
     statuses={r['pipeline_id']:r['pipeline_status'] for r in metrics}
     md=(A/'results_table.md').read_text()
+    real_table=md.split('## Real truncated generations',1)[1].split('## Constructed synthetic probes',1)[0]
+    headline=md.split('## Headline-eligible real-data pipeline rows',1)[1].split('## Locked repositories',1)[0]
     for pipeline,status in statuses.items():
         if status=='control_disqualified':
             assert f'| {pipeline} | control_disqualified |' in md
-            headline=md.split('## Headline-eligible real-data pipeline rows',1)[1].split('## Locked repositories',1)[0]
+            assert f'| {pipeline} |' not in headline
+    for config in app:
+        if config['headline_eligible']=='false':
+            pipeline=config['pipeline_id'];expected=config['non_headline_status']
+            assert statuses[pipeline]==expected
+            assert f'`{pipeline}` is retained for audit history but is `{expected}`' in md
+            assert f'| {pipeline} |' not in real_table
             assert f'| {pipeline} |' not in headline
     print(f'phase 2 verified with trunccheck: {len(results)} fixture-pipeline rows; synthetic sha256={hashlib.sha256(synth).hexdigest()}')
 if __name__=='__main__':main()

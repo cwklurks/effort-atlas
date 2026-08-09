@@ -1189,6 +1189,23 @@
       "sha": "00eae856aa1c1a9e9d058a65a9a94d85884034c4",
       "status": "verified",
       "target": "livebench"
+    },
+    {
+      "category": "extraction_call",
+      "claim": "LightEval extract_target_from_pred executes configured regex targets with explicit fallback and extraction modes.",
+      "encoding": "utf-8",
+      "finding_id": "F071",
+      "generated_file": false,
+      "line_end": 632,
+      "line_ending": "LF",
+      "line_start": 563,
+      "path": "src/lighteval/metrics/utils/extractive_match_utils.py",
+      "permalink": "https://github.com/huggingface/lighteval/blob/64f4f5ae173626509fad6e477ca4ee56ebb26129/src/lighteval/metrics/utils/extractive_match_utils.py#L563-L632",
+      "quote": "def extract_target_from_pred(\n    pred: str,\n    target_res: list[tuple[list[tuple[re.Pattern[str], int]], ExtractionTarget]],\n    fallback_mode: Literal[\"no_fallback\", \"first_match\"] = \"no_fallback\",\n    extraction_mode: Literal[\"first_match\", \"any_match\"] = \"any_match\",\n    timeout_seconds: int = 5,\n):\n    \"\"\"Extracts targets from a prediction string using regex patterns.\n    Returns first sucesffuly extracted match.\n\n    Args:\n        pred (str): The prediction string to extract from\n        target_res (list[tuple[list[tuple[re.Pattern[str], int]], ExtractionTarget]]): List of regex patterns and their priorities for each target type\n        fallback_mode (Literal[\"no_fallback\", \"first_match\"], optional): How to handle extraction failures. Defaults to \"no_fallback\".\n            - \"no_fallback\": Return only successfully parsed match\n            - \"first_match\": Additionaly Include the first string match no matter how parsing finished\n        extraction_mode (Literal[\"first_match\", \"any_match\"], optional): How to handle extraction failures. Defaults to \"any_match\".\n            - \"first_match\": Only tries to extract the first match\n            - \"any_match\": Tries to extract any match\n        timeout_seconds (int, optional): Maximum time in seconds to spend parsing each expression. Defaults to 5.\n\n    Returns:\n        list: List of extracted predictions, with first fallbac string appended if fallback_mode is \"first_match\"\n    \"\"\"\n    extracted_predictions = []\n    fallbacks = []\n\n    # Get all patterns and sort by priority\n    all_patterns = [\n        (pattern, target_type, priority)\n        for target_patterns, target_type in target_res\n        for pattern, priority in target_patterns\n    ]\n    match_found = False\n\n    # Group patterns by priority using itertools.groupby\n    for _, patterns_group in groupby(sorted(all_patterns, key=lambda x: x[2]), key=lambda x: x[2]):\n        # Find all matches for each pattern in this priority group\n        matches_with_pos = (\n            (match, match.start(), match.end(), target_type)\n            for pattern, target_type, _ in patterns_group\n            for match in pattern.finditer(pred)\n        )\n\n        # Sort matches by end position (rightmost first) and then by start position (leftmost first)\n        matches_with_pos = sorted(matches_with_pos, key=lambda x: (x[2], -x[1]), reverse=True)\n\n        # Try to extract from each match, starting from rightmost\n        for match, _, _, target_type in matches_with_pos:\n            extracted_match, str_fallback = extract_match(match, target_type, timeout_seconds)\n            match_found = True\n\n            if str_fallback:\n                fallbacks.append(str_fallback)\n\n            if extracted_match is not None:\n                extracted_predictions.append(extracted_match)\n                break\n\n            if extraction_mode == \"first_match\":\n                break\n\n        # If we found something and we're in first_match mode, stop processing other priorities\n        if extracted_predictions or (match_found and extraction_mode == \"first_match\"):\n            break\n\n    if fallback_mode == \"first_match\" and fallbacks:\n        extracted_predictions += [fallbacks[0]]\n\n    return extracted_predictions\n",
+      "repository": "huggingface/lighteval",
+      "sha": "64f4f5ae173626509fad6e477ca4ee56ebb26129",
+      "status": "verified",
+      "target": "lighteval"
     }
   ],
   "schema_version": 1

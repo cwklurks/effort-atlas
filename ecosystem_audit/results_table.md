@@ -27,7 +27,6 @@ For lm-eval GSM8K flexible extraction, six of the 111 returned real values conta
 | simple-evals | mgsm_answer_prefix | control_disqualified | 131 | 48 | 12 | 2/131 (1.526718%) | 2/2 (100.000000%) | 0/131 (0.000000%) | 2/26 (7.692308%) | 0/105 (0.000000%) | 1/28 (3.571429%) |
 | lighteval | math_extractive_match | ok | 131 | 48 | 12 | 111/131 (84.732824%) | 109/111 (98.198198%) | 2/131 (1.526718%) | 26/26 (100.000000%) | 85/105 (80.952381%) | 28/28 (100.000000%) |
 | livebench | aime_last50 | ok | 48 | 24 | 11 | `not_measured` | `not_measured` | 0/48 (0.000000%) | `not_measured` | `not_measured` | 28/28 (100.000000%) |
-| math-verify | default_parse_verify | ok | 131 | 48 | 12 | 111/131 (84.732824%) | 109/111 (98.198198%) | 3/131 (2.290076%) | 26/26 (100.000000%) | 85/105 (80.952381%) | 28/28 (100.000000%) |
 | matharena | competition_extract_and_grade | ok | 131 | 48 | 12 | 111/131 (84.732824%) | 110/111 (99.099099%) | 3/131 (2.290076%) | 26/26 (100.000000%) | 85/105 (80.952381%) | 28/28 (100.000000%) |
 
 Rows marked `control_disqualified`, `insufficient_power`, or non-runnable are retained with explicit real denominators but excluded from headline comparison. `not_measured` means the upstream task path does not expose an extracted-answer value.
@@ -47,12 +46,12 @@ Rows marked `control_disqualified`, `insufficient_power`, or non-runnable are re
 | simple-evals | mgsm_answer_prefix | 100 | 0/100 (0.000000%) | 0/100 (0.000000%) | 0/100 (0.000000%) |
 | lighteval | math_extractive_match | 100 | 100/100 (100.000000%) | 40/100 (40.000000%) | 0/100 (0.000000%) |
 | livebench | aime_last50 | 100 | `not_measured` | 40/100 (40.000000%) | 0/100 (0.000000%) |
-| math-verify | default_parse_verify | 100 | 100/100 (100.000000%) | 40/100 (40.000000%) | 0/100 (0.000000%) |
 | matharena | competition_extract_and_grade | 100 | 100/100 (100.000000%) | 40/100 (40.000000%) | 0/100 (0.000000%) |
 
-## Demoted wrong-dispatch diagnostics
+## Demoted non-headline diagnostics
 
 - `olympiad_expression` is retained for audit history but is `wrong_task_dispatch`: wrong task dispatch for AIME-shaped data; IMO/USAMO only
+- `default_parse_verify` is retained for audit history but is `generic_utility_only`: generic utility only; no task registration was imported or executed
 
 ## Headline-eligible real-data pipeline rows
 
@@ -63,7 +62,6 @@ Rows marked `control_disqualified`, `insufficient_power`, or non-runnable are re
 | helm | math_chain_of_thought | 23/131 (17.557252%) |
 | lighteval | math_extractive_match | 111/131 (84.732824%) |
 | livebench | aime_last50 | `not_measured` |
-| math-verify | default_parse_verify | 111/131 (84.732824%) |
 | matharena | competition_extract_and_grade | 111/131 (84.732824%) |
 
 ## Locked repositories
@@ -75,7 +73,7 @@ Rows marked `control_disqualified`, `insufficient_power`, or non-runnable are re
 - `inspect_ai` at `f10dc46f20df0738a9acbfb4c4be0bd3d60601ed`; `inspect_ai.scorer:match(numeric=True)`
 - `inspect_evals` at `b31daf3f6f74ce48cb905d185a4c2afc524205b2`; `inspect_evals.utils.aime_common:aime_scorer`
 - `simple-evals` at `652c89d0ca9df547706735883097e9537d40dc47`; `mgsm_eval:parse_answer + score_mgsm`
-- `lighteval` at `64f4f5ae173626509fad6e477ca4ee56ebb26129`; `lighteval.metrics.utils.extractive_match_utils:extract_target_from_pred`
+- `lighteval` at `64f4f5ae173626509fad6e477ca4ee56ebb26129`; `lighteval.metrics.metrics:Metrics.expr_gold_metric.value.compute_sample + lighteval.metrics.utils.extractive_match_utils:extract_target_from_pred`
 - `livebench` at `00eae856aa1c1a9e9d058a65a9a94d85884034c4`; `livebench.process_results.math.math_competitions.utils:aime_process_results`
 - `livebench` at `00eae856aa1c1a9e9d058a65a9a94d85884034c4`; `livebench.process_results.math.olympiad.utils:extract_expression_completions_from_generation + proof_rearrangement_process_results`
 - `math-verify` at `ba3d3aaff23b3f4cac7a14672b4f6e293d97c98b`; `math_verify:parse + verify`

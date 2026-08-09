@@ -53,7 +53,7 @@ def verify_results():
     assert {r['pipeline_id'] for r in manifest['pipelines']}==pipelines and manifest['no_model_calls'] is True
     for pipeline in manifest['pipelines']:
         env=pipeline['environment'];path=ROOT/env['lock_file'];assert path.is_file() and hashlib.sha256(path.read_bytes()).hexdigest()==env['lock_sha256']
-        assert pipeline['source_receipts'] and pipeline['dispatch_receipt_ids'] and pipeline['status'] in {'ok','insufficient_power','wrong_task_dispatch','control_disqualified','import_failed','install_failed','not_runnable'}
+        assert pipeline['source_receipts'] and pipeline['dispatch_receipt_ids'] and pipeline['status'] in {'ok','insufficient_power','wrong_task_dispatch','generic_utility_only','control_disqualified','import_failed','install_failed','not_runnable'}
     deterministic=json.loads((A/'determinism_manifest.json').read_text());assert deterministic['seed']==1729 and deterministic['independent_runs_compared']==2 and deterministic['byte_identical'] is True
     for name,digest in deterministic['sha256'].items():assert hashlib.sha256((A/name).read_bytes()).hexdigest()==digest
 

@@ -294,10 +294,10 @@
         "ok": 295
       },
       "applicability": "all scalar-gold rows; shared math-environment gold marshaling",
-      "callable": "lighteval.metrics.utils.extractive_match_utils:extract_target_from_pred",
+      "callable": "lighteval.metrics.metrics:Metrics.expr_gold_metric.value.compute_sample + lighteval.metrics.utils.extractive_match_utils:extract_target_from_pred",
       "dispatch_receipt_ids": [
-        "F027",
-        "F029"
+        "F044",
+        "F071"
       ],
       "environment": {
         "install_command": "uv venv --python 3.12.8 ecosystem_audit/_envs/lighteval && uv pip install --python ecosystem_audit/_envs/lighteval/bin/python -r ecosystem_audit/environments/lighteval.requirements.txt && uv pip install --python ecosystem_audit/_envs/lighteval/bin/python --no-deps -e ecosystem_audit/_repos/lighteval",
@@ -314,18 +314,18 @@
       "sha": "64f4f5ae173626509fad6e477ca4ee56ebb26129",
       "source_receipts": [
         {
-          "finding_id": "F027",
-          "permalink": "https://github.com/huggingface/lighteval/blob/64f4f5ae173626509fad6e477ca4ee56ebb26129/src/lighteval/tasks/tasks/aime.py#L64-L78"
+          "finding_id": "F044",
+          "permalink": "https://github.com/huggingface/lighteval/blob/64f4f5ae173626509fad6e477ca4ee56ebb26129/src/lighteval/tasks/tasks/gsm8k.py#L67-L85"
         },
         {
-          "finding_id": "F029",
-          "permalink": "https://github.com/huggingface/lighteval/blob/64f4f5ae173626509fad6e477ca4ee56ebb26129/src/lighteval/metrics/utils/extractive_match_utils.py#L590-L632"
+          "finding_id": "F071",
+          "permalink": "https://github.com/huggingface/lighteval/blob/64f4f5ae173626509fad6e477ca4ee56ebb26129/src/lighteval/metrics/utils/extractive_match_utils.py#L563-L632"
         }
       ],
       "status": "ok",
       "status_reasons": [],
       "target": "lighteval",
-      "task_or_config": "Metrics.expr_gold_metric extraction configuration",
+      "task_or_config": "src/lighteval/tasks/tasks/gsm8k.py Metrics.expr_gold_metric",
       "timeout_seconds": 10,
       "timing": "per-fixture wall duration captured in ephemeral .timings.jsonl and excluded from deterministic committed outputs"
     },
@@ -423,10 +423,12 @@
       "adapter_status_counts": {
         "ok": 295
       },
-      "applicability": "gold parses with actual Latex+Expr parser; shared math-environment gold marshaling",
+      "applicability": "gold parses with actual public default Latex+Expr parser; shared math-environment gold marshaling",
       "callable": "math_verify:parse + verify",
       "dispatch_receipt_ids": [
-        "F040"
+        "F034",
+        "F035",
+        "F036"
       ],
       "environment": {
         "install_command": "uv venv --python 3.12.8 ecosystem_audit/_envs/math_verify && uv pip install --python ecosystem_audit/_envs/math_verify/bin/python -r ecosystem_audit/environments/math_verify.requirements.txt && uv pip install --python ecosystem_audit/_envs/math_verify/bin/python --no-deps -e ecosystem_audit/_repos/math-verify",
@@ -435,7 +437,7 @@
         "lock_sha256": "2f369364c734b9177aa85870f11a2aa50f092125c6d9a5a5e21f2838a50b5cac",
         "python": "3.12.8"
       },
-      "headline_eligible": true,
+      "headline_eligible": false,
       "nonsemantic_marshaling": "text:str; scalar gold_answer:str",
       "pipeline_id": "default_parse_verify",
       "repository": "huggingface/Math-Verify",
@@ -443,14 +445,22 @@
       "sha": "ba3d3aaff23b3f4cac7a14672b4f6e293d97c98b",
       "source_receipts": [
         {
-          "finding_id": "F040",
-          "permalink": "https://github.com/huggingface/Math-Verify/blob/ba3d3aaff23b3f4cac7a14672b4f6e293d97c98b/src/math_verify/tasks.py#L167-L190"
+          "finding_id": "F034",
+          "permalink": "https://github.com/huggingface/Math-Verify/blob/ba3d3aaff23b3f4cac7a14672b4f6e293d97c98b/src/math_verify/parser.py#L649-L682"
+        },
+        {
+          "finding_id": "F035",
+          "permalink": "https://github.com/huggingface/Math-Verify/blob/ba3d3aaff23b3f4cac7a14672b4f6e293d97c98b/src/math_verify/parser.py#L700-L706"
+        },
+        {
+          "finding_id": "F036",
+          "permalink": "https://github.com/huggingface/Math-Verify/blob/ba3d3aaff23b3f4cac7a14672b4f6e293d97c98b/src/math_verify/grader.py#L755-L773"
         }
       ],
-      "status": "ok",
+      "status": "generic_utility_only",
       "status_reasons": [],
       "target": "math-verify",
-      "task_or_config": "public default Latex+Expr parser; generic isolated utility",
+      "task_or_config": "generic public utility; no task registration executed",
       "timeout_seconds": 10,
       "timing": "per-fixture wall duration captured in ephemeral .timings.jsonl and excluded from deterministic committed outputs"
     },

@@ -242,7 +242,7 @@
     },
     {
       "pipeline_id": "default_parse_verify",
-      "pipeline_status": "ok",
+      "pipeline_status": "generic_utility_only",
       "real": {
         "accidental_correct": {
           "denominator": 131,
