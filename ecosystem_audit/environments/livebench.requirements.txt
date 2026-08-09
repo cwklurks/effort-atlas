@@ -1,0 +1,2 @@
+# The two locked LiveBench post-generation task paths import only Python stdlib.
+# Python itself is pinned to 3.12.8 by adapter_manifest.json and reproduce.sh.
