@@ -8,7 +8,7 @@
     {
       "command": ".venv/bin/python -m unittest ecosystem_audit/test_round2_contract.py -v",
       "exit_status": 0,
-      "observation": "5 round-2 blocking-contract tests passed"
+      "observation": "6 round-2 blocking-contract tests passed, including semantic/path-exact receipt validation and an unrelated-F068 mutation rejection"
     },
     {
       "command": ".venv/bin/python ecosystem_audit/run_executable_audit.py --locked --seed 1729 --check",
@@ -16,14 +16,24 @@
       "observation": "two independent regenerations were byte-identical and matched committed outputs"
     },
     {
+      "command": ".venv/bin/python ecosystem_audit/validate_receipts.py",
+      "exit_status": 0,
+      "observation": "71 byte-exact code receipts validated against pinned source bytes"
+    },
+    {
       "command": ".venv/bin/python ecosystem_audit/independent_recompute.py",
       "exit_status": 0,
       "observation": "standard-library recomputation matched the committed 131-row real corpus and 12 pipeline result sets without importing the orchestrator or adapters"
     },
     {
+      "command": ".venv/bin/python ecosystem_audit/verify_phase2.py",
+      "exit_status": 0,
+      "observation": "3,540 fixture-pipeline rows verified; synthetic sha256=80329fcd2cbc3cf0056c813b931e4b20ee1e222649c52058fc9b66b875c5e834"
+    },
+    {
       "command": ".venv/bin/python ecosystem_audit/verify.py --strict",
       "exit_status": 0,
-      "observation": "10 targets, 12 pipelines, and 3,540 fixture-pipeline rows verified; full-history clones, 70 byte-exact receipts, environment locks, and timeline evidence checked"
+      "observation": "10 targets, 12 pipelines, and 3,540 fixture-pipeline rows verified; full-history clones, 71 byte-exact receipts, environment locks, and timeline evidence checked"
     },
     {
       "command": "MPLCONFIGDIR=/tmp/effort-atlas-mpl PYTHONPATH=src .venv/bin/python -m unittest discover -s tests -v",
@@ -31,8 +41,8 @@
       "observation": "40 unittest-style tests passed; pre-existing pytest-style tests/test_rescue_analysis.py was not collected"
     }
   ],
-  "completed_at": "2026-08-08T23:41:03Z",
+  "completed_at": "2026-08-09T00:16:23Z",
   "compound_gate_exit_status": 0,
-  "verified_commit": "246b3240807ca4b607809ae90c60f4fbccec00cd",
+  "verified_commit": "c666b4456fae929ba05e84d9fce40616b31c5376",
   "schema_version": 2
 }

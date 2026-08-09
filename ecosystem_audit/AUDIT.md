@@ -1075,13 +1075,15 @@ Encoding/line endings: `utf-8` / `LF`; generated file: `false`.
 
 Phase 1 receipt gate: `.venv/bin/python ecosystem_audit/validate_receipts.py` (exit 0).
 
-Recorded compound gate exit status: `0` at `2026-08-08T23:41:03Z`.
+Recorded compound gate exit status: `0` at `2026-08-09T00:16:23Z`.
 
 - `PYTHONPATH=trunccheck/src .venv/bin/python -m unittest discover -s trunccheck/tests -v` — exit `0`; 27 tests passed.
-- `.venv/bin/python -m unittest ecosystem_audit/test_round2_contract.py -v` — exit `0`; 5 round-2 blocking-contract tests passed.
+- `.venv/bin/python -m unittest ecosystem_audit/test_round2_contract.py -v` — exit `0`; 6 round-2 blocking-contract tests passed, including semantic/path-exact receipt validation and an unrelated-F068 mutation rejection.
 - `.venv/bin/python ecosystem_audit/run_executable_audit.py --locked --seed 1729 --check` — exit `0`; two independent regenerations were byte-identical and matched committed outputs.
+- `.venv/bin/python ecosystem_audit/validate_receipts.py` — exit `0`; 71 byte-exact code receipts validated against pinned source bytes.
 - `.venv/bin/python ecosystem_audit/independent_recompute.py` — exit `0`; standard-library recomputation matched the committed 131-row real corpus and 12 pipeline result sets without importing the orchestrator or adapters.
-- `.venv/bin/python ecosystem_audit/verify.py --strict` — exit `0`; 10 targets, 12 pipelines, and 3,540 fixture-pipeline rows verified; full-history clones, 70 byte-exact receipts, environment locks, and timeline evidence checked.
+- `.venv/bin/python ecosystem_audit/verify_phase2.py` — exit `0`; 3,540 fixture-pipeline rows verified; synthetic sha256=80329fcd2cbc3cf0056c813b931e4b20ee1e222649c52058fc9b66b875c5e834.
+- `.venv/bin/python ecosystem_audit/verify.py --strict` — exit `0`; 10 targets, 12 pipelines, and 3,540 fixture-pipeline rows verified; full-history clones, 71 byte-exact receipts, environment locks, and timeline evidence checked.
 - `MPLCONFIGDIR=/tmp/effort-atlas-mpl PYTHONPATH=src .venv/bin/python -m unittest discover -s tests -v` — exit `0`; 40 unittest-style tests passed; pre-existing pytest-style tests/test_rescue_analysis.py was not collected.
 
 ## Git archaeology and era comparison
