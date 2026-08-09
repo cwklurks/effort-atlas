@@ -60,10 +60,14 @@ class PhaseStatusTests(unittest.TestCase):
             "89 ordinary tests plus 26 exact-lock Tinker tests passed; "
             "private 78-row archives verified",
         )
-        self.assertEqual(phase["status"], "awaiting_merge")
+        self.assertEqual(phase["status"], "complete")
         self.assertEqual(phase["progress"], 100)
         self.assertIn("Independent statistical re-review passed", phase["gate"])
-        self.assertIn("human review and merge", phase["gate"])
+        self.assertIn("human-merged", phase["gate"])
+        phase_three = next(row for row in data["phases"] if row["id"] == 3)
+        self.assertEqual(data["project"]["current_phase"], 3)
+        self.assertEqual(phase_three["status"], "in_progress")
+        self.assertIn("smoke-before-freeze", phase_three["gate"])
         for statement in (fireworks_entry["result"], fireworks_decision):
             self.assertIn("Fireworks ZDR", statement)
             self.assertIn("development-only", statement)

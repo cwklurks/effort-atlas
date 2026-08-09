@@ -5,8 +5,8 @@
     "paper": "Thinking Cut Short",
     "repository": "cwklurks/effort-atlas",
     "updated": "2026-08-08",
-    "current_phase": 2,
-    "summary": "Phase 2 is independently approved after remediation and awaits human review and merge of PR #3."
+    "current_phase": 3,
+    "summary": "Phase 2 is merged; Phase 3 is auditing methodology choices and the preregistration-versus-smoke sequencing conflict."
   },
   "safety": {
     "confirmatory_calls": 0,
@@ -35,18 +35,18 @@
     {
       "id": 2,
       "name": "Grader and analysis integration",
-      "status": "awaiting_merge",
+      "status": "complete",
       "progress": 100,
       "summary": "Grader v2 and analysis are integrated and independently approved after transition, calibration, and rescue-validation remediation.",
-      "gate": "Independent statistical re-review passed; human review and merge of PR #3 remain."
+      "gate": "Independent statistical re-review passed and PR #3 was human-merged."
     },
     {
       "id": 3,
       "name": "Methodology and preregistration freeze",
-      "status": "blocked",
-      "progress": 0,
-      "summary": "Settle supervisor decisions and freeze prompts, routes, schedules, estimands, seeds, and hashes.",
-      "gate": "All confirmatory choices fixed before outcomes exist."
+      "status": "in_progress",
+      "progress": 10,
+      "summary": "Audit every unresolved scientific, route, budget, and artifact choice before drafting the new REAP preregistration.",
+      "gate": "Explicit supervisor decisions and a safe resolution of the smoke-before-freeze sequencing conflict."
     },
     {
       "id": 4,
@@ -112,11 +112,11 @@
     {
       "id": "D",
       "name": "Pre-data analysis layer",
-      "status": "awaiting_merge",
+      "status": "complete",
       "branch": "codex/analysis-layer",
       "pr": 3,
       "owner_model": "gpt-5.6-sol / XHigh",
-      "next": "Human review and merge of independently approved PR #3."
+      "next": "Merged to main at 7c83085; analysis interfaces now constrain the Phase 3 preregistration."
     },
     {
       "id": "E",
@@ -186,6 +186,12 @@
     }
   ],
   "activity": [
+    {
+      "date": "2026-08-08",
+      "phase": 3,
+      "title": "Phase 3 methodology gate started",
+      "detail": "PR #3 was human-merged. Read-only audits are inventorying supervisor decisions, freeze artifacts, route and budget facts, and the conflict between preregistration-first and smoke-before-freeze instructions."
+    },
     {
       "date": "2026-08-08",
       "phase": 2,
@@ -260,6 +266,7 @@
     }
   ],
   "decisions": [
+    "PR #3 was human-merged at 7c83085 before Phase 3 began; Codex did not merge it.",
     "PRs #4, #1, #2, and #5 were human-merged before Phase 2 integration; Codex did not merge them.",
     "Tinker 0.25.0 live probes are blocked because the pinned SDK resubmits internally.",
     "DeepSeek V4 Flash is selected through the Fireworks ZDR development-only lane but remains disabled until its route configuration and hard dollar ceiling are committed.",

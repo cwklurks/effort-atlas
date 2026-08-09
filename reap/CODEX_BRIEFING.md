@@ -16,7 +16,7 @@ Point any new Codex session at this file first: **"Read reap/CODEX_BRIEFING.md a
 | 6 | `PREREGISTRATION.md` + `PREREGISTRATION_AMENDMENT_2026-07-22.md` | **FROZEN. Never edit.** Read to understand what is already committed. |
 | 7 | `reap/REVIEW_PR1_ECOSYSTEM_AUDIT.md` | Red-team review of PR #1 and its 8 blocking fixes. |
 | 8 | `observational/RESULTS.md` + `observational/pipeline.py` + `observational/INPUT_PROVENANCE.md` | The free observational study (done, verified). Pipeline is pinned — agents run it, never rewrite its statistics. Input acquisition is not yet clean-checkout reproducible. |
-| 9 | `src/effort_atlas/` + `tests/` | Existing code. `confirmatory.py`, strict grader v2, and the pre-data analysis layer are integrated and independently approved on PR #3 pending human merge. |
+| 9 | `src/effort_atlas/` + `tests/` | Existing code. `confirmatory.py`, strict grader v2, and the independently approved pre-data analysis layer are merged. Phase 3 methodology and preregistration are now the active gate. |
 
 ## 2. Project state, in one screen
 
@@ -24,7 +24,7 @@ Point any new Codex session at this file first: **"Read reap/CODEX_BRIEFING.md a
 
 **What exists and works:** the frozen Phase-I preregistration + one dated amendment ($0 confirmatory spend, ever); the offline confirmatory preflight (hash-chained AttemptLedger, seeded/hashed schedules, receipt reconciliation); the cap-semantics and observational studies; and independently reviewed Phase-1 implementations for the ecosystem audit, strict grader v2, and fail-closed Tinker probe. Grader v2 reproducibly identifies all 78 archived 4,096-token rows as unanswered with no raw response text committed. The ecosystem audit's real-only table, uniform control gate, receipts, and synthetic separation are independently recomputed. The Tinker probe's dry-run plan is safe, but pinned SDK 0.25.0 is proven to resubmit and its live path therefore blocks before client construction.
 
-**What is integrated and independently approved:** the Phase-2 grader + analysis baseline on PR #3. It preserves strict terminator-only grading, replaces replicate-index transition pairing with item-level sufficient statistics and independent-draw expected mass, includes every valid large-cap completion length in cap-calibration references, validates rescue rows through grader v2, and requires separate ordinary and exact-lock Tinker verification environments. Initial review blockers were remediated and the final adversarial re-review passed; human merge remains.
+**What is integrated and independently approved:** the Phase-2 grader + analysis baseline is merged. It preserves strict terminator-only grading, replaces replicate-index transition pairing with item-level sufficient statistics and independent-draw expected mass, includes every valid large-cap completion length in cap-calibration references, validates rescue rows through grader v2, and requires separate ordinary and exact-lock Tinker verification environments. Initial review blockers were remediated and the final adversarial re-review passed.
 
 **What does NOT exist yet:** a paid runner; executable budget gates; a frozen REAP preregistration; or settled live Tinker/OpenAI smoke facts. Nothing confirmatory can run until those gates close. No current Tinker SDK path satisfies the zero-resubmission rule, so human smoke is blocked rather than merely unscheduled.
 
@@ -40,7 +40,7 @@ Point any new Codex session at this file first: **"Read reap/CODEX_BRIEFING.md a
 | A — `codex/ecosystem-audit`, PR #1 | merged at accepted `303263e` implementation | headline limitations remain mandatory reporting context |
 | B — `codex/grader-v2`, PR #2 | merged at accepted `9a54f17`; 78-row archive verifier passes | integrated with D without weakening extraction semantics |
 | C — `codex/tinker-probe`, PR #5 | merged at accepted `3331dc1`; dry-run safe | live intentionally blocked because Tinker 0.25.0 cannot guarantee one submission; no empirical fact is settled |
-| D — `codex/analysis-layer`, PR #3 | independently approved after remediation; item-level transitions, complete reference denominators, shared rescue validation, and split verifier pass | human review and merge |
+| D — `codex/analysis-layer`, PR #3 | independently approved after remediation and merged at `7c83085` | complete; Phase 3 methodology decisions are now active |
 | E — `codex/runner` | not implemented | waits on accepted grader interfaces, frozen design inputs, and corrected budget math |
 
 The current phase-gate and model-routing plan is in
@@ -60,7 +60,7 @@ The current phase-gate and model-routing plan is in
 
 ## 4. Task queue
 
-Phase 1 is merged and Phase 2 is independently approved. Current gate order: **human merge of PR #3 → preregistration freeze → E runner → human smoke → confirmatory collection**. The original task specifications remain below as historical acceptance contracts.
+Phases 1 and 2 are merged. Current gate order: **resolve Phase 3 methodology and smoke/freeze sequencing → freeze REAP preregistration → E runner → human smoke → confirmatory collection**. The original task specifications remain below as historical acceptance contracts.
 
 Rationale: B, C, D, E are the critical path to the study being *allowed to run*; A is a parallel paper contribution whose Phase-1 half is already citable.
 
