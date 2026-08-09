@@ -6,7 +6,7 @@
     "repository": "cwklurks/effort-atlas",
     "updated": "2026-08-08",
     "current_phase": 1,
-    "summary": "Task A is in implementation; Tasks B and C are remediating adversarial-review findings."
+    "summary": "All three workstreams have checkpoints; A is fixing receipt provenance while B and C are in re-review."
   },
   "safety": {
     "confirmatory_calls": 0,
@@ -28,8 +28,8 @@
       "id": 1,
       "name": "Close existing workstreams",
       "status": "in_progress",
-      "progress": 60,
-      "summary": "Task A is being repaired; grader-v2 and Tinker-probe checkpoints are in review remediation.",
+      "progress": 78,
+      "summary": "B and C remediations are pushed; A is correcting its last receipt-to-path provenance defect.",
       "gate": "A is citable, B is accepted, and C is safe for later human smoke execution."
     },
     {
@@ -89,7 +89,7 @@
       "branch": "codex/ecosystem-audit",
       "pr": 1,
       "owner_model": "gpt-5.6-sol / XHigh",
-      "next": "Implement and independently verify all eight blocking fixes."
+      "next": "Correct two receipt-to-path mappings, add a mutation-killing contract test, and re-review."
     },
     {
       "id": "B",
@@ -98,7 +98,7 @@
       "branch": "codex/grader-v2",
       "pr": 2,
       "owner_model": "gpt-5.6-sol / High",
-      "next": "Kill surviving line-anchor/comparator mutations and raise acceptance coverage."
+      "next": "Independent re-review of remediation commit 9a54f17."
     },
     {
       "id": "C",
@@ -107,7 +107,7 @@
       "branch": "codex/tinker-probe",
       "pr": 5,
       "owner_model": "gpt-5.6-sol / High",
-      "next": "Eliminate SDK resubmission risk and add write-ahead, fail-closed attempt evidence."
+      "next": "Independent re-review of fail-closed remediation commit 3331dc1."
     },
     {
       "id": "D",
@@ -141,8 +141,8 @@
     },
     {
       "label": "Grader-v2 adversarial review",
-      "result": "Changes requested: two surviving test mutations",
-      "status": "attention"
+      "result": "Remediated at 9a54f17: 20 / 20 focused, 60 / 60 full, mutations killed",
+      "status": "passed"
     },
     {
       "label": "Tinker-probe builder checkpoint",
@@ -151,7 +151,12 @@
     },
     {
       "label": "Tinker-probe adversarial review",
-      "result": "Changes requested: retry guarantee and write-ahead evidence blockers",
+      "result": "Remediated at 3331dc1: 26 / 26; live fails closed before client construction",
+      "status": "passed"
+    },
+    {
+      "label": "Ecosystem-audit adversarial review",
+      "result": "Changes requested: two receipt-to-path provenance mappings",
       "status": "attention"
     },
     {
@@ -176,6 +181,18 @@
     }
   ],
   "activity": [
+    {
+      "date": "2026-08-08",
+      "phase": 1,
+      "title": "A entered narrow provenance remediation",
+      "detail": "Independent recomputation accepted seven fix areas but found two declared task paths backed by non-matching upstream receipts. PR #1 remains unaccepted pending correction and mutation review."
+    },
+    {
+      "date": "2026-08-08",
+      "phase": 1,
+      "title": "B and C review blockers remediated",
+      "detail": "Grader-v2 now kills both surviving mutations. Tinker 0.25.0 proved unsafe for one-submission execution, so the live path now records the block and exits before client construction."
+    },
     {
       "date": "2026-08-08",
       "phase": 1,
