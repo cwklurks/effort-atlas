@@ -13,10 +13,11 @@ Point any new Codex session at this file first: **"Read reap/CODEX_BRIEFING.md a
 | 3 | `reap/claude_project/PROJECT_BRIEF.md` | Canonical state: people, history, funding, positioning. |
 | 4 | `reap/01_EXPERIMENT_OUTLINE_v2.md` | The experiment design under review by the supervisor. |
 | 5 | `reap/08_HYPERPARAMETER_DECISIONS.md` | Every knob, its verified facts, what's UNVERIFIED and must be probed. |
-| 6 | `PREREGISTRATION.md` + `PREREGISTRATION_AMENDMENT_2026-07-22.md` | **FROZEN. Never edit.** Read to understand what is already committed. |
-| 7 | `reap/REVIEW_PR1_ECOSYSTEM_AUDIT.md` | Red-team review of PR #1 and its 8 blocking fixes. |
-| 8 | `observational/RESULTS.md` + `observational/pipeline.py` + `observational/INPUT_PROVENANCE.md` | The free observational study (done, verified). Pipeline is pinned — agents run it, never rewrite its statistics. Input acquisition is not yet clean-checkout reproducible. |
-| 9 | `src/effort_atlas/` + `tests/` | Existing code. `confirmatory.py`, strict grader v2, and the independently approved pre-data analysis layer are merged. Phase 3 methodology and preregistration are now the active gate. |
+| 6 | `reap/11_PHASE3_DECISION_PACKET_2026-08-08.md` | Independently reviewed Phase-3 recommendations and D01-D15 approval form. Every choice is advisory and human-pending. |
+| 7 | `PREREGISTRATION.md` + `PREREGISTRATION_AMENDMENT_2026-07-22.md` | **FROZEN. Never edit.** Read to understand what is already committed. |
+| 8 | `reap/REVIEW_PR1_ECOSYSTEM_AUDIT.md` | Red-team review of PR #1 and its 8 blocking fixes. |
+| 9 | `observational/RESULTS.md` + `observational/pipeline.py` + `observational/INPUT_PROVENANCE.md` | The free observational study (done, verified). Pipeline is pinned — agents run it, never rewrite its statistics. Input acquisition is not yet clean-checkout reproducible. |
+| 10 | `src/effort_atlas/` + `tests/` | Existing code. `confirmatory.py`, strict grader v2, and the independently approved pre-data analysis layer are merged. Phase 3 methodology and preregistration are now the active gate. |
 
 ## 2. Project state, in one screen
 
@@ -28,9 +29,26 @@ Point any new Codex session at this file first: **"Read reap/CODEX_BRIEFING.md a
 
 **What does NOT exist yet:** a paid runner; executable budget gates; a frozen REAP preregistration; or settled live Tinker/OpenAI smoke facts. Nothing confirmatory can run until those gates close. No current Tinker SDK path satisfies the zero-resubmission rule, so human smoke is blocked rather than merely unscheduled.
 
+**Current Phase-3 checkpoint:** the advisory decision packet at
+`reap/11_PHASE3_DECISION_PACKET_2026-08-08.md` passed independent review at
+`2b9b161`, including independent cost recomputation and 19/19 killed contract
+mutations. Its D01-D15 choices remain human-pending and authorize no call. The
+recommended sequence is to freeze the scientific design plus explicit
+activation-or-omission rules, implement the runner, and then allow human smoke to
+activate an unchanged panel or omit it. Route or model substitution is forbidden.
+
 **Funding:** $5,000 Tinker credits + ~$200 OpenAI (supervisor) + <$100 OpenRouter. Platform-scoped pools, never mixed. Cost model and gates in `reap/02_BUDGET_AND_COSTS.md`.
 
 **Development model routing:** DeepSeek V4 Flash is selected through Fireworks ZDR for bounded development work, but remains disabled until a development-only configuration and hard dollar ceiling are committed. It never supplies scientific or financial verification.
+
+**Corrected route and budget bounds:** standard Tinker GPT-OSS-120B has a 32K
+context; its 128K PEFT route is distinct and more expensive. Standard Inkling has a
+64K context, so 64K cannot be treated as an output allowance on a nonempty prompt.
+The earlier 90-item Tinker and n=28 OpenAI plans are expected-cost sketches, not
+safe worst-case ceilings. The reviewed packet instead proposes exact schedules
+whose recomputed pre-smoke maxima are $1,492.1761 for P1, $187.0258 for P2, and
+$125.8291 for P3; these remain planning values until human approval and a frozen
+price/route manifest.
 
 **Branch / PR state as of 2026-08-08:**
 
@@ -44,7 +62,8 @@ Point any new Codex session at this file first: **"Read reap/CODEX_BRIEFING.md a
 | E — `codex/runner` | not implemented | waits on accepted grader interfaces, frozen design inputs, and corrected budget math |
 
 The current phase-gate and model-routing plan is in
-`reap/10_PHASE_GATE_PLAN_2026-08-08.md`.
+`reap/10_PHASE_GATE_PLAN_2026-08-08.md`; the current human decision surface is
+`reap/11_PHASE3_DECISION_PACKET_2026-08-08.md`.
 
 ## 3. The laws (repeated because they are load-bearing)
 
@@ -60,7 +79,10 @@ The current phase-gate and model-routing plan is in
 
 ## 4. Task queue
 
-Phases 1 and 2 are merged. Current gate order: **resolve Phase 3 methodology and smoke/freeze sequencing → freeze REAP preregistration → E runner → human smoke → confirmatory collection**. The original task specifications remain below as historical acceptance contracts.
+Phases 1 and 2 are merged. Current gate order: **human D01-D15 decisions → freeze
+the scientific design and activation-or-omission rules → E runner → human smoke →
+activate an unchanged panel or omit it → confirmatory collection**. The original
+task specifications remain below as historical acceptance contracts.
 
 Rationale: B, C, D, E are the critical path to the study being *allowed to run*; A is a parallel paper contribution whose Phase-1 half is already citable.
 

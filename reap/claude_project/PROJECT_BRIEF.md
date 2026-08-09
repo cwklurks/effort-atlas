@@ -40,13 +40,24 @@ Panels: P1 Inkling/Tinker (continuous effort scalar — unique), P2 GPT-OSS-120B
   the final independent re-review passed and PR #3 is merged.
 - DeepSeek V4 Flash is selected through Fireworks ZDR for bounded development only,
   but remains disabled until its configuration and hard dollar ceiling are committed.
+- The advisory Phase-3 decision packet has passed independent technical review at
+  `2b9b161`, including exact arm/cost recomputation and 19/19 killed contract
+  mutations. All D01-D15 choices remain human-pending and authorize no call.
+- The packet corrects two unsafe planning assumptions: standard Tinker GPT-OSS-120B
+  is a 32K-context route, and standard Inkling's 64K context cannot hold a literal
+  64K output plus a nonempty prompt. Earlier expected-cost sketches are not hard
+  budget gates. The proposed exact pre-smoke maxima are $1,492.1761 for P1,
+  $187.0258 for P2, and $125.8291 for P3, pending human approval and frozen route
+  and price evidence.
 - The runner and executable budget gates do not exist yet.
 - No paid REAP smoke or confirmatory call has run. Tinker cap semantics, omitted-cap
   cost bounds, sample independence, and OpenAI usage accounting remain unresolved.
 
-Next gates: settle supervisor decisions and the smoke-versus-freeze ordering;
-freeze REAP preregistration v2; implement and red-team
-the runner; then allow human-initiated smoke calls. See
+Next gates: obtain explicit human choices for D01-D15 in
+`../11_PHASE3_DECISION_PACKET_2026-08-08.md`; freeze the scientific design and
+fail-closed activation-or-omission rules; implement and red-team the runner; then
+allow human-initiated smoke calls. Smoke may activate an unchanged frozen panel or
+omit it, never substitute a route or silently redesign the study. See
 `../10_PHASE_GATE_PLAN_2026-08-08.md`.
 
 ## Vocabulary

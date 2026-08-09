@@ -6,7 +6,7 @@
     "repository": "cwklurks/effort-atlas",
     "updated": "2026-08-08",
     "current_phase": 3,
-    "summary": "Phase 2 is merged; Phase 3 is auditing methodology choices and the preregistration-versus-smoke sequencing conflict."
+    "summary": "Phase 2 is merged; the independently reviewed Phase 3 decision packet is ready for human D01-D15 choices."
   },
   "safety": {
     "confirmatory_calls": 0,
@@ -44,9 +44,9 @@
       "id": 3,
       "name": "Methodology and preregistration freeze",
       "status": "in_progress",
-      "progress": 10,
-      "summary": "Audit every unresolved scientific, route, budget, and artifact choice before drafting the new REAP preregistration.",
-      "gate": "Explicit supervisor decisions and a safe resolution of the smoke-before-freeze sequencing conflict."
+      "progress": 30,
+      "summary": "The advisory decision packet passed independent review; its exact scientific, route, budget, and activation defaults are ready for human selection.",
+      "gate": "Explicit human choices for D01-D15; packet recommendations authorize no call and no route substitution."
     },
     {
       "id": 4,
@@ -130,6 +130,11 @@
   ],
   "verification": [
     {
+      "label": "Phase 3 decision-packet adversarial review",
+      "result": "Approved at 2b9b161: 11 focused checks passed, costs independently recomputed, and 19 / 19 mutations killed",
+      "status": "passed"
+    },
+    {
       "label": "Phase 2 approved canonical suite",
       "result": "89 ordinary tests plus 26 exact-lock Tinker tests passed; private 78-row archives verified",
       "status": "passed"
@@ -186,6 +191,12 @@
     }
   ],
   "activity": [
+    {
+      "date": "2026-08-08",
+      "phase": 3,
+      "title": "Phase 3 decision packet approved",
+      "detail": "The advisory D01-D15 packet passed independent technical review with exact cost recomputation and 19/19 killed mutations. Human choices remain pending; no provider, paid smoke, or confirmatory call was authorized."
+    },
     {
       "date": "2026-08-08",
       "phase": 3,
@@ -266,6 +277,7 @@
     }
   ],
   "decisions": [
+    "The reviewed D01-D15 recommendations are advisory, remain human-pending, and authorize no calls; smoke may only activate an unchanged frozen panel or omit it.",
     "PR #3 was human-merged at 7c83085 before Phase 3 began; Codex did not merge it.",
     "PRs #4, #1, #2, and #5 were human-merged before Phase 2 integration; Codex did not merge them.",
     "Tinker 0.25.0 live probes are blocked because the pinned SDK resubmits internally.",

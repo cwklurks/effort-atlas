@@ -38,7 +38,7 @@ class PhaseStatusTests(unittest.TestCase):
         self.assertEqual(data["safety"]["paid_smoke_calls"], 0)
         self.assertEqual(data["safety"]["frozen_artifact_changes"], 0)
 
-    def test_status_records_phase_two_approval_checkpoint_and_zdr_gate(self):
+    def test_status_records_phase_three_decision_checkpoint_and_zdr_gate(self):
         data = json.loads(SOURCE.read_text())
         checkpoint = next(
             row
@@ -54,6 +54,11 @@ class PhaseStatusTests(unittest.TestCase):
         fireworks_decision = next(
             decision for decision in data["decisions"] if "Fireworks ZDR" in decision
         )
+        phase_three_checkpoint = next(
+            row
+            for row in data["verification"]
+            if row["label"] == "Phase 3 decision-packet adversarial review"
+        )
 
         self.assertEqual(
             checkpoint["result"],
@@ -67,7 +72,19 @@ class PhaseStatusTests(unittest.TestCase):
         phase_three = next(row for row in data["phases"] if row["id"] == 3)
         self.assertEqual(data["project"]["current_phase"], 3)
         self.assertEqual(phase_three["status"], "in_progress")
-        self.assertIn("smoke-before-freeze", phase_three["gate"])
+        self.assertEqual(phase_three["progress"], 30)
+        self.assertIn("D01-D15", phase_three["gate"])
+        self.assertIn("human", phase_three["gate"].lower())
+        self.assertIn("2b9b161", phase_three_checkpoint["result"])
+        self.assertIn("19 / 19 mutations", phase_three_checkpoint["result"])
+        self.assertEqual(phase_three_checkpoint["status"], "passed")
+        decision_record = next(
+            decision
+            for decision in data["decisions"]
+            if "D01-D15" in decision
+        )
+        self.assertIn("advisory", decision_record)
+        self.assertIn("authorize no calls", decision_record)
         for statement in (fireworks_entry["result"], fireworks_decision):
             self.assertIn("Fireworks ZDR", statement)
             self.assertIn("development-only", statement)

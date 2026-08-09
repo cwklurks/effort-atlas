@@ -90,11 +90,12 @@ budget gates, and the REAP preregistration are complete and frozen.
 
 Phase 0 governance, Phase 1 Tasks A-C, and the independently reviewed Phase 2
 grader-analysis integration are merged. Phase 3 is the current gate: settle every
-supervisor decision and freeze a new REAP preregistration without changing the
-Phase-I frozen record. The later critical path is Task E's runner/budget gates. Do not begin E until
-the integrated grader-analysis interfaces are accepted and the required design
-inputs are frozen; do not run any smoke or confirmatory call until the later human
-gate opens.
+supervisor decision in `reap/11_PHASE3_DECISION_PACKET_2026-08-08.md`, then freeze
+a new REAP preregistration without changing the Phase-I frozen record. The packet
+has passed independent technical review, but every D01-D15 choice remains advisory
+and human-pending. The later critical path is Task E's runner/budget gates. Do not
+begin E until the required design inputs are frozen; do not run any smoke or
+confirmatory call until the later human gate opens.
 
 The canonical project/task state lives in `reap/CODEX_BRIEFING.md`; update that file
 when the state materially changes, without rewriting frozen historical records.
