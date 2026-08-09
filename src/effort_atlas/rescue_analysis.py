@@ -15,22 +15,20 @@ from collections import Counter
 from pathlib import Path
 
 from . import ROOT
+from .graders import validate_grade_state
 
 
 NORMAL_FINISH_REASONS = {"stop", "complete", "completed"}
 
 
 def _validate_extraction_contract(row: dict, *, label: str) -> None:
-    present = row.get("extracted_answer_present")
-    answer = row.get("extracted_answer")
-    if type(present) is not bool:
-        raise ValueError(f"{label} row is missing boolean extracted_answer_present")
-    if present and (not isinstance(answer, str) or not answer.strip()):
-        raise ValueError(f"{label} row requires a nonempty extracted_answer string")
-    if not present and answer is not None:
-        raise ValueError(f"{label} row requires extracted_answer=null when absent")
-    if row.get("correct") is True and not present:
-        raise ValueError(f"{label} row is correct without an extracted answer")
+    reason = validate_grade_state(
+        correct=row.get("correct"),
+        extracted_answer_present=row.get("extracted_answer_present"),
+        extracted_answer=row.get("extracted_answer"),
+    )
+    if reason is not None:
+        raise ValueError(f"{label} row violates grader-v2 contract: {reason}")
 
 
 def read_real_rows(directory: Path) -> list[dict]:
@@ -98,20 +96,20 @@ def classify_pairs(
             status = "still_censored"
         elif (
             str(new.get("finish_reason")).lower() in NORMAL_FINISH_REASONS
-            and bool(new.get("correct"))
+            and new["correct"]
             and not old["extracted_answer_present"]
         ):
             status = "primary_answer_rescue"
         elif (
             str(new.get("finish_reason")).lower() in NORMAL_FINISH_REASONS
-            and bool(new.get("correct"))
+            and new["correct"]
             and old["extracted_answer_present"]
-            and not bool(old.get("correct"))
+            and not old["correct"]
         ):
             status = "answer_present_grade_transition"
         elif (
             str(new.get("finish_reason")).lower() in NORMAL_FINISH_REASONS
-            and bool(new.get("correct"))
+            and new["correct"]
         ):
             status = "completed_correct_no_rescue"
         elif str(new.get("finish_reason")).lower() in NORMAL_FINISH_REASONS:
@@ -122,11 +120,11 @@ def classify_pairs(
             {
                 "item_id": item_id,
                 "status": status,
-                "old_correct": bool(old.get("correct")),
+                "old_correct": old["correct"],
                 "old_extracted_answer_present": old["extracted_answer_present"],
                 "old_extracted_answer": old["extracted_answer"],
                 "old_completion_tokens": old.get("completion_tokens"),
-                "new_correct": None if new is None else bool(new.get("correct")),
+                "new_correct": None if new is None else new["correct"],
                 "new_extracted_answer_present": (
                     None if new is None else new["extracted_answer_present"]
                 ),

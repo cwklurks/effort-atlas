@@ -570,31 +570,6 @@ def item_clustered_bootstrap(
     }
 
 
-def _rescue_status(small: dict[str, Any], large: dict[str, Any]) -> str:
-    if (
-        _is_length_stop(small)
-        and not small["extracted_answer_present"]
-        and _is_normal_stop(large)
-        and large["correct"]
-    ):
-        return "primary_answer_rescue"
-    if (
-        _is_length_stop(small)
-        and small["extracted_answer_present"]
-        and not small["correct"]
-        and _is_normal_stop(large)
-        and large["correct"]
-    ):
-        return "answer_present_grade_transition"
-    if not _is_length_stop(small):
-        return "smaller_cap_not_length_stopped"
-    if _is_length_stop(large):
-        return "still_length_stopped"
-    if _is_normal_stop(large) and not large["correct"]:
-        return "larger_cap_completed_wrong"
-    return "other_terminal_transition"
-
-
 def paired_cap_transitions(
     rows: Iterable[dict[str, Any]],
     *,
@@ -825,9 +800,7 @@ def cap_invariance_calibration(
         reference_rows = [
             row for row in records if row["effort"] == effort and row["cap"] == reference_cap
         ]
-        reference_lengths = [
-            row["completion_tokens"] for row in reference_rows if not _is_length_stop(row)
-        ]
+        reference_lengths = [row["completion_tokens"] for row in reference_rows]
         reference_length_stops = sum(_is_length_stop(row) for row in reference_rows)
         for cap in target_caps:
             observed_rows = [
@@ -851,8 +824,8 @@ def cap_invariance_calibration(
                     "effort": effort,
                     "reference_cap": reference_cap,
                     "cap": cap,
-                    "reference_n_completed": len(reference_lengths),
-                    "reference_length_stops_excluded": reference_length_stops,
+                    "reference_n": len(reference_lengths),
+                    "reference_length_stops": reference_length_stops,
                     "observed_n": len(observed_rows),
                     "predicted_truncation_rate": predicted,
                     "observed_truncation_rate": observed,
@@ -973,8 +946,8 @@ def analyze_confirmatory_rows(
             "cap_transition_pairing": "item_id_empirical_marginal_outer_product",
             "cap_transition_interpretation": "expected_item_mass_not_observed_continuations",
             "cap_transition_scope": "all_ordered_cap_pairs",
-            "reference_length_distribution": "empirical_completed_lengths_at_largest_cap",
-            "reference_length_stops": "excluded_and_counted",
+            "reference_length_distribution": "empirical_completion_lengths_for_all_valid_rows_at_largest_cap",
+            "reference_length_stops": "included_as_observed_length_floors",
             "reference_truncation_rule": "completion_tokens_strictly_greater_than_cap",
             "default_calibration": "two_sample_ks_on_shared_support_at_or_below_target_cap",
         },

@@ -404,6 +404,58 @@ class ConfirmatoryAnalysisTests(unittest.TestCase):
             0.75,
         )
 
+    def test_cap_invariance_reference_includes_certainly_truncated_length_stops(self):
+        reference_stop = result_row(
+            "r-stop",
+            "low",
+            16,
+            1,
+            False,
+            finish_reason="length",
+            completion_tokens=16,
+            extracted_answer_present=False,
+        )
+        rows = [
+            result_row("r-short", "low", 16, 1, True, completion_tokens=2),
+            reference_stop,
+            result_row(
+                "s-stop",
+                "low",
+                8,
+                1,
+                False,
+                finish_reason="length",
+                completion_tokens=8,
+                extracted_answer_present=False,
+            ),
+        ]
+
+        row = cap_invariance_calibration(rows, reference_cap=16, caps=[8])[0]
+        relabeled = cap_invariance_calibration(
+            [
+                rows[0],
+                {
+                    **reference_stop,
+                    "finish_reason": "stop",
+                    "extracted_answer_present": True,
+                    "extracted_answer": "0",
+                },
+                rows[2],
+            ],
+            reference_cap=16,
+            caps=[8],
+        )[0]
+
+        self.assertEqual(row["reference_n"], 2)
+        self.assertEqual(row["reference_length_stops"], 1)
+        self.assertEqual(row["predicted_truncation_rate"], 0.5)
+        self.assertEqual(row["observed_truncation_rate"], 1.0)
+        self.assertEqual(row["absolute_rate_error"], 0.5)
+        self.assertEqual(
+            row["predicted_truncation_rate"],
+            relabeled["predicted_truncation_rate"],
+        )
+
     def test_cap_invariance_strategy_can_be_swapped_without_changing_callers(self):
         class ExactStrategy:
             name = "exact-test-strategy"

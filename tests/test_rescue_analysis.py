@@ -77,6 +77,30 @@ class RescueAnalysisTests(unittest.TestCase):
             ["primary_answer_rescue", "unaccounted_stream", "missing"],
         )
 
+    def test_smaller_cap_rows_reject_non_boolean_grades_before_classification(self):
+        for malformed in (1, None, "false"):
+            with self.subTest(correct=malformed):
+                old = old_row("a", extracted_answer_present=True)
+                old["correct"] = malformed
+
+                with self.assertRaisesRegex(ValueError, "malformed_correct"):
+                    classify_pairs([old], [rescue_row("a")], "math", "max", 20000)
+
+    def test_larger_cap_rows_reject_non_boolean_grades_before_classification(self):
+        for malformed in (1, None, "true"):
+            with self.subTest(correct=malformed):
+                rescue = rescue_row("a")
+                rescue["correct"] = malformed
+
+                with self.assertRaisesRegex(ValueError, "malformed_correct"):
+                    classify_pairs(
+                        [old_row("a", extracted_answer_present=False)],
+                        [rescue],
+                        "math",
+                        "max",
+                        20000,
+                    )
+
 
 if __name__ == "__main__":
     unittest.main()
