@@ -49,6 +49,9 @@ class PhaseStatusTests(unittest.TestCase):
         self.assertTrue({"main", "phases", "workstreams", "verification", "activity"} <= parser.ids)
         self.assertIn('aria-live="polite"', rendered)
         self.assertIn('aria-label="Safety counters"', rendered)
+        self.assertIn(
+            'progress.setAttribute("aria-label", `Phase ${phase.id} progress`);', rendered
+        )
         self.assertIn('prefers-reduced-motion', rendered)
 
     def test_renderer_rejects_multiple_active_phases(self):

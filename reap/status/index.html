@@ -305,6 +305,7 @@
         const fill = node("span");
         fill.style.width = `${phase.progress}%`;
         progress.setAttribute("role", "progressbar");
+        progress.setAttribute("aria-label", `Phase ${phase.id} progress`);
         progress.setAttribute("aria-valuenow", phase.progress);
         progress.setAttribute("aria-valuemin", "0");
         progress.setAttribute("aria-valuemax", "100");
