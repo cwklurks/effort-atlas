@@ -1,6 +1,6 @@
 # PROJECT_BRIEF — canonical state of REAP / Thinking Cut Short
 
-**Last updated: 2026-08-08. Update this file whenever project state changes; it is the single source of truth for Claude Project chats.**
+**Last updated: 2026-08-10. Update this file whenever project state changes; it is the single source of truth for Claude Project chats.**
 
 ## People and roles
 
@@ -22,17 +22,18 @@ Benchmarks impose output-token walls. Walls delete final answers mid-reasoning; 
 
 ## REAP (Phase II) design summary
 
-The current proposal is advisory and human-pending; exact choices D01-D15 are in
-`../11_PHASE3_DECISION_PACKET_2026-08-08.md`. It keeps P1 Inkling/Tinker, P2
-GPT-OSS-120B/Tinker, P3 gpt-5.6-terra/OpenAI, and P0 OpenRouter debug-only, but
-samples Arms A/B/C independently and requires `arm_key` everywhere. P1/P2 use 60
-HMMT 2025+2026 items; P3 uses the overlapping 30 HMMT-2026 items. Arm A is the
-replicated 2×2, Arm B is dose-response, and Arm C is a panel-specific large-cap
-reference: 49,152 for standard Inkling and 20,000 for standard GPT-OSS-120B. P3
-currently includes Arm A only. Recomputed pre-smoke maxima are $1,492.1761 for P1,
-$187.0258 for P2, and $125.8291 for P3, subject to frozen route, price, prompt, and
-schedule evidence. Earlier 64K-output and approximately $1,030 sketches are
-superseded and are not execution or budget gates. Preregistration v2 must freeze
+The reviewed proposal remains advisory and human-pending; D01-D15 are in
+`../11_PHASE3_DECISION_PACKET_2026-08-08.md`, and Connor's current choices,
+alternatives, and open questions are recorded in the non-frozen
+`../12_PHASE3_CONNOR_DECISION_WORKSHEET_2026-08-10.md`. Connor supports separate
+A/B/C samples with `arm_key`, standard 32K GPT-OSS-120B, a planned shared 30-of-33
+HMMT-2026 subset, Terra in principle, and descriptive/bootstrapped primary
+statistics. He accepts standard Inkling's recommended effort/cap direction but has
+reopened its 30-versus-60 scope and allocation along with the broader Tinker
+portfolio, H6 rule, exact prompt, batching, final model roster, and DeepSeek gate.
+Arm C remains a panel-specific large-cap reference in the detailed design options.
+The original planning maxima ($1,492.1761 P1, $187.0258 P2, $125.8291 P3) remain
+auditable alternatives, not approved schedules. Preregistration v2 must freeze
 before any confirmatory call.
 
 ## Positioning (updated 2026-08)
@@ -49,11 +50,14 @@ before any confirmatory call.
   mandatory ordinary plus exact-lock Tinker offline suites. Initial review blockers
   in calibration reference accounting and rescue validation were remediated, and
   the final independent re-review passed and PR #3 is merged.
-- DeepSeek V4 Flash is selected through Fireworks ZDR for bounded development only,
-  but remains disabled until its configuration and hard dollar ceiling are committed.
-- The advisory Phase-3 decision packet has passed independent technical review at
+- A direct Fireworks ZDR DeepSeek V4 Flash lane is proposed for bounded mechanical
+  development only. It remains disabled and not authorized until the exact
+  `store=False`/Chat Completions configuration, served-route checks, separate
+  ledger, and $10 cumulative ceiling are approved and committed.
+- The advisory Phase-3 decision packet passed independent technical review at
   `2b9b161`, including exact arm/cost recomputation and 19/19 killed contract
-  mutations. All D01-D15 choices remain human-pending and authorize no call.
+  mutations. Connor's 2026-08-10 non-frozen worksheet records his current positions
+  and every researched alternative; it authorizes no call.
 - The packet corrects two unsafe planning assumptions: standard Tinker GPT-OSS-120B
   is a 32K-context route, and standard Inkling's 64K context cannot hold a literal
   64K output plus a nonempty prompt. Earlier expected-cost sketches are not hard
@@ -64,11 +68,12 @@ before any confirmatory call.
 - No paid REAP smoke or confirmatory call has run. Tinker cap semantics, omitted-cap
   cost bounds, sample independence, and OpenAI usage accounting remain unresolved.
 
-Next gates: obtain explicit human choices for D01-D15 in
-`../11_PHASE3_DECISION_PACKET_2026-08-08.md`; freeze the scientific design and
+Next gates: resolve D03/D04/D06/D09/D11/D12/D13/D15 and obtain Chirag's scientific
+signoff on D03-D10; record the final human choices; freeze the scientific design and
 fail-closed activation-or-omission rules; implement and red-team the runner; then
-allow human-initiated smoke calls. Smoke may activate an unchanged frozen panel or
-omit it, never substitute a route or silently redesign the study. See
+allow human-initiated smoke. Connor proposes at most $2 for the Tinker reliability
+smoke, but the current SDK still blocks it. Smoke may activate an unchanged frozen
+panel or omit it, never silently redesign the study. See
 `../10_PHASE_GATE_PLAN_2026-08-08.md`.
 
 ## Vocabulary

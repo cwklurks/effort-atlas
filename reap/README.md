@@ -34,6 +34,8 @@ When higher native reasoning effort lowers benchmark accuracy, how much of the d
 | `05_RELATED_WORK_ALERT.md` | Coupling Tax finding and repositioning (read first) |
 | `06_PREREG_V2_SKELETON.md` | Superseding preregistration, to be completed and frozen |
 | `10_PHASE_GATE_PLAN_2026-08-08.md` | Current serial gates, development-model routing, and completion criteria |
+| `11_PHASE3_DECISION_PACKET_2026-08-08.md` | Independently reviewed advisory D01-D15 decision packet |
+| `12_PHASE3_CONNOR_DECISION_WORKSHEET_2026-08-10.md` | Non-frozen current positions, all alternatives, model/dataset research, and open questions; authorizes no call |
 | [`status/index.html`](status/index.html) | Generated phase dashboard, safety counters, branch ownership, and verification ledger |
 
 ## Phase dashboard

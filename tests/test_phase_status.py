@@ -75,7 +75,7 @@ class PhaseStatusTests(unittest.TestCase):
         phase_three = next(row for row in data["phases"] if row["id"] == 3)
         self.assertEqual(data["project"]["current_phase"], 3)
         self.assertEqual(phase_three["status"], "in_progress")
-        self.assertEqual(phase_three["progress"], 30)
+        self.assertEqual(phase_three["progress"], 40)
         self.assertEqual(
             phase_three["url"],
             "https://github.com/cwklurks/effort-atlas/pull/6",
@@ -93,7 +93,9 @@ class PhaseStatusTests(unittest.TestCase):
         self.assertIn("advisory", decision_record)
         self.assertIn("authorize no calls", decision_record)
         activity = next(
-            row for row in data["activity"] if row["phase"] == 3
+            row
+            for row in data["activity"]
+            if row["title"] == "Phase 3 decision packet technical review passed"
         )
         self.assertEqual(activity["title"], "Phase 3 decision packet technical review passed")
         for statement in (fireworks_entry["result"], fireworks_decision):
@@ -102,6 +104,29 @@ class PhaseStatusTests(unittest.TestCase):
             self.assertIn("disabled", statement)
             self.assertIn("route configuration", statement)
             self.assertIn("hard dollar ceiling", statement)
+
+    def test_status_records_connor_decisions_without_authorizing_execution(self):
+        data = json.loads(SOURCE.read_text())
+        phase_three = next(row for row in data["phases"] if row["id"] == 3)
+        activity = next(
+            row
+            for row in data["activity"]
+            if row["title"] == "Connor's Phase 3 positions recorded"
+        )
+        record = next(
+            decision
+            for decision in data["decisions"]
+            if "12_PHASE3_CONNOR_DECISION_WORKSHEET_2026-08-10.md" in decision
+        )
+
+        self.assertEqual(data["project"]["updated"], "2026-08-10")
+        self.assertIn("portfolio", data["project"]["summary"])
+        self.assertIn("30-of-33 HMMT-2026", phase_three["summary"])
+        self.assertIn("D03/D04/D06/D09/D11/D12/D13/D15", phase_three["gate"])
+        self.assertIn("$2", activity["detail"])
+        self.assertIn("no call", activity["detail"].lower())
+        self.assertIn("non-frozen", record.lower())
+        self.assertIn("no call", record.lower())
 
     def test_canonical_brief_does_not_repeat_superseded_route_or_budget_summary(self):
         text = PROJECT_BRIEF.read_text()
