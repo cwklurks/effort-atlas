@@ -6,7 +6,7 @@
     "repository": "cwklurks/effort-atlas",
     "updated": "2026-08-10",
     "current_phase": 3,
-    "summary": "Phase 2 is merged; Connor's Phase 3 positions are recorded, and the dataset, model portfolio, statistical, prompt, batching, and development-route choices are being resolved."
+    "summary": "Phase 2 is merged; Connor's Phase 3 positions and an integrated model portfolio, dataset, and statistics recommendation are ready for his separate-model review before the remaining human decisions are frozen."
   },
   "safety": {
     "confirmatory_calls": 0,
@@ -44,9 +44,9 @@
       "id": 3,
       "name": "Methodology and preregistration freeze",
       "status": "in_progress",
-      "progress": 40,
-      "summary": "Connor supports a planned shared 30-of-33 HMMT-2026 subset, separate arms, standard GPT-OSS, and descriptive-first statistics; the Tinker portfolio and remaining methods are open.",
-      "gate": "Finish D01-D15 by resolving D03/D04/D06/D09/D11/D12/D13/D15, obtain human scientific signoff from Chirag, and freeze exact rules; the worksheet authorizes no call.",
+      "progress": 45,
+      "summary": "A non-frozen integrated recommendation proposes a balanced Tinker/OpenAI portfolio around the planned 30-of-33 HMMT-2026 core and exposes its symbolic-grader and route gates for independent external review.",
+      "gate": "Connor runs the supplied prompt with a separate model, Codex audits the response, then Connor and Chirag resolve the remaining human scientific choices and freeze exact rules; no review artifact authorizes a call.",
       "url": "https://github.com/cwklurks/effort-atlas/pull/6"
     },
     {
@@ -131,6 +131,11 @@
   ],
   "verification": [
     {
+      "label": "Integrated recommendation and external-review packet",
+      "result": "112 ordinary tests including the private grader archive plus 26 exact-lock Tinker tests passed; the D01-D15 proposal, five zero-call counters, route/grader blockers, required review output, and independently recomputed cost bounds are present; external review remains pending",
+      "status": "passed"
+    },
+    {
       "label": "Connor Phase 3 decision worksheet",
       "result": "108 ordinary tests plus 26 exact-lock Tinker tests passed; D01-D15 positions, alternatives, safety/no-call state, and the declared breadth schedule/cost arithmetic are mutation-checked; primary-source links are present",
       "status": "passed"
@@ -197,6 +202,12 @@
     }
   ],
   "activity": [
+    {
+      "date": "2026-08-10",
+      "phase": 3,
+      "title": "Integrated recommendation and external-review prompt prepared",
+      "detail": "A non-frozen proposal recommends a balanced Inkling, GPT-OSS, Nemotron, Qwen, and Terra portfolio plus a conditional same-model OpenRouter anchor. A self-contained prompt lets Connor obtain a separate-model review. The proposal surfaces symbolic HMMT grading and provider qualification as blockers and authorizes no call."
+    },
     {
       "date": "2026-08-10",
       "phase": 3,
@@ -289,6 +300,7 @@
     }
   ],
   "decisions": [
+    "The non-frozen 13_PHASE3_INTEGRATED_RECOMMENDATION_2026-08-10.md is an opinionated proposal for Connor's separate-model review, not a human decision or call authorization; its companion prompt requires a claim-by-claim external verdict.",
     "The non-frozen 12_PHASE3_CONNOR_DECISION_WORKSHEET_2026-08-10.md records Connor's current positions and all alternatives; open questions remain and it authorizes no call.",
     "Connor supports a planned shared 30-of-33 HMMT-2026 subset, separate arm sampling, standard 32K GPT-OSS-120B, Terra in principle, and descriptive/bootstrap-first analysis; standard Inkling's scientific direction is accepted while its scope/allocation and the broader Tinker model portfolio are reopened.",
     "A future Tinker reliability smoke is proposed under a $2 hard ceiling only after scientific freeze and a reviewed one-submission runner; no smoke is currently authorized.",

@@ -75,12 +75,13 @@ class PhaseStatusTests(unittest.TestCase):
         phase_three = next(row for row in data["phases"] if row["id"] == 3)
         self.assertEqual(data["project"]["current_phase"], 3)
         self.assertEqual(phase_three["status"], "in_progress")
-        self.assertEqual(phase_three["progress"], 40)
+        self.assertEqual(phase_three["progress"], 45)
         self.assertEqual(
             phase_three["url"],
             "https://github.com/cwklurks/effort-atlas/pull/6",
         )
-        self.assertIn("D01-D15", phase_three["gate"])
+        self.assertIn("separate model", phase_three["gate"])
+        self.assertIn("Codex audits", phase_three["gate"])
         self.assertIn("human", phase_three["gate"].lower())
         self.assertIn("2b9b161", phase_three_checkpoint["result"])
         self.assertIn("19 / 19 mutations", phase_three_checkpoint["result"])
@@ -122,11 +123,28 @@ class PhaseStatusTests(unittest.TestCase):
         self.assertEqual(data["project"]["updated"], "2026-08-10")
         self.assertIn("portfolio", data["project"]["summary"])
         self.assertIn("30-of-33 HMMT-2026", phase_three["summary"])
-        self.assertIn("D03/D04/D06/D09/D11/D12/D13/D15", phase_three["gate"])
+        self.assertIn("separate model", phase_three["gate"])
+        self.assertIn("no review artifact authorizes a call", phase_three["gate"])
         self.assertIn("$2", activity["detail"])
         self.assertIn("no call", activity["detail"].lower())
         self.assertIn("non-frozen", record.lower())
         self.assertIn("no call", record.lower())
+
+        integrated_record = next(
+            decision
+            for decision in data["decisions"]
+            if "13_PHASE3_INTEGRATED_RECOMMENDATION_2026-08-10.md" in decision
+        )
+        integrated_activity = next(
+            row
+            for row in data["activity"]
+            if row["title"]
+            == "Integrated recommendation and external-review prompt prepared"
+        )
+        self.assertIn("separate-model review", integrated_record)
+        self.assertIn("not a human decision", integrated_record)
+        self.assertIn("symbolic HMMT grading", integrated_activity["detail"])
+        self.assertIn("authorizes no call", integrated_activity["detail"])
 
     def test_canonical_brief_does_not_repeat_superseded_route_or_budget_summary(self):
         text = PROJECT_BRIEF.read_text()

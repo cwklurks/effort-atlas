@@ -15,10 +15,11 @@ Point any new Codex session at this file first: **"Read reap/CODEX_BRIEFING.md a
 | 5 | `reap/08_HYPERPARAMETER_DECISIONS.md` | Every knob, its verified facts, what's UNVERIFIED and must be probed. |
 | 6 | `reap/11_PHASE3_DECISION_PACKET_2026-08-08.md` | Independently reviewed Phase-3 recommendations and D01-D15 approval form. Every choice is advisory and human-pending. |
 | 7 | `reap/12_PHASE3_CONNOR_DECISION_WORKSHEET_2026-08-10.md` | Non-frozen record of Connor's current positions, every alternative, current dataset/model research, and the questions still open for Chirag. It authorizes no call. |
-| 8 | `PREREGISTRATION.md` + `PREREGISTRATION_AMENDMENT_2026-07-22.md` | **FROZEN. Never edit.** Read to understand what is already committed. |
-| 9 | `reap/REVIEW_PR1_ECOSYSTEM_AUDIT.md` | Red-team review of PR #1 and its 8 blocking fixes. |
-| 10 | `observational/RESULTS.md` + `observational/pipeline.py` + `observational/INPUT_PROVENANCE.md` | The free observational study (done, verified). Pipeline is pinned — agents run it, never rewrite its statistics. Input acquisition is not yet clean-checkout reproducible. |
-| 11 | `src/effort_atlas/` + `tests/` | Existing code. `confirmatory.py`, strict grader v2, and the independently approved pre-data analysis layer are merged. Phase 3 methodology and preregistration are now the active gate. |
+| 8 | `reap/13_PHASE3_INTEGRATED_RECOMMENDATION_2026-08-10.md` + `reap/prompts/PHASE3_EXTERNAL_REVIEW_PROMPT_2026-08-10.md` | Non-frozen opinionated proposal and self-contained prompt for Connor's separate-model review. They expose the symbolic-grader and current route blockers and authorize no call. |
+| 9 | `PREREGISTRATION.md` + `PREREGISTRATION_AMENDMENT_2026-07-22.md` | **FROZEN. Never edit.** Read to understand what is already committed. |
+| 10 | `reap/REVIEW_PR1_ECOSYSTEM_AUDIT.md` | Red-team review of PR #1 and its 8 blocking fixes. |
+| 11 | `observational/RESULTS.md` + `observational/pipeline.py` + `observational/INPUT_PROVENANCE.md` | The free observational study (done, verified). Pipeline is pinned — agents run it, never rewrite its statistics. Input acquisition is not yet clean-checkout reproducible. |
+| 12 | `src/effort_atlas/` + `tests/` | Existing code. `confirmatory.py`, strict grader v2, and the independently approved pre-data analysis layer are merged. Phase 3 methodology and preregistration are now the active gate. |
 
 ## 2. Project state, in one screen
 
@@ -40,6 +41,15 @@ descriptive-first D07/D08/D10 choices, and a planned shared 30-of-33 HMMT-2026
 subset. Dataset scope,
 Inkling scope, Terra/model roster, H6, prompt, batching, Tinker portfolio, and the
 DeepSeek gate remain open or conditional. The worksheet authorizes no call.
+
+The integrated recommendation at
+`reap/13_PHASE3_INTEGRATED_RECOMMENDATION_2026-08-10.md` proposes a balanced
+Inkling/GPT-OSS/Nemotron/Qwen/Terra portfolio and a conditional same-model
+OpenRouter anchor for Connor to challenge with an outside model. Its companion
+prompt is self-contained. The proposal also corrects an important dataset
+assumption: the 33-row HMMT-2026 source contains symbolic fractions and radicals,
+so the planned 30-item core cannot freeze until a pinned upstream MathArena scorer
+and the exact source-defined selection rule pass. No recommendation is an approval.
 
 **Funding:** $5,000 Tinker credits + ~$200 OpenAI (supervisor) + <$100 OpenRouter. Platform-scoped pools, never mixed. Cost model and gates in `reap/02_BUDGET_AND_COSTS.md`.
 
