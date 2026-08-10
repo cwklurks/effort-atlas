@@ -60,6 +60,35 @@ class Phase3IntegratedRecommendationTests(unittest.TestCase):
             self.assertIn(phrase, self.recommendation)
         self.assertRegex(self.recommendation, r"item-clustered\s+bootstrap")
 
+    def test_recommendation_states_scientific_target_and_readiness_boundary(self) -> None:
+        required = (
+            "## Scientific target, contribution, and readiness",
+            "D_c = accuracy(high effort, c) - accuracy(low effort, c)",
+            "I = D_large - D_small",
+            "The Coupling Tax",
+            "scientific validity > reliable collection > budget safety",
+            "The full REAP A/B/C schedule exporter does not exist",
+            "The paid runner and executable budget gates do not exist",
+            "effective sample size is governed mainly by independent items",
+        )
+        for phrase in required:
+            self.assertIn(phrase, self.recommendation)
+
+    def test_recommendation_covers_marker_route_and_dataset_interpretation_risks(
+        self,
+    ) -> None:
+        required = (
+            "marker compliance",
+            "quantization or numerical precision",
+            "tokenizer",
+            "training-data contamination",
+            "VERIFIED REPOSITORY FACT",
+            "PROPOSED DESIGN CHOICE",
+            "UNRESOLVED HUMAN DECISION",
+        )
+        for phrase in required:
+            self.assertIn(phrase, self.recommendation)
+
     def test_external_prompt_is_self_contained_and_demands_a_final_plan(self) -> None:
         required = (
             "You are an independent scientific and systems reviewer",
@@ -77,6 +106,26 @@ class Phase3IntegratedRecommendationTests(unittest.TestCase):
         self.assertIsNotNone(
             re.search(r"(?m)^## Required output format$", self.review_prompt)
         )
+
+    def test_external_prompt_requires_missing_scientific_and_evidence_checks(self) -> None:
+        required = (
+            "attach or paste both",
+            "I = D_large - D_small",
+            "The Coupling Tax",
+            "effective sample size",
+            "multiple comparisons",
+            "marker compliance",
+            "quantization or numerical precision",
+            "training-data contamination",
+            "Preregistration freeze blocker",
+            "Panel activation blocker",
+            "Recommended improvement",
+            "Later-study idea",
+            "Supplied repository fact",
+            "do not claim that you independently verified repository code",
+        )
+        for phrase in required:
+            self.assertIn(phrase, self.review_prompt)
 
 
 if __name__ == "__main__":

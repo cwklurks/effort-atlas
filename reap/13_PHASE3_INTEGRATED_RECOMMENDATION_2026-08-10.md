@@ -23,6 +23,51 @@ No Tinker smoke or scientific call may run until a supported
 one-submission path exists, the runner enforces it, and an independent review
 passes. The proposed $2 reliability smoke is a future maximum, not authorization.
 
+## Scientific target, contribution, and readiness
+
+For each panel, let `accuracy(effort, cap)` be conventional accuracy under the
+strict answer-presence rule. Define the effort slope at cap `c` and the primary
+interaction as:
+
+```text
+D_c = accuracy(high effort, c) - accuracy(low effort, c)
+I = D_large - D_small
+```
+
+H3 asks whether `I > 0`: does higher effort recover more accuracy when it receives
+more output room? H1 and H2 are mechanism checks about differential length stops
+and cap rescue. Each panel is a directional replication with its own effort
+semantics. Panel effects are not pooled.
+
+The Coupling Tax already applies survival methods to censored reasoning lengths
+and uses cap sweeps to predict accuracy. REAP's proposed contribution is narrower:
+it intervenes on native effort, collects independent replicates, estimates
+item-level variation, tests whether a large-cap length distribution predicts
+smaller-cap truncation, and audits current API routes and receipts. The paper should
+not claim that applying Kaplan-Meier methods to reasoning length is itself new.
+
+The strict grader v2 and the pre-data analysis functions are implemented and
+independently reviewed. Current implementation limits are explicit:
+
+- The full REAP A/B/C schedule exporter does not exist.
+- The paid runner and executable budget gates do not exist.
+- The current Tinker live path is deliberately blocked because SDK 0.25.0 can
+  resubmit.
+- No smoke or confirmatory call has occurred.
+
+The outside reviewer should judge the design separately from implementation
+readiness.
+
+The design priorities are:
+
+```text
+scientific validity > reliable collection > budget safety > model breadth > speed
+```
+
+Thousands of model outputs can improve precision within an item. The effective sample size is governed mainly by independent items: 30 or 60 clusters in the
+proposed panels. Power, uncertainty, and multiple comparison decisions must use
+that clustered structure rather than the generation count.
+
 ## Executive recommendation
 
 REAP should be a staged, mechanism-first study rather than an attempt to spend all
@@ -171,6 +216,12 @@ set explicit effort and `max_tokens`, use zero generation retries, and record th
 served provider plus receipt. If the chosen endpoint is unavailable under ZDR, the
 panel is omitted. It does not fall through to the next provider.
 
+A matching model slug does not prove a controlled hosting comparison. The manifest
+must also pin or record quantization or numerical precision, tokenizer, prompt
+wrapper and renderer, context policy, effort encoding, and served model revision.
+If these cannot be made comparable, report the OpenRouter panel as an operational
+route replication rather than an estimate of the causal effect of hosting alone.
+
 ## Recommended model portfolio
 
 ### First-pass portfolio
@@ -229,10 +280,22 @@ grader design is:
 5. freeze item IDs, prompt bytes, gold strings/hashes, source revision, license,
    scorer revision, and per-item grader type.
 
+Report `extracted_answer_present` as marker compliance by panel, effort, and cap in
+addition to strict correctness. This secondary outcome can reveal a formatting or
+prompt interaction. It does not recover an unmarked answer, and it must not weaken
+the primary rule or speculate that an unmarked response was mathematically correct.
+
 If `problem_idx` 1-30 is not a coherent source-defined subset or the symbolic
 scorer cannot be made reliable, the alternative is a smaller, predeclared
 grader-eligible subset selected solely from gold schema before any model output.
 That changes the power calculation and must be discussed with Chirag.
+
+HMMT-2026 is also recent enough that training-data contamination or benchmark
+exposure may differ across models. The dataset manifest should record the public
+release date and every available model cutoff or data-use disclosure. Absence of a
+disclosure is `unknown`, not evidence of no exposure. The 30-item rule must be
+source-defined and outcome-blind; no item may be selected or removed using model
+responses.
 
 ### Optional HMMT-2025 extension
 
@@ -270,6 +333,12 @@ Keep the merged, low-assumption analysis as primary:
 
 Replicate indices are not trace identities. Never pair replicate 1 at 4K with
 replicate 1 at 16K and describe the result as a continued or rescued trace.
+
+The final preregistration must identify one primary H3 test or interval per panel
+and state how the team will handle multiple panels and the many H1, H2, H5, H6,
+dose, and adjacent-cell summaries. Replication and mechanism results can remain
+prespecified secondary evidence, but adding panels must not silently create more
+opportunities for a positive headline.
 
 ### Optional hierarchical secondary model
 
@@ -476,6 +545,18 @@ explicit approval. Never use it for study data or scientific review.
   authorizing a call.
 
 ## Evidence and mutable facts
+
+Use four labels when carrying this proposal into review or preregistration:
+
+- **VERIFIED REPOSITORY FACT:** directly supported by committed code, tests, or a
+  preserved local artifact. An outside reviewer may call it supplied, but cannot
+  independently verify it without the repository evidence.
+- **CURRENT EXTERNAL FACT:** supported by a dated primary provider or dataset
+  source and subject to change.
+- **PROPOSED DESIGN CHOICE:** this document's recommendation, with no approval or
+  execution authority.
+- **UNRESOLVED HUMAN DECISION:** requires Connor, Chirag, or both to select and
+  record an answer before freeze.
 
 Facts below were checked on 2026-08-10 and must be snapshotted again before freeze:
 

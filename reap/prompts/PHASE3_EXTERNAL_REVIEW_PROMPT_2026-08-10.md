@@ -1,8 +1,10 @@
 # External review prompt for the REAP Phase 3 recommendation
 
-Copy this prompt into a new model conversation and attach or paste
-`13_PHASE3_INTEGRATED_RECOMMENDATION_2026-08-10.md`. The reviewer should not need
-access to the original Codex chat.
+Copy this prompt into a new model conversation and attach or paste both
+`13_PHASE3_INTEGRATED_RECOMMENDATION_2026-08-10.md` and `CODEX_BRIEFING.md`. If the
+second file cannot be attached, use the repository-state summary below and label
+those claims as supplied rather than independently verified. The reviewer should
+not need access to the original Codex chat.
 
 ---
 
@@ -22,7 +24,31 @@ reasoning. If the output allowance stops the response before a final answer, an
 ordinary benchmark records it as wrong. The experiment varies effort and output
 allowance and measures their interaction.
 
-Important facts:
+For each panel, define:
+
+```text
+D_c = accuracy(high effort, c) - accuracy(low effort, c)
+I = D_large - D_small
+```
+
+H3 is the primary scientific question and predicts `I > 0`. H1 and H2 are
+mechanism checks involving differential length stops and cap rescue. Panels are
+directional replications with route-specific effort controls; their effects are
+reported separately and not pooled.
+
+The Coupling Tax already applies survival methods to censored reasoning lengths
+and uses cap sweeps for prediction. Do not treat Kaplan-Meier analysis of reasoning
+length as REAP's novelty. The proposed additions are a controlled native-effort
+axis, independent replication and item-level variation, a direct cap-invariance
+test, and current route/receipt verification.
+
+Use this priority order when resolving tradeoffs:
+
+```text
+scientific validity > reliable collection > budget safety > model breadth > speed
+```
+
+Supplied repository facts:
 
 - No REAP confirmatory, paid study-generation, smoke, provider-probe, or DeepSeek
   development call has occurred.
@@ -35,6 +61,9 @@ Important facts:
   item-clustered bootstrap, item-level independent-draw transition mass, rescue
   evidence, missingness bounds, variance summaries, dose-response tables, and
   cap-invariance calibration.
+- The full arm-aware A/B/C schedule exporter, paid runner, and executable budget
+  gates do not exist. The review must not describe the proposed study as ready to
+  collect data.
 - Replicates at different caps are independent generations, not continuations of
   one trace.
 - Tinker SDK 0.25.0 is known to resubmit internally. The live path is blocked until
@@ -46,6 +75,18 @@ Important facts:
   ceiling.
 - Existing Phase-I preregistration files are frozen and cannot be edited. REAP needs
   a new dated preregistration.
+
+Treat these as supplied repository facts unless you can inspect the attached
+repository artifacts. You may test their internal consistency, but do not claim that you independently verified repository code, tests, hashes, or historical
+counts that you were not given. Distinguish four evidence types in your answer:
+
+- **Supplied repository fact:** a project claim that needs repository evidence for
+  independent verification.
+- **Current external fact:** a dated statement verified from a primary provider or
+  dataset source.
+- **Proposed design choice:** advice with no approval or call authority.
+- **Unresolved human decision:** a choice Connor, Chirag, or both must record before
+  freeze.
 
 ## Non-negotiable safeguards
 
@@ -102,6 +143,21 @@ Important facts:
    financial verification.
 10. Map your final answer to D01-D15. For every D, say: accept, modify, reject, or
     blocked; give a short reason and identify the human owner.
+11. Evaluate power and multiplicity using the correct unit of evidence. The
+    effective sample size is driven mainly by 30 or 60 independent item clusters,
+    not the number of generated responses. State which H3 result is primary per
+    panel and how multiple comparisons across panels, mechanism checks, dose cells,
+    and adjacent contrasts should be reported or controlled.
+12. Evaluate measurement and dataset-exposure risks. Keep strict terminator-based
+    grading primary, but require marker compliance as a separate outcome by effort,
+    cap, panel, and model. Assess whether HMMT-2026's recency creates unequal
+    training-data contamination or benchmark-exposure risk across models, and say
+    what can be documented without claiming exposure can be proved absent.
+13. Decide whether the proposed Tinker/OpenRouter GPT-OSS comparison supports a
+    hosting claim. A shared slug is insufficient unless the team can pin or record
+    quantization or numerical precision, tokenizer, renderer and prompt wrapper,
+    model revision, context policy, effort semantics, and served route. If these
+    differ or remain unknown, provide narrower interpretation language.
 
 If you have internet access, use primary sources only for mutable technical facts:
 official provider documentation, official model catalogs, the first-party dataset
@@ -112,6 +168,16 @@ disagrees.
 Do not optimize for agreement with Connor, Codex, or the attached document. Prefer
 a smaller defensible study over a larger fragile one. Clearly separate scientific
 choices from platform qualification and from spending authorization.
+
+Classify every material finding with exactly one of these severities:
+
+- **Preregistration freeze blocker:** the scientific protocol cannot be frozen
+  truthfully until resolved.
+- **Panel activation blocker:** the design may freeze, but the affected route may
+  not collect confirmatory data until the gate passes.
+- **Recommended improvement:** useful before collection but not required for a
+  defensible freeze or safe activation.
+- **Later-study idea:** valuable extension that should not expand the first pass.
 
 ## Required output format
 
@@ -130,8 +196,11 @@ Return Markdown with exactly these top-level sections:
 
 Within `## Final recommended plan`, give one concrete plan rather than a menu. In
 the D01-D15 table, include columns for decision, disposition, final choice, owner,
-and freeze blocker. List disagreements with the attached recommendation explicitly.
-Assign confidence as high, medium, or low for each consequential recommendation.
+freeze blocker, and finding severity. List disagreements with the attached
+recommendation explicitly. Assign confidence as high, medium, or low for each
+consequential recommendation. In `## Assumptions, evidence, and confidence`, label
+each consequential input with one of the four evidence types above and identify
+anything you could not verify.
 
 End with a short block titled `### Final answer for the research team` that states,
 in plain language, what the team should freeze, what it should postpone, and what
@@ -141,4 +210,5 @@ must happen before the first smoke call.
 
 After receiving the review, preserve the full response and return it to Codex for a
 claim-by-claim audit. Do not treat the other model's answer as approval or call
-authorization.
+authorization. If a decision cannot be resolved from the supplied evidence, leave
+it open for its human owner instead of inventing certainty.
