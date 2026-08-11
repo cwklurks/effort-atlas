@@ -54,8 +54,7 @@ class CalibrationStrategy(Protocol):
         reference_lengths: Sequence[int],
         observed_lengths: Sequence[int],
         cap: int,
-    ) -> float | None:
-        ...
+    ) -> float | None: ...
 
 
 class KSCommonSupport:
@@ -106,7 +105,9 @@ def validate_analysis_rows(rows: Iterable[dict[str, Any]]) -> list[dict[str, Any
         if missing:
             raise ValueError(f"Analysis row {index} is missing: {', '.join(missing)}")
         if any(row[key] is None for key in (*PANEL_KEYS, *PAIR_KEYS, "effort")):
-            raise ValueError(f"Analysis row {index} has an incomplete immutable identity.")
+            raise ValueError(
+                f"Analysis row {index} has an incomplete immutable identity."
+            )
         if type(row["cap"]) is not int or row["cap"] <= 0:
             raise ValueError(f"Analysis row {index} has an invalid cap.")
         if type(row["replicate"]) is not int or row["replicate"] <= 0:
@@ -166,7 +167,9 @@ def _validate_planned_rows(rows: Iterable[dict[str, Any]]) -> list[dict[str, Any
         if missing:
             raise ValueError(f"Planned row {index} is missing: {', '.join(missing)}")
         if any(row[key] is None for key in (*PANEL_KEYS, *PAIR_KEYS, "effort")):
-            raise ValueError(f"Planned row {index} has an incomplete immutable identity.")
+            raise ValueError(
+                f"Planned row {index} has an incomplete immutable identity."
+            )
         if type(row["cap"]) is not int or row["cap"] <= 0:
             raise ValueError(f"Planned row {index} has an invalid cap.")
         if type(row["replicate"]) is not int or row["replicate"] <= 0:
@@ -176,6 +179,36 @@ def _validate_planned_rows(rows: Iterable[dict[str, Any]]) -> list[dict[str, Any
             raise ValueError(f"Duplicate planned analysis row: {identity!r}")
         seen.add(identity)
     return planned
+
+
+def _validate_optional_single_arm_scope(
+    observed: Sequence[dict[str, Any]], planned: Sequence[dict[str, Any]]
+) -> str | None:
+    """Preserve legacy inputs while making any arm-aware v2 call fail closed."""
+
+    combined = [*observed, *planned]
+    if not any("arm_key" in row for row in combined):
+        return None
+
+    arm_keys: set[str] = set()
+    for label, rows in (("observed", observed), ("planned", planned)):
+        for index, row in enumerate(rows, start=1):
+            if "arm_key" not in row:
+                raise ValueError(
+                    "Arm-aware REAP analysis requires arm_key on every observed "
+                    f"and planned row; {label} row {index} is missing it."
+                )
+            arm_key = row["arm_key"]
+            if not isinstance(arm_key, str) or not arm_key.strip():
+                raise ValueError(
+                    f"Arm-aware REAP analysis {label} row {index} has an invalid arm_key."
+                )
+            arm_keys.add(arm_key)
+    if len(arm_keys) != 1:
+        raise ValueError(
+            "Arm-aware REAP analysis requires exactly one arm_key per call."
+        )
+    return next(iter(arm_keys))
 
 
 def _panel_identity(rows: Sequence[dict[str, Any]]) -> tuple[Any, Any, Any]:
@@ -226,7 +259,9 @@ def _require_dimensions(
     caps: Sequence[int] | None,
 ) -> tuple[list[Any], list[int]]:
     efforts = list(effort_order) if effort_order is not None else _ordered_efforts(rows)
-    ordered_caps = list(caps) if caps is not None else sorted({row["cap"] for row in rows})
+    ordered_caps = (
+        list(caps) if caps is not None else sorted({row["cap"] for row in rows})
+    )
     if len(efforts) != len(set(map(str, efforts))):
         raise ValueError("effort_order contains duplicates.")
     if ordered_caps != sorted(set(ordered_caps)):
@@ -234,7 +269,9 @@ def _require_dimensions(
     unknown_efforts = {row["effort"] for row in rows} - set(efforts)
     unknown_caps = {row["cap"] for row in rows} - set(ordered_caps)
     if unknown_efforts or unknown_caps:
-        raise ValueError("Rows contain effort or cap values outside the configured grid.")
+        raise ValueError(
+            "Rows contain effort or cap values outside the configured grid."
+        )
     return efforts, ordered_caps
 
 
@@ -300,15 +337,21 @@ def summarize_cells(
         return []
     _panel_identity(identity_source)
     efforts, ordered_caps = _require_dimensions(identity_source, effort_order, caps)
-    observed_by_cell: defaultdict[tuple[Any, int], list[dict[str, Any]]] = defaultdict(list)
+    observed_by_cell: defaultdict[tuple[Any, int], list[dict[str, Any]]] = defaultdict(
+        list
+    )
     for row in records:
         observed_by_cell[(row["effort"], row["cap"])].append(row)
-    planned_by_cell: defaultdict[tuple[Any, int], list[dict[str, Any]]] = defaultdict(list)
+    planned_by_cell: defaultdict[tuple[Any, int], list[dict[str, Any]]] = defaultdict(
+        list
+    )
     if planned:
         observed_keys = {tuple(row[key] for key in PLANNED_KEYS) for row in records}
         planned_keys = {tuple(row[key] for key in PLANNED_KEYS) for row in planned}
         if not observed_keys <= planned_keys:
-            raise ValueError("Observed analysis rows include identities absent from the plan.")
+            raise ValueError(
+                "Observed analysis rows include identities absent from the plan."
+            )
         for row in planned:
             planned_by_cell[(row["effort"], row["cap"])].append(row)
     cells = []
@@ -346,7 +389,9 @@ def summarize_cells(
                 "accuracy": _proportion(k, n),
                 "length_stop": _proportion(length_stops, n),
                 "unanswered_length_stop": _proportion(unanswered_length_stops, n),
-                "answer_present_length_stop": _proportion(answer_present_length_stops, n),
+                "answer_present_length_stop": _proportion(
+                    answer_present_length_stops, n
+                ),
                 "empty_extracted_answer": _proportion(empty_extracted_answers, n),
             }
             cells.append(
@@ -360,7 +405,9 @@ def summarize_cells(
                     "length_stops": length_stops,
                     "length_stop_rate": length_stops / n if n else None,
                     "unanswered_length_stops": unanswered_length_stops,
-                    "unanswered_length_stop_rate": unanswered_length_stops / n if n else None,
+                    "unanswered_length_stop_rate": unanswered_length_stops / n
+                    if n
+                    else None,
                     "answer_present_length_stops": answer_present_length_stops,
                     "empty_extracted_answers": empty_extracted_answers,
                     "accuracy_bound_lo": k / n if n else None,
@@ -375,14 +422,22 @@ def summarize_cells(
                     ),
                     "completion_tokens": {
                         "mean": _mean(completion_tokens),
-                        "median": statistics.median(completion_tokens) if completion_tokens else None,
-                        "minimum": min(completion_tokens) if completion_tokens else None,
-                        "maximum": max(completion_tokens) if completion_tokens else None,
+                        "median": statistics.median(completion_tokens)
+                        if completion_tokens
+                        else None,
+                        "minimum": min(completion_tokens)
+                        if completion_tokens
+                        else None,
+                        "maximum": max(completion_tokens)
+                        if completion_tokens
+                        else None,
                     },
                     "reasoning_tokens": {
                         "n": len(reasoning_tokens),
                         "mean": _mean(reasoning_tokens),
-                        "median": statistics.median(reasoning_tokens) if reasoning_tokens else None,
+                        "median": statistics.median(reasoning_tokens)
+                        if reasoning_tokens
+                        else None,
                     },
                     "latency_s": {
                         "n": len(latencies),
@@ -442,7 +497,11 @@ def _effects_from_accuracies(
         )
     small_slope = next(row["estimate"] for row in slopes if row["cap"] == small)
     large_slope = next(row["estimate"] for row in slopes if row["cap"] == large)
-    interaction = None if small_slope is None or large_slope is None else large_slope - small_slope
+    interaction = (
+        None
+        if small_slope is None or large_slope is None
+        else large_slope - small_slope
+    )
     return {
         "effort_slopes": slopes,
         "cap_effects": cap_effects,
@@ -509,6 +568,7 @@ def item_clustered_bootstrap(
         total[1] += 1
     items = sorted(by_item, key=str)
     if not items:
+
         def unavailable(row: dict[str, Any]) -> dict[str, Any]:
             return {**row, "ci_low": None, "ci_high": None, "valid_resamples": 0}
 
@@ -584,15 +644,16 @@ def paired_cap_transitions(
         return []
     _panel_identity(identity_source)
     efforts, ordered_caps = _require_dimensions(identity_source, effort_order, caps)
-    observed_by_cell: defaultdict[tuple[Any, Any, int], list[dict[str, Any]]] = defaultdict(list)
+    observed_by_cell: defaultdict[tuple[Any, Any, int], list[dict[str, Any]]] = (
+        defaultdict(list)
+    )
     for row in records:
         observed_by_cell[(row["item_id"], row["effort"], row["cap"])].append(row)
     planned_by_cell: Counter[tuple[Any, Any, int]] = Counter(
         (row["item_id"], row["effort"], row["cap"]) for row in planned
     )
     item_keys = {
-        (row["item_id"], row["effort"], row["cap"])
-        for row in [*records, *planned]
+        (row["item_id"], row["effort"], row["cap"]) for row in [*records, *planned]
     }
     tables = []
     for effort in efforts:
@@ -623,8 +684,12 @@ def paired_cap_transitions(
                 large_observed = len(large_rows)
                 small_correct = sum(row["correct"] for row in small_rows)
                 large_correct = sum(row["correct"] for row in large_rows)
-                small_planned = planned_by_cell[(item_id, effort, small_cap)] or small_observed
-                large_planned = planned_by_cell[(item_id, effort, large_cap)] or large_observed
+                small_planned = (
+                    planned_by_cell[(item_id, effort, small_cap)] or small_observed
+                )
+                large_planned = (
+                    planned_by_cell[(item_id, effort, large_cap)] or large_observed
+                )
                 if small_observed > small_planned or large_observed > large_planned:
                     raise ValueError(
                         "Observed item-level transition replicates exceed the planned count."
@@ -705,7 +770,9 @@ def paired_cap_transitions(
                     "effort": effort,
                     "small_cap": small_cap,
                     "large_cap": large_cap,
-                    "is_adjacent": ordered_caps.index(large_cap) - ordered_caps.index(small_cap) == 1,
+                    "is_adjacent": ordered_caps.index(large_cap)
+                    - ordered_caps.index(small_cap)
+                    == 1,
                     "is_primary_endpoint_contrast": (
                         small_cap == ordered_caps[0] and large_cap == ordered_caps[-1]
                     ),
@@ -786,11 +853,17 @@ def cap_invariance_calibration(
     records = validate_analysis_rows(rows)
     if records:
         _panel_identity(records)
-    efforts = list(effort_order) if effort_order is not None else _ordered_efforts(records)
+    efforts = (
+        list(effort_order) if effort_order is not None else _ordered_efforts(records)
+    )
     if {row["effort"] for row in records} - set(efforts):
-        raise ValueError("Rows contain effort values outside the configured calibration grid.")
-    target_caps = list(caps) if caps is not None else sorted(
-        {row["cap"] for row in records if row["cap"] < reference_cap}
+        raise ValueError(
+            "Rows contain effort values outside the configured calibration grid."
+        )
+    target_caps = (
+        list(caps)
+        if caps is not None
+        else sorted({row["cap"] for row in records if row["cap"] < reference_cap})
     )
     if any(cap >= reference_cap for cap in target_caps):
         raise ValueError("Calibration target caps must be smaller than reference_cap.")
@@ -798,7 +871,9 @@ def cap_invariance_calibration(
     output = []
     for effort in efforts:
         reference_rows = [
-            row for row in records if row["effort"] == effort and row["cap"] == reference_cap
+            row
+            for row in records
+            if row["effort"] == effort and row["cap"] == reference_cap
         ]
         reference_lengths = [row["completion_tokens"] for row in reference_rows]
         reference_length_stops = sum(_is_length_stop(row) for row in reference_rows)
@@ -807,10 +882,13 @@ def cap_invariance_calibration(
                 row for row in records if row["effort"] == effort and row["cap"] == cap
             ]
             observed_lengths = [
-                row["completion_tokens"] for row in observed_rows if not _is_length_stop(row)
+                row["completion_tokens"]
+                for row in observed_rows
+                if not _is_length_stop(row)
             ]
             predicted = (
-                sum(length > cap for length in reference_lengths) / len(reference_lengths)
+                sum(length > cap for length in reference_lengths)
+                / len(reference_lengths)
                 if reference_lengths
                 else None
             )
@@ -830,10 +908,14 @@ def cap_invariance_calibration(
                     "predicted_truncation_rate": predicted,
                     "observed_truncation_rate": observed,
                     "signed_rate_error": (
-                        None if predicted is None or observed is None else predicted - observed
+                        None
+                        if predicted is None or observed is None
+                        else predicted - observed
                     ),
                     "absolute_rate_error": (
-                        None if predicted is None or observed is None else abs(predicted - observed)
+                        None
+                        if predicted is None or observed is None
+                        else abs(predicted - observed)
                     ),
                     "calibration_strategy": metric.name,
                     "calibration_error": metric.calibration_error(
@@ -855,13 +937,13 @@ def analyze_confirmatory_rows(
     calibration_strategy: CalibrationStrategy | None = None,
 ) -> dict[str, Any]:
     """Analyze panels separately and return a JSON-serializable pre-data report."""
-    records = validate_analysis_rows(rows)
-    planned = _validate_planned_rows(planned_rows or [])
+    raw_records = list(rows)
+    raw_planned = list(planned_rows) if planned_rows is not None else []
+    arm_key = _validate_optional_single_arm_scope(raw_records, raw_planned)
+    records = validate_analysis_rows(raw_records)
+    planned = _validate_planned_rows(raw_planned)
     panel_ids = sorted(
-        {
-            tuple(row[key] for key in PANEL_KEYS)
-            for row in [*records, *planned]
-        },
+        {tuple(row[key] for key in PANEL_KEYS) for row in [*records, *planned]},
         key=lambda value: tuple(map(str, value)),
     )
     panels = []
@@ -873,16 +955,16 @@ def analyze_confirmatory_rows(
             row for row in planned if tuple(row[key] for key in PANEL_KEYS) == panel_id
         ]
         dimension_source = panel_rows or panel_plan
-        efforts, ordered_caps = _require_dimensions(dimension_source, effort_order, caps)
+        efforts, ordered_caps = _require_dimensions(
+            dimension_source, effort_order, caps
+        )
         cells = summarize_cells(
             panel_rows,
             planned_rows=panel_plan,
             effort_order=efforts,
             caps=ordered_caps,
         )
-        effects = factorial_effects(
-            panel_rows, effort_order=efforts, caps=ordered_caps
-        )
+        effects = factorial_effects(panel_rows, effort_order=efforts, caps=ordered_caps)
         bootstrap = item_clustered_bootstrap(
             panel_rows,
             effort_order=efforts,
@@ -904,32 +986,34 @@ def analyze_confirmatory_rows(
             }
             for cell in cells
         ]
-        panels.append(
-            {
-                "panel": panel_id[0],
-                "model": panel_id[1],
-                "provider_route": panel_id[2],
-                "cells": cells,
-                "effects": effects,
-                "bootstrap": bootstrap,
-                "variance_components": variance,
-                "cap_transitions": transitions,
-                "dose_response": dose_response_summaries(
-                    cells, effort_order=efforts, caps=ordered_caps
-                ),
-                "cap_invariance": cap_invariance_calibration(
-                    panel_rows,
-                    reference_cap=ordered_caps[-1],
-                    caps=ordered_caps[:-1],
-                    effort_order=efforts,
-                    strategy=calibration_strategy,
-                ),
-            }
-        )
+        panel_report = {
+            "panel": panel_id[0],
+            "model": panel_id[1],
+            "provider_route": panel_id[2],
+            "cells": cells,
+            "effects": effects,
+            "bootstrap": bootstrap,
+            "variance_components": variance,
+            "cap_transitions": transitions,
+            "dose_response": dose_response_summaries(
+                cells, effort_order=efforts, caps=ordered_caps
+            ),
+            "cap_invariance": cap_invariance_calibration(
+                panel_rows,
+                reference_cap=ordered_caps[-1],
+                caps=ordered_caps[:-1],
+                effort_order=efforts,
+                strategy=calibration_strategy,
+            ),
+        }
+        if arm_key is not None:
+            panel_report["arm_key"] = arm_key
+        panels.append(panel_report)
     return {
         "analysis_version": 1,
         "assumptions": {
             "panel_pooling": "none",
+            "arm_pooling": "one arm_key per call for arm-aware v2 inputs",
             "accuracy": "grader_boolean_regardless_of_finish_reason",
             "unanswered_length_stop": "length_finish_and_extracted_answer_present_false",
             "unanswered_accuracy_bound": "observed_k_over_n_to_observed_k_plus_unanswered_length_stops_over_n",

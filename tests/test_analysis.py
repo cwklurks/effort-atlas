@@ -45,7 +45,9 @@ def result_row(
         "replicate": replicate,
         "correct": correct,
         "extracted_answer_present": extracted_answer_present,
-        "extracted_answer": ("1" if correct else "0") if extracted_answer_present else None,
+        "extracted_answer": ("1" if correct else "0")
+        if extracted_answer_present
+        else None,
         "finish_reason": finish_reason,
         "completion_tokens": completion_tokens,
         "reasoning_tokens": max(0, completion_tokens - 1),
@@ -185,13 +187,19 @@ class ConfirmatoryAnalysisTests(unittest.TestCase):
             ),
         ]
 
-        cells = summarize_cells(observed, planned_rows=planned, effort_order=["low", "high"], caps=[4])
+        cells = summarize_cells(
+            observed, planned_rows=planned, effort_order=["low", "high"], caps=[4]
+        )
         by_effort = {cell["effort"]: cell for cell in cells}
         low = by_effort["low"]
         high = by_effort["high"]
 
-        self.assertEqual((low["n"], low["k"], low["planned_n"], low["missing_n"]), (2, 1, 4, 2))
-        self.assertEqual((low["accuracy_bound_lo"], low["accuracy_bound_hi"]), (0.5, 1.0))
+        self.assertEqual(
+            (low["n"], low["k"], low["planned_n"], low["missing_n"]), (2, 1, 4, 2)
+        )
+        self.assertEqual(
+            (low["accuracy_bound_lo"], low["accuracy_bound_hi"]), (0.5, 1.0)
+        )
         self.assertEqual(
             (low["missing_all_wrong_accuracy"], low["missing_all_correct_accuracy"]),
             (0.25, 0.75),
@@ -202,8 +210,12 @@ class ConfirmatoryAnalysisTests(unittest.TestCase):
             (0.0, 1.0),
         )
         self.assertEqual(low["proportions"]["accuracy"]["wilson"], wilson(1, 2))
-        self.assertEqual(low["proportions"]["unanswered_length_stop"]["wilson"], wilson(1, 2))
-        self.assertEqual(low["latency_s"], {"n": 2, "median": 1.0, "minimum": 1.0, "maximum": 1.0})
+        self.assertEqual(
+            low["proportions"]["unanswered_length_stop"]["wilson"], wilson(1, 2)
+        )
+        self.assertEqual(
+            low["latency_s"], {"n": 2, "median": 1.0, "minimum": 1.0, "maximum": 1.0}
+        )
         self.assertEqual(low["receipt_cost_usd"], {"n": 2, "total": 0.02})
 
     def test_paired_transition_table_and_amended_rescue_taxonomy(self):
@@ -245,7 +257,9 @@ class ConfirmatoryAnalysisTests(unittest.TestCase):
             planned_row("missing-large", "low", 8, 1),
         ]
 
-        tables = paired_cap_transitions(rows, planned_rows=planned, effort_order=["low"], caps=[4, 8])
+        tables = paired_cap_transitions(
+            rows, planned_rows=planned, effort_order=["low"], caps=[4, 8]
+        )
         table = tables[0]
 
         self.assertEqual(table["pairing_unit"], "item_id")
@@ -257,9 +271,7 @@ class ConfirmatoryAnalysisTests(unittest.TestCase):
         self.assertEqual(table["missing_larger_cap_items"], 1)
         self.assertEqual(table["n_paired_items"], 6)
         self.assertEqual(sum(table["expected_item_mass"].values()), 6.0)
-        evidence = {
-            row["item_id"]: row for row in table["item_sufficient_statistics"]
-        }
+        evidence = {row["item_id"]: row for row in table["item_sufficient_statistics"]}
         self.assertTrue(evidence["rescue"]["rescue_evidence_present"])
         self.assertEqual(evidence["rescue"]["small_unanswered_length_n"], 1)
         self.assertEqual(evidence["rescue"]["large_normal_correct_n"], 1)
@@ -372,8 +384,12 @@ class ConfirmatoryAnalysisTests(unittest.TestCase):
 
         dose = dose_response_summaries(cells, effort_order=["low", "high"], caps=[4, 8])
 
-        at_four = next(profile for profile in dose["effort_profiles"] if profile["cap"] == 4)
-        for_low = next(profile for profile in dose["cap_profiles"] if profile["effort"] == "low")
+        at_four = next(
+            profile for profile in dose["effort_profiles"] if profile["cap"] == 4
+        )
+        for_low = next(
+            profile for profile in dose["cap_profiles"] if profile["effort"] == "low"
+        )
         self.assertEqual([point["accuracy"] for point in at_four["points"]], [0.5, 0.0])
         self.assertEqual(at_four["endpoint_effort_slope"], -0.5)
         self.assertEqual([point["accuracy"] for point in for_low["points"]], [0.5, 0.0])
@@ -387,8 +403,26 @@ class ConfirmatoryAnalysisTests(unittest.TestCase):
             result_row("r4", "low", 16, 1, True, completion_tokens=12),
             result_row("s1", "low", 8, 1, True, completion_tokens=2),
             result_row("s2", "low", 8, 1, False, completion_tokens=4),
-            result_row("s3", "low", 8, 1, False, finish_reason="length", completion_tokens=8, extracted_answer_present=False),
-            result_row("s4", "low", 8, 1, False, finish_reason="length", completion_tokens=8, extracted_answer_present=False),
+            result_row(
+                "s3",
+                "low",
+                8,
+                1,
+                False,
+                finish_reason="length",
+                completion_tokens=8,
+                extracted_answer_present=False,
+            ),
+            result_row(
+                "s4",
+                "low",
+                8,
+                1,
+                False,
+                finish_reason="length",
+                completion_tokens=8,
+                extracted_answer_present=False,
+            ),
         ]
 
         result = cap_invariance_calibration(rows, reference_cap=16, caps=[8])
@@ -464,7 +498,9 @@ class ConfirmatoryAnalysisTests(unittest.TestCase):
                 self.calls = []
 
             def calibration_error(self, reference_lengths, observed_lengths, cap):
-                self.calls.append((tuple(reference_lengths), tuple(observed_lengths), cap))
+                self.calls.append(
+                    (tuple(reference_lengths), tuple(observed_lengths), cap)
+                )
                 return 0.125
 
         strategy = ExactStrategy()
@@ -472,10 +508,21 @@ class ConfirmatoryAnalysisTests(unittest.TestCase):
             result_row("r1", "low", 16, 1, True, completion_tokens=2),
             result_row("r2", "low", 16, 1, True, completion_tokens=10),
             result_row("s1", "low", 8, 1, True, completion_tokens=2),
-            result_row("s2", "low", 8, 1, False, finish_reason="length", completion_tokens=8, extracted_answer_present=False),
+            result_row(
+                "s2",
+                "low",
+                8,
+                1,
+                False,
+                finish_reason="length",
+                completion_tokens=8,
+                extracted_answer_present=False,
+            ),
         ]
 
-        result = cap_invariance_calibration(rows, reference_cap=16, caps=[8], strategy=strategy)
+        result = cap_invariance_calibration(
+            rows, reference_cap=16, caps=[8], strategy=strategy
+        )
 
         self.assertEqual(result[0]["calibration_strategy"], "exact-test-strategy")
         self.assertEqual(result[0]["calibration_error"], 0.125)
@@ -497,7 +544,9 @@ class ConfirmatoryAnalysisTests(unittest.TestCase):
             bootstrap_resamples=100,
         )
 
-        self.assertEqual(report["assumptions"]["effort_slope"], "higher_effort_minus_lower_effort")
+        self.assertEqual(
+            report["assumptions"]["effort_slope"], "higher_effort_minus_lower_effort"
+        )
         self.assertEqual(len(report["panels"]), 1)
         self.assertEqual(
             set(report["panels"][0]),
@@ -518,8 +567,7 @@ class ConfirmatoryAnalysisTests(unittest.TestCase):
     def test_end_to_end_report_keeps_panels_separate(self):
         first = bootstrap_rows()
         second = [
-            {**row, "panel": "panel-b", "model": "model-b"}
-            for row in bootstrap_rows()
+            {**row, "panel": "panel-b", "model": "model-b"} for row in bootstrap_rows()
         ]
 
         report = analyze_confirmatory_rows(
@@ -534,6 +582,46 @@ class ConfirmatoryAnalysisTests(unittest.TestCase):
             [(panel["panel"], panel["model"]) for panel in report["panels"]],
             [("panel-a", "model-a"), ("panel-b", "model-b")],
         )
+
+    def test_end_to_end_report_refuses_cross_arm_observed_rows(self):
+        rows = [
+            {
+                **row,
+                "arm_key": "arm-a" if row["effort"] == "low" else "arm-b",
+            }
+            for row in bootstrap_rows()
+        ]
+
+        with self.assertRaisesRegex(ValueError, "exactly one arm_key"):
+            analyze_confirmatory_rows(
+                rows,
+                planned_rows=rows,
+                effort_order=["low", "high"],
+                caps=[4, 8],
+                bootstrap_resamples=10,
+            )
+
+    def test_end_to_end_report_requires_arm_key_on_observed_and_planned_rows(self):
+        observed = [{**row, "arm_key": "arm-a"} for row in bootstrap_rows()]
+        planned_without_arm = bootstrap_rows()
+
+        with self.assertRaisesRegex(ValueError, "arm_key on every"):
+            analyze_confirmatory_rows(
+                observed,
+                planned_rows=planned_without_arm,
+                effort_order=["low", "high"],
+                caps=[4, 8],
+                bootstrap_resamples=10,
+            )
+
+        report = analyze_confirmatory_rows(
+            observed,
+            planned_rows=[{**row, "arm_key": "arm-a"} for row in planned_without_arm],
+            effort_order=["low", "high"],
+            caps=[4, 8],
+            bootstrap_resamples=10,
+        )
+        self.assertEqual(report["panels"][0]["arm_key"], "arm-a")
 
 
 if __name__ == "__main__":

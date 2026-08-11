@@ -29,7 +29,7 @@ IDENTITY_FIELDS = (
 )
 PROVIDER_SEED_MAX = 2**31 - 1
 
-EffortValue: TypeAlias = str | int | float
+EffortValue: TypeAlias = str | float
 
 
 def _canonical_json(value: Mapping[str, object]) -> str:
@@ -63,10 +63,15 @@ def _require_effort(value: object) -> EffortValue:
         if not value.strip():
             raise ValueError("effort must be a nonempty label or a finite number.")
         return value
-    if isinstance(value, int):
-        return value
-    if isinstance(value, float) and math.isfinite(value):
-        return value
+    if isinstance(value, (int, float)):
+        try:
+            normalized = float(value)
+        except OverflowError as exc:
+            raise ValueError(
+                "effort must be a nonempty label or a finite number."
+            ) from exc
+        if math.isfinite(normalized):
+            return normalized
     raise ValueError("effort must be a nonempty label or a finite number.")
 
 
@@ -92,7 +97,7 @@ class ReapScheduleIdentity:
         _require_nonempty_string("model", self.model)
         _require_nonempty_string("provider_route", self.provider_route)
         _require_nonempty_string("item_id", self.item_id)
-        _require_effort(self.effort)
+        object.__setattr__(self, "effort", _require_effort(self.effort))
         _require_positive_integer("cap", self.cap)
         _require_positive_integer("replicate", self.replicate)
         _require_nonempty_string("arm_key", self.arm_key)

@@ -185,6 +185,17 @@ class ReapScheduleIdentityTests(unittest.TestCase):
             ):
                 ReapScheduleIdentity.from_mapping(planned_row(effort=effort))
 
+    def test_semantically_equal_numeric_efforts_have_one_canonical_identity(
+        self,
+    ) -> None:
+        integer = ReapScheduleIdentity.from_mapping(planned_row(effort=0))
+        floating = ReapScheduleIdentity.from_mapping(planned_row(effort=0.0))
+
+        self.assertIsInstance(integer.effort, float)
+        self.assertEqual(integer.canonical_json(), floating.canonical_json())
+        self.assertEqual(integer.job_id, floating.job_id)
+        self.assertEqual(integer.provider_seed, floating.provider_seed)
+
 
 class ReapScheduleBuilderTests(unittest.TestCase):
     def test_builder_output_is_independent_of_input_order(self) -> None:
