@@ -66,16 +66,19 @@ model switching were disabled. The completed run predated the final clean-sessio
 and Codex user-configuration isolation hardening, and internal CLI request counts
 remain unverified. It is therefore non-authoritative and not freeze-eligible. The
 current synthesis is in `reap/15_PHASE3_ADVERSARIAL_SYNTHESIS_2026-08-10.md`.
-The current checkpoint is 249 ordinary tests plus 26 exact-lock Tinker tests; all
+The current checkpoint is 250 ordinary tests plus 26 exact-lock Tinker tests; all
 study-call and spend counters remain zero. Model agreement cannot authorize
 spending, provider activation, preregistration freeze, or choices owned by Connor
 or Chirag.
 
 Decision-independent Phase-3 safeguards now exist offline for arm- and phase-aware
-schedules, sealed manifests, manifest-bound activation, list-rate budget gates,
+schedules, sealed manifests, manifest-bound activation, strict list-rate planning
+budget arithmetic,
 the deterministic symbolic-scoring boundary, simulation provenance, and dataset
-provenance. They remain non-frozen prerequisites for the future runner; they are
-not a runner and authorize no execution.
+provenance. The executable budget gate is still a Phase-4 runner deliverable because
+the current planning rows and rates are not exact-byte-bound freeze authority.
+These safeguards remain non-frozen prerequisites; they are not a runner and
+authorize no execution.
 
 **Funding:** $5,000 Tinker credits + ~$200 OpenAI (supervisor) + <$100 OpenRouter. Platform-scoped pools, never mixed. Cost model and gates in `reap/02_BUDGET_AND_COSTS.md`.
 

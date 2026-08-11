@@ -4,7 +4,7 @@
     "name": "REAP",
     "paper": "Thinking Cut Short",
     "repository": "cwklurks/effort-atlas",
-    "updated": "2026-08-10",
+    "updated": "2026-08-11",
     "current_phase": 3,
     "summary": "Phase 2 is merged; the Phase 3 model portfolio, external review, and completed bounded Claude/Codex development relay are preserved. The relay is non-authoritative, the offline implementation remains non-frozen, and all scientific and spending decisions stay human-owned."
   },
@@ -135,7 +135,7 @@
   "verification": [
     {
       "label": "Phase 3 current offline checkpoint",
-      "result": "249 ordinary tests plus 26 exact-lock Tinker tests passed; the canonical verifier remains offline and both lanes are mandatory",
+      "result": "250 ordinary tests plus 26 exact-lock Tinker tests passed; the canonical verifier remains offline and both lanes are mandatory",
       "status": "passed"
     },
     {
@@ -145,7 +145,7 @@
     },
     {
       "label": "Phase 3 offline implementation",
-      "result": "The non-frozen schedule, manifest, activation, budget, scorer, simulation, and dataset safeguards are implemented with focused tests. This implementation authorizes no provider call, smoke, spend, freeze, or collection.",
+      "result": "The non-frozen schedule, manifest, activation, scorer, simulation, dataset, and strict planning-budget safeguards are implemented with focused tests. Planning arithmetic is not freeze authority; the executable exact-artifact budget gate remains Phase 4. This implementation authorizes no provider call, smoke, spend, freeze, or collection.",
       "status": "passed"
     },
     {
@@ -226,6 +226,12 @@
   ],
   "activity": [
     {
+      "date": "2026-08-11",
+      "phase": 3,
+      "title": "Phase 3 trust boundaries hardened",
+      "detail": "Mutation review closed forged activation, scorer, relay, and budget-summary paths. Budget arithmetic is now explicitly planning-only because caller-supplied rows and rates are not freeze authority; the executable exact-artifact gate remains Phase 4. The dashboard records 250 ordinary plus 26 exact-lock tests and every call/spend counter remains zero."
+    },
+    {
       "date": "2026-08-10",
       "phase": 3,
       "title": "Bounded Claude/Codex development relay completed",
@@ -235,7 +241,7 @@
       "date": "2026-08-10",
       "phase": 3,
       "title": "Phase 3 offline safeguards and synthesis added",
-      "detail": "Decision-independent schedule, arm, manifest, activation, budget, scorer, simulation, and dataset guards are implemented and summarized in 15_PHASE3_ADVERSARIAL_SYNTHESIS_2026-08-10.md. Terra remains the proposed main direct anchor and Luna is proposed as a cheap sensitivity panel at current planning prices. All artifacts remain non-frozen and authorize no call."
+      "detail": "Decision-independent schedule, arm, manifest, activation, planning-budget, scorer, simulation, and dataset guards are implemented and summarized in 15_PHASE3_ADVERSARIAL_SYNTHESIS_2026-08-10.md. Planning-budget validation is not executable freeze authority. Terra remains the proposed main direct anchor and Luna is proposed as a cheap sensitivity panel at current planning prices. All artifacts remain non-frozen and authorize no call."
     },
     {
       "date": "2026-08-10",

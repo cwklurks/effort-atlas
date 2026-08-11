@@ -114,6 +114,16 @@ class PhaseStatusTests(unittest.TestCase):
             self.assertIn(capability, implementation["result"])
         self.assertIn("non-frozen", implementation["result"])
         self.assertIn("authorizes no", implementation["result"])
+        self.assertIn("planning-budget", implementation["result"])
+        self.assertIn("not freeze authority", implementation["result"])
+        self.assertIn("Phase 4", implementation["result"])
+        hardening = next(
+            row
+            for row in data["activity"]
+            if row["title"] == "Phase 3 trust boundaries hardened"
+        )
+        self.assertIn("not freeze authority", hardening["detail"])
+        self.assertIn("every call/spend counter remains zero", hardening["detail"])
 
         pricing = next(
             row
@@ -204,7 +214,7 @@ class PhaseStatusTests(unittest.TestCase):
             if "12_PHASE3_CONNOR_DECISION_WORKSHEET_2026-08-10.md" in decision
         )
 
-        self.assertEqual(data["project"]["updated"], "2026-08-10")
+        self.assertEqual(data["project"]["updated"], "2026-08-11")
         self.assertIn("portfolio", data["project"]["summary"])
         self.assertIn("30-of-33 HMMT-2026", phase_three["summary"])
         self.assertIn("separate model", phase_three["gate"])

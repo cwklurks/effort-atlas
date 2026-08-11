@@ -47,7 +47,7 @@ call. Fable and Sol converged on the following C01–C07 verdicts:
 |---|---|---|
 | C01 — dataset scope | Partially confirmed | Repository documents conflict on 30 versus 33. Keep 30 as a planning default; Connor and Chirag must settle the provenance rule. |
 | C02 — Terra effort semantics | Resolved by a later primary-source check | Current OpenAI guidance lists `none`, `low`, `medium`, `high`, `xhigh`, `max`; it does not list `minimal`. Exact route delivery still needs the frozen smoke. |
-| C03 — cost provenance | Partially confirmed, then materially improved | Arithmetic was correct conditional on quoted rates. A dated advisory price artifact and executable list/discount budget gate now exist; freeze-day source capture and exact schedules remain required. |
+| C03 — cost provenance | Partially confirmed, then materially improved | Arithmetic was correct conditional on quoted rates. A dated advisory price artifact and strict list/discount planning validator now exist. They are not freeze authority; the executable exact-artifact budget gate remains a Phase-4 runner requirement. |
 | C04 — simulation fidelity | Partially confirmed | Scratchpad numbers reproduce their code, but the H6 simulation does not reproduce the estimator's shared nested length draws. Chirag's rerun remains authoritative. |
 | C05 — scorer boundary | Initially prose-only; implementation added afterward | A fail-closed boundary now accepts only grader-v2's extracted field and caller-supplied, version/hash-pinned `parse_answer` and `check_answers`. The real MathArena revision is still a human freeze input. |
 | C06 — durable state | Partially confirmed | Safety was preserved, but the dashboard/test count and relay state were stale. They must be regenerated from the final verified branch. |
@@ -160,17 +160,20 @@ The branch now contains decision-independent building blocks, not a frozen study
 - a sealed manifest contract with cross-artifact hashes, detached data, and exact
   byte verification beneath an approved root;
 - manifest-bound activation policy with only `activate` or `omit` outcomes;
-- exact Decimal worst-case budget projection, list-rate default, pool and panel
-  ceilings, and an explicit receipt-checked exception for discount use;
+- non-authoritative exact Decimal planning projection, list-rate default, proposed
+  pool and panel ceilings, and an explicit receipt-policy requirement for discount
+  planning;
 - a fail-closed MathArena boundary that never imports upstream answer extraction or
   falls back to local parsing;
 - generic dataset and simulation provenance manifests;
 - a bounded relay that requires first-party Claude subscription authentication
   reported as `claude.ai`, a clean session for a freeze review, and Codex
   user-configuration isolation;
-- an end-to-end offline test composing schedule, budget, manifest, and activation.
+- an end-to-end offline test that separately exercises strict planning-budget
+  arithmetic and exact-byte schedule, manifest, and activation boundaries without
+  presenting the planning inputs as freeze authority.
 
-The integrated branch passes the canonical offline suite (249 ordinary tests plus
+The integrated branch passes the canonical offline suite (250 ordinary tests plus
 26 exact-lock Tinker tests). Final independent review remains required. These
 components are prerequisites for the future runner, not the runner itself.
 
