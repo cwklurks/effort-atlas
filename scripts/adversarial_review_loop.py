@@ -31,6 +31,7 @@ DEFAULT_CLAUDE_BUDGET = Decimal("2.00")
 MAX_CLAUDE_BUDGET_PER_TURN = Decimal("5.00")
 CLAUDE_MODEL = "claude-fable-5"
 MINIMUM_CLAUDE_VERSION = (2, 1, 170)
+CLAUDE_SUBSCRIPTION_AUTH_METHOD = "oauth"
 CLAUDE_NON_SUBSCRIPTION_ENVIRONMENT_VARIABLES = (
     "ANTHROPIC_API_KEY",
     "ANTHROPIC_AUTH_TOKEN",
@@ -56,6 +57,7 @@ CLAUDE_REQUIRED_FLAGS = (
 )
 CODEX_GLOBAL_REQUIRED_FLAGS = ("--ask-for-approval",)
 CODEX_EXEC_REQUIRED_FLAGS = (
+    "--ignore-user-config",
     "--ephemeral",
     "--cd",
     "--sandbox",
@@ -131,6 +133,7 @@ def build_codex_command(
         "--ask-for-approval",
         "never",
         "exec",
+        "--ignore-user-config",
         "--ephemeral",
         "--cd",
         str(worktree),
@@ -157,6 +160,8 @@ def validate_execution_request(
     acknowledge_costs: bool,
     rounds: int,
     confirm_fable_regular_usage: bool = False,
+    freeze_review: bool = False,
+    start_new_claude_session: bool = False,
 ) -> None:
     if not 1 <= rounds <= MAX_ROUNDS:
         raise ConfigurationError(f"rounds must be between 1 and {MAX_ROUNDS}")
@@ -167,6 +172,12 @@ def validate_execution_request(
             "--live requires confirmation that Fable 5 is included in the "
             "authenticated Max/premium plan, usage credits are disabled, and "
             "automatic model switching is disabled"
+        )
+    if freeze_review and not start_new_claude_session:
+        raise ConfigurationError(
+            "--freeze-review requires a clean Claude session via "
+            "--new-claude-session so prior conversation state cannot enter "
+            "authoritative review evidence"
         )
 
 
@@ -198,6 +209,11 @@ def validate_claude_subscription_auth(status: Mapping[str, object]) -> None:
     if status.get("apiProvider") != "firstParty":
         raise ConfigurationError(
             "Claude Code is not using the first-party subscription provider"
+        )
+    if status.get("authMethod") != CLAUDE_SUBSCRIPTION_AUTH_METHOD:
+        raise ConfigurationError(
+            "Claude Code must use the supported subscription OAuth authMethod; "
+            "API-key and unreported authentication are forbidden"
         )
 
 
@@ -597,6 +613,7 @@ def run_bounded_loop(
     live: bool,
     acknowledge_costs: bool,
     confirm_fable_regular_usage: bool = False,
+    freeze_review: bool = False,
     runner: Runner = run_agent_command,
     claude_executable: str = "claude",
     codex_executable: str = "codex",
@@ -608,6 +625,8 @@ def run_bounded_loop(
         acknowledge_costs=acknowledge_costs,
         rounds=rounds,
         confirm_fable_regular_usage=confirm_fable_regular_usage,
+        freeze_review=freeze_review,
+        start_new_claude_session=start_new_claude_session,
     )
     validate_claude_subscription_environment(os.environ)
     if not live:
@@ -726,6 +745,14 @@ def _parse_args(argv: Sequence[str] | None) -> argparse.Namespace:
         help=(
             "required with --live; confirms an eligible Max/premium subscription, "
             "disabled usage credits, and disabled automatic model switching"
+        ),
+    )
+    parser.add_argument(
+        "--freeze-review",
+        action="store_true",
+        help=(
+            "classify the output as freeze-review evidence; requires a clean "
+            "Claude session and still cannot replace human approval"
         ),
     )
     return parser.parse_args(argv)
@@ -867,7 +894,21 @@ def _write_manifest(
     status: str,
     cli_preflight: Mapping[str, object],
     claude_session_mode: str,
+    freeze_review: bool,
 ) -> None:
+    review = (
+        {
+            "mode": "freeze",
+            "evidence_status": "eligible_for_human_freeze_review",
+            "requires_clean_session": True,
+        }
+        if freeze_review
+        else {
+            "mode": "historical",
+            "evidence_status": "non_authoritative_historical",
+            "requires_clean_session": False,
+        }
+    )
     manifest = {
         "created_at_utc": datetime.now(timezone.utc).isoformat(),
         "repository": dict(repository_context),
@@ -887,6 +928,7 @@ def _write_manifest(
         "codex": {"model": "gpt-5.6-sol", "effort": "xhigh", "ephemeral": True},
         "relay_subprocess_retries": 0,
         "underlying_cli_request_count": "unverified",
+        "review": review,
         "final_synthesis": final_path.name if final_path else None,
         "cli_preflight": dict(cli_preflight),
         "human_authority_required": [
@@ -908,6 +950,8 @@ def main(argv: Sequence[str] | None = None) -> int:
         acknowledge_costs=args.acknowledge_external_model_costs,
         rounds=args.rounds,
         confirm_fable_regular_usage=args.confirm_fable_5_regular_plan_usage,
+        freeze_review=args.freeze_review,
+        start_new_claude_session=args.new_claude_session,
     )
     validate_claude_budget(args.claude_max_budget_usd, rounds=args.rounds)
     if not 60 <= args.timeout_seconds <= 3600:
@@ -923,6 +967,11 @@ def main(argv: Sequence[str] | None = None) -> int:
     validate_output_directory(output_dir, worktree)
     claude_session = args.claude_session or str(uuid.uuid4())
     claude_session_mode = "clean" if args.new_claude_session else "resume_existing"
+    review_status = (
+        "eligible for human freeze review; human authority still required"
+        if args.freeze_review
+        else "non-authoritative historical review"
+    )
 
     max_claude_total = args.claude_max_budget_usd * args.rounds
     print(f"worktree: {worktree}")
@@ -930,6 +979,7 @@ def main(argv: Sequence[str] | None = None) -> int:
     print(f"rounds: {args.rounds} Claude turns + {args.rounds} Codex turns")
     print(f"Claude: {CLAUDE_MODEL}, high, regular eligible-plan usage only")
     print(f"Claude session mode: {claude_session_mode}")
+    print(f"review status: {review_status}")
     print(f"Claude hard maximum: ${max_claude_total:.2f} total")
     print("Codex: gpt-5.6-sol, xhigh, ephemeral, fixed turn count")
     print("agent permissions: read-only; relay subprocess retries: 0")
@@ -959,6 +1009,7 @@ def main(argv: Sequence[str] | None = None) -> int:
         status="running",
         cli_preflight=cli_preflight,
         claude_session_mode=claude_session_mode,
+        freeze_review=args.freeze_review,
     )
 
     try:
@@ -977,6 +1028,7 @@ def main(argv: Sequence[str] | None = None) -> int:
             live=args.live,
             acknowledge_costs=args.acknowledge_external_model_costs,
             confirm_fable_regular_usage=args.confirm_fable_5_regular_plan_usage,
+            freeze_review=args.freeze_review,
             claude_executable=claude_executable,
             codex_executable=codex_executable,
         )
@@ -991,6 +1043,7 @@ def main(argv: Sequence[str] | None = None) -> int:
             status="failed",
             cli_preflight=cli_preflight,
             claude_session_mode=claude_session_mode,
+            freeze_review=args.freeze_review,
         )
         raise
     _write_manifest(
@@ -1003,6 +1056,7 @@ def main(argv: Sequence[str] | None = None) -> int:
         status="complete",
         cli_preflight=cli_preflight,
         claude_session_mode=claude_session_mode,
+        freeze_review=args.freeze_review,
     )
     print(f"final synthesis: {final_path}")
     return 0

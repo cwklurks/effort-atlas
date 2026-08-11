@@ -63,10 +63,15 @@ class AdversarialReviewLoopTests(unittest.TestCase):
             ["--claude-session", "2fe4d6f6-c291-4452-833e-b4726cbe9b10"]
         )
         clean = loop._parse_args(["--new-claude-session"])
+        freeze = loop._parse_args(["--new-claude-session", "--freeze-review"])
         self.assertIsNotNone(existing.claude_session)
         self.assertFalse(existing.new_claude_session)
+        self.assertFalse(existing.freeze_review)
         self.assertIsNone(clean.claude_session)
         self.assertTrue(clean.new_claude_session)
+        self.assertFalse(clean.freeze_review)
+        self.assertTrue(freeze.new_claude_session)
+        self.assertTrue(freeze.freeze_review)
 
         with self.assertRaises(SystemExit):
             loop._parse_args([])
@@ -100,6 +105,18 @@ class AdversarialReviewLoopTests(unittest.TestCase):
             loop.validate_claude_subscription_auth(
                 {"loggedIn": True, "authMethod": "oauth", "apiProvider": "bedrock"}
             )
+        for auth_method in ("apiKey", None):
+            with (
+                self.subTest(auth_method=auth_method),
+                self.assertRaisesRegex(loop.ConfigurationError, "OAuth"),
+            ):
+                loop.validate_claude_subscription_auth(
+                    {
+                        "loggedIn": True,
+                        "authMethod": auth_method,
+                        "apiProvider": "firstParty",
+                    }
+                )
 
         loop.validate_claude_subscription_auth(
             {"loggedIn": True, "authMethod": "oauth", "apiProvider": "firstParty"}
@@ -121,6 +138,52 @@ class AdversarialReviewLoopTests(unittest.TestCase):
             rounds=2,
         )
 
+    def test_freeze_review_requires_a_clean_claude_session(self):
+        with self.assertRaisesRegex(loop.ConfigurationError, "clean Claude session"):
+            loop.validate_execution_request(
+                live=False,
+                acknowledge_costs=False,
+                rounds=2,
+                freeze_review=True,
+                start_new_claude_session=False,
+            )
+
+        loop.validate_execution_request(
+            live=False,
+            acknowledge_costs=False,
+            rounds=2,
+            freeze_review=True,
+            start_new_claude_session=True,
+        )
+
+    def test_clean_freeze_review_manifest_is_only_human_review_eligible(self):
+        with tempfile.TemporaryDirectory() as directory:
+            output = Path(directory)
+            loop._write_manifest(
+                output_dir=output,
+                repository_context={"branch": "codex/prereg-v2", "head": "abc123"},
+                objective="Challenge C01.",
+                rounds=2,
+                claude_budget=Decimal("2.00"),
+                final_path=None,
+                status="running",
+                cli_preflight={},
+                claude_session_mode="clean",
+                freeze_review=True,
+            )
+
+            manifest = json.loads((output / "manifest.json").read_text())
+
+        self.assertEqual(
+            manifest["review"],
+            {
+                "evidence_status": "eligible_for_human_freeze_review",
+                "mode": "freeze",
+                "requires_clean_session": True,
+            },
+        )
+        self.assertIn("preregistration freeze", manifest["human_authority_required"])
+
     def test_codex_command_is_ephemeral_sol_xhigh_and_read_only(self):
         command = loop.build_codex_command(
             executable="codex",
@@ -134,6 +197,8 @@ class AdversarialReviewLoopTests(unittest.TestCase):
         self.assertEqual(command[command.index("--sandbox") + 1], "read-only")
         self.assertEqual(command[command.index("--ask-for-approval") + 1], "never")
         self.assertEqual(command[command.index("--model") + 1], "gpt-5.6-sol")
+        self.assertEqual(command.count("--ignore-user-config"), 1)
+        self.assertLess(command.index("--ignore-user-config"), command.index("--cd"))
         self.assertIn('model_reasoning_effort="xhigh"', command)
         self.assertIn('shell_environment_policy.inherit="none"', command)
         self.assertIn("--skip-git-repo-check", command)
@@ -338,6 +403,37 @@ class AdversarialReviewLoopTests(unittest.TestCase):
 
         self.assertEqual(calls, 0)
 
+    def test_imported_freeze_review_cannot_resume_prior_claude_context(self):
+        calls = 0
+
+        def sentinel_runner(*args, **kwargs):
+            nonlocal calls
+            calls += 1
+            return "must not run"
+
+        with (
+            tempfile.TemporaryDirectory() as directory,
+            self.assertRaisesRegex(loop.ConfigurationError, "clean Claude session"),
+        ):
+            loop.run_bounded_loop(
+                objective="Challenge C01.",
+                worktree=Path("/tmp/reap-target"),
+                output_dir=Path(directory),
+                repository_context={"branch": "codex/prereg-v2", "head": "abc123"},
+                claude_session="2fe4d6f6-c291-4452-833e-b4726cbe9b10",
+                start_new_claude_session=False,
+                claude_budget=Decimal("2.00"),
+                rounds=2,
+                timeout_seconds=300,
+                runner=sentinel_runner,
+                live=True,
+                acknowledge_costs=True,
+                confirm_fable_regular_usage=True,
+                freeze_review=True,
+            )
+
+        self.assertEqual(calls, 0)
+
     def test_imported_loop_cannot_bypass_subscription_environment_guard(self):
         calls = 0
 
@@ -484,7 +580,7 @@ class AdversarialReviewLoopTests(unittest.TestCase):
                 "  exit 0\n"
                 "fi\n"
                 "if [ \"$1\" = 'exec' ] && [ \"$2\" = '--help' ]; then\n"
-                "  printf '%s\\n' '--ephemeral --cd --sandbox --model --config --color --skip-git-repo-check --output-last-message'\n"
+                "  printf '%s\\n' '--ignore-user-config --ephemeral --cd --sandbox --model --config --color --skip-git-repo-check --output-last-message'\n"
                 "  exit 0\n"
                 "fi\n"
                 'printf \'%s\\n\' "$0" >> "$RELAY_FAKE_LOG"\n'
@@ -556,6 +652,7 @@ class AdversarialReviewLoopTests(unittest.TestCase):
             )
 
             self.assertEqual(result.returncode, 0, result.stderr)
+            self.assertIn("non-authoritative historical review", result.stdout)
             self.assertEqual(
                 log.read_text().splitlines(),
                 [
@@ -572,6 +669,14 @@ class AdversarialReviewLoopTests(unittest.TestCase):
             self.assertEqual(manifest["underlying_cli_request_count"], "unverified")
             self.assertEqual(manifest["claude_max_total_budget_usd"], "4.00")
             self.assertEqual(manifest["status"], "complete")
+            self.assertEqual(
+                manifest["review"],
+                {
+                    "evidence_status": "non_authoritative_historical",
+                    "mode": "historical",
+                    "requires_clean_session": False,
+                },
+            )
             self.assertIn("cli_preflight", manifest)
             self.assertEqual(
                 manifest["cli_preflight"]["claude"]["resolved_path"],
