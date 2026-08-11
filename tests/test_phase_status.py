@@ -75,7 +75,7 @@ class PhaseStatusTests(unittest.TestCase):
         phase_three = next(row for row in data["phases"] if row["id"] == 3)
         self.assertEqual(data["project"]["current_phase"], 3)
         self.assertEqual(phase_three["status"], "in_progress")
-        self.assertEqual(phase_three["progress"], 45)
+        self.assertEqual(phase_three["progress"], 50)
         self.assertEqual(
             phase_three["url"],
             "https://github.com/cwklurks/effort-atlas/pull/6",

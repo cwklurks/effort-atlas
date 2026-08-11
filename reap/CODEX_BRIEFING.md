@@ -16,10 +16,11 @@ Point any new Codex session at this file first: **"Read reap/CODEX_BRIEFING.md a
 | 6 | `reap/11_PHASE3_DECISION_PACKET_2026-08-08.md` | Independently reviewed Phase-3 recommendations and D01-D15 approval form. Every choice is advisory and human-pending. |
 | 7 | `reap/12_PHASE3_CONNOR_DECISION_WORKSHEET_2026-08-10.md` | Non-frozen record of Connor's current positions, every alternative, current dataset/model research, and the questions still open for Chirag. It authorizes no call. |
 | 8 | `reap/13_PHASE3_INTEGRATED_RECOMMENDATION_2026-08-10.md` + `reap/prompts/PHASE3_EXTERNAL_REVIEW_PROMPT_2026-08-10.md` | Non-frozen opinionated proposal and self-contained prompt for Connor's separate-model review. They expose the symbolic-grader and current route blockers and authorize no call. |
-| 9 | `PREREGISTRATION.md` + `PREREGISTRATION_AMENDMENT_2026-07-22.md` | **FROZEN. Never edit.** Read to understand what is already committed. |
-| 10 | `reap/REVIEW_PR1_ECOSYSTEM_AUDIT.md` | Red-team review of PR #1 and its 8 blocking fixes. |
-| 11 | `observational/RESULTS.md` + `observational/pipeline.py` + `observational/INPUT_PROVENANCE.md` | The free observational study (done, verified). Pipeline is pinned — agents run it, never rewrite its statistics. Input acquisition is not yet clean-checkout reproducible. |
-| 12 | `src/effort_atlas/` + `tests/` | Existing code. `confirmatory.py`, strict grader v2, and the independently approved pre-data analysis layer are merged. Phase 3 methodology and preregistration are now the active gate. |
+| 9 | `reap/14_PHASE3_EXTERNAL_REVIEW_2026-08-10.md` + `reap/prompts/PHASE3_ADVERSARIAL_LOOP_OBJECTIVE_2026-08-10.md` | Preserved external review plus the C01-C07 objective for a bounded Claude/Codex adversarial relay. The relay is implemented but has not been run. |
+| 10 | `PREREGISTRATION.md` + `PREREGISTRATION_AMENDMENT_2026-07-22.md` | **FROZEN. Never edit.** Read to understand what is already committed. |
+| 11 | `reap/REVIEW_PR1_ECOSYSTEM_AUDIT.md` | Red-team review of PR #1 and its 8 blocking fixes. |
+| 12 | `observational/RESULTS.md` + `observational/pipeline.py` + `observational/INPUT_PROVENANCE.md` | The free observational study (done, verified). Pipeline is pinned — agents run it, never rewrite its statistics. Input acquisition is not yet clean-checkout reproducible. |
+| 13 | `src/effort_atlas/` + `tests/` | Existing code. `confirmatory.py`, strict grader v2, and the independently approved pre-data analysis layer are merged. Phase 3 methodology and preregistration are now the active gate. |
 
 ## 2. Project state, in one screen
 
@@ -51,6 +52,19 @@ assumption: the 33-row HMMT-2026 source contains symbolic fractions and radicals
 so the planned 30-item core cannot freeze until a pinned upstream MathArena scorer
 and the exact source-defined selection rule pass. No recommendation is an approval.
 
+The external response is preserved at
+`reap/14_PHASE3_EXTERNAL_REVIEW_2026-08-10.md`. A bounded Claude/Codex relay at
+`scripts/adversarial_review_loop.py`, with the objective in
+`reap/prompts/PHASE3_ADVERSARIAL_LOOP_OBJECTIVE_2026-08-10.md`, can now exchange
+two read-only challenge rounds automatically and produce a final Sol XHigh
+synthesis. It operates on a tracked-file snapshot, preserves every prompt and
+response, performs no relay-level subprocess retry, labels internal CLI request
+counts unverified, and requires explicit live and cost acknowledgement flags. The
+real relay has not been run. The current checkpoint is
+129 ordinary tests plus 26 exact-lock Tinker tests; all study-call and spend
+counters remain zero. Model agreement cannot authorize spending, provider
+activation, preregistration freeze, or choices owned by Connor or Chirag.
+
 **Funding:** $5,000 Tinker credits + ~$200 OpenAI (supervisor) + <$100 OpenRouter. Platform-scoped pools, never mixed. Cost model and gates in `reap/02_BUDGET_AND_COSTS.md`.
 
 **Development model routing:** a direct Fireworks ZDR DeepSeek V4 Flash lane is
@@ -81,7 +95,7 @@ schedule/price/route manifest.
 | C — `codex/tinker-probe`, PR #5 | merged at accepted `3331dc1`; dry-run safe | live intentionally blocked because Tinker 0.25.0 cannot guarantee one submission; no empirical fact is settled |
 | D — `codex/analysis-layer`, PR #3 | independently approved after remediation and merged at `7c83085` | complete; Phase 3 methodology decisions are now active |
 | E — `codex/runner` | not implemented | waits on accepted grader interfaces, frozen design inputs, and corrected budget math |
-| Phase 3 — `codex/prereg-v2`, draft PR #6 | decision packet reviewed; Connor positions and alternatives being recorded | D03/D04/D06/D09/D11/D12/D13/D15 and Chirag scientific signoff remain open; no call authorized |
+| Phase 3 — `codex/prereg-v2`, draft PR #6 | external review preserved; bounded Claude/Codex relay implemented but not run | C01-C07 synthesis, D03/D04/D06/D09/D11/D12/D13/D15, and Chirag scientific signoff remain open; no call authorized |
 
 The current phase-gate and model-routing plan is in
 `reap/10_PHASE_GATE_PLAN_2026-08-08.md`; the current human decision surface is
