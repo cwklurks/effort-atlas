@@ -104,7 +104,7 @@ class BudgetProjection:
 def project_maximum_exposure(
     rows: Iterable[BudgetRow], rates: Iterable[RouteRate], *, price_basis: str = "list"
 ) -> BudgetProjection:
-    """Sum prompt bounds and explicit output caps using list rates by default."""
+    """Build a planning-only projection using list rates by default."""
 
     if price_basis not in {"list", "discount"}:
         raise ValueError("price_basis must be list or discount")
@@ -175,10 +175,10 @@ def project_maximum_exposure(
     )
 
 
-def enforce_budget_ceiling(
+def validate_planning_ceiling(
     projection: BudgetProjection, ceiling_usd: Decimal
 ) -> BudgetProjection:
-    """Return the projection at or below the ceiling; refuse any excess."""
+    """Validate a planning-only projection against one proposed ceiling."""
 
     if (
         not isinstance(ceiling_usd, Decimal)
@@ -193,7 +193,7 @@ def enforce_budget_ceiling(
     return projection
 
 
-def enforce_freeze_budget_gate(
+def validate_planning_budget_ceiling(
     rows: Iterable[BudgetRow],
     rates: Iterable[RouteRate],
     *,
@@ -202,21 +202,22 @@ def enforce_freeze_budget_gate(
     price_basis: str = "list",
     receipt_checked_discount_policy: bool = False,
 ) -> BudgetProjection:
-    """Compute authoritative exposure and enforce frozen pool and panel ceilings.
+    """Validate planning-only exposure against proposed ceilings.
 
-    Callers supply planned rows and pinned route rates.  This authority boundary
-    never accepts a caller-assembled ``BudgetProjection``.
+    Caller-supplied rows, rates, and snapshot digests are not verified artifacts.
+    This function returns planning arithmetic only and never accepts a precomputed
+    ``BudgetProjection``.
 
-    A discount projection is admissible only when a separately frozen policy commits
+    A discount projection is admissible only when a separate policy commits
     to receipt checks.  This flag records that policy; it does not verify receipts.
     """
     if isinstance(rows, BudgetProjection):
         raise TypeError(
-            "enforce_freeze_budget_gate does not accept BudgetProjection; "
+            "validate_planning_budget_ceiling does not accept BudgetProjection; "
             "supply BudgetRow and RouteRate inputs"
         )
     projection = project_maximum_exposure(rows, rates, price_basis=price_basis)
-    return _enforce_projected_freeze_budget_gate(
+    return _validate_projected_planning_budget_ceiling(
         projection,
         pool_ceilings_usd=pool_ceilings_usd,
         panel_ceilings_usd=panel_ceilings_usd,
@@ -224,20 +225,20 @@ def enforce_freeze_budget_gate(
     )
 
 
-def _enforce_projected_freeze_budget_gate(
+def _validate_projected_planning_budget_ceiling(
     projection: BudgetProjection,
     *,
     pool_ceilings_usd: dict[str, Decimal],
     panel_ceilings_usd: dict[tuple[str, str], Decimal],
     receipt_checked_discount_policy: bool = False,
 ) -> BudgetProjection:
-    """Validate and enforce a derived projection without granting freeze authority."""
+    """Validate a derived planning projection and its proposed ceiling maps."""
     if not isinstance(projection, BudgetProjection):
         raise TypeError("projection must be a BudgetProjection")
     projection_pool_ids, projection_panel_ids = _validate_projection(projection)
     if projection.price_basis == "discount" and not receipt_checked_discount_policy:
         raise BudgetCeilingExceeded(
-            "discount-only projection cannot satisfy a freeze gate without a receipt-checked discount policy"
+            "discount-only planning projection requires a receipt-checked discount policy"
         )
     _require_ceiling_map(pool_ceilings_usd, label="pool")
     _require_ceiling_map(panel_ceilings_usd, label="panel")
