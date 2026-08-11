@@ -28,7 +28,9 @@ def _nonempty_string(label: str, value: object) -> str:
 def _scope_id(label: str, value: object) -> str:
     scope_id = _nonempty_string(label, value)
     if scope_id.strip().casefold() in RESERVED_SCOPE_IDS:
-        raise ValueError(f"{label} must be an explicit non-placeholder scope identifier")
+        raise ValueError(
+            f"{label} must be an explicit non-placeholder scope identifier"
+        )
     return scope_id
 
 
@@ -328,9 +330,7 @@ def _validate_projection_aggregate(
             (
                 _scope_id(f"{label}[{index}] {key_label}", raw_identity)
                 if scope_keys
-                else _nonempty_string(
-                    f"{label}[{index}] {key_label}", raw_identity
-                )
+                else _nonempty_string(f"{label}[{index}] {key_label}", raw_identity)
             )
             for key_label, raw_identity in zip(key_labels, entry[:-1], strict=True)
         )

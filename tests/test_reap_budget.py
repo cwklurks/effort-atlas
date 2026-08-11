@@ -103,9 +103,12 @@ class ReapBudgetTests(unittest.TestCase):
             ),
         )
         for pool_ceilings, panel_ceilings in invalid_maps:
-            with self.subTest(
-                pool_ceilings=pool_ceilings, panel_ceilings=panel_ceilings
-            ), self.assertRaisesRegex(ValueError, "placeholder"):
+            with (
+                self.subTest(
+                    pool_ceilings=pool_ceilings, panel_ceilings=panel_ceilings
+                ),
+                self.assertRaisesRegex(ValueError, "placeholder"),
+            ):
                 enforce_freeze_budget_gate(
                     projection,
                     pool_ceilings_usd=pool_ceilings,
@@ -120,8 +123,14 @@ class ReapBudgetTests(unittest.TestCase):
         mutations = (
             ("row_count", replace(valid, row_count=0)),
             ("row_count", replace(valid, row_count=True)),
-            ("maximum_exposure_usd", replace(valid, maximum_exposure_usd=Decimal("NaN"))),
-            ("maximum_exposure_usd", replace(valid, maximum_exposure_usd=Decimal("-0.01"))),
+            (
+                "maximum_exposure_usd",
+                replace(valid, maximum_exposure_usd=Decimal("NaN")),
+            ),
+            (
+                "maximum_exposure_usd",
+                replace(valid, maximum_exposure_usd=Decimal("-0.01")),
+            ),
             ("snapshot_sha256", replace(valid, snapshot_sha256="bad")),
             ("price_basis", replace(valid, price_basis="guess")),
             ("by_phase_usd", replace(valid, by_phase_usd=())),
@@ -135,8 +144,9 @@ class ReapBudgetTests(unittest.TestCase):
             ),
         )
         for expected, projection in mutations:
-            with self.subTest(expected=expected), self.assertRaisesRegex(
-                ValueError, expected
+            with (
+                self.subTest(expected=expected),
+                self.assertRaisesRegex(ValueError, expected),
             ):
                 enforce_freeze_budget_gate(
                     projection,
@@ -161,8 +171,9 @@ class ReapBudgetTests(unittest.TestCase):
             ),
         )
         for projection in mutations:
-            with self.subTest(projection=projection), self.assertRaisesRegex(
-                ValueError, "finite nonnegative Decimal"
+            with (
+                self.subTest(projection=projection),
+                self.assertRaisesRegex(ValueError, "finite nonnegative Decimal"),
             ):
                 enforce_freeze_budget_gate(
                     projection,
@@ -232,8 +243,9 @@ class ReapBudgetTests(unittest.TestCase):
             ),
         )
         for expected, projection in mutations:
-            with self.subTest(expected=expected), self.assertRaisesRegex(
-                ValueError, expected
+            with (
+                self.subTest(expected=expected),
+                self.assertRaisesRegex(ValueError, expected),
             ):
                 enforce_freeze_budget_gate(
                     projection,
@@ -268,9 +280,12 @@ class ReapBudgetTests(unittest.TestCase):
             ),
         )
         for pool_ceilings, panel_ceilings in mutations:
-            with self.subTest(
-                pool_ceilings=pool_ceilings, panel_ceilings=panel_ceilings
-            ), self.assertRaisesRegex(BudgetCeilingExceeded, "scope"):
+            with (
+                self.subTest(
+                    pool_ceilings=pool_ceilings, panel_ceilings=panel_ceilings
+                ),
+                self.assertRaisesRegex(BudgetCeilingExceeded, "scope"),
+            ):
                 enforce_freeze_budget_gate(
                     projection,
                     pool_ceilings_usd=pool_ceilings,
@@ -280,11 +295,7 @@ class ReapBudgetTests(unittest.TestCase):
     def test_freeze_gate_accepts_explicit_zero_cost_aggregates(self) -> None:
         projection = project_maximum_exposure(
             (BudgetRow("job", "free-route", "main", 0, 1, "pool", "panel"),),
-            (
-                RouteRate(
-                    "free-route", Decimal(0), Decimal(0), "a" * 64, "list"
-                ),
-            ),
+            (RouteRate("free-route", Decimal(0), Decimal(0), "a" * 64, "list"),),
         )
 
         self.assertEqual(projection.maximum_exposure_usd, Decimal(0))
