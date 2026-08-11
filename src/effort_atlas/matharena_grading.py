@@ -68,31 +68,55 @@ class MathArenaPin:
             raise MathArenaImportFailed("pin_invalid")
 
 
-def _source_sha256(module: ModuleType) -> str:
+def _source_bytes(module: ModuleType) -> tuple[Path, bytes]:
     source_file = getattr(module, "__file__", None)
     if not isinstance(source_file, str) or not source_file:
         raise MathArenaImportFailed("source_unavailable")
+    source_path = Path(source_file)
     try:
-        source = Path(source_file).read_bytes()
+        source = source_path.read_bytes()
     except OSError as error:
         raise MathArenaImportFailed("source_unavailable") from error
-    return hashlib.sha256(source).hexdigest()
+    return source_path, source
 
 
-def _callable_matches_source(
+def _load_verified_namespace(
+    source: bytes,
+    *,
+    source_file: Path,
+    module_name: str,
+) -> dict[str, object]:
+    namespace: dict[str, object] = {
+        "__file__": str(source_file),
+        "__name__": module_name,
+        "__package__": module_name.rpartition(".")[0],
+    }
+    try:
+        exec(  # noqa: S102 - execute only the caller's exact hash-pinned source
+            compile(source, str(source_file), "exec"),
+            namespace,
+        )
+    except Exception as error:
+        raise MathArenaImportFailed("source_execution_failed") from error
+    return namespace
+
+
+def _callable_matches_verified_definition(
     function: object,
     *,
+    verified_function: object,
     name: str,
     module_name: str,
-    source_file: Path,
 ) -> bool:
     code = getattr(function, "__code__", None)
-    code_file = getattr(code, "co_filename", None)
+    verified_code = getattr(verified_function, "__code__", None)
     return (
-        getattr(function, "__name__", None) == name
+        callable(function)
+        and callable(verified_function)
+        and getattr(function, "__name__", None) == name
         and getattr(function, "__module__", None) == module_name
-        and isinstance(code_file, str)
-        and Path(code_file).resolve() == source_file.resolve()
+        and code is not None
+        and code == verified_code
     )
 
 
@@ -113,26 +137,45 @@ def _validated_callables(
         raise MathArenaImportFailed("version_missing")
     if observed_version != pin.distribution_version:
         raise MathArenaImportFailed("version_mismatch")
-    if _source_sha256(module) != pin.source_sha256:
+    source_file, source = _source_bytes(module)
+    if hashlib.sha256(source).hexdigest() != pin.source_sha256:
         raise MathArenaImportFailed("source_hash_mismatch")
-    source_file = Path(module.__file__)
+
+    verified_namespace = _load_verified_namespace(
+        source,
+        source_file=source_file,
+        module_name=pin.module_name,
+    )
 
     parse_answer = getattr(module, "parse_answer", None)
     check_answers = getattr(module, "check_answers", None)
-    if not callable(parse_answer) or not callable(check_answers):
+    verified_parse_answer = verified_namespace.get("parse_answer")
+    verified_check_answers = verified_namespace.get("check_answers")
+    if not all(
+        callable(function)
+        for function in (
+            parse_answer,
+            check_answers,
+            verified_parse_answer,
+            verified_check_answers,
+        )
+    ):
         raise MathArenaImportFailed("callable_missing")
-    permitted = (("parse_answer", parse_answer), ("check_answers", check_answers))
+    permitted = (
+        ("parse_answer", parse_answer, verified_parse_answer),
+        ("check_answers", check_answers, verified_check_answers),
+    )
     if any(
-        not _callable_matches_source(
+        not _callable_matches_verified_definition(
             function,
+            verified_function=verified_function,
             name=name,
             module_name=pin.module_name,
-            source_file=source_file,
         )
-        for name, function in permitted
+        for name, function, verified_function in permitted
     ):
         raise MathArenaImportFailed("callable_provenance_mismatch")
-    return parse_answer, check_answers
+    return verified_parse_answer, verified_check_answers
 
 
 def _parse(parse_answer: ParseAnswer, value: str) -> object:

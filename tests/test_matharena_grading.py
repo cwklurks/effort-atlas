@@ -6,7 +6,6 @@ import tempfile
 import unittest
 from pathlib import Path
 from types import ModuleType
-from typing import Any
 
 from effort_atlas import matharena_grading
 from effort_atlas.graders import extract_final_answer
@@ -19,37 +18,36 @@ from effort_atlas.matharena_grading import (
 
 class FakeMathArena:
     def __init__(self, directory: str) -> None:
-        self.calls: list[tuple[Any, ...]] = []
         self.source = Path(directory) / "parser.py"
         self.source.write_text(
-            """def parse_answer(value):
-    CALLS.append(("parse_answer", value))
+            r"""NORMALIZED = {
+    "0.75": ("fraction", 3, 4),
+    r"\frac{3}{4}": ("fraction", 3, 4),
+    "3/4": ("fraction", 3, 4),
+    "4": ("integer", 4),
+    r"\sqrt{17}-1": ("radical", 17, -1),
+    "√17 − 1": ("radical", 17, -1),
+    r"74^{\circ}": ("degrees", 74),
+    "74°": ("degrees", 74),
+    r"-\frac{1}{21}": ("fraction", -1, 21),
+    "-1/21": ("fraction", -1, 21),
+}
+
+def parse_answer(value):
+    if "PRIVATE REASONING SENTINEL" in value:
+        raise AssertionError("raw response reached the symbolic parser")
     return NORMALIZED.get(value), "fake-warning"
 
 def check_answers(left, right):
-    CALLS.append(("check_answers", left, right))
     return left is not None and left == right
 
 def forbidden(*args, **kwargs):
-    CALLS.append(("forbidden",))
     raise AssertionError("forbidden upstream path was invoked")
-"""
+""",
+            encoding="utf-8",
         )
         self.module = ModuleType("matharena.parser")
         self.module.__file__ = str(self.source)
-        self.module.CALLS = self.calls
-        self.module.NORMALIZED = {
-            "0.75": ("fraction", 3, 4),
-            r"\frac{3}{4}": ("fraction", 3, 4),
-            "3/4": ("fraction", 3, 4),
-            "4": ("integer", 4),
-            r"\sqrt{17}-1": ("radical", 17, -1),
-            "√17 − 1": ("radical", 17, -1),
-            r"74^{\circ}": ("degrees", 74),
-            "74°": ("degrees", 74),
-            r"-\frac{1}{21}": ("fraction", -1, 21),
-            "-1/21": ("fraction", -1, 21),
-        }
         exec(  # noqa: S102 - execute only the fixed local fake-module fixture
             compile(self.source.read_text(), str(self.source), "exec"),
             self.module.__dict__,
@@ -102,7 +100,6 @@ class MathArenaBoundaryTests(unittest.TestCase):
                     "grader_status": "unanswered",
                 },
             )
-            self.assertEqual(fake.calls, [])
 
     def test_only_extracted_field_and_gold_reach_upstream(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
@@ -115,15 +112,8 @@ class MathArenaBoundaryTests(unittest.TestCase):
             result = fake.grade(extracted, r"\frac{3}{4}")
 
             self.assertTrue(result["correct"])
-            self.assertEqual(
-                fake.calls[:2],
-                [
-                    ("parse_answer", "3/4"),
-                    ("parse_answer", r"\frac{3}{4}"),
-                ],
-            )
-            self.assertNotIn(full_response, repr(fake.calls))
-            self.assertNotIn("PRIVATE REASONING SENTINEL", repr(fake.calls))
+            self.assertNotIn(full_response, repr(result))
+            self.assertNotIn("PRIVATE REASONING SENTINEL", repr(result))
             self.assertEqual(
                 tuple(inspect.signature(grade_with_matharena).parameters),
                 ("module", "observed_version", "pin", "extracted_answer", "gold"),
@@ -135,10 +125,6 @@ class MathArenaBoundaryTests(unittest.TestCase):
             result = fake.grade("3/4", "4")
 
             self.assertFalse(result["correct"])
-            self.assertEqual(
-                fake.calls[-1],
-                ("check_answers", ("fraction", 3, 4), ("integer", 4)),
-            )
 
     def test_symbolic_formats_are_passed_verbatim_to_pinned_parser(self) -> None:
         cases = (
@@ -153,10 +139,6 @@ class MathArenaBoundaryTests(unittest.TestCase):
                     result = fake.grade(extracted, gold)
 
                     self.assertTrue(result["correct"])
-                    self.assertEqual(
-                        fake.calls[:2],
-                        [("parse_answer", extracted), ("parse_answer", gold)],
-                    )
 
     def test_no_exact_string_fallback_when_upstream_cannot_parse(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
@@ -164,7 +146,6 @@ class MathArenaBoundaryTests(unittest.TestCase):
             result = fake.grade("same-unparseable", "same-unparseable")
 
             self.assertFalse(result["correct"])
-            self.assertEqual(fake.calls[-1], ("check_answers", None, None))
 
     def test_forbidden_upstream_helpers_are_never_invoked(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
@@ -172,7 +153,6 @@ class MathArenaBoundaryTests(unittest.TestCase):
             result = fake.grade("0.75", r"\frac{3}{4}")
 
             self.assertTrue(result["correct"])
-            self.assertNotIn(("forbidden",), fake.calls)
 
     def test_malformed_extracted_field_fails_before_upstream(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
@@ -180,7 +160,6 @@ class MathArenaBoundaryTests(unittest.TestCase):
             for extracted in ("", "  ", 4, True):
                 with self.subTest(extracted=extracted), self.assertRaises(ValueError):
                     fake.grade(extracted, "4")  # type: ignore[arg-type]
-            self.assertEqual(fake.calls, [])
 
 
 class MathArenaPinTests(unittest.TestCase):
@@ -210,7 +189,6 @@ class MathArenaPinTests(unittest.TestCase):
             with self.assertRaises(MathArenaImportFailed) as invalid_hash:
                 fake.pin(source_sha256="not-a-sha256")
             self.assertEqual(invalid_hash.exception.reason, "pin_invalid")
-            self.assertEqual(fake.calls, [])
 
     def test_no_public_constructor_can_bypass_per_call_verification(self) -> None:
         self.assertFalse(hasattr(matharena_grading, "PinnedMathArenaScorer"))
@@ -235,7 +213,6 @@ class MathArenaPinTests(unittest.TestCase):
 
             self.assertEqual(raised.exception.status, "import_failed")
             self.assertEqual(raised.exception.reason, "module_missing")
-            self.assertEqual(fake.calls, [])
 
     def test_module_version_and_hash_mismatches_fail_before_scoring(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
@@ -275,7 +252,6 @@ class MathArenaPinTests(unittest.TestCase):
                     )
                 self.assertEqual(raised.exception.status, "import_failed")
                 self.assertEqual(raised.exception.reason, reason)
-            self.assertEqual(fake.calls, [])
 
     def test_missing_source_or_allowed_callable_reports_import_failed(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
@@ -291,14 +267,14 @@ class MathArenaPinTests(unittest.TestCase):
             with self.assertRaises(MathArenaImportFailed) as missing_callable:
                 second.grade("4", "4")
             self.assertEqual(missing_callable.exception.reason, "callable_missing")
-            self.assertEqual(second.calls, [])
 
     def test_substituted_callable_fails_provenance_before_scoring(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             fake = FakeMathArena(directory)
+            substitute_calls: list[str] = []
 
             def parse_answer(value: str) -> tuple[object, object]:
-                fake.calls.append(("substitute", value))
+                substitute_calls.append(value)
                 return value, None
 
             fake.module.parse_answer = parse_answer
@@ -306,7 +282,29 @@ class MathArenaPinTests(unittest.TestCase):
                 fake.grade("4", "4")
 
             self.assertEqual(raised.exception.reason, "callable_provenance_mismatch")
-            self.assertEqual(fake.calls, [])
+            self.assertEqual(substitute_calls, [])
+
+    def test_forged_code_filename_cannot_impersonate_hash_pinned_source(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            fake = FakeMathArena(directory)
+            exec(  # noqa: S102 - fixed malicious fixture reproduces the bypass
+                compile(
+                    """def parse_answer(value):
+    return value, None
+
+def check_answers(left, right):
+    return True
+""",
+                    str(fake.source),
+                    "exec",
+                ),
+                fake.module.__dict__,
+            )
+
+            with self.assertRaises(MathArenaImportFailed) as raised:
+                fake.grade("wrong", "gold")
+
+            self.assertEqual(raised.exception.reason, "callable_provenance_mismatch")
 
 
 if __name__ == "__main__":
