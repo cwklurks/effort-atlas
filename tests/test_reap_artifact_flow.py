@@ -2,11 +2,17 @@ from __future__ import annotations
 
 import hashlib
 import json
+import tempfile
 import unittest
 from decimal import Decimal
+from pathlib import Path
 
-from effort_atlas.activation import ActivationPolicy, evaluate_activation
-from effort_atlas.confirmatory import sha256_json
+from effort_atlas.activation import (
+    ActivationPolicy,
+    evaluate_activation,
+    load_activation_policy,
+)
+from effort_atlas.analysis import analyze_confirmatory_rows
 from effort_atlas.reap_budget import (
     BudgetCeilingExceeded,
     BudgetRow,
@@ -14,7 +20,7 @@ from effort_atlas.reap_budget import (
     enforce_freeze_budget_gate,
     project_maximum_exposure,
 )
-from effort_atlas.reap_manifest import seal_manifest, validate_manifest
+from effort_atlas.reap_manifest import seal_manifest, verify_manifest_files
 from effort_atlas.reap_schedule import build_reap_schedule
 
 
@@ -40,74 +46,135 @@ class ReapArtifactFlowTests(unittest.TestCase):
             "phase": "main",
             "panel": "test-panel",
             "model": "test-model",
-            "provider_route": "test-route",
+            "provider_route": "openai-direct::test-route",
             "item_id": "test-item",
-            "effort": "low",
-            "cap": 4096,
             "replicate": 1,
             "master_seed": 20260722,
         }
         self.jobs = build_reap_schedule(
-            ({**base, "arm_key": "arm-a"}, {**base, "arm_key": "arm-b"})
+            {
+                **base,
+                "arm_key": arm_key,
+                "effort": effort,
+                "cap": cap,
+            }
+            for arm_key in ("arm-a", "arm-b")
+            for effort in ("low", "high")
+            for cap in (4096, 8192)
         )
 
-    def _sealed_manifest(self) -> dict[str, object]:
-        dataset_sha = _digest("dataset")
-        prompt_sha = _digest("prompt-renderer-grader")
-        route_sha = _digest("route-price-snapshot")
-        schedule_sha = sha256_json(
-            [
+    def _write_frozen_artifact_tree(self, root: Path) -> dict[str, object]:
+        schedule_rows = [
+            {
+                **job.identity.as_dict(),
+                "job_id": job.job_id,
+                "provider_seed": job.provider_seed,
+            }
+            for job in self.jobs
+        ]
+        contents = {
+            "dataset": json.dumps(
                 {
-                    **job.identity.as_dict(),
-                    "job_id": job.job_id,
-                    "provider_seed": job.provider_seed,
-                }
-                for job in self.jobs
-            ]
-        )
+                    "dataset_id": "fixture-math",
+                    "items": [{"item_id": "test-item", "gold": r"\frac{1}{2}"}],
+                },
+                sort_keys=True,
+                separators=(",", ":"),
+            ).encode(),
+            "prompt_renderer_grader": json.dumps(
+                {
+                    "final_answer_terminator": "Final answer: <answer>",
+                    "matharena_scorer": {
+                        "distribution_version": "fixture-version",
+                        "module_name": "matharena.parser",
+                        "source_sha256": _digest("pinned-matharena-source"),
+                    },
+                },
+                sort_keys=True,
+                separators=(",", ":"),
+            ).encode(),
+            "route_price": json.dumps(
+                {
+                    "basis": "list",
+                    "route_id": "openai-direct::test-route",
+                    "input_usd_per_million": "0.20",
+                    "output_usd_per_million": "1.20",
+                },
+                sort_keys=True,
+                separators=(",", ":"),
+            ).encode(),
+            "schedule": json.dumps(
+                schedule_rows, sort_keys=True, separators=(",", ":")
+            ).encode(),
+            "analysis": b'{"analysis_version":1,"input_schema":"reap_v2"}',
+            "activation": json.dumps(
+                {
+                    "activation_policy_version": 1,
+                    "predicate_ids": [
+                        "single_submission",
+                        "termination_mapping",
+                    ],
+                    "substitution_allowed": False,
+                    "terminal_actions": ["activate", "omit"],
+                },
+                sort_keys=True,
+                separators=(",", ":"),
+            ).encode(),
+        }
+        paths = {name: f"artifacts/{name}.json" for name in contents}
+        for name, data in contents.items():
+            target = root / paths[name]
+            target.parent.mkdir(parents=True, exist_ok=True)
+            target.write_bytes(data)
+        hashes = {
+            name: hashlib.sha256(data).hexdigest() for name, data in contents.items()
+        }
         return seal_manifest(
             {
                 "manifest_version": 2,
                 "state": "frozen",
-                "dataset": {"path": "artifacts/dataset.json", "sha256": dataset_sha},
+                "dataset": {
+                    "path": paths["dataset"],
+                    "sha256": hashes["dataset"],
+                },
                 "prompt_renderer_grader": {
-                    "path": "artifacts/prompt_renderer_grader.json",
-                    "sha256": prompt_sha,
+                    "path": paths["prompt_renderer_grader"],
+                    "sha256": hashes["prompt_renderer_grader"],
                 },
                 "route_price": {
-                    "path": "artifacts/route_price.json",
-                    "sha256": route_sha,
+                    "path": paths["route_price"],
+                    "sha256": hashes["route_price"],
                 },
                 "schedule": {
-                    "path": "artifacts/schedule.json",
-                    "sha256": schedule_sha,
-                    "dataset_sha256": dataset_sha,
-                    "prompt_renderer_grader_sha256": prompt_sha,
-                    "route_price_sha256": route_sha,
+                    "path": paths["schedule"],
+                    "sha256": hashes["schedule"],
+                    "dataset_sha256": hashes["dataset"],
+                    "prompt_renderer_grader_sha256": hashes["prompt_renderer_grader"],
+                    "route_price_sha256": hashes["route_price"],
                 },
                 "analysis": {
-                    "path": "artifacts/analysis.json",
-                    "sha256": _digest("analysis"),
-                    "schedule_sha256": schedule_sha,
+                    "path": paths["analysis"],
+                    "sha256": hashes["analysis"],
+                    "schedule_sha256": hashes["schedule"],
                 },
                 "activation": {
-                    "path": "artifacts/activation.json",
-                    "sha256": _digest("activation"),
-                    "schedule_sha256": schedule_sha,
-                    "route_price_sha256": route_sha,
+                    "path": paths["activation"],
+                    "sha256": hashes["activation"],
+                    "schedule_sha256": hashes["schedule"],
+                    "route_price_sha256": hashes["route_price"],
                 },
             }
         )
 
     def test_schedule_budget_manifest_and_activation_compose_fail_closed(self) -> None:
-        self.assertEqual(len(self.jobs), 2)
+        self.assertEqual(len(self.jobs), 8)
         self.assertNotEqual(self.jobs[0].job_id, self.jobs[1].job_id)
         self.assertNotEqual(self.jobs[0].provider_seed, self.jobs[1].provider_seed)
 
         budget_rows = tuple(
             BudgetRow(
                 job_id=job.job_id,
-                route_id="openai-direct::test-route",
+                route_id=job.identity.provider_route,
                 phase="main",
                 prompt_token_bound=512,
                 max_output_tokens=job.identity.cap,
@@ -128,37 +195,86 @@ class ReapArtifactFlowTests(unittest.TestCase):
                 ),
             ),
         )
-        self.assertEqual(projection.maximum_exposure_usd, Decimal("0.0100352"))
+        self.assertEqual(projection.maximum_exposure_usd, Decimal("0.0598016"))
         self.assertEqual(projection.price_basis, "list")
         self.assertEqual(
             projection.by_pool_usd,
-            (("openai-direct", Decimal("0.0100352")),),
+            (("openai-direct", Decimal("0.0598016")),),
         )
         self.assertEqual(
             projection.by_pool_panel_usd,
-            (("openai-direct", "test-panel", Decimal("0.0100352")),),
+            (("openai-direct", "test-panel", Decimal("0.0598016")),),
         )
         enforce_freeze_budget_gate(
             projection,
-            pool_ceilings_usd={"openai-direct": Decimal("0.0100352")},
-            panel_ceilings_usd={("openai-direct", "test-panel"): Decimal("0.0100352")},
+            pool_ceilings_usd={"openai-direct": Decimal("0.0598016")},
+            panel_ceilings_usd={("openai-direct", "test-panel"): Decimal("0.0598016")},
         )
         with self.assertRaisesRegex(BudgetCeilingExceeded, "openai-direct"):
             enforce_freeze_budget_gate(
                 projection,
-                pool_ceilings_usd={"tinker": Decimal("0.0100352")},
-                panel_ceilings_usd={("tinker", "test-panel"): Decimal("0.0100352")},
+                pool_ceilings_usd={"tinker": Decimal("0.0598016")},
+                panel_ceilings_usd={("tinker", "test-panel"): Decimal("0.0598016")},
             )
 
-        manifest = validate_manifest(self._sealed_manifest(), require_frozen=True)
         required = ("single_submission", "termination_mapping")
-        policy = ActivationPolicy(
-            predicate_ids=required,
-            expected_manifest_sha256=manifest["manifest_sha256"],
-            policy_sha256=_policy_digest(required, manifest["manifest_sha256"]),
-        )
-        evidence = {
-            "manifest_sha256": manifest["manifest_sha256"],
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            manifest = self._write_frozen_artifact_tree(root)
+            verified = verify_manifest_files(manifest, approved_root=root)
+            self.assertEqual(
+                len(verified["evidence"]["sections"]),
+                6,
+            )
+            direct_policy = ActivationPolicy(
+                predicate_ids=required,
+                expected_manifest_sha256=manifest["manifest_sha256"],
+                policy_sha256=_policy_digest(required, manifest["manifest_sha256"]),
+            )
+            direct_evidence = self._activation_evidence(direct_policy)
+            direct_decision = evaluate_activation(
+                policy=direct_policy, evidence=direct_evidence
+            )
+            self.assertEqual(direct_decision.action, "omit")
+            self.assertIn(
+                "activation_policy:unverified_root", direct_decision.failed_predicates
+            )
+
+            policy = load_activation_policy(manifest=manifest, approved_root=root)
+            evidence = self._activation_evidence(policy)
+            self.assertEqual(
+                evaluate_activation(policy=policy, evidence=evidence).action,
+                "activate",
+            )
+
+            arm_a_rows = [
+                self._analysis_row(job)
+                for job in self.jobs
+                if job.identity.arm_key == "arm-a"
+            ]
+            report = analyze_confirmatory_rows(
+                arm_a_rows,
+                planned_rows=arm_a_rows,
+                effort_order=["low", "high"],
+                caps=[4096, 8192],
+                bootstrap_resamples=10,
+            )
+            self.assertEqual(len(report["panels"]), 1)
+            self.assertEqual(report["panels"][0]["arm_key"], "arm-a")
+
+        for failed_field in ("budget_within_bound", "schedule_manifest_match"):
+            failed = {**evidence, failed_field: False}
+            decision = evaluate_activation(
+                policy=policy,
+                evidence=failed,
+            )
+            self.assertEqual(decision.action, "omit")
+            self.assertIn(failed_field, decision.failed_predicates)
+
+    @staticmethod
+    def _activation_evidence(policy: ActivationPolicy) -> dict[str, object]:
+        return {
+            "manifest_sha256": policy.expected_manifest_sha256,
             "activation_policy_sha256": policy.policy_sha256,
             "generation_retry_count": 0,
             "receipt_reconciled": True,
@@ -178,24 +294,19 @@ class ReapArtifactFlowTests(unittest.TestCase):
                 },
             ],
         }
-        unverified_policy_decision = evaluate_activation(
-            policy=policy,
-            evidence=evidence,
-        )
-        self.assertEqual(unverified_policy_decision.action, "omit")
-        self.assertIn(
-            "activation_policy:unverified_root",
-            unverified_policy_decision.failed_predicates,
-        )
 
-        for failed_field in ("budget_within_bound", "schedule_manifest_match"):
-            failed = {**evidence, failed_field: False}
-            decision = evaluate_activation(
-                policy=policy,
-                evidence=failed,
-            )
-            self.assertEqual(decision.action, "omit")
-            self.assertIn(failed_field, decision.failed_predicates)
+    @staticmethod
+    def _analysis_row(job: object) -> dict[str, object]:
+        identity = job.identity
+        correct = identity.effort == "high" or identity.cap == 8192
+        return {
+            **identity.as_dict(),
+            "correct": correct,
+            "extracted_answer_present": True,
+            "extracted_answer": "1" if correct else "0",
+            "finish_reason": "stop",
+            "completion_tokens": 8,
+        }
 
 
 if __name__ == "__main__":
