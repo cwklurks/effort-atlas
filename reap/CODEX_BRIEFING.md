@@ -16,11 +16,12 @@ Point any new Codex session at this file first: **"Read reap/CODEX_BRIEFING.md a
 | 6 | `reap/11_PHASE3_DECISION_PACKET_2026-08-08.md` | Independently reviewed Phase-3 recommendations and D01-D15 approval form. Every choice is advisory and human-pending. |
 | 7 | `reap/12_PHASE3_CONNOR_DECISION_WORKSHEET_2026-08-10.md` | Non-frozen record of Connor's current positions, every alternative, current dataset/model research, and the questions still open for Chirag. It authorizes no call. |
 | 8 | `reap/13_PHASE3_INTEGRATED_RECOMMENDATION_2026-08-10.md` + `reap/prompts/PHASE3_EXTERNAL_REVIEW_PROMPT_2026-08-10.md` | Non-frozen opinionated proposal and self-contained prompt for Connor's separate-model review. They expose the symbolic-grader and current route blockers and authorize no call. |
-| 9 | `reap/14_PHASE3_EXTERNAL_REVIEW_2026-08-10.md` + `reap/prompts/PHASE3_ADVERSARIAL_LOOP_OBJECTIVE_2026-08-10.md` | Preserved external review plus the C01-C07 objective for a bounded Claude/Codex adversarial relay. The relay is implemented but has not been run. |
-| 10 | `PREREGISTRATION.md` + `PREREGISTRATION_AMENDMENT_2026-07-22.md` | **FROZEN. Never edit.** Read to understand what is already committed. |
-| 11 | `reap/REVIEW_PR1_ECOSYSTEM_AUDIT.md` | Red-team review of PR #1 and its 8 blocking fixes. |
-| 12 | `observational/RESULTS.md` + `observational/pipeline.py` + `observational/INPUT_PROVENANCE.md` | The free observational study (done, verified). Pipeline is pinned — agents run it, never rewrite its statistics. Input acquisition is not yet clean-checkout reproducible. |
-| 13 | `src/effort_atlas/` + `tests/` | Existing code. `confirmatory.py`, strict grader v2, and the independently approved pre-data analysis layer are merged. Phase 3 methodology and preregistration are now the active gate. |
+| 9 | `reap/14_PHASE3_EXTERNAL_REVIEW_2026-08-10.md` + `reap/prompts/PHASE3_ADVERSARIAL_LOOP_OBJECTIVE_2026-08-10.md` | Preserved external review plus the C01-C07 objective used by the completed bounded Claude/Codex development relay. The relay is non-authoritative and does not close human decisions. |
+| 10 | `reap/15_PHASE3_ADVERSARIAL_SYNTHESIS_2026-08-10.md` | Current non-frozen synthesis: model roles, planning prices, dataset recommendation, D01-D15 working answers, implemented safeguards, and remaining human decisions. It authorizes no call or freeze. |
+| 11 | `PREREGISTRATION.md` + `PREREGISTRATION_AMENDMENT_2026-07-22.md` | **FROZEN. Never edit.** Read to understand what is already committed. |
+| 12 | `reap/REVIEW_PR1_ECOSYSTEM_AUDIT.md` | Red-team review of PR #1 and its 8 blocking fixes. |
+| 13 | `observational/RESULTS.md` + `observational/pipeline.py` + `observational/INPUT_PROVENANCE.md` | The free observational study (done, verified). Pipeline is pinned — agents run it, never rewrite its statistics. Input acquisition is not yet clean-checkout reproducible. |
+| 14 | `src/effort_atlas/` + `tests/` | Existing code. `confirmatory.py`, strict grader v2, and the independently approved pre-data analysis layer are merged. Phase 3 methodology and preregistration are now the active gate. |
 
 ## 2. Project state, in one screen
 
@@ -55,20 +56,26 @@ and the exact source-defined selection rule pass. No recommendation is an approv
 The external response is preserved at
 `reap/14_PHASE3_EXTERNAL_REVIEW_2026-08-10.md`. A bounded Claude/Codex relay at
 `scripts/adversarial_review_loop.py`, with the objective in
-`reap/prompts/PHASE3_ADVERSARIAL_LOOP_OBJECTIVE_2026-08-10.md`, can now exchange
-two read-only challenge rounds automatically and produce a final Sol XHigh
-synthesis. It operates on a tracked-file snapshot, preserves every prompt and
-response, performs no relay-level subprocess retry, labels internal CLI request
-counts unverified, and pins Claude to `claude-fable-5`. Live execution rejects API
-keys and gateway/provider overrides, requires a logged-in first-party Claude
-account, and requires human confirmation that Fable 5 is included in the account's
-Max/premium plan, usage credits are disabled, and automatic model switching is
-disabled. The Codex command applies its `never` approval policy as a global flag
-before the `exec` subcommand and preflights the global and exec help surfaces
-separately. The real relay has not been run. The current checkpoint is
-133 ordinary tests plus 26 exact-lock Tinker tests; all study-call and spend
-counters remain zero. Model agreement cannot authorize spending, provider
-activation, preregistration freeze, or choices owned by Connor or Chirag.
+`reap/prompts/PHASE3_ADVERSARIAL_LOOP_OBJECTIVE_2026-08-10.md`, completed a
+two-round challenge. This completed development relay ran between
+`claude-fable-5` on eligible regular-plan
+usage and Sol XHigh. It operated on a tracked-file snapshot, preserved every
+prompt and response, and used zero relay-level subprocess retries. API and gateway
+billing variables were rejected; Connor confirmed usage credits and automatic
+model switching were disabled. The completed run predated the final clean-session
+and Codex user-configuration isolation hardening, and internal CLI request counts
+remain unverified. It is therefore non-authoritative and not freeze-eligible. The
+current synthesis is in `reap/15_PHASE3_ADVERSARIAL_SYNTHESIS_2026-08-10.md`.
+The current checkpoint is 237 ordinary tests plus 26 exact-lock Tinker tests; all
+study-call and spend counters remain zero. Model agreement cannot authorize
+spending, provider activation, preregistration freeze, or choices owned by Connor
+or Chirag.
+
+Decision-independent Phase-3 safeguards now exist offline for arm- and phase-aware
+schedules, sealed manifests, manifest-bound activation, list-rate budget gates,
+the deterministic symbolic-scoring boundary, simulation provenance, and dataset
+provenance. They remain non-frozen prerequisites for the future runner; they are
+not a runner and authorize no execution.
 
 **Funding:** $5,000 Tinker credits + ~$200 OpenAI (supervisor) + <$100 OpenRouter. Platform-scoped pools, never mixed. Cost model and gates in `reap/02_BUDGET_AND_COSTS.md`.
 
@@ -83,9 +90,14 @@ financial verification.
 context; its 128K PEFT route is distinct and more expensive. Standard Inkling has a
 64K context, so 64K cannot be treated as an output allowance on a nonempty prompt.
 The earlier 90-item Tinker and n=28 OpenAI plans are expected-cost sketches, not
-safe worst-case ceilings. The reviewed packet's recomputed pre-smoke maxima are
-$1,492.1761 for 60-item Inkling P1, $187.0258 for 60-item GPT-OSS P2, and $125.8291
-for 30-item Terra P3. Connor has reopened the Inkling scope and Tinker allocation;
+safe worst-case ceilings. The reviewed packet's original pre-smoke maxima include
+$1,492.1761 for 60-item Inkling P1 and $125.8291 for 30-item Terra P3. The current
+20,480-token GPT-OSS planning shape is $187.8000 at its captured list rates.
+Official OpenAI pages retrieved 2026-08-10 list Luna at $0.20/$0.02/$1.20 and
+Terra at $2.00/$0.20/$12.00 per 1M input/cached/output tokens. At the declared
+30-item maximum-token shape, Luna is $12.582912 and Terra is $125.829120, or
+$138.412032 together before smoke. These are mutable planning facts, not price
+guarantees or route activation. Connor has reopened the Inkling scope and Tinker allocation;
 the worksheet compares a 30-item Inkling design, GPT-OSS, Qwen, and Nemotron
 portfolio options. Every value remains planning-only until approval and a frozen
 schedule/price/route manifest.
@@ -100,7 +112,7 @@ schedule/price/route manifest.
 | C — `codex/tinker-probe`, PR #5 | merged at accepted `3331dc1`; dry-run safe | live intentionally blocked because Tinker 0.25.0 cannot guarantee one submission; no empirical fact is settled |
 | D — `codex/analysis-layer`, PR #3 | independently approved after remediation and merged at `7c83085` | complete; Phase 3 methodology decisions are now active |
 | E — `codex/runner` | not implemented | waits on accepted grader interfaces, frozen design inputs, and corrected budget math |
-| Phase 3 — `codex/prereg-v2`, draft PR #6 | external review preserved; bounded Claude/Codex relay implemented but not run | C01-C07 synthesis, D03/D04/D06/D09/D11/D12/D13/D15, and Chirag scientific signoff remain open; no call authorized |
+| Phase 3 — `codex/prereg-v2`, draft PR #6 | external review, completed non-authoritative development relay, current synthesis, and offline safeguards preserved | D03/D04/D06/D09/D11/D12/D13/D15 and Chirag scientific signoff remain open; no call authorized |
 
 The current phase-gate and model-routing plan is in
 `reap/10_PHASE_GATE_PLAN_2026-08-08.md`; the current human decision surface is

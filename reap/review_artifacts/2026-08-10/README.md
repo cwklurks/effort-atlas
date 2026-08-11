@@ -6,12 +6,16 @@ reviewer: Claude Fable 5).
 
 ## Provenance
 
-Both scripts were **transferred verbatim** from the review session's scratchpad —
-they are the exact files that produced the numbers in the review's tables, not
-post-hoc reconstructions (transfer verified by SHA-256 at copy time;
-`reap_sims.py` = `0ab92e474e69bd76ebaa956724128010218d2a2a06662e9643dde2870bcd772b`).
-The `.out.txt` files are a rerun in this worktree; the rerun reproduced the
-originally reported numbers exactly.
+The committed scripts reproduce the review tables, and the `.out.txt` files are a
+fresh deterministic rerun in this worktree. The claim that these bytes originated
+as an exact scratchpad transfer was made by the external reviewer, but that origin
+claim was not independently verified by Codex. The reviewable repository facts
+are the committed bytes, their hashes, and the reproduced outputs:
+
+- `reap_sims.py` SHA-256:
+  `0ab92e474e69bd76ebaa956724128010218d2a2a06662e9643dde2870bcd772b`
+- `reap_costs.py` SHA-256:
+  `84c1f07b52ca99f4c470594341df1b1ffcf4c8ad775d0358b610f4aaf15d484c`
 
 ## Contents
 
@@ -29,17 +33,19 @@ originally reported numbers exactly.
 - `reap_sims.out.txt` — rerun output (matches the review's two tables).
 - `reap_costs.py` — independent recomputation of every panel's generation count,
   token bounds, and conservative cost maximum. Reproduces Terra/Luna/Sol and
-  OpenRouter figures from doc-stated rates; demonstrates that no repository-recorded
-  Tinker rate reproduces the Phase 3 Tinker maxima (they require the live page's
-  2026-08-10 rates, two of them at a 50% limited-time discount — see the review's
-  budget section).
+  OpenRouter figures from rates stated in the reviewed document. Its Tinker-rate
+  diagnostic reflects the repository state at review time. The later dated route
+  artifact at `reap/phase3_evidence/route_prices_2026-08-10.json` is the current
+  advisory planning source; freeze-day evidence and exact schedules remain
+  required.
 - `reap_costs.out.txt` — rerun output.
 
 ## Status
 
 These are **review evidence**, not the frozen power analysis. The frozen power
 analysis is Chirag's, to be rerun with data-derived length priors
-(`results_matharena.parquet`). Numbers count as independently verified only after
-a third-party rerun (Codex audit step).
+(`results_matharena.parquet`). Codex reran the committed scripts and confirmed
+their deterministic outputs; that verifies code-to-table reproduction, not the
+scientific assumptions or scratchpad-origin claim.
 
 No provider or model-generation calls are made by either script.

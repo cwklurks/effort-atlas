@@ -25,16 +25,21 @@ Benchmarks impose output-token walls. Walls delete final answers mid-reasoning; 
 The reviewed proposal remains advisory and human-pending; D01-D15 are in
 `../11_PHASE3_DECISION_PACKET_2026-08-08.md`, and Connor's current choices,
 alternatives, and open questions are recorded in the non-frozen
-`../12_PHASE3_CONNOR_DECISION_WORKSHEET_2026-08-10.md`. Connor supports separate
+`../12_PHASE3_CONNOR_DECISION_WORKSHEET_2026-08-10.md`. The current reconciled
+working recommendation is in the non-frozen
+`../15_PHASE3_ADVERSARIAL_SYNTHESIS_2026-08-10.md`. Connor supports separate
 A/B/C samples with `arm_key`, standard 32K GPT-OSS-120B, a planned shared 30-of-33
 HMMT-2026 subset, Terra in principle, and descriptive/bootstrapped primary
 statistics. He accepts standard Inkling's recommended effort/cap direction but has
 reopened its 30-versus-60 scope and allocation along with the broader Tinker
 portfolio, H6 rule, exact prompt, batching, final model roster, and DeepSeek gate.
 Arm C remains a panel-specific large-cap reference in the detailed design options.
-The original planning maxima ($1,492.1761 P1, $187.0258 P2, $125.8291 P3) remain
-auditable alternatives, not approved schedules. Preregistration v2 must freeze
-before any confirmatory call.
+The original planning maxima remain auditable alternatives, not approved
+schedules. Current official planning rates retrieved 2026-08-10 put Luna at
+$0.20/$0.02/$1.20 and Terra at $2.00/$0.20/$12.00 per million
+input/cached/output tokens; the declared 30-item shapes are $12.582912 and
+$125.829120 respectively. Preregistration v2 must freeze before any confirmatory
+call.
 
 ## Positioning (updated 2026-08)
 
@@ -58,13 +63,22 @@ before any confirmatory call.
   `2b9b161`, including exact arm/cost recomputation and 19/19 killed contract
   mutations. Connor's 2026-08-10 non-frozen worksheet records his current positions
   and every researched alternative; it authorizes no call.
+- A completed bounded Claude/Codex development relay exchanged two challenge
+  rounds between Fable 5 on eligible regular-plan usage and Sol XHigh. It is
+  non-authoritative because it predated final relay hardening; it closes no human
+  choice and authorizes no execution.
+- Decision-independent offline safeguards now cover arm- and phase-aware schedules,
+  sealed exact-byte manifests, manifest-bound activation, list-rate pool/panel
+  budget gates, deterministic symbolic scoring, and dataset/simulation provenance.
+  These are non-frozen building blocks for the future runner, not an executable
+  study or route approval.
 - The packet corrects two unsafe planning assumptions: standard Tinker GPT-OSS-120B
   is a 32K-context route, and standard Inkling's 64K context cannot hold a literal
   64K output plus a nonempty prompt. Earlier expected-cost sketches are not hard
-  budget gates. The proposed exact pre-smoke maxima are $1,492.1761 for P1,
-  $187.0258 for P2, and $125.8291 for P3, pending human approval and frozen route
-  and price evidence.
-- The runner and executable budget gates do not exist yet.
+  budget gates. The exact schedules, routes, prices, panel ceilings, and pool
+  ceilings remain human-pending and must be frozen together.
+- The paid runner and receipt-driven execution gates do not exist yet; the generic
+  offline budget gate above is only a prerequisite.
 - No paid REAP smoke or confirmatory call has run. Tinker cap semantics, omitted-cap
   cost bounds, sample independence, and OpenAI usage accounting remain unresolved.
 

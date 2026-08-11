@@ -6,12 +6,15 @@
     "repository": "cwklurks/effort-atlas",
     "updated": "2026-08-10",
     "current_phase": 3,
-    "summary": "Phase 2 is merged; the Phase 3 model portfolio external review is preserved, and a bounded Claude/Codex adversarial relay is ready but has not been run. Remaining scientific and spending decisions stay human-owned."
+    "summary": "Phase 2 is merged; the Phase 3 model portfolio, external review, and completed bounded Claude/Codex development relay are preserved. The relay is non-authoritative, the offline implementation remains non-frozen, and all scientific and spending decisions stay human-owned."
   },
   "safety": {
     "confirmatory_calls": 0,
+    "paid_study_generation_calls": 0,
     "confirmatory_spend_usd": 0,
     "paid_smoke_calls": 0,
+    "provider_probe_calls": 0,
+    "deepseek_development_calls": 0,
     "frozen_artifact_changes": 0
   },
   "phases": [
@@ -45,8 +48,8 @@
       "name": "Methodology and preregistration freeze",
       "status": "in_progress",
       "progress": 50,
-      "summary": "The non-frozen 30-of-33 HMMT-2026 portfolio recommendation and external review are preserved. A bounded, read-only Claude/Codex relay can challenge C01-C07 automatically from a tracked snapshot, but it has not been run.",
-      "gate": "Connor runs the bounded separate model relay only by explicit human initiation, Codex audits its final synthesis, then Connor and Chirag resolve the remaining scientific choices and freeze exact rules; no review artifact authorizes a call.",
+      "summary": "The non-frozen 30-of-33 HMMT-2026 portfolio recommendation, external review, completed development relay, and decision-independent offline safeguards are preserved. The relay is non-authoritative and does not settle human-owned science.",
+      "gate": "Connor and Chirag make the remaining human scientific choices after separate model review and Codex audits, then freeze exact rules; no review artifact authorizes a call.",
       "url": "https://github.com/cwklurks/effort-atlas/pull/6"
     },
     {
@@ -131,8 +134,23 @@
   ],
   "verification": [
     {
+      "label": "Phase 3 current offline checkpoint",
+      "result": "237 ordinary tests plus 26 exact-lock Tinker tests passed; the canonical verifier remains offline and both lanes are mandatory",
+      "status": "passed"
+    },
+    {
       "label": "Bounded Claude/Codex adversarial relay",
-      "result": "133 ordinary tests plus 26 exact-lock Tinker tests passed; Claude is pinned to claude-fable-5, API and gateway billing variables are rejected, and live requires first-party login plus confirmation of eligible regular-plan usage, disabled usage credits, and disabled automatic model switching. The local non-model preflight confirms Claude 2.1.227 authenticated through claude.ai and the installed Codex CLI's global never-approval plus read-only exec surfaces. Fake-agent integration still proves two read-only challenge rounds with zero relay-level subprocess retries. Internal CLI request counts remain unverified. The real relay has not been run.",
+      "result": "A completed development relay exchanged two bounded review rounds between claude-fable-5 on eligible regular-plan usage and Sol XHigh. It is non-authoritative and not freeze-eligible. API and gateway billing variables were rejected, usage credits and automatic model switching were disabled by human confirmation, prompts and responses were preserved, and relay-level retries were zero. The completed run predated the final clean-session and Codex user-config isolation hardening, so internal CLI request counts remain unverified and its synthesis is retained only as development evidence.",
+      "status": "passed"
+    },
+    {
+      "label": "Phase 3 offline implementation",
+      "result": "The non-frozen schedule, manifest, activation, budget, scorer, simulation, and dataset safeguards are implemented with focused tests. This implementation authorizes no provider call, smoke, spend, freeze, or collection.",
+      "status": "passed"
+    },
+    {
+      "label": "Current OpenAI planning prices",
+      "result": "Official pages retrieved 2026-08-10 list Luna $0.20/$0.02/$1.20 and Terra $2.00/$0.20/$12.00 per 1M input/cached/output tokens. These values are planning-only evidence with no route or portfolio activation.",
       "status": "passed"
     },
     {
@@ -210,8 +228,14 @@
     {
       "date": "2026-08-10",
       "phase": 3,
-      "title": "Bounded Claude/Codex review relay prepared",
-      "detail": "A dry-run-default relay can resume the supplied Claude session and alternate two read-only challenge rounds with ephemeral Sol XHigh verification. Claude is pinned to claude-fable-5; API and gateway billing variables are rejected, and live requires first-party login plus confirmation that Fable 5 is included in an eligible Max/premium plan, usage credits are disabled, and automatic model switching is disabled. It reviews only committed tracked bytes, preserves every prompt and response, performs no relay-level retry, and labels internal CLI request counts unverified. It has not been run; all study-call counters remain zero."
+      "title": "Bounded Claude/Codex development relay completed",
+      "detail": "Two bounded review rounds ran between claude-fable-5 on eligible regular-plan usage and Sol XHigh. API and gateway billing variables were rejected; usage credits and automatic model switching were disabled by human confirmation. The run preserved its prompt/response transcript with zero relay-level retries, but it predated final clean-session and Codex user-config hardening, so it is non-authoritative, internal CLI request counts remain unverified, and every study-call counter remains zero."
+    },
+    {
+      "date": "2026-08-10",
+      "phase": 3,
+      "title": "Phase 3 offline safeguards and synthesis added",
+      "detail": "Decision-independent schedule, arm, manifest, activation, budget, scorer, simulation, and dataset guards are implemented and summarized in 15_PHASE3_ADVERSARIAL_SYNTHESIS_2026-08-10.md. Terra remains the proposed main direct anchor and Luna is proposed as a cheap sensitivity panel at current planning prices. All artifacts remain non-frozen and authorize no call."
     },
     {
       "date": "2026-08-10",
@@ -311,7 +335,8 @@
     }
   ],
   "decisions": [
-    "The bounded Claude/Codex relay is a development-review aid, not an approval mechanism. Its Claude side is pinned to claude-fable-5 and may run only through eligible regular-plan usage with API/gateway billing absent, usage credits disabled, and automatic model switching disabled. It has not been run; even after it runs, spending, provider activation, preregistration freeze, and Connor/Chirag choices remain human decisions.",
+    "The completed bounded Claude/Codex development relay is a non-authoritative review aid, not an approval mechanism or freeze-eligible evidence. Its Claude side used claude-fable-5 through eligible regular-plan usage with API/gateway billing absent, usage credits disabled, and automatic model switching disabled. Spending, provider activation, preregistration freeze, and Connor/Chirag choices remain human decisions.",
+    "The non-frozen 15_PHASE3_ADVERSARIAL_SYNTHESIS_2026-08-10.md is an advisory record that reconciles the model loop, offline safeguards, current planning prices, and remaining D01-D15 decisions; advisory records authorize no calls or freeze.",
     "The non-frozen 13_PHASE3_INTEGRATED_RECOMMENDATION_2026-08-10.md is an opinionated proposal for Connor's separate-model review, not a human decision or call authorization; its companion prompt requires a claim-by-claim external verdict.",
     "The non-frozen 12_PHASE3_CONNOR_DECISION_WORKSHEET_2026-08-10.md records Connor's current positions and all alternatives; open questions remain and it authorizes no call.",
     "Connor supports a planned shared 30-of-33 HMMT-2026 subset, separate arm sampling, standard 32K GPT-OSS-120B, Terra in principle, and descriptive/bootstrap-first analysis; standard Inkling's scientific direction is accepted while its scope/allocation and the broader Tinker model portfolio are reopened.",

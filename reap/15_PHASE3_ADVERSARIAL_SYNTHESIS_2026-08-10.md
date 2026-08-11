@@ -55,7 +55,8 @@ call. Fable and Sol converged on the following C01–C07 verdicts:
 
 This completed relay is useful development evidence, not freeze-authoritative
 evidence. The first completed run predated the relay hardening that enforces a
-clean Claude session, OAuth-only Claude authentication, and Codex
+clean Claude session, first-party Claude subscription authentication reported as
+`claude.ai`, and Codex
 `--ignore-user-config`. Internal CLI request counts also remain unverified. Model
 agreement does not close a decision owned by Connor or Chirag.
 
@@ -164,12 +165,14 @@ The branch now contains decision-independent building blocks, not a frozen study
 - a fail-closed MathArena boundary that never imports upstream answer extraction or
   falls back to local parsing;
 - generic dataset and simulation provenance manifests;
-- a bounded relay that requires OAuth for Claude, a clean session for a freeze
-  review, and Codex user-configuration isolation;
+- a bounded relay that requires first-party Claude subscription authentication
+  reported as `claude.ai`, a clean session for a freeze review, and Codex
+  user-configuration isolation;
 - an end-to-end offline test composing schedule, budget, manifest, and activation.
 
-These components still need final independent review and the canonical offline
-suite. They are prerequisites for the future runner, not the runner itself.
+The integrated branch passes the canonical offline suite (237 ordinary tests plus
+26 exact-lock Tinker tests). Final independent review remains required. These
+components are prerequisites for the future runner, not the runner itself.
 
 ## Questions for the supervisor call
 

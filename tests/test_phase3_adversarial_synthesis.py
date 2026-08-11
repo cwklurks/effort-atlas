@@ -6,6 +6,14 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 SYNTHESIS = ROOT / "reap" / "15_PHASE3_ADVERSARIAL_SYNTHESIS_2026-08-10.md"
+EXTERNAL_REVIEW = ROOT / "reap" / "14_PHASE3_EXTERNAL_REVIEW_2026-08-10.md"
+CONNOR_WORKSHEET = ROOT / "reap" / "12_PHASE3_CONNOR_DECISION_WORKSHEET_2026-08-10.md"
+DATASET_CANDIDATES = ROOT / "reap" / "04_DATASET_CANDIDATES.md"
+REAP_README = ROOT / "reap" / "README.md"
+REVIEW_ARTIFACTS_README = (
+    ROOT / "reap" / "review_artifacts" / "2026-08-10" / "README.md"
+)
+PROJECT_BRIEF = ROOT / "reap" / "claude_project" / "PROJECT_BRIEF.md"
 
 
 class Phase3AdversarialSynthesisTests(unittest.TestCase):
@@ -63,6 +71,54 @@ class Phase3AdversarialSynthesisTests(unittest.TestCase):
         self.assertIn("not freeze-authoritative", self.text)
         self.assertIn("Internal CLI request counts also remain unverified", self.text)
         self.assertIn("Chirag's rerun remains authoritative", self.text)
+
+    def test_current_effort_auth_and_hmmt_facts_do_not_repeat_superseded_wording(
+        self,
+    ) -> None:
+        external_review = EXTERNAL_REVIEW.read_text(encoding="utf-8")
+        worksheet = CONNOR_WORKSHEET.read_text(encoding="utf-8")
+        candidates = DATASET_CANDIDATES.read_text(encoding="utf-8")
+
+        normalized = " ".join(self.text.split())
+        self.assertIn("first-party Claude subscription authentication", normalized)
+        self.assertIn("reported as `claude.ai`", normalized)
+        self.assertNotIn("requires OAuth for Claude", self.text)
+        self.assertIn("`none/low/medium/high/xhigh/max`", external_review)
+        self.assertNotIn("none/minimal/low/medium/high/xhigh/max", external_review)
+        self.assertIn("hard short-answer math", worksheet.lower())
+        self.assertNotIn("Hard, clean integer math", worksheet)
+        self.assertIn(
+            "2025 has 30 rows; the current 2026 source has 33 rows", candidates
+        )
+
+    def test_current_documents_and_review_artifact_provenance_are_bounded(self) -> None:
+        readme = REAP_README.read_text(encoding="utf-8")
+        artifacts = REVIEW_ARTIFACTS_README.read_text(encoding="utf-8")
+        project_brief = PROJECT_BRIEF.read_text(encoding="utf-8")
+        normalized_artifacts = " ".join(artifacts.split())
+
+        for document in (
+            "14_PHASE3_EXTERNAL_REVIEW_2026-08-10.md",
+            "15_PHASE3_ADVERSARIAL_SYNTHESIS_2026-08-10.md",
+        ):
+            self.assertIn(document, readme)
+        self.assertIn("committed scripts reproduce", normalized_artifacts)
+        self.assertIn(
+            "origin claim was not independently verified", normalized_artifacts
+        )
+        self.assertNotIn("transferred verbatim", artifacts)
+        self.assertIn(
+            "84c1f07b52ca99f4c470594341df1b1ffcf4c8ad775d0358b610f4aaf15d484c",
+            artifacts,
+        )
+        for phrase in (
+            "15_PHASE3_ADVERSARIAL_SYNTHESIS_2026-08-10.md",
+            "completed bounded Claude/Codex development relay",
+            "Luna",
+            "Terra",
+            "Decision-independent offline safeguards",
+        ):
+            self.assertIn(phrase, project_brief)
 
 
 if __name__ == "__main__":

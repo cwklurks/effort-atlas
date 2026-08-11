@@ -888,14 +888,29 @@ class AdversarialReviewLoopTests(unittest.TestCase):
         self.assertIn("Connor or Chirag", objective)
         self.assertIn("must not approve", objective)
 
-    def test_durable_state_records_ready_but_unrun_relay(self):
+    def test_durable_state_records_completed_non_authoritative_relay(self):
         status = Path("reap/status/phase_status.json").read_text()
         briefing = Path("reap/CODEX_BRIEFING.md").read_text()
+        ordinary = (
+            unittest.TestLoader()
+            .discover("tests", pattern="test_*.py")
+            .countTestCases()
+        )
+        exact_lock = (
+            unittest.TestLoader()
+            .discover("tests", pattern="tinker_probe_suite.py")
+            .countTestCases()
+        )
 
         for text in (status, briefing):
             self.assertIn("bounded Claude/Codex", text)
-            self.assertIn("not been run", text)
-            self.assertIn("133 ordinary tests plus 26 exact-lock Tinker tests", text)
+            self.assertIn("completed development relay", text)
+            self.assertIn("non-authoritative", text)
+            self.assertNotIn("real relay has not been run", text)
+            self.assertIn(
+                f"{ordinary} ordinary tests plus {exact_lock} exact-lock Tinker tests",
+                text,
+            )
             self.assertIn("claude-fable-5", text)
             self.assertIn("usage credits", text)
         self.assertIn("scripts/adversarial_review_loop.py", briefing)

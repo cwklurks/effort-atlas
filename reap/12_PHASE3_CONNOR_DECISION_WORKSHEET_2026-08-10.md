@@ -137,7 +137,7 @@ with Terra.
 
 | Set | Proposed role | Why it is useful | Why include or defer |
 |---|---|---|---|
-| HMMT Feb 2026, planned 30-of-33 subset | Shared core | Hard, clean integer math; already central to the observational work; exact same selected items can run on every scientific panel. | Freeze the source revision, licence record, outcome-blind 30-row selection rule, item IDs, gold hashes, and shared-anchor hash. |
+| HMMT Feb 2026, planned 30-of-33 subset | Shared core | Hard short-answer math with LaTeX fractions, radicals, powers, and other symbolic golds; already central to the observational work; exact same selected items can run on every scientific panel. | Freeze the source revision, licence record, outcome-blind 30-row selection rule, item IDs, gold hashes, scorer mode, and shared-anchor hash. |
 | HMMT Feb 2025, 30 items | Optional Tinker extension | Adds independent item clusters without changing task type. | Decide 30 versus 60 after power/cost discussion; no cross-platform mismatch is claimed because shared estimates use only the 2026 core. |
 | AIME 2025+2026, 60 items | Continuity extension | Familiar integer-answer benchmark. | Defer: exact licences/revisions/item manifest unresolved and first-pass budget is better spent on the core. |
 | GPQA-Diamond, 198 items | Cross-domain multiple choice | Tests whether the wall effect extends beyond math. | Defer: gated access, redistribution limits, and MCQ guessing/fallback risks require a separate strict protocol. |
