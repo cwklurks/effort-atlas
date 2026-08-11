@@ -136,8 +136,6 @@ def build_codex_command(
         str(worktree),
         "--sandbox",
         "read-only",
-        "--ask-for-approval",
-        "never",
         "--model",
         model,
         "--config",

@@ -129,6 +129,7 @@ class AdversarialReviewLoopTests(unittest.TestCase):
         )
 
         self.assertEqual(command[:4], ["codex", "--ask-for-approval", "never", "exec"])
+        self.assertEqual(command.count("--ask-for-approval"), 1)
         self.assertIn("--ephemeral", command)
         self.assertEqual(command[command.index("--sandbox") + 1], "read-only")
         self.assertEqual(command[command.index("--ask-for-approval") + 1], "never")
