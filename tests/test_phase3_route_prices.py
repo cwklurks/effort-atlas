@@ -44,10 +44,10 @@ class Phase3RoutePriceSnapshotTests(unittest.TestCase):
     def test_planning_examples_recompute_from_snapshot_prices(self) -> None:
         expected = {
             ("direct-openai-arm-a-30", "openai-terra-list-2026-08-10"): Decimal(
-                "157.2864"
+                "125.82912"
             ),
             ("direct-openai-arm-a-30", "openai-luna-list-2026-08-10"): Decimal(
-                "62.91456"
+                "12.582912"
             ),
             ("direct-openai-arm-a-30", "openai-sol-list-2026-08-10"): Decimal(
                 "314.5728"
@@ -98,23 +98,21 @@ class Phase3RoutePriceSnapshotTests(unittest.TestCase):
                 observed[(example["example_id"], price_id)] = cost
         self.assertEqual(observed, expected)
 
-    def test_current_openai_snapshot_does_not_reuse_historical_review_rates(
+    def test_current_openai_snapshot_matches_primary_model_pages(
         self,
     ) -> None:
         terra = self.prices["openai-terra-list-2026-08-10"]
         luna = self.prices["openai-luna-list-2026-08-10"]
         self.assertEqual(
             (terra["input_usd_per_million"], terra["output_usd_per_million"]),
-            ("2.50", "15.00"),
+            ("2.00", "12.00"),
         )
         self.assertEqual(
             (luna["input_usd_per_million"], luna["output_usd_per_million"]),
-            ("1.00", "6.00"),
+            ("0.20", "1.20"),
         )
-        self.assertNotEqual(
-            (terra["input_usd_per_million"], terra["output_usd_per_million"]),
-            ("2", "12"),
-        )
+        self.assertEqual(terra["cached_input_usd_per_million"], "0.20")
+        self.assertEqual(luna["cached_input_usd_per_million"], "0.02")
 
 
 if __name__ == "__main__":
