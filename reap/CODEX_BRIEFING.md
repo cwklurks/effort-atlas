@@ -66,7 +66,7 @@ model switching were disabled. The completed run predated the final clean-sessio
 and Codex user-configuration isolation hardening, and internal CLI request counts
 remain unverified. It is therefore non-authoritative and not freeze-eligible. The
 current synthesis is in `reap/15_PHASE3_ADVERSARIAL_SYNTHESIS_2026-08-10.md`.
-The current checkpoint is 247 ordinary tests plus 26 exact-lock Tinker tests; all
+The current checkpoint is 249 ordinary tests plus 26 exact-lock Tinker tests; all
 study-call and spend counters remain zero. Model agreement cannot authorize
 spending, provider activation, preregistration freeze, or choices owned by Connor
 or Chirag.

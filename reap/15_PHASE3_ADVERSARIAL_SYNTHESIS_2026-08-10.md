@@ -170,7 +170,7 @@ The branch now contains decision-independent building blocks, not a frozen study
   user-configuration isolation;
 - an end-to-end offline test composing schedule, budget, manifest, and activation.
 
-The integrated branch passes the canonical offline suite (247 ordinary tests plus
+The integrated branch passes the canonical offline suite (249 ordinary tests plus
 26 exact-lock Tinker tests). Final independent review remains required. These
 components are prerequisites for the future runner, not the runner itself.
 

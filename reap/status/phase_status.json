@@ -135,7 +135,7 @@
   "verification": [
     {
       "label": "Phase 3 current offline checkpoint",
-      "result": "247 ordinary tests plus 26 exact-lock Tinker tests passed; the canonical verifier remains offline and both lanes are mandatory",
+      "result": "249 ordinary tests plus 26 exact-lock Tinker tests passed; the canonical verifier remains offline and both lanes are mandatory",
       "status": "passed"
     },
     {
