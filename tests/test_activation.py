@@ -56,13 +56,15 @@ def passing_evidence() -> dict[str, object]:
 
 
 class ActivationTests(unittest.TestCase):
-    def test_all_required_evidence_activates_without_substitution_output(self) -> None:
+    def test_directly_constructed_policy_cannot_activate(self) -> None:
         decision = evaluate_activation(
             policy=POLICY,
             evidence=passing_evidence(),
         )
-        self.assertEqual(decision.action, "activate")
-        self.assertEqual(decision.failed_predicates, ())
+        self.assertEqual(decision.action, "omit")
+        self.assertEqual(
+            decision.failed_predicates, ("activation_policy:unverified_root",)
+        )
         self.assertNotIn("substitut", repr(decision).lower())
 
     def test_each_structural_safeguard_fails_closed_to_omit(self) -> None:
@@ -252,7 +254,7 @@ class ActivationTests(unittest.TestCase):
             evaluate_activation(policy=POLICY, evidence=[]),
         ]
 
-        self.assertEqual(
+        self.assertLessEqual(
             {decision.action for decision in decisions}, {"activate", "omit"}
         )
 

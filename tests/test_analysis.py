@@ -18,7 +18,6 @@ from effort_atlas.analysis import (
     wilson,
 )
 
-
 FIXTURE = json.loads(
     (Path(__file__).parent / "fixtures" / "task_d_known_answers.json").read_text()
 )
@@ -542,6 +541,7 @@ class ConfirmatoryAnalysisTests(unittest.TestCase):
             effort_order=["low", "high"],
             caps=[4, 8],
             bootstrap_resamples=100,
+            input_schema="legacy",
         )
 
         self.assertEqual(
@@ -576,6 +576,7 @@ class ConfirmatoryAnalysisTests(unittest.TestCase):
             effort_order=["low", "high"],
             caps=[4, 8],
             bootstrap_resamples=10,
+            input_schema="legacy",
         )
 
         self.assertEqual(

@@ -12,8 +12,8 @@ import math
 import random
 import statistics
 from collections import Counter, defaultdict
-from typing import Any, Iterable, Protocol, Sequence
-
+from collections.abc import Iterable, Sequence
+from typing import Any, Protocol
 
 BOOTSTRAP_RESAMPLES = 10_000
 BOOTSTRAP_SEED = 20260722
@@ -33,6 +33,9 @@ RESULT_KEYS = (
 PLANNED_KEYS = (*PANEL_KEYS, *PAIR_KEYS, "effort", "cap")
 LENGTH_FINISH_REASONS = {"length", "max_tokens", "max_output_tokens"}
 NORMAL_FINISH_REASONS = {"stop", "complete", "completed"}
+REAP_MARKER_FIELDS = frozenset(
+    {"arm_key", "phase", "job_id", "schedule_ordinal", "master_seed"}
+)
 KNOWN_EFFORT_ORDER = {
     "none": 0,
     "minimal": 1,
@@ -181,13 +184,27 @@ def _validate_planned_rows(rows: Iterable[dict[str, Any]]) -> list[dict[str, Any
     return planned
 
 
-def _validate_optional_single_arm_scope(
-    observed: Sequence[dict[str, Any]], planned: Sequence[dict[str, Any]]
+def _validate_single_arm_scope(
+    observed: Sequence[dict[str, Any]],
+    planned: Sequence[dict[str, Any]],
+    *,
+    input_schema: str,
 ) -> str | None:
-    """Preserve legacy inputs while making any arm-aware v2 call fail closed."""
+    """Require REAP arm identity unless compatibility is explicitly legacy-only."""
 
     combined = [*observed, *planned]
-    if not any("arm_key" in row for row in combined):
+    if input_schema == "legacy":
+        for index, row in enumerate(combined, start=1):
+            markers = sorted(REAP_MARKER_FIELDS.intersection(row))
+            if markers:
+                raise ValueError(
+                    "Legacy analysis cannot accept a REAP marker; "
+                    f"row {index} contains {', '.join(markers)}."
+                )
+        return None
+    if input_schema != "reap_v2":
+        raise ValueError("input_schema must be 'reap_v2' or 'legacy'.")
+    if not combined:
         return None
 
     arm_keys: set[str] = set()
@@ -935,11 +952,14 @@ def analyze_confirmatory_rows(
     bootstrap_resamples: int = BOOTSTRAP_RESAMPLES,
     bootstrap_seed: int = BOOTSTRAP_SEED,
     calibration_strategy: CalibrationStrategy | None = None,
+    input_schema: str = "reap_v2",
 ) -> dict[str, Any]:
     """Analyze panels separately and return a JSON-serializable pre-data report."""
     raw_records = list(rows)
     raw_planned = list(planned_rows) if planned_rows is not None else []
-    arm_key = _validate_optional_single_arm_scope(raw_records, raw_planned)
+    arm_key = _validate_single_arm_scope(
+        raw_records, raw_planned, input_schema=input_schema
+    )
     records = validate_analysis_rows(raw_records)
     planned = _validate_planned_rows(raw_planned)
     panel_ids = sorted(
@@ -1012,8 +1032,13 @@ def analyze_confirmatory_rows(
     return {
         "analysis_version": 1,
         "assumptions": {
+            "input_schema": input_schema,
             "panel_pooling": "none",
-            "arm_pooling": "one arm_key per call for arm-aware v2 inputs",
+            "arm_pooling": (
+                "one arm_key per call"
+                if input_schema == "reap_v2"
+                else "not applicable to explicitly declared non-REAP legacy inputs"
+            ),
             "accuracy": "grader_boolean_regardless_of_finish_reason",
             "unanswered_length_stop": "length_finish_and_extracted_answer_present_false",
             "unanswered_accuracy_bound": "observed_k_over_n_to_observed_k_plus_unanswered_length_stops_over_n",

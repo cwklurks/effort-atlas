@@ -156,12 +156,14 @@ class ReapArtifactFlowTests(unittest.TestCase):
                 },
             ],
         }
-        self.assertEqual(
-            evaluate_activation(
-                policy=policy,
-                evidence=evidence,
-            ).action,
-            "activate",
+        unverified_policy_decision = evaluate_activation(
+            policy=policy,
+            evidence=evidence,
+        )
+        self.assertEqual(unverified_policy_decision.action, "omit")
+        self.assertIn(
+            "activation_policy:unverified_root",
+            unverified_policy_decision.failed_predicates,
         )
 
         for failed_field in ("budget_within_bound", "schedule_manifest_match"):

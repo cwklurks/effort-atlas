@@ -6,8 +6,11 @@ import hashlib
 import json
 import re
 from collections.abc import Mapping
-from dataclasses import dataclass
+from dataclasses import dataclass, field
+from pathlib import Path
 from typing import Any, Literal
+
+from .reap_manifest import verify_manifest_files
 
 SHA256_PATTERN = re.compile(r"[0-9a-f]{64}")
 ACTIVATION_POLICY_VERSION = 1
@@ -25,6 +28,15 @@ EVIDENCE_FIELDS = frozenset(
     }
 )
 PREDICATE_FIELDS = frozenset({"id", "status", "evidence_sha256"})
+ACTIVATION_ARTIFACT_FIELDS = frozenset(
+    {
+        "activation_policy_version",
+        "predicate_ids",
+        "substitution_allowed",
+        "terminal_actions",
+    }
+)
+_VERIFIED_POLICY_ROOT = object()
 
 
 @dataclass(frozen=True)
@@ -61,13 +73,44 @@ def _activation_policy_digest(
     return hashlib.sha256(canonical.encode("utf-8")).hexdigest()
 
 
-@dataclass(frozen=True, slots=True)
+@dataclass(frozen=True, slots=True, init=False)
 class ActivationPolicy:
-    """Validated frozen predicate set bound to one expected manifest."""
+    """Activation predicates, trusted only when loaded from verified frozen files."""
 
     predicate_ids: tuple[str, ...]
     expected_manifest_sha256: str
     policy_sha256: str
+    _verified_root: object = field(default=None, repr=False, compare=False)
+
+    def __init__(
+        self,
+        predicate_ids: tuple[str, ...],
+        expected_manifest_sha256: str,
+        policy_sha256: str,
+    ) -> None:
+        object.__setattr__(self, "predicate_ids", predicate_ids)
+        object.__setattr__(self, "expected_manifest_sha256", expected_manifest_sha256)
+        object.__setattr__(self, "policy_sha256", policy_sha256)
+        object.__setattr__(self, "_verified_root", None)
+        self.__post_init__()
+
+    @classmethod
+    def _from_verified_root(
+        cls,
+        *,
+        predicate_ids: tuple[str, ...],
+        expected_manifest_sha256: str,
+        policy_sha256: str,
+    ) -> ActivationPolicy:
+        policy = object.__new__(cls)
+        object.__setattr__(policy, "predicate_ids", predicate_ids)
+        object.__setattr__(
+            policy, "expected_manifest_sha256", expected_manifest_sha256
+        )
+        object.__setattr__(policy, "policy_sha256", policy_sha256)
+        object.__setattr__(policy, "_verified_root", _VERIFIED_POLICY_ROOT)
+        policy.__post_init__()
+        return policy
 
     def __post_init__(self) -> None:
         if (
@@ -87,8 +130,86 @@ class ActivationPolicy:
         expected_digest = _activation_policy_digest(
             self.predicate_ids, self.expected_manifest_sha256
         )
-        if self.policy_sha256 != expected_digest:
+        if (
+            self._verified_root is not _VERIFIED_POLICY_ROOT
+            and self.policy_sha256 != expected_digest
+        ):
             raise ActivationPolicyInvalid("policy_digest_mismatch")
+
+
+def _reject_duplicate_json_keys(pairs: list[tuple[str, Any]]) -> dict[str, Any]:
+    value: dict[str, Any] = {}
+    for key, child in pairs:
+        if key in value:
+            raise ValueError(f"activation artifact has duplicate field: {key}")
+        value[key] = child
+    return value
+
+
+def _parse_activation_artifact(contents: bytes) -> tuple[str, ...]:
+    try:
+        value = json.loads(
+            contents.decode("utf-8"), object_pairs_hook=_reject_duplicate_json_keys
+        )
+    except (UnicodeDecodeError, json.JSONDecodeError) as error:
+        raise ValueError("activation artifact must be valid UTF-8 JSON") from error
+    if not isinstance(value, Mapping):
+        raise TypeError("activation artifact must be a JSON object")
+    actual_fields = frozenset(value)
+    if actual_fields != ACTIVATION_ARTIFACT_FIELDS:
+        raise ValueError("activation artifact fields are invalid")
+    if (
+        type(value["activation_policy_version"]) is not int
+        or value["activation_policy_version"] != ACTIVATION_POLICY_VERSION
+    ):
+        raise ValueError(
+            f"activation_policy_version must be {ACTIVATION_POLICY_VERSION}"
+        )
+    if value["substitution_allowed"] is not False:
+        raise ValueError("activation artifact must forbid substitution")
+    if value["terminal_actions"] != list(TERMINAL_ACTIONS):
+        raise ValueError("activation artifact terminal_actions are invalid")
+    raw_predicates = value["predicate_ids"]
+    if not isinstance(raw_predicates, list):
+        raise TypeError("activation artifact predicate_ids must be a list")
+    predicate_ids = tuple(raw_predicates)
+    if (
+        not predicate_ids
+        or any(
+            not isinstance(predicate_id, str) or not predicate_id.strip()
+            for predicate_id in predicate_ids
+        )
+        or len(set(predicate_ids)) != len(predicate_ids)
+    ):
+        raise ValueError("activation artifact predicate_ids are invalid")
+    return predicate_ids
+
+
+def load_activation_policy(
+    *, manifest: Mapping[str, Any], approved_root: str | Path
+) -> ActivationPolicy:
+    """Load policy authority only from an exact-file-verified frozen manifest root."""
+
+    verified = verify_manifest_files(manifest, approved_root=approved_root)
+    validated_manifest = verified["manifest"]
+    evidence = verified["evidence"]
+    activation_reference = validated_manifest["activation"]
+    activation_path = (
+        Path(evidence["approved_root"]) / activation_reference["path"]
+    )
+    try:
+        contents = activation_path.read_bytes()
+    except OSError as error:
+        raise ValueError("verified activation artifact became unreadable") from error
+    actual_sha256 = hashlib.sha256(contents).hexdigest()
+    if actual_sha256 != activation_reference["sha256"]:
+        raise ValueError("activation artifact changed after manifest verification")
+    predicate_ids = _parse_activation_artifact(contents)
+    return ActivationPolicy._from_verified_root(
+        predicate_ids=predicate_ids,
+        expected_manifest_sha256=validated_manifest["manifest_sha256"],
+        policy_sha256=activation_reference["sha256"],
+    )
 
 
 def _structural_failures(
@@ -177,7 +298,10 @@ def evaluate_activation(
         return ActivationDecision("omit", ("activation_policy:invalid",))
     if not isinstance(evidence, Mapping):
         return ActivationDecision("omit", ("evidence:malformed",))
-    failures = _structural_failures(evidence, policy)
+    failures = []
+    if policy._verified_root is not _VERIFIED_POLICY_ROOT:
+        failures.append("activation_policy:unverified_root")
+    failures.extend(_structural_failures(evidence, policy))
     failures.extend(
         _predicate_failures(policy.predicate_ids, evidence.get("predicates"))
     )
