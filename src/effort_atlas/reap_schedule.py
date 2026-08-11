@@ -16,6 +16,7 @@ from dataclasses import dataclass
 from typing import TypeAlias
 
 IDENTITY_FIELDS = (
+    "phase",
     "panel",
     "model",
     "provider_route",
@@ -24,6 +25,7 @@ IDENTITY_FIELDS = (
     "cap",
     "replicate",
     "arm_key",
+    "master_seed",
 )
 PROVIDER_SEED_MAX = 2**31 - 1
 
@@ -43,6 +45,12 @@ def _require_nonempty_string(field: str, value: object) -> str:
 def _require_positive_integer(field: str, value: object) -> int:
     if isinstance(value, bool) or not isinstance(value, int) or value < 1:
         raise ValueError(f"{field} must be a positive integer, not a boolean.")
+    return value
+
+
+def _require_nonnegative_integer(field: str, value: object) -> int:
+    if isinstance(value, bool) or not isinstance(value, int) or value < 0:
+        raise ValueError(f"{field} must be a nonnegative integer, not a boolean.")
     return value
 
 
@@ -66,6 +74,7 @@ def _require_effort(value: object) -> EffortValue:
 class ReapScheduleIdentity:
     """The complete immutable identity of one planned REAP output."""
 
+    phase: str
     panel: str
     model: str
     provider_route: str
@@ -74,9 +83,11 @@ class ReapScheduleIdentity:
     cap: int
     replicate: int
     arm_key: str
+    master_seed: int
 
     def __post_init__(self) -> None:
         """Reject invalid identities even when constructed without a mapping."""
+        _require_nonempty_string("phase", self.phase)
         _require_nonempty_string("panel", self.panel)
         _require_nonempty_string("model", self.model)
         _require_nonempty_string("provider_route", self.provider_route)
@@ -85,6 +96,7 @@ class ReapScheduleIdentity:
         _require_positive_integer("cap", self.cap)
         _require_positive_integer("replicate", self.replicate)
         _require_nonempty_string("arm_key", self.arm_key)
+        _require_nonnegative_integer("master_seed", self.master_seed)
 
     @classmethod
     def from_mapping(cls, row: Mapping[str, object]) -> ReapScheduleIdentity:
@@ -104,6 +116,7 @@ class ReapScheduleIdentity:
             )
 
         return cls(
+            phase=_require_nonempty_string("phase", row["phase"]),
             panel=_require_nonempty_string("panel", row["panel"]),
             model=_require_nonempty_string("model", row["model"]),
             provider_route=_require_nonempty_string(
@@ -114,6 +127,7 @@ class ReapScheduleIdentity:
             cap=_require_positive_integer("cap", row["cap"]),
             replicate=_require_positive_integer("replicate", row["replicate"]),
             arm_key=_require_nonempty_string("arm_key", row["arm_key"]),
+            master_seed=_require_nonnegative_integer("master_seed", row["master_seed"]),
         )
 
     def as_dict(self) -> dict[str, object]:
@@ -167,6 +181,16 @@ def build_reap_schedule(
         if canonical in by_canonical_json:
             raise ValueError(f"Duplicate canonical identity: {canonical}")
         by_canonical_json[canonical] = identity
+
+    canonical_by_provider_seed: dict[int, str] = {}
+    for canonical, identity in by_canonical_json.items():
+        existing = canonical_by_provider_seed.get(identity.provider_seed)
+        if existing is not None:
+            raise ValueError(
+                "provider seed collision between distinct canonical identities: "
+                f"{existing} and {canonical}"
+            )
+        canonical_by_provider_seed[identity.provider_seed] = canonical
 
     return tuple(
         ReapScheduledJob(by_canonical_json[canonical])

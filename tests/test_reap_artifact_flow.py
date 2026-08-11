@@ -23,6 +23,7 @@ def _digest(label: str) -> str:
 class ReapArtifactFlowTests(unittest.TestCase):
     def setUp(self) -> None:
         base = {
+            "phase": "main",
             "panel": "test-panel",
             "model": "test-model",
             "provider_route": "test-route",
@@ -30,6 +31,7 @@ class ReapArtifactFlowTests(unittest.TestCase):
             "effort": "low",
             "cap": 4096,
             "replicate": 1,
+            "master_seed": 20260722,
         }
         self.jobs = build_reap_schedule(
             ({**base, "arm_key": "arm-a"}, {**base, "arm_key": "arm-b"})

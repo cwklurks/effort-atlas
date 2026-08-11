@@ -13,6 +13,7 @@ from effort_atlas.reap_schedule import (
 
 def planned_row(**overrides: object) -> dict[str, object]:
     row: dict[str, object] = {
+        "phase": "main",
         "panel": "panel-alpha",
         "model": "model-alpha",
         "provider_route": "provider/route-alpha",
@@ -21,12 +22,32 @@ def planned_row(**overrides: object) -> dict[str, object]:
         "cap": 4096,
         "replicate": 1,
         "arm_key": "arm-a",
+        "master_seed": 20260722,
     }
     row.update(overrides)
     return row
 
 
 class ReapScheduleIdentityTests(unittest.TestCase):
+    def test_phase_and_master_seed_are_required_identity_inputs(self) -> None:
+        baseline = {
+            **planned_row(),
+            "phase": "main",
+            "master_seed": 20260722,
+        }
+        identity = ReapScheduleIdentity.from_mapping(baseline)
+        different_phase = ReapScheduleIdentity.from_mapping(
+            {**baseline, "phase": "smoke"}
+        )
+        different_master_seed = ReapScheduleIdentity.from_mapping(
+            {**baseline, "master_seed": 20260723}
+        )
+
+        self.assertNotEqual(identity.job_id, different_phase.job_id)
+        self.assertNotEqual(identity.provider_seed, different_phase.provider_seed)
+        self.assertNotEqual(identity.job_id, different_master_seed.job_id)
+        self.assertNotEqual(identity.provider_seed, different_master_seed.provider_seed)
+
     def test_canonical_identity_and_derived_values_are_deterministic(self) -> None:
         first = ReapScheduleIdentity.from_mapping(planned_row())
         reordered = {key: planned_row()[key] for key in reversed(IDENTITY_FIELDS)}
@@ -38,15 +59,16 @@ class ReapScheduleIdentityTests(unittest.TestCase):
         self.assertEqual(
             first.canonical_json(),
             '{"arm_key":"arm-a","cap":4096,"effort":"high",'
-            '"item_id":"item-001","model":"model-alpha",'
-            '"panel":"panel-alpha","provider_route":"provider/route-alpha",'
+            '"item_id":"item-001","master_seed":20260722,'
+            '"model":"model-alpha","panel":"panel-alpha","phase":"main",'
+            '"provider_route":"provider/route-alpha",'
             '"replicate":1}',
         )
         self.assertEqual(
             first.job_id,
-            "1f24e1ecde9d543f17f0583b6dfd9920d841c9849bbfa278f4c14ae1dcd79021",
+            "04cc07fb703d91a0b5ce5cb47d267ffedbb716159d73080e31daa445d3e22fe7",
         )
-        self.assertEqual(first.provider_seed, 1622398704)
+        self.assertEqual(first.provider_seed, 1461308915)
         self.assertEqual(
             json.loads(first.canonical_json()),
             {field: planned_row()[field] for field in IDENTITY_FIELDS},
@@ -76,6 +98,7 @@ class ReapScheduleIdentityTests(unittest.TestCase):
     def test_every_required_field_participates_in_job_identity(self) -> None:
         baseline = ReapScheduleIdentity.from_mapping(planned_row())
         alternatives = {
+            "phase": "smoke",
             "panel": "panel-beta",
             "model": "model-beta",
             "provider_route": "provider/route-beta",
@@ -84,6 +107,7 @@ class ReapScheduleIdentityTests(unittest.TestCase):
             "cap": 8192,
             "replicate": 2,
             "arm_key": "arm-b",
+            "master_seed": 20260723,
         }
 
         for field, value in alternatives.items():
@@ -102,9 +126,16 @@ class ReapScheduleIdentityTests(unittest.TestCase):
                     ReapScheduleIdentity.from_mapping(row)
 
         with self.assertRaisesRegex(ValueError, "unknown"):
-            ReapScheduleIdentity.from_mapping({**planned_row(), "phase": "main"})
+            ReapScheduleIdentity.from_mapping({**planned_row(), "unexpected": "x"})
 
-        for field in ("panel", "model", "provider_route", "item_id", "arm_key"):
+        for field in (
+            "phase",
+            "panel",
+            "model",
+            "provider_route",
+            "item_id",
+            "arm_key",
+        ):
             with self.subTest(blank=field), self.assertRaisesRegex(ValueError, field):
                 ReapScheduleIdentity.from_mapping(planned_row(**{field: "  "}))
 
@@ -121,6 +152,21 @@ class ReapScheduleIdentityTests(unittest.TestCase):
                     self.assertRaisesRegex(ValueError, field),
                 ):
                     ReapScheduleIdentity.from_mapping(planned_row(**{field: invalid}))
+
+    def test_master_seed_requires_a_nonnegative_non_boolean_integer(self) -> None:
+        for valid in (0, 20260722):
+            self.assertEqual(
+                ReapScheduleIdentity.from_mapping(
+                    planned_row(master_seed=valid)
+                ).master_seed,
+                valid,
+            )
+        for invalid in (True, False, -1, 1.0, "1"):
+            with (
+                self.subTest(invalid=invalid),
+                self.assertRaisesRegex(ValueError, "master_seed"),
+            ):
+                ReapScheduleIdentity.from_mapping(planned_row(master_seed=invalid))
 
     def test_effort_supports_labels_or_finite_numbers_but_not_booleans(self) -> None:
         for effort in ("medium", 0, 0.7, 0.99):
@@ -164,6 +210,21 @@ class ReapScheduleBuilderTests(unittest.TestCase):
 
         with self.assertRaisesRegex(ValueError, "Duplicate canonical identity"):
             build_reap_schedule([row, reordered])
+
+    def test_builder_rejects_distinct_jobs_with_same_provider_seed(self) -> None:
+        first = planned_row(item_id="item-65150")
+        second = planned_row(item_id="item-88099")
+        self.assertNotEqual(
+            ReapScheduleIdentity.from_mapping(first).job_id,
+            ReapScheduleIdentity.from_mapping(second).job_id,
+        )
+        self.assertEqual(
+            ReapScheduleIdentity.from_mapping(first).provider_seed,
+            ReapScheduleIdentity.from_mapping(second).provider_seed,
+        )
+
+        with self.assertRaisesRegex(ValueError, "provider seed collision"):
+            build_reap_schedule([first, second])
 
 
 if __name__ == "__main__":
