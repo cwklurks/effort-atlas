@@ -14,10 +14,20 @@ from effort_atlas.reap_budget import (
 
 
 class ReapBudgetTests(unittest.TestCase):
+    def test_budget_rows_require_explicit_pool_and_panel_identity(self) -> None:
+        with self.assertRaisesRegex(TypeError, "pool_id.*panel_id"):
+            BudgetRow("job", "route", "main", 1, 1)
+        for pool_id, panel_id in (("", "panel"), ("pool", ""), (" ", "panel")):
+            with (
+                self.subTest(pool_id=pool_id, panel_id=panel_id),
+                self.assertRaises(ValueError),
+            ):
+                BudgetRow("job", "route", "main", 1, 1, pool_id, panel_id)
+
     def test_maximum_exposure_sums_every_rows_prompt_and_cap(self) -> None:
         rows = (
-            BudgetRow("job-main", "route-a", "main", 100, 200),
-            BudgetRow("job-smoke", "route-a", "smoke", 50, 75),
+            BudgetRow("job-main", "route-a", "main", 100, 200, "pool", "panel"),
+            BudgetRow("job-smoke", "route-a", "smoke", 50, 75, "pool", "panel"),
         )
         rates = (
             RouteRate(
@@ -44,7 +54,7 @@ class ReapBudgetTests(unittest.TestCase):
 
     def test_exact_ceiling_passes_and_any_excess_refuses(self) -> None:
         projection = project_maximum_exposure(
-            (BudgetRow("job", "route", "main", 1_000_000, 1_000_000),),
+            (BudgetRow("job", "route", "main", 1_000_000, 1_000_000, "pool", "panel"),),
             (RouteRate("route", Decimal(2), Decimal(12), "b" * 64, "list"),),
         )
         self.assertEqual(projection.maximum_exposure_usd, Decimal(14))
@@ -53,7 +63,7 @@ class ReapBudgetTests(unittest.TestCase):
             enforce_budget_ceiling(projection, Decimal("13.999999"))
 
     def test_missing_route_rate_duplicate_ids_and_malformed_values_fail(self) -> None:
-        valid_row = BudgetRow("job", "route", "main", 1, 1)
+        valid_row = BudgetRow("job", "route", "main", 1, 1, "pool", "panel")
         valid_rate = RouteRate("route", Decimal(1), Decimal(1), "c" * 64, "list")
 
         with self.assertRaisesRegex(ValueError, "no price"):
@@ -76,6 +86,8 @@ class ReapBudgetTests(unittest.TestCase):
                 "phase": "main",
                 "prompt_token_bound": 1,
                 "max_output_tokens": 1,
+                "pool_id": "pool",
+                "panel_id": "panel",
                 **mutation,
             }
             with self.subTest(mutation=mutation), self.assertRaises(ValueError):
@@ -95,7 +107,9 @@ class ReapBudgetTests(unittest.TestCase):
     def test_projection_reports_list_and_discount_bases_separately(self) -> None:
         rows = (
             BudgetRow("list-job", "list-route", "main", 0, 1_000_000, "pool", "panel"),
-            BudgetRow("discount-job", "discount-route", "main", 0, 1_000_000, "pool", "panel"),
+            BudgetRow(
+                "discount-job", "discount-route", "main", 0, 1_000_000, "pool", "panel"
+            ),
         )
         rates = (
             RouteRate("list-route", Decimal(0), Decimal(10), "e" * 64, "discount"),
@@ -115,7 +129,9 @@ class ReapBudgetTests(unittest.TestCase):
             (("list", Decimal(30)),),
         )
 
-    def test_projection_defaults_to_list_and_preserves_snapshot_pool_panel_identity(self) -> None:
+    def test_projection_defaults_to_list_and_preserves_snapshot_pool_panel_identity(
+        self,
+    ) -> None:
         row = BudgetRow("job", "route", "main", 0, 1_000_000, "tinker", "p1")
         rates = (
             RouteRate("route", Decimal(0), Decimal(5), "e" * 64, "discount"),
@@ -144,7 +160,9 @@ class ReapBudgetTests(unittest.TestCase):
                 (RouteRate("route", Decimal(0), Decimal(1), "e" * 64, "discount"),),
             )
 
-    def test_freeze_gate_enforces_panel_and_pool_ceilings_and_discount_policy(self) -> None:
+    def test_freeze_gate_enforces_panel_and_pool_ceilings_and_discount_policy(
+        self,
+    ) -> None:
         row = BudgetRow("job", "route", "main", 0, 1_000_000, "pool", "panel")
         list_projection = project_maximum_exposure(
             (row,), (RouteRate("route", Decimal(0), Decimal(10), "e" * 64, "list"),)

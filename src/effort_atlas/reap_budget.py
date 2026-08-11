@@ -43,8 +43,8 @@ class BudgetRow:
     phase: str
     prompt_token_bound: int
     max_output_tokens: int
-    pool_id: str = "unscoped"
-    panel_id: str = "unscoped"
+    pool_id: str
+    panel_id: str
 
     def __post_init__(self) -> None:
         _nonempty_string("job_id", self.job_id)
@@ -117,11 +117,15 @@ def project_maximum_exposure(
             raise TypeError("every rate must be a RouteRate")
         rate_key = (rate.route_id, rate.basis)
         if rate_key in rates_by_route:
-            raise ValueError(f"Duplicate route_id and basis: {rate.route_id}/{rate.basis}")
+            raise ValueError(
+                f"Duplicate route_id and basis: {rate.route_id}/{rate.basis}"
+            )
         rates_by_route[rate_key] = rate
         snapshot_digests.add(rate.snapshot_sha256)
     if len(snapshot_digests) > 1:
-        raise ValueError("All route rates in a projection must share one snapshot_sha256")
+        raise ValueError(
+            "All route rates in a projection must share one snapshot_sha256"
+        )
 
     by_phase: defaultdict[str, Decimal] = defaultdict(Decimal)
     by_basis: defaultdict[str, Decimal] = defaultdict(Decimal)
@@ -210,7 +214,9 @@ def enforce_freeze_budget_gate(
     for pool_id, panel_id, exposure in projection.by_pool_panel_usd:
         ceiling = panel_ceilings_usd.get((pool_id, panel_id))
         if ceiling is None:
-            raise BudgetCeilingExceeded(f"panel ceiling is missing for {pool_id}/{panel_id}")
+            raise BudgetCeilingExceeded(
+                f"panel ceiling is missing for {pool_id}/{panel_id}"
+            )
         if exposure > ceiling:
             raise BudgetCeilingExceeded(
                 f"panel {pool_id}/{panel_id} maximum exposure {exposure} exceeds hard ceiling {ceiling}"
@@ -226,7 +232,9 @@ def _require_ceiling_map(values: dict[object, object], *, label: str) -> None:
             _nonempty_string("pool ceiling key", key)
         else:
             if not isinstance(key, tuple) or len(key) != 2:
-                raise ValueError("panel ceiling keys must be (pool_id, panel_id) tuples")
+                raise ValueError(
+                    "panel ceiling keys must be (pool_id, panel_id) tuples"
+                )
             _nonempty_string("panel pool_id", key[0])
             _nonempty_string("panel panel_id", key[1])
         _rate(f"{label} ceiling", ceiling)

@@ -164,6 +164,8 @@ class Phase3RoutePriceSnapshotTests(unittest.TestCase):
                 phase="planning-test",
                 prompt_token_bound=1,
                 max_output_tokens=1,
+                pool_id=price["route_id"].split("::", 1)[0],
+                panel_id=price["price_id"],
             )
             for index, price in enumerate(list_prices)
         )
