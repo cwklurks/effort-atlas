@@ -1,10 +1,11 @@
 from __future__ import annotations
 
 import hashlib
+import json
 import unittest
 from decimal import Decimal
 
-from effort_atlas.activation import evaluate_activation
+from effort_atlas.activation import ActivationPolicy, evaluate_activation
 from effort_atlas.confirmatory import sha256_json
 from effort_atlas.reap_budget import (
     BudgetRow,
@@ -18,6 +19,18 @@ from effort_atlas.reap_schedule import build_reap_schedule
 
 def _digest(label: str) -> str:
     return hashlib.sha256(label.encode("utf-8")).hexdigest()
+
+
+def _policy_digest(predicate_ids: tuple[str, ...], manifest_sha256: str) -> str:
+    payload = {
+        "expected_manifest_sha256": manifest_sha256,
+        "policy_version": 1,
+        "predicate_ids": list(predicate_ids),
+        "substitution_allowed": False,
+        "terminal_actions": ["activate", "omit"],
+    }
+    canonical = json.dumps(payload, sort_keys=True, separators=(",", ":"))
+    return hashlib.sha256(canonical.encode("utf-8")).hexdigest()
 
 
 class ReapArtifactFlowTests(unittest.TestCase):
@@ -116,8 +129,15 @@ class ReapArtifactFlowTests(unittest.TestCase):
         enforce_budget_ceiling(projection, Decimal("0.0100352"))
 
         manifest = validate_manifest(self._sealed_manifest(), require_frozen=True)
+        required = ("single_submission", "termination_mapping")
+        policy = ActivationPolicy(
+            predicate_ids=required,
+            expected_manifest_sha256=manifest["manifest_sha256"],
+            policy_sha256=_policy_digest(required, manifest["manifest_sha256"]),
+        )
         evidence = {
             "manifest_sha256": manifest["manifest_sha256"],
+            "activation_policy_sha256": policy.policy_sha256,
             "generation_retry_count": 0,
             "receipt_reconciled": True,
             "budget_within_bound": True,
@@ -136,11 +156,9 @@ class ReapArtifactFlowTests(unittest.TestCase):
                 },
             ],
         }
-        required = ("single_submission", "termination_mapping")
         self.assertEqual(
             evaluate_activation(
-                required_predicate_ids=required,
-                expected_manifest_sha256=manifest["manifest_sha256"],
+                policy=policy,
                 evidence=evidence,
             ).action,
             "activate",
@@ -149,8 +167,7 @@ class ReapArtifactFlowTests(unittest.TestCase):
         for failed_field in ("budget_within_bound", "schedule_manifest_match"):
             failed = {**evidence, failed_field: False}
             decision = evaluate_activation(
-                required_predicate_ids=required,
-                expected_manifest_sha256=manifest["manifest_sha256"],
+                policy=policy,
                 evidence=failed,
             )
             self.assertEqual(decision.action, "omit")
