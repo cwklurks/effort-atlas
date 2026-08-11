@@ -85,6 +85,16 @@
       "source_id": "tinker_models"
     },
     {
+      "price_id": "tinker-nemotron-ultra-list-2026-08-10",
+      "route_id": "nvidia/NVIDIA-Nemotron-3-Ultra-550B-A55B-BF16",
+      "provider": "Tinker",
+      "basis": "list",
+      "input_usd_per_million": "4.98",
+      "output_usd_per_million": "12.45",
+      "context_tokens": 65536,
+      "source_id": "tinker_models"
+    },
+    {
       "price_id": "tinker-nemotron-ultra-promo-2026-08-10",
       "route_id": "nvidia/NVIDIA-Nemotron-3-Ultra-550B-A55B-BF16",
       "provider": "Tinker",
@@ -176,6 +186,7 @@
       "prompt_token_bound": 7864320,
       "output_token_bound": 9830400,
       "price_ids": [
+        "tinker-nemotron-ultra-list-2026-08-10",
         "tinker-nemotron-ultra-promo-2026-08-10",
         "tinker-qwen35-397b-list-2026-08-10",
         "openrouter-baseten-gpt-oss-list-2026-08-10",

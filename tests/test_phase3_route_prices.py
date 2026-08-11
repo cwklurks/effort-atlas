@@ -65,6 +65,9 @@ class Phase3RoutePriceSnapshotTests(unittest.TestCase):
             ("breadth-arm-a-30-n8", "tinker-nemotron-ultra-promo-2026-08-10"): Decimal(
                 "80.7763968"
             ),
+            ("breadth-arm-a-30-n8", "tinker-nemotron-ultra-list-2026-08-10"): Decimal(
+                "161.5527936"
+            ),
             ("breadth-arm-a-30-n8", "tinker-qwen35-397b-list-2026-08-10"): Decimal(
                 "97.3209600"
             ),
@@ -97,6 +100,24 @@ class Phase3RoutePriceSnapshotTests(unittest.TestCase):
                 ) / MILLION
                 observed[(example["example_id"], price_id)] = cost
         self.assertEqual(observed, expected)
+
+    def test_every_promotional_price_has_a_matching_list_price(self) -> None:
+        for promo in (price for price in self.prices.values() if price["basis"] == "discount"):
+            matches = [
+                price
+                for price in self.prices.values()
+                if price["basis"] == "list"
+                and price["route_id"] == promo["route_id"]
+                and price["provider"] == promo["provider"]
+            ]
+            with self.subTest(price_id=promo["price_id"]):
+                self.assertEqual(len(matches), 1)
+
+        nemotron = self.prices["tinker-nemotron-ultra-list-2026-08-10"]
+        self.assertEqual(
+            (nemotron["input_usd_per_million"], nemotron["output_usd_per_million"]),
+            ("4.98", "12.45"),
+        )
 
     def test_current_openai_snapshot_matches_primary_model_pages(
         self,

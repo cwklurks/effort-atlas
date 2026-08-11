@@ -43,6 +43,8 @@ class BudgetRow:
     phase: str
     prompt_token_bound: int
     max_output_tokens: int
+    pool_id: str = "unscoped"
+    panel_id: str = "unscoped"
 
     def __post_init__(self) -> None:
         _nonempty_string("job_id", self.job_id)
@@ -50,6 +52,8 @@ class BudgetRow:
         _nonempty_string("phase", self.phase)
         _token_bound("prompt_token_bound", self.prompt_token_bound, positive=False)
         _token_bound("max_output_tokens", self.max_output_tokens, positive=True)
+        _nonempty_string("pool_id", self.pool_id)
+        _nonempty_string("panel_id", self.panel_id)
 
 
 @dataclass(frozen=True, slots=True)
@@ -79,12 +83,19 @@ class BudgetProjection:
     row_count: int
     by_phase_usd: tuple[tuple[str, Decimal], ...]
     by_price_basis_usd: tuple[tuple[str, Decimal], ...]
+    snapshot_sha256: str
+    by_pool_usd: tuple[tuple[str, Decimal], ...]
+    by_pool_panel_usd: tuple[tuple[str, str, Decimal], ...]
+    price_basis: str
 
 
 def project_maximum_exposure(
-    rows: Iterable[BudgetRow], rates: Iterable[RouteRate]
+    rows: Iterable[BudgetRow], rates: Iterable[RouteRate], *, price_basis: str = "list"
 ) -> BudgetProjection:
-    """Sum prompt bounds and explicit output caps for every planned row."""
+    """Sum prompt bounds and explicit output caps using list rates by default."""
+
+    if price_basis not in {"list", "discount"}:
+        raise ValueError("price_basis must be list or discount")
 
     materialized_rows = tuple(rows)
     materialized_rates = tuple(rates)
@@ -99,22 +110,29 @@ def project_maximum_exposure(
             raise ValueError(f"Duplicate job_id: {row.job_id}")
         job_ids.add(row.job_id)
 
-    rates_by_route: dict[str, RouteRate] = {}
+    snapshot_digests: set[str] = set()
+    rates_by_route: dict[tuple[str, str], RouteRate] = {}
     for rate in materialized_rates:
         if not isinstance(rate, RouteRate):
             raise TypeError("every rate must be a RouteRate")
-        if rate.route_id in rates_by_route:
-            raise ValueError(f"Duplicate route_id: {rate.route_id}")
-        rates_by_route[rate.route_id] = rate
+        rate_key = (rate.route_id, rate.basis)
+        if rate_key in rates_by_route:
+            raise ValueError(f"Duplicate route_id and basis: {rate.route_id}/{rate.basis}")
+        rates_by_route[rate_key] = rate
+        snapshot_digests.add(rate.snapshot_sha256)
+    if len(snapshot_digests) > 1:
+        raise ValueError("All route rates in a projection must share one snapshot_sha256")
 
     by_phase: defaultdict[str, Decimal] = defaultdict(Decimal)
     by_basis: defaultdict[str, Decimal] = defaultdict(Decimal)
+    by_pool: defaultdict[str, Decimal] = defaultdict(Decimal)
+    by_pool_panel: defaultdict[tuple[str, str], Decimal] = defaultdict(Decimal)
     total = Decimal(0)
     for row in materialized_rows:
-        rate = rates_by_route.get(row.route_id)
+        rate = rates_by_route.get((row.route_id, price_basis))
         if rate is None:
             raise ValueError(
-                f"Planned row {row.job_id} has no price for {row.route_id}"
+                f"Planned row {row.job_id} has no price for {row.route_id} at {price_basis} basis"
             )
         exposure = (
             Decimal(row.prompt_token_bound) * rate.input_usd_per_million
@@ -123,12 +141,21 @@ def project_maximum_exposure(
         total += exposure
         by_phase[row.phase] += exposure
         by_basis[rate.basis] += exposure
+        by_pool[row.pool_id] += exposure
+        by_pool_panel[(row.pool_id, row.panel_id)] += exposure
 
     return BudgetProjection(
         maximum_exposure_usd=total,
         row_count=len(materialized_rows),
         by_phase_usd=tuple(sorted(by_phase.items())),
         by_price_basis_usd=tuple(sorted(by_basis.items())),
+        snapshot_sha256=next(iter(snapshot_digests)),
+        by_pool_usd=tuple(sorted(by_pool.items())),
+        by_pool_panel_usd=tuple(
+            (pool_id, panel_id, exposure)
+            for (pool_id, panel_id), exposure in sorted(by_pool_panel.items())
+        ),
+        price_basis=price_basis,
     )
 
 
@@ -148,3 +175,58 @@ def enforce_budget_ceiling(
             f"maximum exposure {projection.maximum_exposure_usd} exceeds hard ceiling {ceiling_usd}"
         )
     return projection
+
+
+def enforce_freeze_budget_gate(
+    projection: BudgetProjection,
+    *,
+    pool_ceilings_usd: dict[str, Decimal],
+    panel_ceilings_usd: dict[tuple[str, str], Decimal],
+    receipt_checked_discount_policy: bool = False,
+) -> BudgetProjection:
+    """Fail closed unless frozen pool and panel ceilings cover list-rate exposure.
+
+    A discount projection is admissible only when a separately frozen policy commits
+    to receipt checks.  This flag records that policy; it does not verify receipts.
+    """
+    if not isinstance(projection, BudgetProjection):
+        raise TypeError("projection must be a BudgetProjection")
+    if projection.price_basis == "discount" and not receipt_checked_discount_policy:
+        raise BudgetCeilingExceeded(
+            "discount-only projection cannot satisfy a freeze gate without a receipt-checked discount policy"
+        )
+    if projection.price_basis != "list" and projection.price_basis != "discount":
+        raise BudgetCeilingExceeded("freeze projection has an unrecognized price basis")
+    _require_ceiling_map(pool_ceilings_usd, label="pool")
+    _require_ceiling_map(panel_ceilings_usd, label="panel")
+    for pool_id, exposure in projection.by_pool_usd:
+        ceiling = pool_ceilings_usd.get(pool_id)
+        if ceiling is None:
+            raise BudgetCeilingExceeded(f"pool ceiling is missing for {pool_id}")
+        if exposure > ceiling:
+            raise BudgetCeilingExceeded(
+                f"pool {pool_id} maximum exposure {exposure} exceeds hard ceiling {ceiling}"
+            )
+    for pool_id, panel_id, exposure in projection.by_pool_panel_usd:
+        ceiling = panel_ceilings_usd.get((pool_id, panel_id))
+        if ceiling is None:
+            raise BudgetCeilingExceeded(f"panel ceiling is missing for {pool_id}/{panel_id}")
+        if exposure > ceiling:
+            raise BudgetCeilingExceeded(
+                f"panel {pool_id}/{panel_id} maximum exposure {exposure} exceeds hard ceiling {ceiling}"
+            )
+    return projection
+
+
+def _require_ceiling_map(values: dict[object, object], *, label: str) -> None:
+    if not isinstance(values, dict):
+        raise TypeError(f"{label}_ceilings_usd must be a dictionary")
+    for key, ceiling in values.items():
+        if label == "pool":
+            _nonempty_string("pool ceiling key", key)
+        else:
+            if not isinstance(key, tuple) or len(key) != 2:
+                raise ValueError("panel ceiling keys must be (pool_id, panel_id) tuples")
+            _nonempty_string("panel pool_id", key[0])
+            _nonempty_string("panel panel_id", key[1])
+        _rate(f"{label} ceiling", ceiling)

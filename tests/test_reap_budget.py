@@ -8,6 +8,7 @@ from effort_atlas.reap_budget import (
     BudgetRow,
     RouteRate,
     enforce_budget_ceiling,
+    enforce_freeze_budget_gate,
     project_maximum_exposure,
 )
 
@@ -59,7 +60,7 @@ class ReapBudgetTests(unittest.TestCase):
             project_maximum_exposure((valid_row,), ())
         with self.assertRaisesRegex(ValueError, "Duplicate job_id"):
             project_maximum_exposure((valid_row, valid_row), (valid_rate,))
-        with self.assertRaisesRegex(ValueError, "Duplicate route_id"):
+        with self.assertRaisesRegex(ValueError, "Duplicate route_id and basis"):
             project_maximum_exposure((valid_row,), (valid_rate, valid_rate))
 
         invalid_rows = (
@@ -93,23 +94,98 @@ class ReapBudgetTests(unittest.TestCase):
 
     def test_projection_reports_list_and_discount_bases_separately(self) -> None:
         rows = (
-            BudgetRow("list-job", "list-route", "main", 0, 1_000_000),
-            BudgetRow("discount-job", "discount-route", "main", 0, 1_000_000),
+            BudgetRow("list-job", "list-route", "main", 0, 1_000_000, "pool", "panel"),
+            BudgetRow("discount-job", "discount-route", "main", 0, 1_000_000, "pool", "panel"),
         )
         rates = (
-            RouteRate("list-route", Decimal(0), Decimal(10), "e" * 64, "list"),
+            RouteRate("list-route", Decimal(0), Decimal(10), "e" * 64, "discount"),
+            RouteRate("list-route", Decimal(0), Decimal(20), "e" * 64, "list"),
             RouteRate(
                 "discount-route",
                 Decimal(0),
                 Decimal(5),
-                "f" * 64,
+                "e" * 64,
                 "discount",
             ),
+            RouteRate("discount-route", Decimal(0), Decimal(10), "e" * 64, "list"),
         )
         projection = project_maximum_exposure(rows, rates)
         self.assertEqual(
             projection.by_price_basis_usd,
-            (("discount", Decimal(5)), ("list", Decimal(10))),
+            (("list", Decimal(30)),),
+        )
+
+    def test_projection_defaults_to_list_and_preserves_snapshot_pool_panel_identity(self) -> None:
+        row = BudgetRow("job", "route", "main", 0, 1_000_000, "tinker", "p1")
+        rates = (
+            RouteRate("route", Decimal(0), Decimal(5), "e" * 64, "discount"),
+            RouteRate("route", Decimal(0), Decimal(10), "e" * 64, "list"),
+        )
+
+        projection = project_maximum_exposure((row,), rates)
+
+        self.assertEqual(projection.maximum_exposure_usd, Decimal(10))
+        self.assertEqual(projection.snapshot_sha256, "e" * 64)
+        self.assertEqual(projection.by_pool_panel_usd, (("tinker", "p1", Decimal(10)),))
+
+    def test_mixed_snapshot_digests_and_missing_list_rates_fail_closed(self) -> None:
+        row = BudgetRow("job", "route", "main", 0, 1, "pool", "panel")
+        with self.assertRaisesRegex(ValueError, "snapshot"):
+            project_maximum_exposure(
+                (row,),
+                (
+                    RouteRate("route", Decimal(0), Decimal(1), "e" * 64, "list"),
+                    RouteRate("other", Decimal(0), Decimal(1), "f" * 64, "list"),
+                ),
+            )
+        with self.assertRaisesRegex(ValueError, "list"):
+            project_maximum_exposure(
+                (row,),
+                (RouteRate("route", Decimal(0), Decimal(1), "e" * 64, "discount"),),
+            )
+
+    def test_freeze_gate_enforces_panel_and_pool_ceilings_and_discount_policy(self) -> None:
+        row = BudgetRow("job", "route", "main", 0, 1_000_000, "pool", "panel")
+        list_projection = project_maximum_exposure(
+            (row,), (RouteRate("route", Decimal(0), Decimal(10), "e" * 64, "list"),)
+        )
+        self.assertEqual(
+            enforce_freeze_budget_gate(
+                list_projection,
+                pool_ceilings_usd={"pool": Decimal(10)},
+                panel_ceilings_usd={("pool", "panel"): Decimal(10)},
+            ),
+            list_projection,
+        )
+        with self.assertRaisesRegex(BudgetCeilingExceeded, "panel"):
+            enforce_freeze_budget_gate(
+                list_projection,
+                pool_ceilings_usd={"pool": Decimal(10)},
+                panel_ceilings_usd={("pool", "panel"): Decimal("9.99")},
+            )
+
+        discount_projection = project_maximum_exposure(
+            (row,),
+            (
+                RouteRate("route", Decimal(0), Decimal(5), "e" * 64, "discount"),
+                RouteRate("route", Decimal(0), Decimal(10), "e" * 64, "list"),
+            ),
+            price_basis="discount",
+        )
+        with self.assertRaisesRegex(BudgetCeilingExceeded, "discount"):
+            enforce_freeze_budget_gate(
+                discount_projection,
+                pool_ceilings_usd={"pool": Decimal(5)},
+                panel_ceilings_usd={("pool", "panel"): Decimal(5)},
+            )
+        self.assertEqual(
+            enforce_freeze_budget_gate(
+                discount_projection,
+                pool_ceilings_usd={"pool": Decimal(5)},
+                panel_ceilings_usd={("pool", "panel"): Decimal(5)},
+                receipt_checked_discount_policy=True,
+            ),
+            discount_projection,
         )
 
 
