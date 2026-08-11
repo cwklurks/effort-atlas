@@ -19,6 +19,7 @@ import subprocess
 import sys
 import tarfile
 import textwrap
+import uuid
 from collections.abc import Callable, Mapping, Sequence
 from datetime import datetime, timezone
 from decimal import Decimal, InvalidOperation
@@ -41,6 +42,7 @@ CLAUDE_NON_SUBSCRIPTION_ENVIRONMENT_VARIABLES = (
 DEFAULT_OBJECTIVE = Path("reap/prompts/PHASE3_ADVERSARIAL_LOOP_OBJECTIVE_2026-08-10.md")
 CLAUDE_REQUIRED_FLAGS = (
     "--resume",
+    "--session-id",
     "--print",
     "--effort",
     "--model",
@@ -78,13 +80,22 @@ Runner = Callable[..., str]
 
 
 def build_claude_command(
-    *, executable: str, session_id: str, max_budget_usd: Decimal
+    *,
+    executable: str,
+    session_id: str,
+    max_budget_usd: Decimal,
+    start_new_session: bool = False,
+    round_number: int = 1,
 ) -> list[str]:
-    """Build one resumed, non-interactive, read-only Claude review turn."""
+    """Build one non-interactive, read-only Claude review turn."""
+
+    session_flag = (
+        "--session-id" if start_new_session and round_number == 1 else "--resume"
+    )
 
     return [
         executable,
-        "--resume",
+        session_flag,
         session_id,
         "--print",
         "--effort",
@@ -581,6 +592,7 @@ def run_bounded_loop(
     output_dir: Path,
     repository_context: Mapping[str, str],
     claude_session: str,
+    start_new_claude_session: bool = False,
     claude_budget: Decimal,
     rounds: int,
     timeout_seconds: int,
@@ -612,6 +624,8 @@ def run_bounded_loop(
             executable=claude_executable,
             session_id=claude_session,
             max_budget_usd=claude_budget,
+            start_new_session=start_new_claude_session,
+            round_number=round_number,
         )
         claude_prompt = _claude_prompt(
             objective=objective,
@@ -686,7 +700,13 @@ def _parse_args(argv: Sequence[str] | None) -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--worktree", type=Path, default=Path.cwd())
     parser.add_argument("--objective-file", type=Path, default=DEFAULT_OBJECTIVE)
-    parser.add_argument("--claude-session", required=True)
+    session = parser.add_mutually_exclusive_group(required=True)
+    session.add_argument("--claude-session")
+    session.add_argument(
+        "--new-claude-session",
+        action="store_true",
+        help="start a clean persisted Fable session, then resume it within the loop",
+    )
     parser.add_argument("--rounds", type=int, default=2)
     parser.add_argument(
         "--claude-max-budget-usd",
@@ -848,6 +868,7 @@ def _write_manifest(
     final_path: Path | None,
     status: str,
     cli_preflight: Mapping[str, object],
+    claude_session_mode: str,
 ) -> None:
     manifest = {
         "created_at_utc": datetime.now(timezone.utc).isoformat(),
@@ -863,6 +884,7 @@ def _write_manifest(
             "billing": "regular eligible-plan usage only",
             "usage_credits": "human-confirmed disabled",
             "automatic_model_switching": "human-confirmed disabled",
+            "session_mode": claude_session_mode,
         },
         "codex": {"model": "gpt-5.6-sol", "effort": "xhigh", "ephemeral": True},
         "relay_subprocess_retries": 0,
@@ -901,12 +923,15 @@ def main(argv: Sequence[str] | None = None) -> int:
 
     output_dir = (args.output_dir or _default_output_dir()).expanduser().resolve()
     validate_output_directory(output_dir, worktree)
+    claude_session = args.claude_session or str(uuid.uuid4())
+    claude_session_mode = "clean" if args.new_claude_session else "resume_existing"
 
     max_claude_total = args.claude_max_budget_usd * args.rounds
     print(f"worktree: {worktree}")
     print(f"branch/head: {repository_context['branch']} {repository_context['head']}")
     print(f"rounds: {args.rounds} Claude turns + {args.rounds} Codex turns")
     print(f"Claude: {CLAUDE_MODEL}, high, regular eligible-plan usage only")
+    print(f"Claude session mode: {claude_session_mode}")
     print(f"Claude hard maximum: ${max_claude_total:.2f} total")
     print("Codex: gpt-5.6-sol, xhigh, ephemeral, fixed turn count")
     print("agent permissions: read-only; relay subprocess retries: 0")
@@ -935,6 +960,7 @@ def main(argv: Sequence[str] | None = None) -> int:
         final_path=None,
         status="running",
         cli_preflight=cli_preflight,
+        claude_session_mode=claude_session_mode,
     )
 
     try:
@@ -945,7 +971,8 @@ def main(argv: Sequence[str] | None = None) -> int:
             worktree=snapshot,
             output_dir=output_dir,
             repository_context=repository_context,
-            claude_session=args.claude_session,
+            claude_session=claude_session,
+            start_new_claude_session=args.new_claude_session,
             claude_budget=args.claude_max_budget_usd,
             rounds=args.rounds,
             timeout_seconds=args.timeout_seconds,
@@ -965,6 +992,7 @@ def main(argv: Sequence[str] | None = None) -> int:
             final_path=None,
             status="failed",
             cli_preflight=cli_preflight,
+            claude_session_mode=claude_session_mode,
         )
         raise
     _write_manifest(
@@ -976,6 +1004,7 @@ def main(argv: Sequence[str] | None = None) -> int:
         final_path=final_path,
         status="complete",
         cli_preflight=cli_preflight,
+        claude_session_mode=claude_session_mode,
     )
     print(f"final synthesis: {final_path}")
     return 0

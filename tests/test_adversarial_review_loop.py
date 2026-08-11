@@ -34,6 +34,51 @@ class AdversarialReviewLoopTests(unittest.TestCase):
         emitted_flags = {argument for argument in command if argument.startswith("--")}
         self.assertLessEqual(emitted_flags, set(loop.CLAUDE_REQUIRED_FLAGS))
 
+    def test_clean_session_starts_once_then_resumes_the_same_uuid(self):
+        session_id = "11111111-2222-4333-8444-555555555555"
+        first = loop.build_claude_command(
+            executable="claude",
+            session_id=session_id,
+            max_budget_usd=Decimal("2.00"),
+            start_new_session=True,
+            round_number=1,
+        )
+        second = loop.build_claude_command(
+            executable="claude",
+            session_id=session_id,
+            max_budget_usd=Decimal("2.00"),
+            start_new_session=True,
+            round_number=2,
+        )
+
+        self.assertIn("--session-id", first)
+        self.assertNotIn("--resume", first)
+        self.assertEqual(first[first.index("--session-id") + 1], session_id)
+        self.assertIn("--resume", second)
+        self.assertNotIn("--session-id", second)
+        self.assertEqual(second[second.index("--resume") + 1], session_id)
+
+    def test_cli_requires_exactly_one_existing_or_clean_claude_session_mode(self):
+        existing = loop._parse_args(
+            ["--claude-session", "2fe4d6f6-c291-4452-833e-b4726cbe9b10"]
+        )
+        clean = loop._parse_args(["--new-claude-session"])
+        self.assertIsNotNone(existing.claude_session)
+        self.assertFalse(existing.new_claude_session)
+        self.assertIsNone(clean.claude_session)
+        self.assertTrue(clean.new_claude_session)
+
+        with self.assertRaises(SystemExit):
+            loop._parse_args([])
+        with self.assertRaises(SystemExit):
+            loop._parse_args(
+                [
+                    "--claude-session",
+                    "2fe4d6f6-c291-4452-833e-b4726cbe9b10",
+                    "--new-claude-session",
+                ]
+            )
+
     def test_regular_usage_guard_rejects_non_subscription_billing(self):
         with self.assertRaisesRegex(loop.ConfigurationError, "ANTHROPIC_API_KEY"):
             loop.validate_claude_subscription_environment(
@@ -186,6 +231,46 @@ class AdversarialReviewLoopTests(unittest.TestCase):
                 [entry["event"] for entry in journal],
                 ["attempt_started", "attempt_completed"] * 4,
             )
+
+    def test_new_session_orchestration_starts_once_and_then_resumes(self):
+        claude_commands = []
+
+        def fake_run(
+            command, prompt, *, cwd, timeout_seconds, stdout_path, stderr_path
+        ):
+            del prompt, cwd, timeout_seconds
+            stdout_path.write_text("stdout\n")
+            stderr_path.write_text("")
+            if command[0] == "codex":
+                response_path = Path(
+                    command[command.index("--output-last-message") + 1]
+                )
+                response_path.write_text("codex response\n")
+                return response_path.read_text()
+            claude_commands.append(command)
+            return "claude response\n"
+
+        with tempfile.TemporaryDirectory() as directory:
+            loop.run_bounded_loop(
+                objective="Challenge the Phase 3 claims.",
+                worktree=Path("/tmp/reap-target"),
+                output_dir=Path(directory),
+                repository_context={"branch": "codex/prereg-v2", "head": "abc123"},
+                claude_session="11111111-2222-4333-8444-555555555555",
+                start_new_claude_session=True,
+                claude_budget=Decimal("2.00"),
+                rounds=2,
+                timeout_seconds=300,
+                runner=fake_run,
+                live=True,
+                acknowledge_costs=True,
+                confirm_fable_regular_usage=True,
+            )
+
+        self.assertIn("--session-id", claude_commands[0])
+        self.assertNotIn("--resume", claude_commands[0])
+        self.assertIn("--resume", claude_commands[1])
+        self.assertNotIn("--session-id", claude_commands[1])
 
     def test_agent_failure_stops_without_retry(self):
         calls = 0
@@ -373,7 +458,7 @@ class AdversarialReviewLoopTests(unittest.TestCase):
             claude.write_text(
                 "#!/bin/sh\n"
                 "if [ \"$1\" = '--help' ]; then\n"
-                "  printf '%s\\n' '--resume --print --effort --model --max-budget-usd --permission-mode --safe-mode --no-chrome --disable-slash-commands --tools --output-format'\n"
+                "  printf '%s\\n' '--resume --session-id --print --effort --model --max-budget-usd --permission-mode --safe-mode --no-chrome --disable-slash-commands --tools --output-format'\n"
                 "  exit 0\n"
                 "fi\n"
                 "if [ \"$1\" = '--version' ]; then\n"
