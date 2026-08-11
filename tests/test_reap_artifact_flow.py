@@ -167,18 +167,16 @@ class ReapArtifactFlowTests(unittest.TestCase):
             )
             for job in self.jobs
         )
-        projection = project_maximum_exposure(
-            budget_rows,
-            (
-                RouteRate(
-                    route_id="openai-direct::test-route",
-                    input_usd_per_million=Decimal("0.20"),
-                    output_usd_per_million=Decimal("1.20"),
-                    snapshot_sha256=_digest("route-price-snapshot"),
-                    basis="list",
-                ),
+        budget_rates = (
+            RouteRate(
+                route_id="openai-direct::test-route",
+                input_usd_per_million=Decimal("0.20"),
+                output_usd_per_million=Decimal("1.20"),
+                snapshot_sha256=_digest("route-price-snapshot"),
+                basis="list",
             ),
         )
+        projection = project_maximum_exposure(budget_rows, budget_rates)
         self.assertEqual(projection.maximum_exposure_usd, Decimal("0.0598016"))
         self.assertEqual(projection.price_basis, "list")
         self.assertEqual(
@@ -190,13 +188,15 @@ class ReapArtifactFlowTests(unittest.TestCase):
             (("openai-direct", "test-panel", Decimal("0.0598016")),),
         )
         enforce_freeze_budget_gate(
-            projection,
+            budget_rows,
+            budget_rates,
             pool_ceilings_usd={"openai-direct": Decimal("0.0598016")},
             panel_ceilings_usd={("openai-direct", "test-panel"): Decimal("0.0598016")},
         )
         with self.assertRaisesRegex(BudgetCeilingExceeded, "openai-direct"):
             enforce_freeze_budget_gate(
-                projection,
+                budget_rows,
+                budget_rates,
                 pool_ceilings_usd={"tinker": Decimal("0.0598016")},
                 panel_ceilings_usd={("tinker", "test-panel"): Decimal("0.0598016")},
             )

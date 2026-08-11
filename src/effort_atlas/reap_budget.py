@@ -194,17 +194,44 @@ def enforce_budget_ceiling(
 
 
 def enforce_freeze_budget_gate(
+    rows: Iterable[BudgetRow],
+    rates: Iterable[RouteRate],
+    *,
+    pool_ceilings_usd: dict[str, Decimal],
+    panel_ceilings_usd: dict[tuple[str, str], Decimal],
+    price_basis: str = "list",
+    receipt_checked_discount_policy: bool = False,
+) -> BudgetProjection:
+    """Compute authoritative exposure and enforce frozen pool and panel ceilings.
+
+    Callers supply planned rows and pinned route rates.  This authority boundary
+    never accepts a caller-assembled ``BudgetProjection``.
+
+    A discount projection is admissible only when a separately frozen policy commits
+    to receipt checks.  This flag records that policy; it does not verify receipts.
+    """
+    if isinstance(rows, BudgetProjection):
+        raise TypeError(
+            "enforce_freeze_budget_gate does not accept BudgetProjection; "
+            "supply BudgetRow and RouteRate inputs"
+        )
+    projection = project_maximum_exposure(rows, rates, price_basis=price_basis)
+    return _enforce_projected_freeze_budget_gate(
+        projection,
+        pool_ceilings_usd=pool_ceilings_usd,
+        panel_ceilings_usd=panel_ceilings_usd,
+        receipt_checked_discount_policy=receipt_checked_discount_policy,
+    )
+
+
+def _enforce_projected_freeze_budget_gate(
     projection: BudgetProjection,
     *,
     pool_ceilings_usd: dict[str, Decimal],
     panel_ceilings_usd: dict[tuple[str, str], Decimal],
     receipt_checked_discount_policy: bool = False,
 ) -> BudgetProjection:
-    """Fail closed unless frozen pool and panel ceilings cover list-rate exposure.
-
-    A discount projection is admissible only when a separately frozen policy commits
-    to receipt checks.  This flag records that policy; it does not verify receipts.
-    """
+    """Validate and enforce a derived projection without granting freeze authority."""
     if not isinstance(projection, BudgetProjection):
         raise TypeError("projection must be a BudgetProjection")
     projection_pool_ids, projection_panel_ids = _validate_projection(projection)

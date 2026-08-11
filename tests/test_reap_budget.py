@@ -9,6 +9,7 @@ from effort_atlas.reap_budget import (
     BudgetProjection,
     BudgetRow,
     RouteRate,
+    _enforce_projected_freeze_budget_gate,
     enforce_budget_ceiling,
     enforce_freeze_budget_gate,
     project_maximum_exposure,
@@ -16,6 +17,26 @@ from effort_atlas.reap_budget import (
 
 
 class ReapBudgetTests(unittest.TestCase):
+    def test_public_freeze_gate_rejects_fabricated_zero_projection(self) -> None:
+        fabricated = BudgetProjection(
+            maximum_exposure_usd=Decimal(0),
+            row_count=1,
+            by_phase_usd=(("main", Decimal(0)),),
+            by_price_basis_usd=(("list", Decimal(0)),),
+            snapshot_sha256="a" * 64,
+            by_pool_usd=(("pool", Decimal(0)),),
+            by_pool_panel_usd=(("pool", "panel", Decimal(0)),),
+            price_basis="list",
+        )
+
+        with self.assertRaisesRegex(TypeError, "does not accept BudgetProjection"):
+            enforce_freeze_budget_gate(
+                fabricated,
+                (),
+                pool_ceilings_usd={"pool": Decimal(0)},
+                panel_ceilings_usd={("pool", "panel"): Decimal(0)},
+            )
+
     def test_budget_rows_require_explicit_pool_and_panel_identity(self) -> None:
         with self.assertRaisesRegex(TypeError, "pool_id.*panel_id"):
             BudgetRow("job", "route", "main", 1, 1)
@@ -73,7 +94,7 @@ class ReapBudgetTests(unittest.TestCase):
         )
 
         with self.assertRaisesRegex(ValueError, "placeholder"):
-            enforce_freeze_budget_gate(
+            _enforce_projected_freeze_budget_gate(
                 projection,
                 pool_ceilings_usd={"real-pool": Decimal(1)},
                 panel_ceilings_usd={("real-pool", "real-panel"): Decimal(1)},
@@ -109,7 +130,7 @@ class ReapBudgetTests(unittest.TestCase):
                 ),
                 self.assertRaisesRegex(ValueError, "placeholder"),
             ):
-                enforce_freeze_budget_gate(
+                _enforce_projected_freeze_budget_gate(
                     projection,
                     pool_ceilings_usd=pool_ceilings,
                     panel_ceilings_usd=panel_ceilings,
@@ -148,7 +169,7 @@ class ReapBudgetTests(unittest.TestCase):
                 self.subTest(expected=expected),
                 self.assertRaisesRegex(ValueError, expected),
             ):
-                enforce_freeze_budget_gate(
+                _enforce_projected_freeze_budget_gate(
                     projection,
                     pool_ceilings_usd={"pool": Decimal(1)},
                     panel_ceilings_usd={("pool", "panel"): Decimal(1)},
@@ -175,7 +196,7 @@ class ReapBudgetTests(unittest.TestCase):
                 self.subTest(projection=projection),
                 self.assertRaisesRegex(ValueError, "finite nonnegative Decimal"),
             ):
-                enforce_freeze_budget_gate(
+                _enforce_projected_freeze_budget_gate(
                     projection,
                     pool_ceilings_usd={"pool": Decimal(1)},
                     panel_ceilings_usd={("pool", "panel"): Decimal(1)},
@@ -247,7 +268,7 @@ class ReapBudgetTests(unittest.TestCase):
                 self.subTest(expected=expected),
                 self.assertRaisesRegex(ValueError, expected),
             ):
-                enforce_freeze_budget_gate(
+                _enforce_projected_freeze_budget_gate(
                     projection,
                     pool_ceilings_usd={
                         pool_id: Decimal(1)
@@ -260,10 +281,8 @@ class ReapBudgetTests(unittest.TestCase):
                 )
 
     def test_freeze_gate_requires_exact_ceiling_scope_sets(self) -> None:
-        projection = project_maximum_exposure(
-            (BudgetRow("job", "route", "main", 0, 1_000_000, "pool", "panel"),),
-            (RouteRate("route", Decimal(0), Decimal(1), "a" * 64, "list"),),
-        )
+        rows = (BudgetRow("job", "route", "main", 0, 1_000_000, "pool", "panel"),)
+        rates = (RouteRate("route", Decimal(0), Decimal(1), "a" * 64, "list"),)
         mutations = (
             ({}, {("pool", "panel"): Decimal(1)}),
             (
@@ -287,22 +306,23 @@ class ReapBudgetTests(unittest.TestCase):
                 self.assertRaisesRegex(BudgetCeilingExceeded, "scope"),
             ):
                 enforce_freeze_budget_gate(
-                    projection,
+                    rows,
+                    rates,
                     pool_ceilings_usd=pool_ceilings,
                     panel_ceilings_usd=panel_ceilings,
                 )
 
     def test_freeze_gate_accepts_explicit_zero_cost_aggregates(self) -> None:
-        projection = project_maximum_exposure(
-            (BudgetRow("job", "free-route", "main", 0, 1, "pool", "panel"),),
-            (RouteRate("free-route", Decimal(0), Decimal(0), "a" * 64, "list"),),
-        )
+        rows = (BudgetRow("job", "free-route", "main", 0, 1, "pool", "panel"),)
+        rates = (RouteRate("free-route", Decimal(0), Decimal(0), "a" * 64, "list"),)
+        projection = project_maximum_exposure(rows, rates)
 
         self.assertEqual(projection.maximum_exposure_usd, Decimal(0))
         self.assertEqual(projection.by_pool_usd, (("pool", Decimal(0)),))
         self.assertEqual(
             enforce_freeze_budget_gate(
-                projection,
+                rows,
+                rates,
                 pool_ceilings_usd={"pool": Decimal(0)},
                 panel_ceilings_usd={("pool", "panel"): Decimal(0)},
             ),
@@ -449,12 +469,12 @@ class ReapBudgetTests(unittest.TestCase):
         self,
     ) -> None:
         row = BudgetRow("job", "route", "main", 0, 1_000_000, "pool", "panel")
-        list_projection = project_maximum_exposure(
-            (row,), (RouteRate("route", Decimal(0), Decimal(10), "e" * 64, "list"),)
-        )
+        list_rates = (RouteRate("route", Decimal(0), Decimal(10), "e" * 64, "list"),)
+        list_projection = project_maximum_exposure((row,), list_rates)
         self.assertEqual(
             enforce_freeze_budget_gate(
-                list_projection,
+                (row,),
+                list_rates,
                 pool_ceilings_usd={"pool": Decimal(10)},
                 panel_ceilings_usd={("pool", "panel"): Decimal(10)},
             ),
@@ -462,30 +482,36 @@ class ReapBudgetTests(unittest.TestCase):
         )
         with self.assertRaisesRegex(BudgetCeilingExceeded, "panel"):
             enforce_freeze_budget_gate(
-                list_projection,
+                (row,),
+                list_rates,
                 pool_ceilings_usd={"pool": Decimal(10)},
                 panel_ceilings_usd={("pool", "panel"): Decimal("9.99")},
             )
 
+        discount_rates = (
+            RouteRate("route", Decimal(0), Decimal(5), "e" * 64, "discount"),
+            RouteRate("route", Decimal(0), Decimal(10), "e" * 64, "list"),
+        )
         discount_projection = project_maximum_exposure(
             (row,),
-            (
-                RouteRate("route", Decimal(0), Decimal(5), "e" * 64, "discount"),
-                RouteRate("route", Decimal(0), Decimal(10), "e" * 64, "list"),
-            ),
+            discount_rates,
             price_basis="discount",
         )
         with self.assertRaisesRegex(BudgetCeilingExceeded, "discount"):
             enforce_freeze_budget_gate(
-                discount_projection,
+                (row,),
+                discount_rates,
                 pool_ceilings_usd={"pool": Decimal(5)},
                 panel_ceilings_usd={("pool", "panel"): Decimal(5)},
+                price_basis="discount",
             )
         self.assertEqual(
             enforce_freeze_budget_gate(
-                discount_projection,
+                (row,),
+                discount_rates,
                 pool_ceilings_usd={"pool": Decimal(5)},
                 panel_ceilings_usd={("pool", "panel"): Decimal(5)},
+                price_basis="discount",
                 receipt_checked_discount_policy=True,
             ),
             discount_projection,
