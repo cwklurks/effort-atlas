@@ -59,9 +59,12 @@ The external response is preserved at
 two read-only challenge rounds automatically and produce a final Sol XHigh
 synthesis. It operates on a tracked-file snapshot, preserves every prompt and
 response, performs no relay-level subprocess retry, labels internal CLI request
-counts unverified, and requires explicit live and cost acknowledgement flags. The
-real relay has not been run. The current checkpoint is
-129 ordinary tests plus 26 exact-lock Tinker tests; all study-call and spend
+counts unverified, and pins Claude to `claude-fable-5`. Live execution rejects API
+keys and gateway/provider overrides, requires a logged-in first-party Claude
+account, and requires human confirmation that Fable 5 is included in the account's
+Max/premium plan, usage credits are disabled, and automatic model switching is
+disabled. The real relay has not been run. The current checkpoint is
+133 ordinary tests plus 26 exact-lock Tinker tests; all study-call and spend
 counters remain zero. Model agreement cannot authorize spending, provider
 activation, preregistration freeze, or choices owned by Connor or Chirag.
 

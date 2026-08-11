@@ -28,11 +28,22 @@ MAX_ROUNDS = 3
 MAX_TRANSCRIPT_CHARACTERS = 750_000
 DEFAULT_CLAUDE_BUDGET = Decimal("2.00")
 MAX_CLAUDE_BUDGET_PER_TURN = Decimal("5.00")
+CLAUDE_MODEL = "claude-fable-5"
+MINIMUM_CLAUDE_VERSION = (2, 1, 170)
+CLAUDE_NON_SUBSCRIPTION_ENVIRONMENT_VARIABLES = (
+    "ANTHROPIC_API_KEY",
+    "ANTHROPIC_AUTH_TOKEN",
+    "ANTHROPIC_BASE_URL",
+    "CLAUDE_CODE_USE_BEDROCK",
+    "CLAUDE_CODE_USE_FOUNDRY",
+    "CLAUDE_CODE_USE_VERTEX",
+)
 DEFAULT_OBJECTIVE = Path("reap/prompts/PHASE3_ADVERSARIAL_LOOP_OBJECTIVE_2026-08-10.md")
 CLAUDE_REQUIRED_FLAGS = (
     "--resume",
     "--print",
     "--effort",
+    "--model",
     "--max-budget-usd",
     "--permission-mode",
     "--safe-mode",
@@ -77,6 +88,8 @@ def build_claude_command(
         "--print",
         "--effort",
         "high",
+        "--model",
+        CLAUDE_MODEL,
         "--max-budget-usd",
         f"{max_budget_usd:.2f}",
         "--permission-mode",
@@ -127,12 +140,53 @@ def build_codex_command(
 
 
 def validate_execution_request(
-    *, live: bool, acknowledge_costs: bool, rounds: int
+    *,
+    live: bool,
+    acknowledge_costs: bool,
+    rounds: int,
+    confirm_fable_regular_usage: bool = False,
 ) -> None:
     if not 1 <= rounds <= MAX_ROUNDS:
         raise ConfigurationError(f"rounds must be between 1 and {MAX_ROUNDS}")
     if live and not acknowledge_costs:
         raise ConfigurationError("--live requires --acknowledge-external-model-costs")
+    if live and not confirm_fable_regular_usage:
+        raise ConfigurationError(
+            "--live requires confirmation that Fable 5 is included in the "
+            "authenticated Max/premium plan, usage credits are disabled, and "
+            "automatic model switching is disabled"
+        )
+
+
+def validate_claude_subscription_environment(
+    environment: Mapping[str, str],
+) -> None:
+    """Reject environment configuration that can bypass subscription billing."""
+
+    configured = [
+        variable
+        for variable in CLAUDE_NON_SUBSCRIPTION_ENVIRONMENT_VARIABLES
+        if environment.get(variable)
+    ]
+    if configured:
+        raise ConfigurationError(
+            "regular Claude subscription usage requires these variables to be "
+            f"unset: {', '.join(configured)}"
+        )
+
+
+def validate_claude_subscription_auth(status: Mapping[str, object]) -> None:
+    """Require a logged-in first-party Claude account before any relay turn."""
+
+    if status.get("loggedIn") is not True:
+        raise ConfigurationError(
+            "Claude Code is not logged in; run `claude auth login` with the "
+            "eligible Claude subscription account"
+        )
+    if status.get("apiProvider") != "firstParty":
+        raise ConfigurationError(
+            "Claude Code is not using the first-party subscription provider"
+        )
 
 
 def validate_claude_budget(max_budget_usd: Decimal, *, rounds: int) -> None:
@@ -529,6 +583,7 @@ def run_bounded_loop(
     timeout_seconds: int,
     live: bool,
     acknowledge_costs: bool,
+    confirm_fable_regular_usage: bool = False,
     runner: Runner = run_agent_command,
     claude_executable: str = "claude",
     codex_executable: str = "codex",
@@ -539,7 +594,9 @@ def run_bounded_loop(
         live=live,
         acknowledge_costs=acknowledge_costs,
         rounds=rounds,
+        confirm_fable_regular_usage=confirm_fable_regular_usage,
     )
+    validate_claude_subscription_environment(os.environ)
     if not live:
         raise ConfigurationError("run_bounded_loop cannot execute without live=True")
     validate_claude_budget(claude_budget, rounds=rounds)
@@ -642,6 +699,14 @@ def _parse_args(argv: Sequence[str] | None) -> argparse.Namespace:
         action="store_true",
         help="required with --live; confirms Claude/Codex development-model usage",
     )
+    parser.add_argument(
+        "--confirm-fable-5-regular-plan-usage",
+        action="store_true",
+        help=(
+            "required with --live; confirms an eligible Max/premium subscription, "
+            "disabled usage credits, and disabled automatic model switching"
+        ),
+    )
     return parser.parse_args(argv)
 
 
@@ -694,13 +759,66 @@ def _preflight_cli(
     }
 
 
-def preflight_clis() -> dict[str, dict[str, object]]:
+def _preflight_claude_subscription(executable: str) -> dict[str, object]:
+    located = shutil.which(executable)
+    if located is None:
+        raise ConfigurationError(f"required executable not found: {executable}")
+    version_result = subprocess.run(
+        [located, "--version"], capture_output=True, text=True, check=False
+    )
+    if version_result.returncode != 0:
+        raise ConfigurationError("Claude version preflight failed")
+    version_text = version_result.stdout.strip()
+    try:
+        version = tuple(int(part) for part in version_text.split()[0].split("."))
+    except (ValueError, IndexError) as error:
+        raise ConfigurationError(
+            "Claude version preflight was not parseable"
+        ) from error
+    if version < MINIMUM_CLAUDE_VERSION:
+        required = ".".join(str(part) for part in MINIMUM_CLAUDE_VERSION)
+        raise ConfigurationError(
+            f"Fable 5 requires Claude Code {required} or later; found {version_text}"
+        )
+
+    auth_result = subprocess.run(
+        [located, "auth", "status", "--json"],
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    if auth_result.returncode != 0:
+        raise ConfigurationError("Claude subscription auth preflight failed")
+    try:
+        status = json.loads(auth_result.stdout)
+    except json.JSONDecodeError as error:
+        raise ConfigurationError("Claude auth status was not valid JSON") from error
+    if not isinstance(status, dict):
+        raise ConfigurationError("Claude auth status must be a JSON object")
+    validate_claude_subscription_auth(status)
     return {
-        "claude": _preflight_cli(
-            "claude",
-            ["--help"],
-            CLAUDE_REQUIRED_FLAGS,
-        ),
+        "version": version_text,
+        "logged_in": True,
+        "auth_method": str(status.get("authMethod", "unreported")),
+        "api_provider": "firstParty",
+    }
+
+
+def preflight_clis(
+    environment: Mapping[str, str] | None = None,
+) -> dict[str, dict[str, object]]:
+    validate_claude_subscription_environment(
+        os.environ if environment is None else environment
+    )
+    claude = _preflight_cli(
+        "claude",
+        ["--help"],
+        CLAUDE_REQUIRED_FLAGS,
+    )
+    claude["subscription"] = _preflight_claude_subscription("claude")
+    claude["model"] = CLAUDE_MODEL
+    return {
+        "claude": claude,
         "codex": _preflight_cli(
             "codex",
             ["exec", "--help"],
@@ -729,6 +847,12 @@ def _write_manifest(
         "planned_agent_turns": {"claude": rounds, "codex": rounds},
         "claude_max_budget_per_turn_usd": str(claude_budget),
         "claude_max_total_budget_usd": str(claude_budget * rounds),
+        "claude": {
+            "model": CLAUDE_MODEL,
+            "billing": "regular eligible-plan usage only",
+            "usage_credits": "human-confirmed disabled",
+            "automatic_model_switching": "human-confirmed disabled",
+        },
         "codex": {"model": "gpt-5.6-sol", "effort": "xhigh", "ephemeral": True},
         "relay_subprocess_retries": 0,
         "underlying_cli_request_count": "unverified",
@@ -752,6 +876,7 @@ def main(argv: Sequence[str] | None = None) -> int:
         live=args.live,
         acknowledge_costs=args.acknowledge_external_model_costs,
         rounds=args.rounds,
+        confirm_fable_regular_usage=args.confirm_fable_5_regular_plan_usage,
     )
     validate_claude_budget(args.claude_max_budget_usd, rounds=args.rounds)
     if not 60 <= args.timeout_seconds <= 3600:
@@ -770,6 +895,7 @@ def main(argv: Sequence[str] | None = None) -> int:
     print(f"worktree: {worktree}")
     print(f"branch/head: {repository_context['branch']} {repository_context['head']}")
     print(f"rounds: {args.rounds} Claude turns + {args.rounds} Codex turns")
+    print(f"Claude: {CLAUDE_MODEL}, high, regular eligible-plan usage only")
     print(f"Claude hard maximum: ${max_claude_total:.2f} total")
     print("Codex: gpt-5.6-sol, xhigh, ephemeral, fixed turn count")
     print("agent permissions: read-only; relay subprocess retries: 0")
@@ -814,6 +940,7 @@ def main(argv: Sequence[str] | None = None) -> int:
             timeout_seconds=args.timeout_seconds,
             live=args.live,
             acknowledge_costs=args.acknowledge_external_model_costs,
+            confirm_fable_regular_usage=args.confirm_fable_5_regular_plan_usage,
             claude_executable=claude_executable,
             codex_executable=codex_executable,
         )

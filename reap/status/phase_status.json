@@ -132,7 +132,7 @@
   "verification": [
     {
       "label": "Bounded Claude/Codex adversarial relay",
-      "result": "129 ordinary tests plus 26 exact-lock Tinker tests passed; fake-agent integration proves two automatic challenge rounds and a final synthesis, with tracked-snapshot isolation, read-only agents, zero relay-level subprocess retries, and a hard Claude budget. Internal CLI request counts remain unverified. The real relay has not been run.",
+      "result": "133 ordinary tests plus 26 exact-lock Tinker tests passed; Claude is pinned to claude-fable-5, API and gateway billing variables are rejected, and live requires first-party login plus confirmation of eligible regular-plan usage, disabled usage credits, and disabled automatic model switching. Fake-agent integration still proves two read-only challenge rounds with zero relay-level subprocess retries. Internal CLI request counts remain unverified. The real relay has not been run.",
       "status": "passed"
     },
     {
@@ -211,7 +211,7 @@
       "date": "2026-08-10",
       "phase": 3,
       "title": "Bounded Claude/Codex review relay prepared",
-      "detail": "A dry-run-default relay can resume the supplied Claude session and alternate two read-only challenge rounds with ephemeral Sol XHigh verification. It reviews only committed tracked bytes, preserves every prompt and response, caps Claude spend, performs no relay-level retry, and labels internal CLI request counts unverified. It has not been run; all study-call counters remain zero."
+      "detail": "A dry-run-default relay can resume the supplied Claude session and alternate two read-only challenge rounds with ephemeral Sol XHigh verification. Claude is pinned to claude-fable-5; API and gateway billing variables are rejected, and live requires first-party login plus confirmation that Fable 5 is included in an eligible Max/premium plan, usage credits are disabled, and automatic model switching is disabled. It reviews only committed tracked bytes, preserves every prompt and response, performs no relay-level retry, and labels internal CLI request counts unverified. It has not been run; all study-call counters remain zero."
     },
     {
       "date": "2026-08-10",
@@ -311,7 +311,7 @@
     }
   ],
   "decisions": [
-    "The bounded Claude/Codex relay is a development-review aid, not an approval mechanism. It has not been run; even after it runs, spending, provider activation, preregistration freeze, and Connor/Chirag choices remain human decisions.",
+    "The bounded Claude/Codex relay is a development-review aid, not an approval mechanism. Its Claude side is pinned to claude-fable-5 and may run only through eligible regular-plan usage with API/gateway billing absent, usage credits disabled, and automatic model switching disabled. It has not been run; even after it runs, spending, provider activation, preregistration freeze, and Connor/Chirag choices remain human decisions.",
     "The non-frozen 13_PHASE3_INTEGRATED_RECOMMENDATION_2026-08-10.md is an opinionated proposal for Connor's separate-model review, not a human decision or call authorization; its companion prompt requires a claim-by-claim external verdict.",
     "The non-frozen 12_PHASE3_CONNOR_DECISION_WORKSHEET_2026-08-10.md records Connor's current positions and all alternatives; open questions remain and it authorizes no call.",
     "Connor supports a planned shared 30-of-33 HMMT-2026 subset, separate arm sampling, standard 32K GPT-OSS-120B, Terra in principle, and descriptive/bootstrap-first analysis; standard Inkling's scientific direction is accepted while its scope/allocation and the broader Tinker model portfolio are reopened.",

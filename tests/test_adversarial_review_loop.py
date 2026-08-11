@@ -23,6 +23,7 @@ class AdversarialReviewLoopTests(unittest.TestCase):
         self.assertIn("--resume", command)
         self.assertIn("2fe4d6f6-c291-4452-833e-b4726cbe9b10", command)
         self.assertIn("--print", command)
+        self.assertEqual(command[command.index("--model") + 1], "claude-fable-5")
         self.assertIn("--max-budget-usd", command)
         self.assertIn("2.00", command)
         self.assertIn("--safe-mode", command)
@@ -32,6 +33,48 @@ class AdversarialReviewLoopTests(unittest.TestCase):
         self.assertNotIn("--dangerously-skip-permissions", command)
         emitted_flags = {argument for argument in command if argument.startswith("--")}
         self.assertLessEqual(emitted_flags, set(loop.CLAUDE_REQUIRED_FLAGS))
+
+    def test_regular_usage_guard_rejects_non_subscription_billing(self):
+        with self.assertRaisesRegex(loop.ConfigurationError, "ANTHROPIC_API_KEY"):
+            loop.validate_claude_subscription_environment(
+                {"ANTHROPIC_API_KEY": "secret"}
+            )
+        with self.assertRaisesRegex(loop.ConfigurationError, "ANTHROPIC_BASE_URL"):
+            loop.validate_claude_subscription_environment(
+                {"ANTHROPIC_BASE_URL": "https://gateway.invalid"}
+            )
+
+        loop.validate_claude_subscription_environment({})
+
+    def test_regular_usage_auth_requires_logged_in_first_party_subscription(self):
+        with self.assertRaisesRegex(loop.ConfigurationError, "not logged in"):
+            loop.validate_claude_subscription_auth(
+                {"loggedIn": False, "authMethod": "none", "apiProvider": "firstParty"}
+            )
+        with self.assertRaisesRegex(loop.ConfigurationError, "first-party"):
+            loop.validate_claude_subscription_auth(
+                {"loggedIn": True, "authMethod": "oauth", "apiProvider": "bedrock"}
+            )
+
+        loop.validate_claude_subscription_auth(
+            {"loggedIn": True, "authMethod": "oauth", "apiProvider": "firstParty"}
+        )
+
+    def test_live_requires_regular_usage_and_no_switching_confirmation(self):
+        with self.assertRaisesRegex(loop.ConfigurationError, "Fable 5"):
+            loop.validate_execution_request(
+                live=True,
+                acknowledge_costs=True,
+                confirm_fable_regular_usage=False,
+                rounds=2,
+            )
+
+        loop.validate_execution_request(
+            live=True,
+            acknowledge_costs=True,
+            confirm_fable_regular_usage=True,
+            rounds=2,
+        )
 
     def test_codex_command_is_ephemeral_sol_xhigh_and_read_only(self):
         command = loop.build_codex_command(
@@ -72,7 +115,12 @@ class AdversarialReviewLoopTests(unittest.TestCase):
                 )
 
         loop.validate_execution_request(live=False, acknowledge_costs=False, rounds=3)
-        loop.validate_execution_request(live=True, acknowledge_costs=True, rounds=1)
+        loop.validate_execution_request(
+            live=True,
+            acknowledge_costs=True,
+            confirm_fable_regular_usage=True,
+            rounds=1,
+        )
 
         with self.assertRaisesRegex(loop.ConfigurationError, "budget"):
             loop.validate_claude_budget(Decimal("5.01"), rounds=2)
@@ -116,6 +164,7 @@ class AdversarialReviewLoopTests(unittest.TestCase):
                 runner=fake_run,
                 live=True,
                 acknowledge_costs=True,
+                confirm_fable_regular_usage=True,
             )
 
             self.assertEqual(
@@ -162,6 +211,7 @@ class AdversarialReviewLoopTests(unittest.TestCase):
                 runner=failing_run,
                 live=True,
                 acknowledge_costs=True,
+                confirm_fable_regular_usage=True,
             )
 
         self.assertEqual(calls, 1)
@@ -198,6 +248,36 @@ class AdversarialReviewLoopTests(unittest.TestCase):
                 runner=sentinel_runner,
                 live=True,
                 acknowledge_costs=False,
+            )
+
+        self.assertEqual(calls, 0)
+
+    def test_imported_loop_cannot_bypass_subscription_environment_guard(self):
+        calls = 0
+
+        def sentinel_runner(*args, **kwargs):
+            nonlocal calls
+            calls += 1
+            return "must not run"
+
+        with (
+            tempfile.TemporaryDirectory() as directory,
+            mock.patch.dict(os.environ, {"ANTHROPIC_API_KEY": "sentinel"}),
+            self.assertRaisesRegex(loop.ConfigurationError, "ANTHROPIC_API_KEY"),
+        ):
+            loop.run_bounded_loop(
+                objective="Challenge C01.",
+                worktree=Path("/tmp/reap-target"),
+                output_dir=Path(directory),
+                repository_context={"branch": "codex/prereg-v2", "head": "abc123"},
+                claude_session="2fe4d6f6-c291-4452-833e-b4726cbe9b10",
+                claude_budget=Decimal("2.00"),
+                rounds=2,
+                timeout_seconds=300,
+                runner=sentinel_runner,
+                live=True,
+                acknowledge_costs=True,
+                confirm_fable_regular_usage=True,
             )
 
         self.assertEqual(calls, 0)
@@ -262,6 +342,7 @@ class AdversarialReviewLoopTests(unittest.TestCase):
                 runner=fake_run,
                 live=True,
                 acknowledge_costs=True,
+                confirm_fable_regular_usage=True,
             )
 
         self.assertEqual(observed_fsync_counts, [1, 3])
@@ -292,7 +373,15 @@ class AdversarialReviewLoopTests(unittest.TestCase):
             claude.write_text(
                 "#!/bin/sh\n"
                 "if [ \"$1\" = '--help' ]; then\n"
-                "  printf '%s\\n' '--resume --print --effort --max-budget-usd --permission-mode --safe-mode --no-chrome --disable-slash-commands --tools --output-format'\n"
+                "  printf '%s\\n' '--resume --print --effort --model --max-budget-usd --permission-mode --safe-mode --no-chrome --disable-slash-commands --tools --output-format'\n"
+                "  exit 0\n"
+                "fi\n"
+                "if [ \"$1\" = '--version' ]; then\n"
+                "  printf '%s\\n' '2.1.227 (Claude Code)'\n"
+                "  exit 0\n"
+                "fi\n"
+                "if [ \"$1\" = 'auth' ] && [ \"$2\" = 'status' ]; then\n"
+                '  printf \'%s\\n\' \'{"loggedIn":true,"authMethod":"oauth","apiProvider":"firstParty"}\'\n'
                 "  exit 0\n"
                 "fi\n"
                 'printf \'%s\\n\' "$0" >> "$RELAY_FAKE_LOG"\n'
@@ -368,6 +457,7 @@ class AdversarialReviewLoopTests(unittest.TestCase):
                     *base_command,
                     "--live",
                     "--acknowledge-external-model-costs",
+                    "--confirm-fable-5-regular-plan-usage",
                 ],
                 env=environment,
                 capture_output=True,
@@ -406,6 +496,7 @@ class AdversarialReviewLoopTests(unittest.TestCase):
                     str(failed_output),
                     "--live",
                     "--acknowledge-external-model-costs",
+                    "--confirm-fable-5-regular-plan-usage",
                 ],
                 env={
                     **environment,
@@ -523,7 +614,9 @@ class AdversarialReviewLoopTests(unittest.TestCase):
         for text in (status, briefing):
             self.assertIn("bounded Claude/Codex", text)
             self.assertIn("not been run", text)
-            self.assertIn("129 ordinary tests plus 26 exact-lock Tinker tests", text)
+            self.assertIn("133 ordinary tests plus 26 exact-lock Tinker tests", text)
+            self.assertIn("claude-fable-5", text)
+            self.assertIn("usage credits", text)
         self.assertIn("scripts/adversarial_review_loop.py", briefing)
         self.assertIn(
             "reap/prompts/PHASE3_ADVERSARIAL_LOOP_OBJECTIVE_2026-08-10.md",
