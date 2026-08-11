@@ -729,6 +729,12 @@ def run_bounded_loop(
         freeze_review=freeze_review,
         start_new_claude_session=start_new_claude_session,
     )
+    if freeze_review:
+        raise ConfigurationError(
+            "freeze reviews require the CLI entry point so repository cleanliness, "
+            "tracked objective bytes, a tracked-HEAD snapshot, output isolation, "
+            "and the review manifest cannot be bypassed"
+        )
     validate_claude_subscription_environment(os.environ)
     if not live:
         raise ConfigurationError("run_bounded_loop cannot execute without live=True")

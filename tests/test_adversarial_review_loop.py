@@ -437,6 +437,89 @@ class AdversarialReviewLoopTests(unittest.TestCase):
 
         preflight.assert_not_called()
 
+    def test_imported_freeze_review_rejects_unverified_repository_state(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            repository = root / "repository"
+            repository.mkdir()
+            (repository / "tracked-objective.md").write_text("Review C01.\n")
+            for command in (
+                ["git", "init", "-q"],
+                ["git", "config", "user.email", "relay-test@example.invalid"],
+                ["git", "config", "user.name", "Relay Test"],
+                ["git", "add", "tracked-objective.md"],
+                ["git", "commit", "-q", "-m", "fixture"],
+            ):
+                subprocess.run(command, cwd=repository, check=True)
+
+            head = subprocess.run(
+                ["git", "rev-parse", "HEAD"],
+                cwd=repository,
+                capture_output=True,
+                text=True,
+                check=True,
+            ).stdout.strip()
+            branch = subprocess.run(
+                ["git", "branch", "--show-current"],
+                cwd=repository,
+                capture_output=True,
+                text=True,
+                check=True,
+            ).stdout.strip()
+            verified_context = {"branch": branch, "head": head}
+
+            with (
+                mock.patch.object(
+                    loop,
+                    "preflight_clis",
+                    side_effect=AssertionError(
+                        "CLI preflight reached from imported freeze mode"
+                    ),
+                ) as preflight,
+                mock.patch.object(
+                    loop,
+                    "_run_bounded_loop_with_runner",
+                    side_effect=AssertionError(
+                        "agent boundary reached from imported freeze mode"
+                    ),
+                ) as agent_boundary,
+            ):
+
+                def assert_imported_freeze_rejected(case, repository_context):
+                    with (
+                        self.subTest(case=case),
+                        self.assertRaisesRegex(
+                            loop.ConfigurationError, "CLI entry point"
+                        ),
+                    ):
+                        loop.run_bounded_loop(
+                            objective="Forged caller-provided objective.",
+                            worktree=repository,
+                            output_dir=root / f"output-{case}",
+                            repository_context=repository_context,
+                            claude_session="11111111-2222-4333-8444-555555555555",
+                            start_new_claude_session=True,
+                            claude_budget=Decimal("2.00"),
+                            rounds=1,
+                            timeout_seconds=300,
+                            live=True,
+                            acknowledge_costs=True,
+                            confirm_fable_regular_usage=True,
+                            freeze_review=True,
+                        )
+
+                assert_imported_freeze_rejected(
+                    "forged_context",
+                    {"branch": "forged", "head": "0" * 40},
+                )
+                (repository / "untracked-objective.md").write_text("untracked\n")
+                assert_imported_freeze_rejected("untracked_objective", verified_context)
+                (repository / "tracked-objective.md").write_text("dirty bytes\n")
+                assert_imported_freeze_rejected("dirty_worktree", verified_context)
+
+            preflight.assert_not_called()
+            agent_boundary.assert_not_called()
+
     def test_imported_loop_cannot_bypass_subscription_environment_guard(self):
         with (
             tempfile.TemporaryDirectory() as directory,
@@ -768,6 +851,47 @@ class AdversarialReviewLoopTests(unittest.TestCase):
                 manifest["cli_preflight"]["claude"]["resolved_path"],
                 str(claude.resolve()),
             )
+
+            freeze_output = root / "freeze-output"
+            freeze_log = root / "freeze-calls.log"
+            freeze_result = subprocess.run(
+                [
+                    sys.executable,
+                    str(script),
+                    "--worktree",
+                    str(repository),
+                    "--objective-file",
+                    str(objective),
+                    "--new-claude-session",
+                    "--rounds",
+                    "1",
+                    "--output-dir",
+                    str(freeze_output),
+                    "--live",
+                    "--acknowledge-external-model-costs",
+                    "--confirm-fable-5-regular-plan-usage",
+                    "--freeze-review",
+                ],
+                env={**environment, "RELAY_FAKE_LOG": str(freeze_log)},
+                capture_output=True,
+                text=True,
+                check=False,
+            )
+            self.assertEqual(freeze_result.returncode, 0, freeze_result.stderr)
+            self.assertEqual(
+                freeze_log.read_text().splitlines(),
+                [str(claude.resolve()), str(codex.resolve())],
+            )
+            freeze_manifest = json.loads((freeze_output / "manifest.json").read_text())
+            self.assertEqual(
+                freeze_manifest["review"],
+                {
+                    "evidence_status": "eligible_for_human_freeze_review",
+                    "mode": "freeze",
+                    "requires_clean_session": True,
+                },
+            )
+            self.assertEqual(freeze_manifest["claude"]["session_mode"], "clean")
 
             failed_output = root / "failed-output"
             failed_log = root / "failed-calls.log"
