@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import unittest
+from dataclasses import replace
 from decimal import Decimal
 
 from effort_atlas.reap_budget import (
@@ -110,6 +111,192 @@ class ReapBudgetTests(unittest.TestCase):
                     pool_ceilings_usd=pool_ceilings,
                     panel_ceilings_usd=panel_ceilings,
                 )
+
+    def test_freeze_gate_rejects_empty_or_malformed_projection_structure(self) -> None:
+        valid = project_maximum_exposure(
+            (BudgetRow("job", "route", "main", 0, 1_000_000, "pool", "panel"),),
+            (RouteRate("route", Decimal(0), Decimal(1), "a" * 64, "list"),),
+        )
+        mutations = (
+            ("row_count", replace(valid, row_count=0)),
+            ("row_count", replace(valid, row_count=True)),
+            ("maximum_exposure_usd", replace(valid, maximum_exposure_usd=Decimal("NaN"))),
+            ("maximum_exposure_usd", replace(valid, maximum_exposure_usd=Decimal("-0.01"))),
+            ("snapshot_sha256", replace(valid, snapshot_sha256="bad")),
+            ("price_basis", replace(valid, price_basis="guess")),
+            ("by_phase_usd", replace(valid, by_phase_usd=())),
+            ("by_price_basis_usd", replace(valid, by_price_basis_usd=())),
+            ("by_pool_usd", replace(valid, by_pool_usd=())),
+            ("by_pool_panel_usd", replace(valid, by_pool_panel_usd=())),
+            ("by_phase_usd", replace(valid, by_phase_usd=[])),  # type: ignore[arg-type]
+            (
+                "by_pool_panel_usd",
+                replace(valid, by_pool_panel_usd=(("pool", "panel"),)),  # type: ignore[arg-type]
+            ),
+        )
+        for expected, projection in mutations:
+            with self.subTest(expected=expected), self.assertRaisesRegex(
+                ValueError, expected
+            ):
+                enforce_freeze_budget_gate(
+                    projection,
+                    pool_ceilings_usd={"pool": Decimal(1)},
+                    panel_ceilings_usd={("pool", "panel"): Decimal(1)},
+                )
+
+    def test_freeze_gate_rejects_non_decimal_and_nonfinite_aggregate_exposure(
+        self,
+    ) -> None:
+        valid = project_maximum_exposure(
+            (BudgetRow("job", "route", "main", 0, 1_000_000, "pool", "panel"),),
+            (RouteRate("route", Decimal(0), Decimal(1), "a" * 64, "list"),),
+        )
+        mutations = (
+            replace(valid, by_phase_usd=(("main", 1),)),
+            replace(valid, by_price_basis_usd=(("list", Decimal("Infinity")),)),
+            replace(valid, by_pool_usd=(("pool", Decimal("-0.01")),)),
+            replace(
+                valid,
+                by_pool_panel_usd=(("pool", "panel", Decimal("NaN")),),
+            ),
+        )
+        for projection in mutations:
+            with self.subTest(projection=projection), self.assertRaisesRegex(
+                ValueError, "finite nonnegative Decimal"
+            ):
+                enforce_freeze_budget_gate(
+                    projection,
+                    pool_ceilings_usd={"pool": Decimal(1)},
+                    panel_ceilings_usd={("pool", "panel"): Decimal(1)},
+                )
+
+    def test_freeze_gate_rejects_duplicate_or_unreconciled_aggregates(self) -> None:
+        valid = project_maximum_exposure(
+            (BudgetRow("job", "route", "main", 0, 1_000_000, "pool", "panel"),),
+            (RouteRate("route", Decimal(0), Decimal(1), "a" * 64, "list"),),
+        )
+        mutations = (
+            ("duplicate", replace(valid, by_phase_usd=(("main", Decimal("0.5")),) * 2)),
+            (
+                "duplicate",
+                replace(
+                    valid,
+                    by_price_basis_usd=(("list", Decimal("0.5")),) * 2,
+                ),
+            ),
+            ("duplicate", replace(valid, by_pool_usd=(("pool", Decimal("0.5")),) * 2)),
+            (
+                "duplicate",
+                replace(
+                    valid,
+                    by_pool_panel_usd=(("pool", "panel", Decimal("0.5")),) * 2,
+                ),
+            ),
+            ("does not sum", replace(valid, by_phase_usd=(("main", Decimal("0.5")),))),
+            (
+                "does not sum",
+                replace(valid, by_price_basis_usd=(("list", Decimal("0.5")),)),
+            ),
+            (
+                "price_basis",
+                replace(valid, by_price_basis_usd=(("discount", Decimal(1)),)),
+            ),
+            ("does not sum", replace(valid, by_pool_usd=(("pool", Decimal("0.5")),))),
+            (
+                "does not sum",
+                replace(
+                    valid,
+                    by_pool_panel_usd=(("pool", "panel", Decimal("0.5")),),
+                ),
+            ),
+            (
+                "pool identities",
+                replace(
+                    valid,
+                    by_pool_panel_usd=(("other-pool", "panel", Decimal(1)),),
+                ),
+            ),
+            (
+                "panel sum",
+                replace(
+                    valid,
+                    by_pool_usd=(
+                        ("pool-a", Decimal("0.5")),
+                        ("pool-b", Decimal("0.5")),
+                    ),
+                    by_pool_panel_usd=(
+                        ("pool-a", "panel-a", Decimal("0.25")),
+                        ("pool-b", "panel-b", Decimal("0.75")),
+                    ),
+                ),
+            ),
+        )
+        for expected, projection in mutations:
+            with self.subTest(expected=expected), self.assertRaisesRegex(
+                ValueError, expected
+            ):
+                enforce_freeze_budget_gate(
+                    projection,
+                    pool_ceilings_usd={
+                        pool_id: Decimal(1)
+                        for pool_id, _exposure in projection.by_pool_usd
+                    },
+                    panel_ceilings_usd={
+                        (pool_id, panel_id): Decimal(1)
+                        for pool_id, panel_id, _exposure in projection.by_pool_panel_usd
+                    },
+                )
+
+    def test_freeze_gate_requires_exact_ceiling_scope_sets(self) -> None:
+        projection = project_maximum_exposure(
+            (BudgetRow("job", "route", "main", 0, 1_000_000, "pool", "panel"),),
+            (RouteRate("route", Decimal(0), Decimal(1), "a" * 64, "list"),),
+        )
+        mutations = (
+            ({}, {("pool", "panel"): Decimal(1)}),
+            (
+                {"pool": Decimal(1), "extra-pool": Decimal(1)},
+                {("pool", "panel"): Decimal(1)},
+            ),
+            ({"pool": Decimal(1)}, {}),
+            (
+                {"pool": Decimal(1)},
+                {
+                    ("pool", "panel"): Decimal(1),
+                    ("pool", "extra-panel"): Decimal(1),
+                },
+            ),
+        )
+        for pool_ceilings, panel_ceilings in mutations:
+            with self.subTest(
+                pool_ceilings=pool_ceilings, panel_ceilings=panel_ceilings
+            ), self.assertRaisesRegex(BudgetCeilingExceeded, "scope"):
+                enforce_freeze_budget_gate(
+                    projection,
+                    pool_ceilings_usd=pool_ceilings,
+                    panel_ceilings_usd=panel_ceilings,
+                )
+
+    def test_freeze_gate_accepts_explicit_zero_cost_aggregates(self) -> None:
+        projection = project_maximum_exposure(
+            (BudgetRow("job", "free-route", "main", 0, 1, "pool", "panel"),),
+            (
+                RouteRate(
+                    "free-route", Decimal(0), Decimal(0), "a" * 64, "list"
+                ),
+            ),
+        )
+
+        self.assertEqual(projection.maximum_exposure_usd, Decimal(0))
+        self.assertEqual(projection.by_pool_usd, (("pool", Decimal(0)),))
+        self.assertEqual(
+            enforce_freeze_budget_gate(
+                projection,
+                pool_ceilings_usd={"pool": Decimal(0)},
+                panel_ceilings_usd={("pool", "panel"): Decimal(0)},
+            ),
+            projection,
+        )
 
     def test_maximum_exposure_sums_every_rows_prompt_and_cap(self) -> None:
         rows = (
