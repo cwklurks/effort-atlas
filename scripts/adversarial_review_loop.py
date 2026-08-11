@@ -31,7 +31,7 @@ DEFAULT_CLAUDE_BUDGET = Decimal("2.00")
 MAX_CLAUDE_BUDGET_PER_TURN = Decimal("5.00")
 CLAUDE_MODEL = "claude-fable-5"
 MINIMUM_CLAUDE_VERSION = (2, 1, 170)
-CLAUDE_SUBSCRIPTION_AUTH_METHOD = "oauth"
+CLAUDE_SUBSCRIPTION_AUTH_METHOD = "claude.ai"
 CLAUDE_NON_SUBSCRIPTION_ENVIRONMENT_VARIABLES = (
     "ANTHROPIC_API_KEY",
     "ANTHROPIC_AUTH_TOKEN",
@@ -212,7 +212,7 @@ def validate_claude_subscription_auth(status: Mapping[str, object]) -> None:
         )
     if status.get("authMethod") != CLAUDE_SUBSCRIPTION_AUTH_METHOD:
         raise ConfigurationError(
-            "Claude Code must use the supported subscription OAuth authMethod; "
+            "Claude Code must use the supported first-party subscription authMethod; "
             "API-key and unreported authentication are forbidden"
         )
 

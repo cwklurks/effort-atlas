@@ -103,12 +103,16 @@ class AdversarialReviewLoopTests(unittest.TestCase):
             )
         with self.assertRaisesRegex(loop.ConfigurationError, "first-party"):
             loop.validate_claude_subscription_auth(
-                {"loggedIn": True, "authMethod": "oauth", "apiProvider": "bedrock"}
+                {
+                    "loggedIn": True,
+                    "authMethod": "claude.ai",
+                    "apiProvider": "bedrock",
+                }
             )
         for auth_method in ("apiKey", None):
             with (
                 self.subTest(auth_method=auth_method),
-                self.assertRaisesRegex(loop.ConfigurationError, "OAuth"),
+                self.assertRaisesRegex(loop.ConfigurationError, "subscription"),
             ):
                 loop.validate_claude_subscription_auth(
                     {
@@ -119,7 +123,11 @@ class AdversarialReviewLoopTests(unittest.TestCase):
                 )
 
         loop.validate_claude_subscription_auth(
-            {"loggedIn": True, "authMethod": "oauth", "apiProvider": "firstParty"}
+            {
+                "loggedIn": True,
+                "authMethod": "claude.ai",
+                "apiProvider": "firstParty",
+            }
         )
 
     def test_live_requires_regular_usage_and_no_switching_confirmation(self):
@@ -563,7 +571,7 @@ class AdversarialReviewLoopTests(unittest.TestCase):
                 "  exit 0\n"
                 "fi\n"
                 "if [ \"$1\" = 'auth' ] && [ \"$2\" = 'status' ]; then\n"
-                '  printf \'%s\\n\' \'{"loggedIn":true,"authMethod":"oauth","apiProvider":"firstParty"}\'\n'
+                '  printf \'%s\\n\' \'{"loggedIn":true,"authMethod":"claude.ai","apiProvider":"firstParty"}\'\n'
                 "  exit 0\n"
                 "fi\n"
                 'printf \'%s\\n\' "$0" >> "$RELAY_FAKE_LOG"\n'
