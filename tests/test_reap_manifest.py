@@ -1,9 +1,17 @@
 from __future__ import annotations
 
 import copy
+import hashlib
+import os
+import tempfile
 import unittest
+from pathlib import Path
 
-from effort_atlas.reap_manifest import seal_manifest, validate_manifest
+from effort_atlas.reap_manifest import (
+    seal_manifest,
+    validate_manifest,
+    verify_manifest_files,
+)
 
 HASHES = {
     name: str(index) * 64
@@ -46,7 +54,107 @@ def valid_manifest(*, state: str = "frozen") -> dict[str, object]:
     return seal_manifest(unsigned)
 
 
+def file_backed_manifest(root: Path) -> dict[str, object]:
+    contents = {
+        "dataset": b'{"items":[]}',
+        "prompt": b'{"prompt":"Final answer:"}',
+        "routes": b'{"rates":[]}',
+        "schedule": b'{"jobs":[]}',
+        "analysis": b'{"analysis":"frozen"}',
+        "activation": b'{"action":"omit"}',
+    }
+    paths = {
+        "dataset": "artifacts/dataset.json",
+        "prompt": "artifacts/prompt-renderer-grader.json",
+        "routes": "artifacts/routes.json",
+        "schedule": "artifacts/schedule.json",
+        "analysis": "artifacts/analysis.json",
+        "activation": "artifacts/activation.json",
+    }
+    digests = {name: hashlib.sha256(value).hexdigest() for name, value in contents.items()}
+    for name, relative_path in paths.items():
+        path = root / relative_path
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_bytes(contents[name])
+    return seal_manifest(
+        {
+            "manifest_version": 2,
+            "state": "frozen",
+            "dataset": _reference(paths["dataset"], digests["dataset"]),
+            "prompt_renderer_grader": _reference(paths["prompt"], digests["prompt"]),
+            "route_price": _reference(paths["routes"], digests["routes"]),
+            "schedule": {
+                **_reference(paths["schedule"], digests["schedule"]),
+                "dataset_sha256": digests["dataset"],
+                "prompt_renderer_grader_sha256": digests["prompt"],
+                "route_price_sha256": digests["routes"],
+            },
+            "analysis": {
+                **_reference(paths["analysis"], digests["analysis"]),
+                "schedule_sha256": digests["schedule"],
+            },
+            "activation": {
+                **_reference(paths["activation"], digests["activation"]),
+                "schedule_sha256": digests["schedule"],
+                "route_price_sha256": digests["routes"],
+            },
+        }
+    )
+
+
 class ReapManifestTests(unittest.TestCase):
+    def test_file_verification_reads_exact_bytes_and_returns_detached_evidence(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            manifest = file_backed_manifest(root)
+
+            verified = verify_manifest_files(manifest, approved_root=root)
+
+            self.assertEqual(verified["manifest"], manifest)
+            self.assertEqual(verified["evidence"]["manifest_sha256"], manifest["manifest_sha256"])
+            self.assertEqual(len(verified["evidence"]["sections"]), 6)
+            verified["manifest"]["dataset"]["path"] = "mutated"  # type: ignore[index]
+            self.assertEqual(manifest["dataset"]["path"], "artifacts/dataset.json")  # type: ignore[index]
+
+    def test_file_verification_rejects_byte_mutation_for_each_reference(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            manifest = file_backed_manifest(root)
+            for section in (
+                "dataset",
+                "prompt_renderer_grader",
+                "route_price",
+                "schedule",
+                "analysis",
+                "activation",
+            ):
+                path = root / manifest[section]["path"]  # type: ignore[index]
+                path.write_bytes(path.read_bytes() + b"mutation")
+                with self.subTest(section=section), self.assertRaisesRegex(ValueError, section):
+                    verify_manifest_files(manifest, approved_root=root)
+                path.write_bytes(path.read_bytes()[: -len(b"mutation")])
+
+    def test_file_verification_rejects_missing_nonfile_and_symlink_escape(self) -> None:
+        with tempfile.TemporaryDirectory() as directory, tempfile.TemporaryDirectory() as outside_directory:
+            root = Path(directory)
+            manifest = file_backed_manifest(root)
+            dataset = root / "artifacts/dataset.json"
+
+            dataset.unlink()
+            with self.assertRaisesRegex(ValueError, "missing"):
+                verify_manifest_files(manifest, approved_root=root)
+
+            dataset.mkdir()
+            with self.assertRaisesRegex(ValueError, "not a regular file"):
+                verify_manifest_files(manifest, approved_root=root)
+
+            dataset.rmdir()
+            outside = Path(outside_directory) / "outside.json"
+            outside.write_bytes(b"outside")
+            os.symlink(outside, dataset)
+            with self.assertRaisesRegex(ValueError, "symlink"):
+                verify_manifest_files(manifest, approved_root=root)
+
     def test_seal_and_validate_return_detached_nested_values(self) -> None:
         sealed = valid_manifest()
         validated = validate_manifest(sealed)

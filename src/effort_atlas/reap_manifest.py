@@ -3,9 +3,10 @@
 from __future__ import annotations
 
 import copy
+import hashlib
 import re
 from collections.abc import Mapping
-from pathlib import PurePosixPath
+from pathlib import Path, PurePosixPath
 from typing import Any
 
 from .confirmatory import sha256_json
@@ -190,3 +191,93 @@ def validate_manifest(
     if require_frozen and manifest["state"] != "frozen":
         raise ValueError("a frozen manifest is required")
     return copy.deepcopy(dict(manifest))
+
+
+def verify_manifest_files(
+    manifest: Mapping[str, Any], *, approved_root: str | Path
+) -> dict[str, Any]:
+    """Verify referenced artifact bytes beneath an explicit approved root.
+
+    This is a read-only gate.  It validates the sealed manifest and its cross-links
+    before resolving paths, rejects all symlink traversal, and returns detached
+    verification evidence without changing either manifest or referenced files.
+    """
+    validated = validate_manifest(manifest, require_frozen=True)
+    root = _require_approved_root(approved_root)
+    sections = []
+    for section_name in (
+        "dataset",
+        "prompt_renderer_grader",
+        "route_price",
+        "schedule",
+        "analysis",
+        "activation",
+    ):
+        reference = validated[section_name]
+        if not isinstance(reference, Mapping):  # Defensive after shape validation.
+            raise TypeError(f"{section_name} reference is invalid")
+        target = _resolve_reference_path(
+            root, reference["path"], label=section_name
+        )
+        try:
+            contents = target.read_bytes()
+        except OSError as error:
+            raise ValueError(f"{section_name} target is unreadable: {target}") from error
+        actual = hashlib.sha256(contents).hexdigest()
+        expected = reference["sha256"]
+        if actual != expected:
+            raise ValueError(
+                f"{section_name} SHA-256 mismatch: expected {expected}, got {actual}"
+            )
+        sections.append(
+            {
+                "section": section_name,
+                "path": str(reference["path"]),
+                "sha256": actual,
+                "byte_count": len(contents),
+            }
+        )
+    return {
+        "manifest": copy.deepcopy(validated),
+        "evidence": {
+            "manifest_sha256": validated["manifest_sha256"],
+            "approved_root": str(root),
+            "sections": sections,
+        },
+    }
+
+
+def _require_approved_root(value: str | Path) -> Path:
+    root = Path(value)
+    try:
+        if root.is_symlink():
+            raise ValueError("approved_root must not be a symlink")
+        if not root.exists() or not root.is_dir():
+            raise ValueError("approved_root must be an existing directory")
+        return root.resolve(strict=True)
+    except OSError as error:
+        raise ValueError("approved_root is unreadable") from error
+
+
+def _resolve_reference_path(root: Path, relative_path: object, *, label: str) -> Path:
+    path = _require_relative_path(relative_path, label=f"{label}.path")
+    candidate = root
+    for part in PurePosixPath(path).parts:
+        candidate = candidate / part
+        try:
+            if candidate.is_symlink():
+                raise ValueError(f"{label} target contains a symlink")
+        except OSError as error:
+            raise ValueError(f"{label} target is unreadable") from error
+    try:
+        if not candidate.exists():
+            raise ValueError(f"{label} target is missing")
+        if not candidate.is_file():
+            raise ValueError(f"{label} target is not a regular file")
+        resolved = candidate.resolve(strict=True)
+        resolved.relative_to(root)
+        return resolved
+    except ValueError:
+        raise
+    except OSError as error:
+        raise ValueError(f"{label} target is unreadable") from error
