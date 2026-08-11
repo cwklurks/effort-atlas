@@ -6,29 +6,15 @@ import json
 import tempfile
 import unittest
 from pathlib import Path
+from unittest.mock import patch
 
-from effort_atlas.activation import (
-    ActivationPolicy,
-    evaluate_activation,
-    load_activation_policy,
-)
+from effort_atlas import activation
+from effort_atlas.activation import evaluate_activation
 from effort_atlas.reap_manifest import seal_manifest
 
 
 def _digest(value: bytes) -> str:
     return hashlib.sha256(value).hexdigest()
-
-
-def _policy_digest(predicate_ids: tuple[str, ...], manifest_sha256: str) -> str:
-    payload = {
-        "expected_manifest_sha256": manifest_sha256,
-        "policy_version": 1,
-        "predicate_ids": list(predicate_ids),
-        "substitution_allowed": False,
-        "terminal_actions": ["activate", "omit"],
-    }
-    canonical = json.dumps(payload, sort_keys=True, separators=(",", ":"))
-    return hashlib.sha256(canonical.encode("utf-8")).hexdigest()
 
 
 def _write_frozen_root(
@@ -95,10 +81,14 @@ def _write_frozen_root(
     return manifest, contents["activation"]
 
 
-def _passing_evidence(policy: ActivationPolicy) -> dict[str, object]:
+def _passing_evidence(
+    manifest: dict[str, object], predicate_ids: tuple[str, ...]
+) -> dict[str, object]:
+    activation_reference = manifest["activation"]
+    assert isinstance(activation_reference, dict)
     return {
-        "manifest_sha256": policy.expected_manifest_sha256,
-        "activation_policy_sha256": policy.policy_sha256,
+        "manifest_sha256": manifest["manifest_sha256"],
+        "activation_policy_sha256": activation_reference["sha256"],
         "generation_retry_count": 0,
         "receipt_reconciled": True,
         "budget_within_bound": True,
@@ -110,33 +100,82 @@ def _passing_evidence(policy: ActivationPolicy) -> dict[str, object]:
                 "status": "pass",
                 "evidence_sha256": hashlib.sha256(predicate_id.encode()).hexdigest(),
             }
-            for predicate_id in policy.predicate_ids
+            for predicate_id in predicate_ids
         ],
     }
 
 
 class ActivationPolicyRootTests(unittest.TestCase):
-    def test_verification_authority_is_not_a_public_constructor_argument(self) -> None:
-        self.assertNotIn(
-            "_verified_root", inspect.signature(ActivationPolicy).parameters
-        )
-
-    def test_caller_recomputed_subset_policy_cannot_activate(self) -> None:
+    def test_direct_verified_root_classmethod_cannot_self_authorize(self) -> None:
         predicate_ids = ("cap_semantics",)
-        manifest_sha256 = "a" * 64
-        caller_policy = ActivationPolicy(
+        requirements = activation._ActivationRequirements(
             predicate_ids=predicate_ids,
-            expected_manifest_sha256=manifest_sha256,
-            policy_sha256=_policy_digest(predicate_ids, manifest_sha256),
+            expected_manifest_sha256="a" * 64,
+            policy_sha256="b" * 64,
         )
 
         decision = evaluate_activation(
-            policy=caller_policy,
-            evidence=_passing_evidence(caller_policy),
+            manifest=requirements,
+            approved_root=Path("does-not-matter"),
+            evidence={
+                "manifest_sha256": "a" * 64,
+                "activation_policy_sha256": "b" * 64,
+            },
         )
 
         self.assertEqual(decision.action, "omit")
-        self.assertIn("activation_policy:unverified_root", decision.failed_predicates)
+        self.assertEqual(
+            decision.failed_predicates, ("activation_manifest:invalid",)
+        )
+
+    def test_public_boundary_accepts_no_policy_object_or_verification_token(self) -> None:
+        parameters = inspect.signature(evaluate_activation).parameters
+        self.assertEqual(set(parameters), {"manifest", "approved_root", "evidence"})
+        self.assertFalse(hasattr(activation, "ActivationPolicy"))
+        self.assertFalse(hasattr(activation, "load_activation_policy"))
+        self.assertNotIn("policy", parameters)
+        self.assertNotIn("verified", parameters)
+
+    def test_raw_manifest_and_policy_digests_without_files_cannot_activate(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            manifest, _ = _write_frozen_root(root, ("cap_semantics",))
+            for path in (root / "artifacts").iterdir():
+                path.unlink()
+
+            decision = evaluate_activation(
+                manifest=manifest,
+                approved_root=root,
+                evidence=_passing_evidence(manifest, ("cap_semantics",)),
+            )
+
+        self.assertEqual(decision.action, "omit")
+        self.assertEqual(
+            decision.failed_predicates, ("activation_manifest:invalid",)
+        )
+
+    def test_manifest_verifier_filesystem_failures_omit_instead_of_escaping(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            manifest, _ = _write_frozen_root(root, ("cap_semantics",))
+            evidence = _passing_evidence(manifest, ("cap_semantics",))
+            for error in (OSError("unreadable"), RuntimeError("symlink loop")):
+                with self.subTest(error=type(error).__name__):
+                    with patch(
+                        "effort_atlas.activation.verify_manifest_files",
+                        side_effect=error,
+                    ):
+                        decision = evaluate_activation(
+                            manifest=manifest,
+                            approved_root=root,
+                            evidence=evidence,
+                        )
+
+                    self.assertEqual(decision.action, "omit")
+                    self.assertEqual(
+                        decision.failed_predicates,
+                        ("activation_manifest:invalid",),
+                    )
 
     def test_exact_file_verified_frozen_activation_artifact_can_activate(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
@@ -145,13 +184,14 @@ class ActivationPolicyRootTests(unittest.TestCase):
                 root, ("cap_semantics", "termination_mapping")
             )
 
-            policy = load_activation_policy(manifest=manifest, approved_root=root)
             decision = evaluate_activation(
-                policy=policy,
-                evidence=_passing_evidence(policy),
+                manifest=manifest,
+                approved_root=root,
+                evidence=_passing_evidence(
+                    manifest, ("cap_semantics", "termination_mapping")
+                ),
             )
 
-        self.assertEqual(policy.policy_sha256, manifest["activation"]["sha256"])
         self.assertEqual(decision.action, "activate")
         self.assertEqual(decision.failed_predicates, ())
 
@@ -162,8 +202,16 @@ class ActivationPolicyRootTests(unittest.TestCase):
             activation_path = root / manifest["activation"]["path"]
             activation_path.write_bytes(b'{"predicate_ids":[]}')
 
-            with self.assertRaisesRegex(ValueError, "activation SHA-256 mismatch"):
-                load_activation_policy(manifest=manifest, approved_root=root)
+            decision = evaluate_activation(
+                manifest=manifest,
+                approved_root=root,
+                evidence=_passing_evidence(manifest, ("cap_semantics",)),
+            )
+
+        self.assertEqual(decision.action, "omit")
+        self.assertEqual(
+            decision.failed_predicates, ("activation_manifest:invalid",)
+        )
 
 
 if __name__ == "__main__":

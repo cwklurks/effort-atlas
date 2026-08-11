@@ -6,7 +6,7 @@ import hashlib
 import json
 import re
 from collections.abc import Mapping
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Literal
 
@@ -36,7 +36,6 @@ ACTIVATION_ARTIFACT_FIELDS = frozenset(
         "terminal_actions",
     }
 )
-_VERIFIED_POLICY_ROOT = object()
 
 
 @dataclass(frozen=True)
@@ -45,96 +44,17 @@ class ActivationDecision:
     failed_predicates: tuple[str, ...]
 
 
-class ActivationPolicyInvalid(ValueError):
-    """Raised when supplied policy content does not match its frozen digest."""
-
-    def __init__(self, reason: str) -> None:
-        self.reason = reason
-        super().__init__(f"Invalid activation policy: {reason}")
-
-
 def _valid_sha256(value: object) -> bool:
     return isinstance(value, str) and SHA256_PATTERN.fullmatch(value) is not None
 
 
-def _activation_policy_digest(
-    predicate_ids: tuple[str, ...], expected_manifest_sha256: str
-) -> str:
-    payload = {
-        "expected_manifest_sha256": expected_manifest_sha256,
-        "policy_version": ACTIVATION_POLICY_VERSION,
-        "predicate_ids": list(predicate_ids),
-        "substitution_allowed": False,
-        "terminal_actions": list(TERMINAL_ACTIONS),
-    }
-    canonical = json.dumps(
-        payload, sort_keys=True, separators=(",", ":"), ensure_ascii=True
-    )
-    return hashlib.sha256(canonical.encode("utf-8")).hexdigest()
-
-
-@dataclass(frozen=True, slots=True, init=False)
-class ActivationPolicy:
-    """Activation predicates, trusted only when loaded from verified frozen files."""
+@dataclass(frozen=True, slots=True)
+class _ActivationRequirements:
+    """Parsed requirements used only inside the manifest-verifying boundary."""
 
     predicate_ids: tuple[str, ...]
     expected_manifest_sha256: str
     policy_sha256: str
-    _verified_root: object = field(default=None, repr=False, compare=False)
-
-    def __init__(
-        self,
-        predicate_ids: tuple[str, ...],
-        expected_manifest_sha256: str,
-        policy_sha256: str,
-    ) -> None:
-        object.__setattr__(self, "predicate_ids", predicate_ids)
-        object.__setattr__(self, "expected_manifest_sha256", expected_manifest_sha256)
-        object.__setattr__(self, "policy_sha256", policy_sha256)
-        object.__setattr__(self, "_verified_root", None)
-        self.__post_init__()
-
-    @classmethod
-    def _from_verified_root(
-        cls,
-        *,
-        predicate_ids: tuple[str, ...],
-        expected_manifest_sha256: str,
-        policy_sha256: str,
-    ) -> ActivationPolicy:
-        policy = object.__new__(cls)
-        object.__setattr__(policy, "predicate_ids", predicate_ids)
-        object.__setattr__(
-            policy, "expected_manifest_sha256", expected_manifest_sha256
-        )
-        object.__setattr__(policy, "policy_sha256", policy_sha256)
-        object.__setattr__(policy, "_verified_root", _VERIFIED_POLICY_ROOT)
-        policy.__post_init__()
-        return policy
-
-    def __post_init__(self) -> None:
-        if (
-            not isinstance(self.predicate_ids, tuple)
-            or not self.predicate_ids
-            or any(
-                not isinstance(predicate_id, str) or not predicate_id.strip()
-                for predicate_id in self.predicate_ids
-            )
-            or len(set(self.predicate_ids)) != len(self.predicate_ids)
-        ):
-            raise ActivationPolicyInvalid("predicate_ids_invalid")
-        if not _valid_sha256(self.expected_manifest_sha256):
-            raise ActivationPolicyInvalid("manifest_sha256_invalid")
-        if not _valid_sha256(self.policy_sha256):
-            raise ActivationPolicyInvalid("policy_sha256_invalid")
-        expected_digest = _activation_policy_digest(
-            self.predicate_ids, self.expected_manifest_sha256
-        )
-        if (
-            self._verified_root is not _VERIFIED_POLICY_ROOT
-            and self.policy_sha256 != expected_digest
-        ):
-            raise ActivationPolicyInvalid("policy_digest_mismatch")
 
 
 def _reject_duplicate_json_keys(pairs: list[tuple[str, Any]]) -> dict[str, Any]:
@@ -185,10 +105,10 @@ def _parse_activation_artifact(contents: bytes) -> tuple[str, ...]:
     return predicate_ids
 
 
-def load_activation_policy(
+def _load_activation_requirements(
     *, manifest: Mapping[str, Any], approved_root: str | Path
-) -> ActivationPolicy:
-    """Load policy authority only from an exact-file-verified frozen manifest root."""
+) -> _ActivationRequirements:
+    """Read requirements only after exact-file verification of the frozen root."""
 
     verified = verify_manifest_files(manifest, approved_root=approved_root)
     validated_manifest = verified["manifest"]
@@ -205,7 +125,7 @@ def load_activation_policy(
     if actual_sha256 != activation_reference["sha256"]:
         raise ValueError("activation artifact changed after manifest verification")
     predicate_ids = _parse_activation_artifact(contents)
-    return ActivationPolicy._from_verified_root(
+    return _ActivationRequirements(
         predicate_ids=predicate_ids,
         expected_manifest_sha256=validated_manifest["manifest_sha256"],
         policy_sha256=activation_reference["sha256"],
@@ -213,7 +133,7 @@ def load_activation_policy(
 
 
 def _structural_failures(
-    evidence: Mapping[str, Any], policy: ActivationPolicy
+    evidence: Mapping[str, Any], requirements: _ActivationRequirements
 ) -> list[str]:
     failures: list[str] = []
     actual_fields = frozenset(evidence)
@@ -226,11 +146,14 @@ def _structural_failures(
     manifest_sha256 = evidence.get("manifest_sha256")
     if (
         not _valid_sha256(manifest_sha256)
-        or manifest_sha256 != policy.expected_manifest_sha256
+        or manifest_sha256 != requirements.expected_manifest_sha256
     ):
         failures.append("manifest_mismatch")
     policy_sha256 = evidence.get("activation_policy_sha256")
-    if not _valid_sha256(policy_sha256) or policy_sha256 != policy.policy_sha256:
+    if (
+        not _valid_sha256(policy_sha256)
+        or policy_sha256 != requirements.policy_sha256
+    ):
         failures.append("activation_policy_mismatch")
 
     retry_count = evidence.get("generation_retry_count")
@@ -289,21 +212,31 @@ def _predicate_failures(predicate_ids: tuple[str, ...], value: object) -> list[s
 
 def evaluate_activation(
     *,
-    policy: ActivationPolicy | object,
+    manifest: Mapping[str, Any] | object,
+    approved_root: str | Path,
     evidence: Mapping[str, Any] | object,
 ) -> ActivationDecision:
-    """Activate only when every immutable and operational check passes."""
+    """Verify frozen artifact bytes, then apply every activation predicate.
 
-    if not isinstance(policy, ActivationPolicy):
-        return ActivationDecision("omit", ("activation_policy:invalid",))
+    Manifest verification is deliberately inside this public boundary.  Callers
+    cannot supply a pre-verified policy, token, or digest in place of the frozen
+    root and its exact referenced files.
+    """
+
     if not isinstance(evidence, Mapping):
         return ActivationDecision("omit", ("evidence:malformed",))
-    failures = []
-    if policy._verified_root is not _VERIFIED_POLICY_ROOT:
-        failures.append("activation_policy:unverified_root")
-    failures.extend(_structural_failures(evidence, policy))
+    if not isinstance(manifest, Mapping):
+        return ActivationDecision("omit", ("activation_manifest:invalid",))
+    try:
+        requirements = _load_activation_requirements(
+            manifest=manifest,
+            approved_root=approved_root,
+        )
+    except (OSError, RuntimeError, TypeError, ValueError):
+        return ActivationDecision("omit", ("activation_manifest:invalid",))
+    failures = _structural_failures(evidence, requirements)
     failures.extend(
-        _predicate_failures(policy.predicate_ids, evidence.get("predicates"))
+        _predicate_failures(requirements.predicate_ids, evidence.get("predicates"))
     )
     deduplicated = tuple(dict.fromkeys(failures))
     return ActivationDecision("omit" if deduplicated else "activate", deduplicated)

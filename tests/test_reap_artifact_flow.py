@@ -7,11 +7,7 @@ import unittest
 from decimal import Decimal
 from pathlib import Path
 
-from effort_atlas.activation import (
-    ActivationPolicy,
-    evaluate_activation,
-    load_activation_policy,
-)
+from effort_atlas.activation import evaluate_activation
 from effort_atlas.analysis import analyze_confirmatory_rows
 from effort_atlas.reap_budget import (
     BudgetCeilingExceeded,
@@ -26,18 +22,6 @@ from effort_atlas.reap_schedule import build_reap_schedule
 
 def _digest(label: str) -> str:
     return hashlib.sha256(label.encode("utf-8")).hexdigest()
-
-
-def _policy_digest(predicate_ids: tuple[str, ...], manifest_sha256: str) -> str:
-    payload = {
-        "expected_manifest_sha256": manifest_sha256,
-        "policy_version": 1,
-        "predicate_ids": list(predicate_ids),
-        "substitution_allowed": False,
-        "terminal_actions": ["activate", "omit"],
-    }
-    canonical = json.dumps(payload, sort_keys=True, separators=(",", ":"))
-    return hashlib.sha256(canonical.encode("utf-8")).hexdigest()
 
 
 class ReapArtifactFlowTests(unittest.TestCase):
@@ -226,26 +210,25 @@ class ReapArtifactFlowTests(unittest.TestCase):
                 len(verified["evidence"]["sections"]),
                 6,
             )
-            direct_policy = ActivationPolicy(
-                predicate_ids=required,
-                expected_manifest_sha256=manifest["manifest_sha256"],
-                policy_sha256=_policy_digest(required, manifest["manifest_sha256"]),
-            )
-            direct_evidence = self._activation_evidence(direct_policy)
-            direct_decision = evaluate_activation(
-                policy=direct_policy, evidence=direct_evidence
-            )
-            self.assertEqual(direct_decision.action, "omit")
-            self.assertIn(
-                "activation_policy:unverified_root", direct_decision.failed_predicates
-            )
-
-            policy = load_activation_policy(manifest=manifest, approved_root=root)
-            evidence = self._activation_evidence(policy)
+            evidence = self._activation_evidence(manifest, required)
             self.assertEqual(
-                evaluate_activation(policy=policy, evidence=evidence).action,
+                evaluate_activation(
+                    manifest=manifest,
+                    approved_root=root,
+                    evidence=evidence,
+                ).action,
                 "activate",
             )
+
+            for failed_field in ("budget_within_bound", "schedule_manifest_match"):
+                failed = {**evidence, failed_field: False}
+                decision = evaluate_activation(
+                    manifest=manifest,
+                    approved_root=root,
+                    evidence=failed,
+                )
+                self.assertEqual(decision.action, "omit")
+                self.assertIn(failed_field, decision.failed_predicates)
 
             arm_a_rows = [
                 self._analysis_row(job)
@@ -262,20 +245,15 @@ class ReapArtifactFlowTests(unittest.TestCase):
             self.assertEqual(len(report["panels"]), 1)
             self.assertEqual(report["panels"][0]["arm_key"], "arm-a")
 
-        for failed_field in ("budget_within_bound", "schedule_manifest_match"):
-            failed = {**evidence, failed_field: False}
-            decision = evaluate_activation(
-                policy=policy,
-                evidence=failed,
-            )
-            self.assertEqual(decision.action, "omit")
-            self.assertIn(failed_field, decision.failed_predicates)
-
     @staticmethod
-    def _activation_evidence(policy: ActivationPolicy) -> dict[str, object]:
+    def _activation_evidence(
+        manifest: dict[str, object], predicate_ids: tuple[str, ...]
+    ) -> dict[str, object]:
+        activation_reference = manifest["activation"]
+        assert isinstance(activation_reference, dict)
         return {
-            "manifest_sha256": policy.expected_manifest_sha256,
-            "activation_policy_sha256": policy.policy_sha256,
+            "manifest_sha256": manifest["manifest_sha256"],
+            "activation_policy_sha256": activation_reference["sha256"],
             "generation_retry_count": 0,
             "receipt_reconciled": True,
             "budget_within_bound": True,
@@ -283,12 +261,12 @@ class ReapArtifactFlowTests(unittest.TestCase):
             "served_route_match": True,
             "predicates": [
                 {
-                    "id": "single_submission",
+                    "id": predicate_ids[0],
                     "status": "pass",
                     "evidence_sha256": _digest("single-submission-evidence"),
                 },
                 {
-                    "id": "termination_mapping",
+                    "id": predicate_ids[1],
                     "status": "pass",
                     "evidence_sha256": _digest("termination-mapping-evidence"),
                 },
