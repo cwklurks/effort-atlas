@@ -1,3 +1,4 @@
+import inspect
 import json
 import os
 import subprocess
@@ -271,7 +272,7 @@ class AdversarialReviewLoopTests(unittest.TestCase):
 
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
-            result = loop.run_bounded_loop(
+            result = loop._run_bounded_loop_with_runner(
                 objective="Challenge the Phase 3 claims.",
                 worktree=Path("/tmp/reap-target"),
                 output_dir=root,
@@ -325,7 +326,7 @@ class AdversarialReviewLoopTests(unittest.TestCase):
             return "claude response\n"
 
         with tempfile.TemporaryDirectory() as directory:
-            loop.run_bounded_loop(
+            loop._run_bounded_loop_with_runner(
                 objective="Challenge the Phase 3 claims.",
                 worktree=Path("/tmp/reap-target"),
                 output_dir=Path(directory),
@@ -358,7 +359,7 @@ class AdversarialReviewLoopTests(unittest.TestCase):
         self.addCleanup(temporary.cleanup)
         directory = temporary.name
         with self.assertRaisesRegex(loop.AgentExecutionError, "sentinel"):
-            loop.run_bounded_loop(
+            loop._run_bounded_loop_with_runner(
                 objective="Challenge the Phase 3 claims.",
                 worktree=Path("/tmp/reap-target"),
                 output_dir=Path(directory),
@@ -384,15 +385,13 @@ class AdversarialReviewLoopTests(unittest.TestCase):
         )
 
     def test_imported_loop_cannot_bypass_live_cost_acknowledgement(self):
-        calls = 0
-
-        def sentinel_runner(*args, **kwargs):
-            nonlocal calls
-            calls += 1
-            return "must not run"
-
         with (
             tempfile.TemporaryDirectory() as directory,
+            mock.patch.object(
+                loop,
+                "preflight_clis",
+                side_effect=AssertionError("CLI preflight reached before validation"),
+            ) as preflight,
             self.assertRaisesRegex(loop.ConfigurationError, "acknowledge"),
         ):
             loop.run_bounded_loop(
@@ -404,23 +403,20 @@ class AdversarialReviewLoopTests(unittest.TestCase):
                 claude_budget=Decimal("2.00"),
                 rounds=2,
                 timeout_seconds=300,
-                runner=sentinel_runner,
                 live=True,
                 acknowledge_costs=False,
             )
 
-        self.assertEqual(calls, 0)
+        preflight.assert_not_called()
 
     def test_imported_freeze_review_cannot_resume_prior_claude_context(self):
-        calls = 0
-
-        def sentinel_runner(*args, **kwargs):
-            nonlocal calls
-            calls += 1
-            return "must not run"
-
         with (
             tempfile.TemporaryDirectory() as directory,
+            mock.patch.object(
+                loop,
+                "preflight_clis",
+                side_effect=AssertionError("CLI preflight reached before validation"),
+            ) as preflight,
             self.assertRaisesRegex(loop.ConfigurationError, "clean Claude session"),
         ):
             loop.run_bounded_loop(
@@ -433,26 +429,23 @@ class AdversarialReviewLoopTests(unittest.TestCase):
                 claude_budget=Decimal("2.00"),
                 rounds=2,
                 timeout_seconds=300,
-                runner=sentinel_runner,
                 live=True,
                 acknowledge_costs=True,
                 confirm_fable_regular_usage=True,
                 freeze_review=True,
             )
 
-        self.assertEqual(calls, 0)
+        preflight.assert_not_called()
 
     def test_imported_loop_cannot_bypass_subscription_environment_guard(self):
-        calls = 0
-
-        def sentinel_runner(*args, **kwargs):
-            nonlocal calls
-            calls += 1
-            return "must not run"
-
         with (
             tempfile.TemporaryDirectory() as directory,
             mock.patch.dict(os.environ, {"ANTHROPIC_API_KEY": "sentinel"}),
+            mock.patch.object(
+                loop,
+                "preflight_clis",
+                side_effect=AssertionError("CLI preflight reached before env guard"),
+            ) as preflight,
             self.assertRaisesRegex(loop.ConfigurationError, "ANTHROPIC_API_KEY"),
         ):
             loop.run_bounded_loop(
@@ -464,13 +457,98 @@ class AdversarialReviewLoopTests(unittest.TestCase):
                 claude_budget=Decimal("2.00"),
                 rounds=2,
                 timeout_seconds=300,
-                runner=sentinel_runner,
                 live=True,
                 acknowledge_costs=True,
                 confirm_fable_regular_usage=True,
             )
 
-        self.assertEqual(calls, 0)
+        preflight.assert_not_called()
+
+    def test_imported_default_runner_preflights_before_any_agent_turn(self):
+        public_parameters = inspect.signature(loop.run_bounded_loop).parameters
+        self.assertNotIn("runner", public_parameters)
+        self.assertNotIn("claude_executable", public_parameters)
+        self.assertNotIn("codex_executable", public_parameters)
+
+        with (
+            tempfile.TemporaryDirectory() as directory,
+            mock.patch.object(
+                loop,
+                "preflight_clis",
+                side_effect=loop.ConfigurationError("validated CLI preflight sentinel"),
+            ) as preflight,
+            mock.patch.object(
+                loop,
+                "_run_recorded_turn",
+                side_effect=AssertionError("agent turn reached before CLI preflight"),
+            ) as agent_turn,
+            self.assertRaisesRegex(
+                loop.ConfigurationError, "validated CLI preflight sentinel"
+            ),
+        ):
+            loop.run_bounded_loop(
+                objective="Challenge C01.",
+                worktree=Path("/tmp/reap-target"),
+                output_dir=Path(directory),
+                repository_context={"branch": "codex/prereg-v2", "head": "abc123"},
+                claude_session="2fe4d6f6-c291-4452-833e-b4726cbe9b10",
+                claude_budget=Decimal("2.00"),
+                rounds=1,
+                timeout_seconds=300,
+                live=True,
+                acknowledge_costs=True,
+                confirm_fable_regular_usage=True,
+            )
+
+        preflight.assert_called_once_with()
+        agent_turn.assert_not_called()
+
+        events = []
+        validated = {
+            "claude": {"resolved_path": "/validated/bin/claude"},
+            "codex": {"resolved_path": "/validated/bin/codex"},
+        }
+
+        def successful_preflight():
+            events.append("preflight")
+            return validated
+
+        def injected_boundary(**kwargs):
+            events.append("agent_boundary")
+            self.assertIs(kwargs["runner"], loop.run_agent_command)
+            self.assertEqual(kwargs["claude_executable"], "/validated/bin/claude")
+            self.assertEqual(kwargs["codex_executable"], "/validated/bin/codex")
+            return Path("/tmp/final-synthesis.md")
+
+        with (
+            tempfile.TemporaryDirectory() as directory,
+            mock.patch.object(
+                loop, "preflight_clis", side_effect=successful_preflight
+            ) as preflight,
+            mock.patch.object(
+                loop,
+                "_run_bounded_loop_with_runner",
+                side_effect=injected_boundary,
+            ) as agent_boundary,
+        ):
+            result = loop.run_bounded_loop(
+                objective="Challenge C01.",
+                worktree=Path("/tmp/reap-target"),
+                output_dir=Path(directory),
+                repository_context={"branch": "codex/prereg-v2", "head": "abc123"},
+                claude_session="2fe4d6f6-c291-4452-833e-b4726cbe9b10",
+                claude_budget=Decimal("2.00"),
+                rounds=1,
+                timeout_seconds=300,
+                live=True,
+                acknowledge_costs=True,
+                confirm_fable_regular_usage=True,
+            )
+
+        self.assertEqual(result, Path("/tmp/final-synthesis.md"))
+        self.assertEqual(events, ["preflight", "agent_boundary"])
+        preflight.assert_called_once_with()
+        agent_boundary.assert_called_once()
 
     def test_timeout_preserves_partial_logs_and_relay_does_not_retry(self):
         with tempfile.TemporaryDirectory() as directory:
@@ -520,7 +598,7 @@ class AdversarialReviewLoopTests(unittest.TestCase):
             tempfile.TemporaryDirectory() as directory,
             mock.patch.object(loop.os, "fsync") as fsync,
         ):
-            loop.run_bounded_loop(
+            loop._run_bounded_loop_with_runner(
                 objective="Challenge C01.",
                 worktree=Path("/tmp/reap-target"),
                 output_dir=Path(directory),

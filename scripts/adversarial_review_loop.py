@@ -599,7 +599,7 @@ def run_agent_command(
     return result.stdout
 
 
-def run_bounded_loop(
+def _run_bounded_loop_with_runner(
     *,
     objective: str,
     worktree: Path,
@@ -614,11 +614,11 @@ def run_bounded_loop(
     acknowledge_costs: bool,
     confirm_fable_regular_usage: bool = False,
     freeze_review: bool = False,
-    runner: Runner = run_agent_command,
+    runner: Runner,
     claude_executable: str = "claude",
     codex_executable: str = "codex",
 ) -> Path:
-    """Run fixed Claude->Codex rounds and return the final synthesis path."""
+    """Run fixed rounds with an explicitly injected, already-qualified runner."""
 
     validate_execution_request(
         live=live,
@@ -701,6 +701,58 @@ def run_bounded_loop(
         history.append((f"Round {round_number} Codex verification", codex_response))
 
     return output_dir / f"round_{rounds:02d}_codex.md"
+
+
+def run_bounded_loop(
+    *,
+    objective: str,
+    worktree: Path,
+    output_dir: Path,
+    repository_context: Mapping[str, str],
+    claude_session: str,
+    start_new_claude_session: bool = False,
+    claude_budget: Decimal,
+    rounds: int,
+    timeout_seconds: int,
+    live: bool,
+    acknowledge_costs: bool,
+    confirm_fable_regular_usage: bool = False,
+    freeze_review: bool = False,
+) -> Path:
+    """Run with the real CLIs only after validating their exact executable paths."""
+
+    validate_execution_request(
+        live=live,
+        acknowledge_costs=acknowledge_costs,
+        rounds=rounds,
+        confirm_fable_regular_usage=confirm_fable_regular_usage,
+        freeze_review=freeze_review,
+        start_new_claude_session=start_new_claude_session,
+    )
+    validate_claude_subscription_environment(os.environ)
+    if not live:
+        raise ConfigurationError("run_bounded_loop cannot execute without live=True")
+    validate_claude_budget(claude_budget, rounds=rounds)
+
+    cli_preflight = preflight_clis()
+    return _run_bounded_loop_with_runner(
+        objective=objective,
+        worktree=worktree,
+        output_dir=output_dir,
+        repository_context=repository_context,
+        claude_session=claude_session,
+        start_new_claude_session=start_new_claude_session,
+        claude_budget=claude_budget,
+        rounds=rounds,
+        timeout_seconds=timeout_seconds,
+        live=live,
+        acknowledge_costs=acknowledge_costs,
+        confirm_fable_regular_usage=confirm_fable_regular_usage,
+        freeze_review=freeze_review,
+        runner=run_agent_command,
+        claude_executable=str(cli_preflight["claude"]["resolved_path"]),
+        codex_executable=str(cli_preflight["codex"]["resolved_path"]),
+    )
 
 
 def _positive_decimal(value: str) -> Decimal:
@@ -1015,7 +1067,7 @@ def main(argv: Sequence[str] | None = None) -> int:
     try:
         claude_executable = str(cli_preflight["claude"]["resolved_path"])
         codex_executable = str(cli_preflight["codex"]["resolved_path"])
-        final_path = run_bounded_loop(
+        final_path = _run_bounded_loop_with_runner(
             objective=objective,
             worktree=snapshot,
             output_dir=output_dir,
@@ -1029,6 +1081,7 @@ def main(argv: Sequence[str] | None = None) -> int:
             acknowledge_costs=args.acknowledge_external_model_costs,
             confirm_fable_regular_usage=args.confirm_fable_5_regular_plan_usage,
             freeze_review=args.freeze_review,
+            runner=run_agent_command,
             claude_executable=claude_executable,
             codex_executable=codex_executable,
         )
