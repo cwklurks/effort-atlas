@@ -8,9 +8,10 @@ from decimal import Decimal
 from effort_atlas.activation import ActivationPolicy, evaluate_activation
 from effort_atlas.confirmatory import sha256_json
 from effort_atlas.reap_budget import (
+    BudgetCeilingExceeded,
     BudgetRow,
     RouteRate,
-    enforce_budget_ceiling,
+    enforce_freeze_budget_gate,
     project_maximum_exposure,
 )
 from effort_atlas.reap_manifest import seal_manifest, validate_manifest
@@ -106,10 +107,12 @@ class ReapArtifactFlowTests(unittest.TestCase):
         budget_rows = tuple(
             BudgetRow(
                 job_id=job.job_id,
-                route_id=job.identity.provider_route,
+                route_id="openai-direct::test-route",
                 phase="main",
                 prompt_token_bound=512,
                 max_output_tokens=job.identity.cap,
+                pool_id="openai-direct",
+                panel_id=job.identity.panel,
             )
             for job in self.jobs
         )
@@ -117,7 +120,7 @@ class ReapArtifactFlowTests(unittest.TestCase):
             budget_rows,
             (
                 RouteRate(
-                    route_id="test-route",
+                    route_id="openai-direct::test-route",
                     input_usd_per_million=Decimal("0.20"),
                     output_usd_per_million=Decimal("1.20"),
                     snapshot_sha256=_digest("route-price-snapshot"),
@@ -126,7 +129,26 @@ class ReapArtifactFlowTests(unittest.TestCase):
             ),
         )
         self.assertEqual(projection.maximum_exposure_usd, Decimal("0.0100352"))
-        enforce_budget_ceiling(projection, Decimal("0.0100352"))
+        self.assertEqual(projection.price_basis, "list")
+        self.assertEqual(
+            projection.by_pool_usd,
+            (("openai-direct", Decimal("0.0100352")),),
+        )
+        self.assertEqual(
+            projection.by_pool_panel_usd,
+            (("openai-direct", "test-panel", Decimal("0.0100352")),),
+        )
+        enforce_freeze_budget_gate(
+            projection,
+            pool_ceilings_usd={"openai-direct": Decimal("0.0100352")},
+            panel_ceilings_usd={("openai-direct", "test-panel"): Decimal("0.0100352")},
+        )
+        with self.assertRaisesRegex(BudgetCeilingExceeded, "openai-direct"):
+            enforce_freeze_budget_gate(
+                projection,
+                pool_ceilings_usd={"tinker": Decimal("0.0100352")},
+                panel_ceilings_usd={("tinker", "test-panel"): Decimal("0.0100352")},
+            )
 
         manifest = validate_manifest(self._sealed_manifest(), require_frozen=True)
         required = ("single_submission", "termination_mapping")
