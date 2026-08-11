@@ -10,6 +10,9 @@ from decimal import Decimal
 
 MILLION = Decimal(1_000_000)
 SHA256_PATTERN = re.compile(r"[0-9a-f]{64}")
+RESERVED_SCOPE_IDS = frozenset(
+    {"unscoped", "tbd", "pending", "unknown", "[__]", "__", "[decide]"}
+)
 
 
 class BudgetCeilingExceeded(ValueError):
@@ -20,6 +23,13 @@ def _nonempty_string(label: str, value: object) -> str:
     if not isinstance(value, str) or not value.strip():
         raise ValueError(f"{label} must be a nonempty string")
     return value
+
+
+def _scope_id(label: str, value: object) -> str:
+    scope_id = _nonempty_string(label, value)
+    if scope_id.strip().casefold() in RESERVED_SCOPE_IDS:
+        raise ValueError(f"{label} must be an explicit non-placeholder scope identifier")
+    return scope_id
 
 
 def _token_bound(label: str, value: object, *, positive: bool) -> int:
@@ -52,8 +62,8 @@ class BudgetRow:
         _nonempty_string("phase", self.phase)
         _token_bound("prompt_token_bound", self.prompt_token_bound, positive=False)
         _token_bound("max_output_tokens", self.max_output_tokens, positive=True)
-        _nonempty_string("pool_id", self.pool_id)
-        _nonempty_string("panel_id", self.panel_id)
+        _scope_id("pool_id", self.pool_id)
+        _scope_id("panel_id", self.panel_id)
 
 
 @dataclass(frozen=True, slots=True)
@@ -204,6 +214,7 @@ def enforce_freeze_budget_gate(
     _require_ceiling_map(pool_ceilings_usd, label="pool")
     _require_ceiling_map(panel_ceilings_usd, label="panel")
     for pool_id, exposure in projection.by_pool_usd:
+        _scope_id("projection pool_id", pool_id)
         ceiling = pool_ceilings_usd.get(pool_id)
         if ceiling is None:
             raise BudgetCeilingExceeded(f"pool ceiling is missing for {pool_id}")
@@ -212,6 +223,8 @@ def enforce_freeze_budget_gate(
                 f"pool {pool_id} maximum exposure {exposure} exceeds hard ceiling {ceiling}"
             )
     for pool_id, panel_id, exposure in projection.by_pool_panel_usd:
+        _scope_id("projection panel pool_id", pool_id)
+        _scope_id("projection panel_id", panel_id)
         ceiling = panel_ceilings_usd.get((pool_id, panel_id))
         if ceiling is None:
             raise BudgetCeilingExceeded(
@@ -229,12 +242,12 @@ def _require_ceiling_map(values: dict[object, object], *, label: str) -> None:
         raise TypeError(f"{label}_ceilings_usd must be a dictionary")
     for key, ceiling in values.items():
         if label == "pool":
-            _nonempty_string("pool ceiling key", key)
+            _scope_id("pool ceiling key", key)
         else:
             if not isinstance(key, tuple) or len(key) != 2:
                 raise ValueError(
                     "panel ceiling keys must be (pool_id, panel_id) tuples"
                 )
-            _nonempty_string("panel pool_id", key[0])
-            _nonempty_string("panel panel_id", key[1])
+            _scope_id("panel pool_id", key[0])
+            _scope_id("panel panel_id", key[1])
         _rate(f"{label} ceiling", ceiling)

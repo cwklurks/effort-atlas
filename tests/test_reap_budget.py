@@ -5,6 +5,7 @@ from decimal import Decimal
 
 from effort_atlas.reap_budget import (
     BudgetCeilingExceeded,
+    BudgetProjection,
     BudgetRow,
     RouteRate,
     enforce_budget_ceiling,
@@ -23,6 +24,92 @@ class ReapBudgetTests(unittest.TestCase):
                 self.assertRaises(ValueError),
             ):
                 BudgetRow("job", "route", "main", 1, 1, pool_id, panel_id)
+
+    def test_budget_rows_reject_reserved_scope_placeholders(self) -> None:
+        placeholder_values = (
+            "unscoped",
+            " UNSCOPED ",
+            "tbd",
+            " Pending ",
+            "UNKNOWN",
+            "[__]",
+            "__",
+            "[DECIDE]",
+        )
+        for placeholder in placeholder_values:
+            for pool_id, panel_id in (
+                (placeholder, "real-panel"),
+                ("real-provider-pool", placeholder),
+            ):
+                with (
+                    self.subTest(pool_id=pool_id, panel_id=panel_id),
+                    self.assertRaisesRegex(ValueError, "placeholder"),
+                ):
+                    BudgetRow("job", "route", "main", 1, 1, pool_id, panel_id)
+
+        row = BudgetRow(
+            "job",
+            "route",
+            "main",
+            1,
+            1,
+            "openai-direct",
+            "hmmt-2026-terra",
+        )
+        self.assertEqual(row.pool_id, "openai-direct")
+        self.assertEqual(row.panel_id, "hmmt-2026-terra")
+
+    def test_freeze_gate_rejects_placeholder_scope_in_forged_projection(self) -> None:
+        projection = BudgetProjection(
+            maximum_exposure_usd=Decimal(1),
+            row_count=1,
+            by_phase_usd=(("main", Decimal(1)),),
+            by_price_basis_usd=(("list", Decimal(1)),),
+            snapshot_sha256="a" * 64,
+            by_pool_usd=((" UnScOpEd ", Decimal(1)),),
+            by_pool_panel_usd=((" UnScOpEd ", "real-panel", Decimal(1)),),
+            price_basis="list",
+        )
+
+        with self.assertRaisesRegex(ValueError, "placeholder"):
+            enforce_freeze_budget_gate(
+                projection,
+                pool_ceilings_usd={"real-pool": Decimal(1)},
+                panel_ceilings_usd={("real-pool", "real-panel"): Decimal(1)},
+            )
+
+    def test_freeze_gate_rejects_placeholder_scope_in_ceiling_maps(self) -> None:
+        projection = project_maximum_exposure(
+            (
+                BudgetRow(
+                    "job", "route", "main", 0, 1_000_000, "real-pool", "real-panel"
+                ),
+            ),
+            (RouteRate("route", Decimal(0), Decimal(1), "a" * 64, "list"),),
+        )
+
+        invalid_maps = (
+            (
+                {"real-pool": Decimal(1), "UNKNOWN": Decimal(1)},
+                {("real-pool", "real-panel"): Decimal(1)},
+            ),
+            (
+                {"real-pool": Decimal(1)},
+                {
+                    ("real-pool", "real-panel"): Decimal(1),
+                    ("real-pool", " [DECIDE] "): Decimal(1),
+                },
+            ),
+        )
+        for pool_ceilings, panel_ceilings in invalid_maps:
+            with self.subTest(
+                pool_ceilings=pool_ceilings, panel_ceilings=panel_ceilings
+            ), self.assertRaisesRegex(ValueError, "placeholder"):
+                enforce_freeze_budget_gate(
+                    projection,
+                    pool_ceilings_usd=pool_ceilings,
+                    panel_ceilings_usd=panel_ceilings,
+                )
 
     def test_maximum_exposure_sums_every_rows_prompt_and_cap(self) -> None:
         rows = (
