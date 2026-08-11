@@ -52,17 +52,18 @@ CLAUDE_REQUIRED_FLAGS = (
     "--tools",
     "--output-format",
 )
-CODEX_REQUIRED_FLAGS = (
+CODEX_GLOBAL_REQUIRED_FLAGS = ("--ask-for-approval",)
+CODEX_EXEC_REQUIRED_FLAGS = (
     "--ephemeral",
     "--cd",
     "--sandbox",
-    "--ask-for-approval",
     "--model",
     "--config",
     "--color",
     "--skip-git-repo-check",
     "--output-last-message",
 )
+CODEX_REQUIRED_FLAGS = CODEX_GLOBAL_REQUIRED_FLAGS + CODEX_EXEC_REQUIRED_FLAGS
 
 
 class ConfigurationError(ValueError):
@@ -116,6 +117,8 @@ def build_codex_command(
 
     return [
         executable,
+        "--ask-for-approval",
+        "never",
         "exec",
         "--ephemeral",
         "--cd",
@@ -817,13 +820,21 @@ def preflight_clis(
     )
     claude["subscription"] = _preflight_claude_subscription("claude")
     claude["model"] = CLAUDE_MODEL
+    codex_global = _preflight_cli(
+        "codex",
+        ["--help"],
+        CODEX_GLOBAL_REQUIRED_FLAGS,
+    )
+    codex = _preflight_cli(
+        "codex",
+        ["exec", "--help"],
+        CODEX_EXEC_REQUIRED_FLAGS,
+    )
+    codex["global_help_sha256"] = codex_global["help_sha256"]
+    codex["global_required_flags"] = list(CODEX_GLOBAL_REQUIRED_FLAGS)
     return {
         "claude": claude,
-        "codex": _preflight_cli(
-            "codex",
-            ["exec", "--help"],
-            CODEX_REQUIRED_FLAGS,
-        ),
+        "codex": codex,
     }
 
 

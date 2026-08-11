@@ -63,7 +63,9 @@ counts unverified, and pins Claude to `claude-fable-5`. Live execution rejects A
 keys and gateway/provider overrides, requires a logged-in first-party Claude
 account, and requires human confirmation that Fable 5 is included in the account's
 Max/premium plan, usage credits are disabled, and automatic model switching is
-disabled. The real relay has not been run. The current checkpoint is
+disabled. The Codex command applies its `never` approval policy as a global flag
+before the `exec` subcommand and preflights the global and exec help surfaces
+separately. The real relay has not been run. The current checkpoint is
 133 ordinary tests plus 26 exact-lock Tinker tests; all study-call and spend
 counters remain zero. Model agreement cannot authorize spending, provider
 activation, preregistration freeze, or choices owned by Connor or Chirag.

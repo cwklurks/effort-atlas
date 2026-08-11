@@ -83,7 +83,7 @@ class AdversarialReviewLoopTests(unittest.TestCase):
             response_path=Path("/tmp/reap-review-output/codex.md"),
         )
 
-        self.assertEqual(command[:2], ["codex", "exec"])
+        self.assertEqual(command[:4], ["codex", "--ask-for-approval", "never", "exec"])
         self.assertIn("--ephemeral", command)
         self.assertEqual(command[command.index("--sandbox") + 1], "read-only")
         self.assertEqual(command[command.index("--ask-for-approval") + 1], "never")
@@ -393,8 +393,12 @@ class AdversarialReviewLoopTests(unittest.TestCase):
             codex = fake_bin / "codex"
             codex.write_text(
                 "#!/bin/sh\n"
+                "if [ \"$1\" = '--help' ]; then\n"
+                "  printf '%s\\n' '--ask-for-approval'\n"
+                "  exit 0\n"
+                "fi\n"
                 "if [ \"$1\" = 'exec' ] && [ \"$2\" = '--help' ]; then\n"
-                "  printf '%s\\n' '--ephemeral --cd --sandbox --ask-for-approval --model --config --color --skip-git-repo-check --output-last-message'\n"
+                "  printf '%s\\n' '--ephemeral --cd --sandbox --model --config --color --skip-git-repo-check --output-last-message'\n"
                 "  exit 0\n"
                 "fi\n"
                 'printf \'%s\\n\' "$0" >> "$RELAY_FAKE_LOG"\n'

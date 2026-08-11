@@ -132,7 +132,7 @@
   "verification": [
     {
       "label": "Bounded Claude/Codex adversarial relay",
-      "result": "133 ordinary tests plus 26 exact-lock Tinker tests passed; Claude is pinned to claude-fable-5, API and gateway billing variables are rejected, and live requires first-party login plus confirmation of eligible regular-plan usage, disabled usage credits, and disabled automatic model switching. Fake-agent integration still proves two read-only challenge rounds with zero relay-level subprocess retries. Internal CLI request counts remain unverified. The real relay has not been run.",
+      "result": "133 ordinary tests plus 26 exact-lock Tinker tests passed; Claude is pinned to claude-fable-5, API and gateway billing variables are rejected, and live requires first-party login plus confirmation of eligible regular-plan usage, disabled usage credits, and disabled automatic model switching. The local non-model preflight confirms Claude 2.1.227 authenticated through claude.ai and the installed Codex CLI's global never-approval plus read-only exec surfaces. Fake-agent integration still proves two read-only challenge rounds with zero relay-level subprocess retries. Internal CLI request counts remain unverified. The real relay has not been run.",
       "status": "passed"
     },
     {
