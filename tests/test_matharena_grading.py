@@ -8,12 +8,12 @@ from pathlib import Path
 from types import ModuleType
 from typing import Any
 
+from effort_atlas import matharena_grading
 from effort_atlas.graders import extract_final_answer
 from effort_atlas.matharena_grading import (
     MathArenaImportFailed,
     MathArenaPin,
-    PinnedMathArenaScorer,
-    bind_matharena_scorer,
+    grade_with_matharena,
 )
 
 
@@ -68,16 +68,20 @@ def forbidden(*args, **kwargs):
         values.update(overrides)
         return MathArenaPin(**values)
 
-    def bind(
+    def grade(
         self,
+        extracted_answer: str | None,
+        gold: str,
         *,
         pin: MathArenaPin | None = None,
-        observed_version: str = "caller-pinned-version",
-    ) -> PinnedMathArenaScorer:
-        return bind_matharena_scorer(
+        observed_version: str | None = "caller-pinned-version",
+    ) -> dict[str, object]:
+        return grade_with_matharena(
             self.module,
             observed_version=observed_version,
             pin=pin or self.pin(),
+            extracted_answer=extracted_answer,
+            gold=gold,
         )
 
 
@@ -85,10 +89,9 @@ class MathArenaBoundaryTests(unittest.TestCase):
     def test_unanswered_grader_v2_result_never_invokes_upstream(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             fake = FakeMathArena(directory)
-            scorer = fake.bind()
             extracted = extract_final_answer("Reasoning mentions 3/4 and 4 but is cut")
 
-            result = scorer.grade(extracted, "4")
+            result = fake.grade(extracted, "4")
 
             self.assertEqual(
                 result,
@@ -104,13 +107,12 @@ class MathArenaBoundaryTests(unittest.TestCase):
     def test_only_extracted_field_and_gold_reach_upstream(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             fake = FakeMathArena(directory)
-            scorer = fake.bind()
             full_response = (
                 "PRIVATE REASONING SENTINEL with stray 4\nFinal answer: 3/4\nlater text"
             )
             extracted = extract_final_answer(full_response)
 
-            result = scorer.grade(extracted, r"\frac{3}{4}")
+            result = fake.grade(extracted, r"\frac{3}{4}")
 
             self.assertTrue(result["correct"])
             self.assertEqual(
@@ -123,14 +125,14 @@ class MathArenaBoundaryTests(unittest.TestCase):
             self.assertNotIn(full_response, repr(fake.calls))
             self.assertNotIn("PRIVATE REASONING SENTINEL", repr(fake.calls))
             self.assertEqual(
-                tuple(inspect.signature(scorer.grade).parameters),
-                ("extracted_answer", "gold"),
+                tuple(inspect.signature(grade_with_matharena).parameters),
+                ("module", "observed_version", "pin", "extracted_answer", "gold"),
             )
 
     def test_fraction_does_not_fall_back_to_last_number(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             fake = FakeMathArena(directory)
-            result = fake.bind().grade("3/4", "4")
+            result = fake.grade("3/4", "4")
 
             self.assertFalse(result["correct"])
             self.assertEqual(
@@ -148,7 +150,7 @@ class MathArenaBoundaryTests(unittest.TestCase):
             for extracted, gold in cases:
                 with self.subTest(extracted=extracted, gold=gold):
                     fake = FakeMathArena(directory)
-                    result = fake.bind().grade(extracted, gold)
+                    result = fake.grade(extracted, gold)
 
                     self.assertTrue(result["correct"])
                     self.assertEqual(
@@ -159,7 +161,7 @@ class MathArenaBoundaryTests(unittest.TestCase):
     def test_no_exact_string_fallback_when_upstream_cannot_parse(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             fake = FakeMathArena(directory)
-            result = fake.bind().grade("same-unparseable", "same-unparseable")
+            result = fake.grade("same-unparseable", "same-unparseable")
 
             self.assertFalse(result["correct"])
             self.assertEqual(fake.calls[-1], ("check_answers", None, None))
@@ -167,7 +169,7 @@ class MathArenaBoundaryTests(unittest.TestCase):
     def test_forbidden_upstream_helpers_are_never_invoked(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             fake = FakeMathArena(directory)
-            result = fake.bind().grade("0.75", r"\frac{3}{4}")
+            result = fake.grade("0.75", r"\frac{3}{4}")
 
             self.assertTrue(result["correct"])
             self.assertNotIn(("forbidden",), fake.calls)
@@ -175,10 +177,9 @@ class MathArenaBoundaryTests(unittest.TestCase):
     def test_malformed_extracted_field_fails_before_upstream(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             fake = FakeMathArena(directory)
-            scorer = fake.bind()
             for extracted in ("", "  ", 4, True):
                 with self.subTest(extracted=extracted), self.assertRaises(ValueError):
-                    scorer.grade(extracted, "4")  # type: ignore[arg-type]
+                    fake.grade(extracted, "4")  # type: ignore[arg-type]
             self.assertEqual(fake.calls, [])
 
 
@@ -187,18 +188,22 @@ class MathArenaPinTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as directory:
             fake = FakeMathArena(directory)
             with self.assertRaises(MathArenaImportFailed) as missing_pin:
-                bind_matharena_scorer(
+                grade_with_matharena(
                     fake.module,
                     observed_version="caller-pinned-version",
                     pin=None,
+                    extracted_answer="4",
+                    gold="4",
                 )
             self.assertEqual(missing_pin.exception.reason, "pin_missing")
 
             with self.assertRaises(MathArenaImportFailed) as missing_version:
-                bind_matharena_scorer(
+                grade_with_matharena(
                     fake.module,
                     observed_version=None,
                     pin=fake.pin(),
+                    extracted_answer="4",
+                    gold="4",
                 )
             self.assertEqual(missing_version.exception.reason, "version_missing")
 
@@ -207,28 +212,25 @@ class MathArenaPinTests(unittest.TestCase):
             self.assertEqual(invalid_hash.exception.reason, "pin_invalid")
             self.assertEqual(fake.calls, [])
 
-    def test_direct_scorer_construction_cannot_bypass_binding(self) -> None:
-        with tempfile.TemporaryDirectory() as directory:
-            fake = FakeMathArena(directory)
-            with self.assertRaises(MathArenaImportFailed) as raised:
-                PinnedMathArenaScorer(
-                    fake.pin(),
-                    fake.module.parse_answer,
-                    fake.module.check_answers,
-                )
+    def test_no_public_constructor_can_bypass_per_call_verification(self) -> None:
+        self.assertFalse(hasattr(matharena_grading, "PinnedMathArenaScorer"))
+        self.assertFalse(hasattr(matharena_grading, "bind_matharena_scorer"))
 
-            self.assertEqual(raised.exception.reason, "binding_required")
-            self.assertEqual(fake.calls, [])
+    def test_imported_private_binding_token_cannot_authorize_fake_scorer(self) -> None:
+        self.assertFalse(hasattr(matharena_grading, "_VALIDATED_BINDING"))
+        self.assertFalse(hasattr(matharena_grading, "PinnedMathArenaScorer"))
 
     def test_missing_module_reports_import_failed_before_scoring(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             fake = FakeMathArena(directory)
 
             with self.assertRaises(MathArenaImportFailed) as raised:
-                bind_matharena_scorer(
+                grade_with_matharena(
                     None,
                     observed_version="caller-pinned-version",
                     pin=fake.pin(),
+                    extracted_answer="4",
+                    gold="4",
                 )
 
             self.assertEqual(raised.exception.status, "import_failed")
@@ -264,10 +266,12 @@ class MathArenaPinTests(unittest.TestCase):
                     self.subTest(reason=reason),
                     self.assertRaises(MathArenaImportFailed) as raised,
                 ):
-                    bind_matharena_scorer(
+                    grade_with_matharena(
                         module,
                         observed_version=observed_version,
                         pin=pin,
+                        extracted_answer="4",
+                        gold="4",
                     )
                 self.assertEqual(raised.exception.status, "import_failed")
                 self.assertEqual(raised.exception.reason, reason)
@@ -279,13 +283,13 @@ class MathArenaPinTests(unittest.TestCase):
             pin = fake.pin()
             fake.source.unlink()
             with self.assertRaises(MathArenaImportFailed) as missing_source:
-                fake.bind(pin=pin)
+                fake.grade("4", "4", pin=pin)
             self.assertEqual(missing_source.exception.reason, "source_unavailable")
 
             second = FakeMathArena(directory)
             del second.module.check_answers
             with self.assertRaises(MathArenaImportFailed) as missing_callable:
-                second.bind()
+                second.grade("4", "4")
             self.assertEqual(missing_callable.exception.reason, "callable_missing")
             self.assertEqual(second.calls, [])
 
@@ -299,7 +303,7 @@ class MathArenaPinTests(unittest.TestCase):
 
             fake.module.parse_answer = parse_answer
             with self.assertRaises(MathArenaImportFailed) as raised:
-                fake.bind()
+                fake.grade("4", "4")
 
             self.assertEqual(raised.exception.reason, "callable_provenance_mismatch")
             self.assertEqual(fake.calls, [])

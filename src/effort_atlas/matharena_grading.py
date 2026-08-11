@@ -1,9 +1,10 @@
 """Fail-closed boundary for a future pinned MathArena symbolic scorer.
 
-This module does not import MathArena, select a revision, or parse answers.  A
-caller must supply an already imported parser module plus its observed package
-version and exact source-file pin.  Only the two deterministic parser callables
-needed after grader-v2 extraction cross this boundary.
+This module does not import MathArena, select a revision, or extract answers.  A
+caller supplies an already imported parser module plus its observed package
+version and exact source-file pin to :func:`grade_with_matharena`.  That sole
+public grading call revalidates provenance before every comparison and passes
+only grader-v2's extracted field to the two permitted deterministic callables.
 """
 
 from __future__ import annotations
@@ -18,6 +19,13 @@ from typing import TypedDict
 
 ParseAnswer = Callable[[str], tuple[object, object]]
 CheckAnswers = Callable[[object, object], bool]
+
+__all__ = [
+    "MathArenaGradeResult",
+    "MathArenaImportFailed",
+    "MathArenaPin",
+    "grade_with_matharena",
+]
 
 
 class MathArenaGradeResult(TypedDict):
@@ -60,68 +68,6 @@ class MathArenaPin:
             raise MathArenaImportFailed("pin_invalid")
 
 
-_VALIDATED_BINDING = object()
-
-
-@dataclass(frozen=True, slots=True, init=False)
-class PinnedMathArenaScorer:
-    """Validated handles to the two permitted deterministic upstream calls."""
-
-    pin: MathArenaPin
-    _parse_answer: ParseAnswer
-    _check_answers: CheckAnswers
-
-    def __init__(
-        self,
-        pin: MathArenaPin,
-        parse_answer: ParseAnswer,
-        check_answers: CheckAnswers,
-        *,
-        _binding_token: object | None = None,
-    ) -> None:
-        if _binding_token is not _VALIDATED_BINDING:
-            raise MathArenaImportFailed("binding_required")
-        object.__setattr__(self, "pin", pin)
-        object.__setattr__(self, "_parse_answer", parse_answer)
-        object.__setattr__(self, "_check_answers", check_answers)
-
-    def _parse(self, value: str) -> object:
-        parsed = self._parse_answer(value)
-        if not isinstance(parsed, tuple) or len(parsed) != 2:
-            raise ValueError("Pinned parse_answer returned an invalid result shape.")
-        return parsed[0]
-
-    def grade(
-        self,
-        extracted_answer: str | None,
-        gold: str,
-    ) -> MathArenaGradeResult:
-        """Compare only grader-v2's extracted field with the gold field."""
-        if not isinstance(gold, str) or not gold.strip():
-            raise ValueError("gold must be a nonempty string.")
-        if extracted_answer is None:
-            return {
-                "correct": False,
-                "extracted_answer_present": False,
-                "extracted_answer": None,
-                "grader_status": "unanswered",
-            }
-        if not isinstance(extracted_answer, str) or not extracted_answer.strip():
-            raise ValueError("extracted_answer must be None or a nonempty string.")
-
-        parsed_answer = self._parse(extracted_answer)
-        parsed_gold = self._parse(gold)
-        correct = self._check_answers(parsed_answer, parsed_gold)
-        if type(correct) is not bool:
-            raise ValueError("Pinned check_answers returned a non-boolean result.")
-        return {
-            "correct": correct,
-            "extracted_answer_present": True,
-            "extracted_answer": extracted_answer,
-            "grader_status": "ok",
-        }
-
-
 def _source_sha256(module: ModuleType) -> str:
     source_file = getattr(module, "__file__", None)
     if not isinstance(source_file, str) or not source_file:
@@ -150,13 +96,13 @@ def _callable_matches_source(
     )
 
 
-def bind_matharena_scorer(
+def _validated_callables(
     module: ModuleType | None,
     *,
     observed_version: str | None,
     pin: MathArenaPin | None,
-) -> PinnedMathArenaScorer:
-    """Validate exact caller-supplied provenance before exposing scoring."""
+) -> tuple[ParseAnswer, CheckAnswers]:
+    """Validate exact caller-supplied provenance for one grade operation."""
     if pin is None:
         raise MathArenaImportFailed("pin_missing")
     if module is None:
@@ -186,9 +132,53 @@ def bind_matharena_scorer(
         for name, function in permitted
     ):
         raise MathArenaImportFailed("callable_provenance_mismatch")
-    return PinnedMathArenaScorer(
-        pin,
-        parse_answer,
-        check_answers,
-        _binding_token=_VALIDATED_BINDING,
+    return parse_answer, check_answers
+
+
+def _parse(parse_answer: ParseAnswer, value: str) -> object:
+    parsed = parse_answer(value)
+    if not isinstance(parsed, tuple) or len(parsed) != 2:
+        raise ValueError("Pinned parse_answer returned an invalid result shape.")
+    return parsed[0]
+
+
+def grade_with_matharena(
+    module: ModuleType | None,
+    *,
+    observed_version: str | None,
+    pin: MathArenaPin | None,
+    extracted_answer: str | None,
+    gold: str,
+) -> MathArenaGradeResult:
+    """Verify the upstream boundary, then grade only grader-v2's extracted field."""
+    if not isinstance(gold, str) or not gold.strip():
+        raise ValueError("gold must be a nonempty string.")
+    if extracted_answer is not None and (
+        not isinstance(extracted_answer, str) or not extracted_answer.strip()
+    ):
+        raise ValueError("extracted_answer must be None or a nonempty string.")
+
+    parse_answer, check_answers = _validated_callables(
+        module,
+        observed_version=observed_version,
+        pin=pin,
     )
+    if extracted_answer is None:
+        return {
+            "correct": False,
+            "extracted_answer_present": False,
+            "extracted_answer": None,
+            "grader_status": "unanswered",
+        }
+
+    parsed_answer = _parse(parse_answer, extracted_answer)
+    parsed_gold = _parse(parse_answer, gold)
+    correct = check_answers(parsed_answer, parsed_gold)
+    if type(correct) is not bool:
+        raise ValueError("Pinned check_answers returned a non-boolean result.")
+    return {
+        "correct": correct,
+        "extracted_answer_present": True,
+        "extracted_answer": extracted_answer,
+        "grader_status": "ok",
+    }
