@@ -1,0 +1,39 @@
+== Inkling standard, 30 items ==
+  Arm A: gens=2,400  prompt_bound=19,660,800  output_bound=24,576,000
+  Arm B: gens=4,800  prompt_bound=39,321,600  output_bound=60,948,480
+  Arm C: gens=960  prompt_bound=7,864,320  output_bound=47,185,920
+  TOTAL Inkling: gens=8,160  prompt=66,846,720  output=132,710,400  all_tokens=199,557,120
+== GPT-OSS-120B standard, 60 items ==
+  Arm A: gens=4,800  prompt_bound=39,321,600  output_bound=49,152,000
+  Arm B: gens=9,600  prompt_bound=78,643,200  output_bound=82,575,360
+  Arm C: gens=1,920  prompt_bound=15,728,640  output_bound=39,321,600
+  TOTAL GPT-OSS-120B: gens=16,320  prompt=133,693,440  output=171,048,960  all_tokens=304,742,400
+== Breadth panel (Nemotron / Qwen), 30 items ==
+  Arm A-style: gens=960  prompt_bound=7,864,320  output_bound=9,830,400
+  TOTAL Breadth: gens=960  prompt=7,864,320  output=9,830,400  all_tokens=17,694,720
+  doc claims prompt bound 7,864,320 and output bound 9,830,400 -> MATCH
+== Terra, 30 items, prompt bound 4096 ==
+  Arm A-style: gens=960  prompt_bound=3,932,160  output_bound=9,830,400
+  TOTAL Terra: gens=960  prompt=3,932,160  output=9,830,400  all_tokens=13,762,560
+
+== OpenAI direct (rates from doc: terra $2/$12, luna $0.2/$1.2, sol $5/$30 per M) ==
+  terra: $125.83
+  luna: $12.58
+  sol: $314.57
+
+== OpenRouter anchor, 30 items, prompt bound 8192 (rates from doc) ==
+  Baseten: $5.702
+  Groq: $7.078
+  Cerebras: $10.125
+
+== Tinker attempts with reap/02 recorded rates (uniform $/M, dated pre-2026-08-10) ==
+  Inkling: full=$933.93  cached-prefill=$683.65  claimed=$746.09
+    implied uniform rate from claim: $3.7387/M (cached-prefill convention: $5.1074/M)
+  GPT-OSS-120B (60 items): full=$255.98  cached-prefill=$166.14  claimed=$187.03
+    implied uniform rate from claim: $0.6137/M (cached-prefill convention: $0.9456/M)
+  Nemotron Ultra 550B: no repo rate recorded; implied uniform rate $4.5652/M, implied cached-prefill rate $7.0839/M
+  Qwen3.5 397B: no repo rate recorded; implied uniform rate $5.4999/M, implied cached-prefill rate $8.5344/M
+
+== Portfolio totals as displayed ==
+  746.09+187.03+80.78+97.32 = 1111.22  (doc says 1,111.21)
+  1,492.18 / 2 = 746.09  (doc's 60->30 item halving for Inkling)
