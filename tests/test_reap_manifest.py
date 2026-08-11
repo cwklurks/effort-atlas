@@ -47,6 +47,30 @@ def valid_manifest(*, state: str = "frozen") -> dict[str, object]:
 
 
 class ReapManifestTests(unittest.TestCase):
+    def test_seal_and_validate_return_detached_nested_values(self) -> None:
+        sealed = valid_manifest()
+        validated = validate_manifest(sealed)
+
+        validated_dataset = validated["dataset"]
+        self.assertIsInstance(validated_dataset, dict)
+        validated_dataset["path"] = "mutated-after-validation.json"
+        self.assertEqual(
+            sealed["dataset"]["path"],  # type: ignore[index]
+            "artifacts/dataset.json",
+        )
+
+        unsigned = {
+            key: value for key, value in sealed.items() if key != "manifest_sha256"
+        }
+        resealed = seal_manifest(unsigned)
+        unsigned_dataset = unsigned["dataset"]
+        self.assertIsInstance(unsigned_dataset, dict)
+        unsigned_dataset["path"] = "mutated-after-sealing.json"
+        self.assertEqual(
+            resealed["dataset"]["path"],  # type: ignore[index]
+            "artifacts/dataset.json",
+        )
+
     def test_sealed_manifest_is_deterministic_and_valid(self) -> None:
         manifest = valid_manifest()
         self.assertEqual(

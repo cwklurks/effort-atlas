@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import copy
 import re
 from collections.abc import Mapping
 from pathlib import PurePosixPath
@@ -166,7 +167,7 @@ def seal_manifest(unsigned_manifest: Mapping[str, Any]) -> dict[str, Any]:
 
     if not isinstance(unsigned_manifest, Mapping):
         raise TypeError("manifest must be an object")
-    unsigned = dict(unsigned_manifest)
+    unsigned = copy.deepcopy(dict(unsigned_manifest))
     _validate_unsigned(unsigned)
     return {**unsigned, "manifest_sha256": sha256_json(unsigned)}
 
@@ -179,13 +180,13 @@ def validate_manifest(
     if not isinstance(manifest, Mapping):
         raise TypeError("manifest must be an object")
     _require_exact_fields(manifest, SEALED_FIELDS, label="sealed manifest")
-    unsigned = {
-        key: value for key, value in manifest.items() if key != "manifest_sha256"
-    }
+    unsigned = copy.deepcopy(
+        {key: value for key, value in manifest.items() if key != "manifest_sha256"}
+    )
     _validate_unsigned(unsigned)
     supplied = _require_sha256(manifest["manifest_sha256"], label="manifest_sha256")
     if supplied != sha256_json(unsigned):
         raise ValueError("manifest_sha256 does not match the canonical manifest")
     if require_frozen and manifest["state"] != "frozen":
         raise ValueError("a frozen manifest is required")
-    return dict(manifest)
+    return copy.deepcopy(dict(manifest))
