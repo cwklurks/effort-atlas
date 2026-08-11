@@ -139,6 +139,11 @@
       "status": "passed"
     },
     {
+      "label": "Phase 3 implementation adversarial review",
+      "result": "Approved at exact head f9aef0b with no critical or warning findings after mutations of activation, arm labels, budget claims, MathArena provenance, and relay freeze boundaries",
+      "status": "passed"
+    },
+    {
       "label": "Bounded Claude/Codex adversarial relay",
       "result": "A completed development relay exchanged two bounded review rounds between claude-fable-5 on eligible regular-plan usage and Sol XHigh. It is non-authoritative and not freeze-eligible. API and gateway billing variables were rejected, usage credits and automatic model switching were disabled by human confirmation, prompts and responses were preserved, and relay-level retries were zero. The completed run predated the final clean-session and Codex user-config isolation hardening, so internal CLI request counts remain unverified and its synthesis is retained only as development evidence.",
       "status": "passed"
@@ -229,7 +234,7 @@
       "date": "2026-08-11",
       "phase": 3,
       "title": "Phase 3 trust boundaries hardened",
-      "detail": "Mutation review closed forged activation, scorer, relay, and budget-summary paths. Budget arithmetic is now explicitly planning-only because caller-supplied rows and rates are not freeze authority; the executable exact-artifact gate remains Phase 4. The dashboard records 250 ordinary plus 26 exact-lock tests and every call/spend counter remains zero."
+      "detail": "Mutation review closed forged activation, scorer, relay, and budget-summary paths. Budget arithmetic is now explicitly planning-only because caller-supplied rows and rates are not freeze authority; the executable exact-artifact gate remains Phase 4. Final adversarial review approved exact head f9aef0b with no critical or warning findings. The dashboard records 250 ordinary plus 26 exact-lock tests and every call/spend counter remains zero."
     },
     {
       "date": "2026-08-10",

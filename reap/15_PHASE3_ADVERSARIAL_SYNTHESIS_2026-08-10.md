@@ -174,8 +174,9 @@ The branch now contains decision-independent building blocks, not a frozen study
   presenting the planning inputs as freeze authority.
 
 The integrated branch passes the canonical offline suite (250 ordinary tests plus
-26 exact-lock Tinker tests). Final independent review remains required. These
-components are prerequisites for the future runner, not the runner itself.
+26 exact-lock Tinker tests). Final adversarial review approved exact head `f9aef0b`
+with no critical or warning findings. These components are prerequisites for the
+future runner, not the runner itself.
 
 ## Questions for the supervisor call
 

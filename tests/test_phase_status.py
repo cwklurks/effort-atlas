@@ -92,6 +92,11 @@ class PhaseStatusTests(unittest.TestCase):
             for row in data["verification"]
             if row["label"] == "Phase 3 offline implementation"
         )
+        final_review = next(
+            row
+            for row in data["verification"]
+            if row["label"] == "Phase 3 implementation adversarial review"
+        )
 
         self.assertIn(
             f"{ordinary} ordinary tests plus {exact_lock} exact-lock Tinker tests",
@@ -117,12 +122,16 @@ class PhaseStatusTests(unittest.TestCase):
         self.assertIn("planning-budget", implementation["result"])
         self.assertIn("not freeze authority", implementation["result"])
         self.assertIn("Phase 4", implementation["result"])
+        self.assertEqual(final_review["status"], "passed")
+        self.assertIn("f9aef0b", final_review["result"])
+        self.assertIn("no critical or warning findings", final_review["result"])
         hardening = next(
             row
             for row in data["activity"]
             if row["title"] == "Phase 3 trust boundaries hardened"
         )
         self.assertIn("not freeze authority", hardening["detail"])
+        self.assertIn("Final adversarial review approved", hardening["detail"])
         self.assertIn("every call/spend counter remains zero", hardening["detail"])
 
         pricing = next(
