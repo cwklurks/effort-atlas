@@ -20,7 +20,8 @@
   "prices": [
     {
       "price_id": "openai-terra-list-2026-08-10",
-      "route_id": "gpt-5.6-terra",
+      "route_id": "openai-direct::gpt-5.6-terra",
+      "provider_route": "gpt-5.6-terra",
       "provider": "OpenAI direct",
       "basis": "list",
       "input_usd_per_million": "2.00",
@@ -32,7 +33,8 @@
     },
     {
       "price_id": "openai-luna-list-2026-08-10",
-      "route_id": "gpt-5.6-luna",
+      "route_id": "openai-direct::gpt-5.6-luna",
+      "provider_route": "gpt-5.6-luna",
       "provider": "OpenAI direct",
       "basis": "list",
       "input_usd_per_million": "0.20",
@@ -44,7 +46,8 @@
     },
     {
       "price_id": "openai-sol-list-2026-08-10",
-      "route_id": "gpt-5.6-sol",
+      "route_id": "openai-direct::gpt-5.6-sol",
+      "provider_route": "gpt-5.6-sol",
       "provider": "OpenAI direct",
       "basis": "list",
       "input_usd_per_million": "5.00",
@@ -56,7 +59,8 @@
     },
     {
       "price_id": "tinker-inkling-list-2026-08-10",
-      "route_id": "thinkingmachines/Inkling",
+      "route_id": "tinker::thinkingmachines/Inkling",
+      "provider_route": "thinkingmachines/Inkling",
       "provider": "Tinker",
       "basis": "list",
       "input_usd_per_million": "3.74",
@@ -66,7 +70,8 @@
     },
     {
       "price_id": "tinker-inkling-promo-2026-08-10",
-      "route_id": "thinkingmachines/Inkling",
+      "route_id": "tinker::thinkingmachines/Inkling",
+      "provider_route": "thinkingmachines/Inkling",
       "provider": "Tinker",
       "basis": "discount",
       "input_usd_per_million": "1.87",
@@ -76,7 +81,8 @@
     },
     {
       "price_id": "tinker-gpt-oss-120b-list-2026-08-10",
-      "route_id": "openai/gpt-oss-120b",
+      "route_id": "tinker::openai/gpt-oss-120b",
+      "provider_route": "openai/gpt-oss-120b",
       "provider": "Tinker",
       "basis": "list",
       "input_usd_per_million": "0.33",
@@ -86,7 +92,8 @@
     },
     {
       "price_id": "tinker-nemotron-ultra-list-2026-08-10",
-      "route_id": "nvidia/NVIDIA-Nemotron-3-Ultra-550B-A55B-BF16",
+      "route_id": "tinker::nvidia/NVIDIA-Nemotron-3-Ultra-550B-A55B-BF16",
+      "provider_route": "nvidia/NVIDIA-Nemotron-3-Ultra-550B-A55B-BF16",
       "provider": "Tinker",
       "basis": "list",
       "input_usd_per_million": "4.98",
@@ -96,7 +103,8 @@
     },
     {
       "price_id": "tinker-nemotron-ultra-promo-2026-08-10",
-      "route_id": "nvidia/NVIDIA-Nemotron-3-Ultra-550B-A55B-BF16",
+      "route_id": "tinker::nvidia/NVIDIA-Nemotron-3-Ultra-550B-A55B-BF16",
+      "provider_route": "nvidia/NVIDIA-Nemotron-3-Ultra-550B-A55B-BF16",
       "provider": "Tinker",
       "basis": "discount",
       "input_usd_per_million": "2.49",
@@ -106,7 +114,8 @@
     },
     {
       "price_id": "tinker-qwen35-397b-list-2026-08-10",
-      "route_id": "Qwen/Qwen3.5-397B-A17B",
+      "route_id": "tinker::Qwen/Qwen3.5-397B-A17B",
+      "provider_route": "Qwen/Qwen3.5-397B-A17B",
       "provider": "Tinker",
       "basis": "list",
       "input_usd_per_million": "3.00",
@@ -116,7 +125,8 @@
     },
     {
       "price_id": "openrouter-baseten-gpt-oss-list-2026-08-10",
-      "route_id": "openai/gpt-oss-120b",
+      "route_id": "openrouter::baseten::openai/gpt-oss-120b",
+      "provider_route": "openai/gpt-oss-120b",
       "provider": "Baseten via OpenRouter",
       "basis": "list",
       "input_usd_per_million": "0.10",
@@ -125,7 +135,8 @@
     },
     {
       "price_id": "openrouter-groq-gpt-oss-list-2026-08-10",
-      "route_id": "openai/gpt-oss-120b",
+      "route_id": "openrouter::groq::openai/gpt-oss-120b",
+      "provider_route": "openai/gpt-oss-120b",
       "provider": "Groq via OpenRouter",
       "basis": "list",
       "input_usd_per_million": "0.15",
@@ -134,7 +145,8 @@
     },
     {
       "price_id": "openrouter-cerebras-gpt-oss-list-2026-08-10",
-      "route_id": "openai/gpt-oss-120b",
+      "route_id": "openrouter::cerebras::openai/gpt-oss-120b",
+      "provider_route": "openai/gpt-oss-120b",
       "provider": "Cerebras via OpenRouter",
       "basis": "list",
       "input_usd_per_million": "0.35",
@@ -143,7 +155,8 @@
     },
     {
       "price_id": "openrouter-deepinfra-gpt-oss-list-2026-08-10",
-      "route_id": "openai/gpt-oss-120b",
+      "route_id": "openrouter::deepinfra::openai/gpt-oss-120b",
+      "provider_route": "openai/gpt-oss-120b",
       "provider": "DeepInfra via OpenRouter",
       "basis": "list",
       "input_usd_per_million": "0.039",

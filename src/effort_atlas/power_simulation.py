@@ -61,22 +61,25 @@ def run_deterministic_simulation(
         simulator_source_sha256=simulator_source_sha256,
     )
 
+    scenario_record = _deep_json_copy(scenario_parameters)
+    assumptions_record = _deep_json_copy(assumptions)
+    monte_carlo_record = _deep_json_copy(monte_carlo_counts)
+
     output = simulator(
-        scenario_parameters=dict(scenario_parameters),
+        scenario_parameters=_deep_json_copy(scenario_record),
         seed=seed,
-        monte_carlo_counts=dict(monte_carlo_counts),
+        monte_carlo_counts=_deep_json_copy(monte_carlo_record),
     )
     if not isinstance(output, Mapping):
         raise SimulationProvenanceError("Simulator output must be a JSON object.")
-    output_record = dict(output)
-    _validate_json_value(output_record, path="output")
+    output_record = _deep_json_copy(output)
 
     unsigned_provenance = {
         "provenance_version": PROVENANCE_VERSION,
-        "scenario_parameters": dict(scenario_parameters),
-        "assumptions": dict(assumptions),
+        "scenario_parameters": scenario_record,
+        "assumptions": assumptions_record,
         "seed": seed,
-        "monte_carlo_counts": dict(monte_carlo_counts),
+        "monte_carlo_counts": monte_carlo_record,
         "simulator_identifier": simulator_identifier,
         "simulator_version": simulator_version,
         "simulator_source_sha256": simulator_source_sha256,
@@ -87,8 +90,13 @@ def run_deterministic_simulation(
     return {
         "provenance": provenance,
         "provenance_sha256": provenance_sha256,
-        "output": output_record,
+        "output": _deep_json_copy(output_record),
     }
+
+
+def _deep_json_copy(value: object) -> Any:
+    """Return a JSON-only deep copy detached from every caller-owned object."""
+    return json.loads(canonical_json(value))
 
 
 def _validate_nonempty_mapping(value: Mapping[str, Any], *, name: str) -> None:
@@ -106,30 +114,47 @@ def _validate_seed(seed: int) -> None:
 
 def _validate_monte_carlo_counts(counts: Mapping[str, int]) -> None:
     if not isinstance(counts, Mapping) or not counts:
-        raise SimulationProvenanceError("monte_carlo_counts must be a nonempty mapping.")
+        raise SimulationProvenanceError(
+            "monte_carlo_counts must be a nonempty mapping."
+        )
     for name, count in counts.items():
         if not isinstance(name, str) or not name.strip() or _is_placeholder(name):
-            raise SimulationProvenanceError("Monte Carlo count names must be explicit strings.")
+            raise SimulationProvenanceError(
+                "Monte Carlo count names must be explicit strings."
+            )
         if type(count) is not int:
-            raise SimulationProvenanceError("Monte Carlo counts must be integers, not booleans.")
+            raise SimulationProvenanceError(
+                "Monte Carlo counts must be integers, not booleans."
+            )
         if count <= 0:
             raise SimulationProvenanceError("Monte Carlo counts must be positive.")
 
 
 def _validate_metadata(
-    *, simulator_identifier: str, simulator_version: str, simulator_source_sha256: str,
+    *,
+    simulator_identifier: str,
+    simulator_version: str,
+    simulator_source_sha256: str,
 ) -> None:
     for name, value in (
         ("simulator_identifier", simulator_identifier),
         ("simulator_version", simulator_version),
     ):
         if not isinstance(value, str) or _is_placeholder(value):
-            raise SimulationProvenanceError(f"{name} must be an explicit non-placeholder string.")
-    if not isinstance(simulator_source_sha256, str) or not _SHA256_PATTERN.fullmatch(simulator_source_sha256):
-        raise SimulationProvenanceError("simulator_source_sha256 must be a lowercase SHA-256 digest.")
+            raise SimulationProvenanceError(
+                f"{name} must be an explicit non-placeholder string."
+            )
+    if not isinstance(simulator_source_sha256, str) or not _SHA256_PATTERN.fullmatch(
+        simulator_source_sha256
+    ):
+        raise SimulationProvenanceError(
+            "simulator_source_sha256 must be a lowercase SHA-256 digest."
+        )
 
 
-def _validate_json_value(value: object, *, path: str, reject_placeholders: bool = False) -> None:
+def _validate_json_value(
+    value: object, *, path: str, reject_placeholders: bool = False
+) -> None:
     if isinstance(value, float) and not math.isfinite(value):
         raise SimulationProvenanceError(f"{path} contains a non-finite number.")
     if value is None or isinstance(value, (bool, int, float)):
@@ -141,7 +166,9 @@ def _validate_json_value(value: object, *, path: str, reject_placeholders: bool 
     if isinstance(value, Mapping):
         for key, child in value.items():
             if not isinstance(key, str):
-                raise SimulationProvenanceError(f"{path} contains a non-string object key.")
+                raise SimulationProvenanceError(
+                    f"{path} contains a non-string object key."
+                )
             if reject_placeholders and _is_placeholder(key):
                 raise SimulationProvenanceError(f"{path} contains a placeholder key.")
             _validate_json_value(

@@ -1,9 +1,12 @@
 from __future__ import annotations
 
+import hashlib
 import json
 import unittest
 from decimal import Decimal
 from pathlib import Path
+
+from effort_atlas.reap_budget import BudgetRow, RouteRate, project_maximum_exposure
 
 ROOT = Path(__file__).resolve().parents[1]
 SNAPSHOT = ROOT / "reap" / "phase3_evidence" / "route_prices_2026-08-10.json"
@@ -102,7 +105,9 @@ class Phase3RoutePriceSnapshotTests(unittest.TestCase):
         self.assertEqual(observed, expected)
 
     def test_every_promotional_price_has_a_matching_list_price(self) -> None:
-        for promo in (price for price in self.prices.values() if price["basis"] == "discount"):
+        for promo in (
+            price for price in self.prices.values() if price["basis"] == "discount"
+        ):
             matches = [
                 price
                 for price in self.prices.values()
@@ -134,6 +139,54 @@ class Phase3RoutePriceSnapshotTests(unittest.TestCase):
         )
         self.assertEqual(terra["cached_input_usd_per_million"], "0.20")
         self.assertEqual(luna["cached_input_usd_per_million"], "0.02")
+
+    def test_provider_qualified_routes_form_one_unambiguous_budget_snapshot(
+        self,
+    ) -> None:
+        snapshot_sha256 = hashlib.sha256(SNAPSHOT.read_bytes()).hexdigest()
+        list_prices = [
+            price for price in self.prices.values() if price["basis"] == "list"
+        ]
+        rates = tuple(
+            RouteRate(
+                route_id=price["route_id"],
+                input_usd_per_million=Decimal(price["input_usd_per_million"]),
+                output_usd_per_million=Decimal(price["output_usd_per_million"]),
+                snapshot_sha256=snapshot_sha256,
+                basis=price["basis"],
+            )
+            for price in list_prices
+        )
+        rows = tuple(
+            BudgetRow(
+                job_id=f"job-{index}",
+                route_id=price["route_id"],
+                phase="planning-test",
+                prompt_token_bound=1,
+                max_output_tokens=1,
+            )
+            for index, price in enumerate(list_prices)
+        )
+
+        projection = project_maximum_exposure(rows, rates)
+
+        self.assertEqual(projection.row_count, len(list_prices))
+        self.assertEqual(
+            len(
+                {(price["route_id"], price["basis"]) for price in self.prices.values()}
+            ),
+            len(self.prices),
+        )
+        for price in self.prices.values():
+            with self.subTest(price_id=price["price_id"]):
+                self.assertIn("provider_route", price)
+                self.assertNotEqual(price["route_id"], price["provider_route"])
+                self.assertIn("::", price["route_id"])
+
+        tinker = self.prices["tinker-gpt-oss-120b-list-2026-08-10"]
+        baseten = self.prices["openrouter-baseten-gpt-oss-list-2026-08-10"]
+        self.assertEqual(tinker["provider_route"], baseten["provider_route"])
+        self.assertNotEqual(tinker["route_id"], baseten["route_id"])
 
 
 if __name__ == "__main__":

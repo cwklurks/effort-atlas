@@ -36,16 +36,24 @@ def valid_kwargs():
 
 class PowerSimulationProvenanceTests(unittest.TestCase):
     def test_identical_declared_inputs_and_outputs_reproduce_exact_record(self):
-        first = run_deterministic_simulation(deterministic_fixture_simulator, **valid_kwargs())
-        second = run_deterministic_simulation(deterministic_fixture_simulator, **valid_kwargs())
+        first = run_deterministic_simulation(
+            deterministic_fixture_simulator, **valid_kwargs()
+        )
+        second = run_deterministic_simulation(
+            deterministic_fixture_simulator, **valid_kwargs()
+        )
 
         self.assertEqual(first, second)
-        self.assertEqual(first["provenance_sha256"], first["provenance"]["provenance_sha256"])
+        self.assertEqual(
+            first["provenance_sha256"], first["provenance"]["provenance_sha256"]
+        )
         self.assertEqual(first["provenance"]["seed"], 20260722)
         self.assertEqual(first["output"]["seed_echo"], 20260722)
 
     def test_each_declared_identity_input_changes_provenance_hash(self):
-        baseline = run_deterministic_simulation(deterministic_fixture_simulator, **valid_kwargs())
+        baseline = run_deterministic_simulation(
+            deterministic_fixture_simulator, **valid_kwargs()
+        )
         mutations = (
             {"seed": 7},
             {"scenario_parameters": {"scenario_name": "changed", "effect_size": 0.1}},
@@ -56,8 +64,12 @@ class PowerSimulationProvenanceTests(unittest.TestCase):
         for mutation in mutations:
             with self.subTest(mutation=mutation):
                 kwargs = {**valid_kwargs(), **mutation}
-                actual = run_deterministic_simulation(deterministic_fixture_simulator, **kwargs)
-                self.assertNotEqual(actual["provenance_sha256"], baseline["provenance_sha256"])
+                actual = run_deterministic_simulation(
+                    deterministic_fixture_simulator, **kwargs
+                )
+                self.assertNotEqual(
+                    actual["provenance_sha256"], baseline["provenance_sha256"]
+                )
 
     def test_canonical_json_has_stable_key_order_and_rejects_nonfinite_values(self):
         self.assertEqual(canonical_json({"z": 1, "a": [2, 3]}), '{"a":[2,3],"z":1}')
@@ -68,10 +80,13 @@ class PowerSimulationProvenanceTests(unittest.TestCase):
         for assumptions in ({}, {"outcome_model": "TBD"}, {"outcome_model": ""}):
             with (
                 self.subTest(assumptions=assumptions),
-                self.assertRaisesRegex(SimulationProvenanceError, "assumptions|placeholder"),
+                self.assertRaisesRegex(
+                    SimulationProvenanceError, "assumptions|placeholder"
+                ),
             ):
                 run_deterministic_simulation(
-                    deterministic_fixture_simulator, **{**valid_kwargs(), "assumptions": assumptions}
+                    deterministic_fixture_simulator,
+                    **{**valid_kwargs(), "assumptions": assumptions},
                 )
 
     def test_rejects_booleans_as_seed_or_monte_carlo_counts(self):
@@ -94,7 +109,10 @@ class PowerSimulationProvenanceTests(unittest.TestCase):
             {"simulator_version": "PENDING"},
             {"simulator_source_sha256": "not-a-hash"},
         ):
-            with self.subTest(mutation=mutation), self.assertRaises(SimulationProvenanceError):
+            with (
+                self.subTest(mutation=mutation),
+                self.assertRaises(SimulationProvenanceError),
+            ):
                 run_deterministic_simulation(
                     deterministic_fixture_simulator, **{**valid_kwargs(), **mutation}
                 )
@@ -104,8 +122,49 @@ class PowerSimulationProvenanceTests(unittest.TestCase):
             lambda **_: {"value": math.inf},
             lambda **_: ["not", "an", "object"],
         ):
-            with self.subTest(simulator=simulator), self.assertRaises(SimulationProvenanceError):
+            with (
+                self.subTest(simulator=simulator),
+                self.assertRaises(SimulationProvenanceError),
+            ):
                 run_deterministic_simulation(simulator, **valid_kwargs())
+
+    def test_nested_inputs_and_output_are_detached_from_caller_mutation(self):
+        scenario_parameters = {
+            "scenario_name": "nested-fixture",
+            "effect_size": 0.1,
+            "design": {"caps": [4096, 16384]},
+        }
+        assumptions = {
+            "outcome_model": "declared_fixture_only",
+            "nested": {"labels": ["before"]},
+        }
+        simulator_output = {"summary": {"values": [1, 2]}}
+
+        def nested_output_simulator(**_):
+            return simulator_output
+
+        record = run_deterministic_simulation(
+            nested_output_simulator,
+            **{
+                **valid_kwargs(),
+                "scenario_parameters": scenario_parameters,
+                "assumptions": assumptions,
+            },
+        )
+        expected_provenance = canonical_json(record["provenance"])
+        expected_output = canonical_json(record["output"])
+
+        scenario_parameters["design"]["caps"].append(32768)
+        assumptions["nested"]["labels"].append("after")
+        simulator_output["summary"]["values"].append(3)
+        record["output"]["summary"]["values"].append(4)
+
+        self.assertEqual(canonical_json(record["provenance"]), expected_provenance)
+        self.assertNotEqual(canonical_json(record["output"]), expected_output)
+        self.assertEqual(
+            record["provenance_sha256"],
+            record["provenance"]["provenance_sha256"],
+        )
 
 
 if __name__ == "__main__":
