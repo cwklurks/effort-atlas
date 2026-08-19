@@ -49,7 +49,7 @@
       "status": "in_progress",
       "progress": 65,
       "summary": "The non-frozen model recommendation, completed development relay, approved offline safeguards, and exact-source benchmark capability audit are preserved. HMMT-2026 item 25, items 31–33, model scope, and final statistical choices remain explicit decisions.",
-      "gate": "Connor and Chirag settle the remaining dataset, model, and statistical choices, then freeze exact rules; no review, report, or Linux handoff authorizes a call.",
+      "gate": "Human owners Connor and Chirag settle the remaining dataset, model, and statistical choices, then freeze exact rules; no review, report, or Linux handoff authorizes a call.",
       "url": "https://github.com/cwklurks/effort-atlas/pull/6"
     },
     {

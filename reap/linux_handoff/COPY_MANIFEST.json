@@ -137,7 +137,7 @@
     },
     {
       "path": "reap/linux_handoff/CONTEXT_BUILD_RECEIPT.md",
-      "sha256": "cdb950fc1fd5e14f064dd144111729ad7193aa398ca63c3940098d5d402fbbc8",
+      "sha256": "67d79625fb851c6d42c61e43c0d4b0701b6fd6f35bfd23e086ebc3e4ccb97fce",
       "bytes": 776,
       "purpose": "context-bundle security and reproducibility receipt"
     },
@@ -149,8 +149,8 @@
     },
     {
       "path": "reap/linux_handoff/REPO_CONTEXT.xml",
-      "sha256": "ba670f982fa07f16b092252bf00667faa48f1b7944f9d090c972b16ac77e923c",
-      "bytes": 1267111,
+      "sha256": "6a5b8ede12c5f57a85f5f7004b3e9d4ddd707c29903e684f541e8e06e5cfe43b",
+      "bytes": 1267217,
       "purpose": "secret-scanned tracked repository context bundle"
     },
     {

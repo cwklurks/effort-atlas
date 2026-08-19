@@ -2,8 +2,8 @@
 
 **Built:** 2026-08-19
 **Tool:** Repomix 1.14.0
-**Result:** 109 tracked files, 311,330 estimated tokens, 1,267,111 bytes
-**SHA-256:** `ba670f982fa07f16b092252bf00667faa48f1b7944f9d090c972b16ac77e923c`
+**Result:** 109 tracked files, 311,364 estimated tokens, 1,267,217 bytes
+**SHA-256:** `6a5b8ede12c5f57a85f5f7004b3e9d4ddd707c29903e684f541e8e06e5cfe43b`
 
 Repomix's default security scan reported no suspicious files. A second build from
 the same worktree produced the same SHA-256. The builder deliberately excludes raw
