@@ -252,6 +252,17 @@ class BenchmarkProvenanceTests(unittest.TestCase):
                 json.loads(summary_path.read_text())["schema_version"],
                 summary["schema_version"],
             )
+            forged_summary = {
+                **summary,
+                "integrity": {"capability_rows_sha256": "0" * 64},
+            }
+            write_capability_outputs(rows, forged_summary, table, summary_path)
+            self.assertEqual(
+                json.loads(summary_path.read_text())["integrity"][
+                    "capability_rows_sha256"
+                ],
+                hashlib.sha256(table.read_bytes()).hexdigest(),
+            )
 
             with self.assertRaisesRegex(ProvenanceError, "exact schema"):
                 write_capability_outputs(
@@ -291,6 +302,48 @@ class BenchmarkProvenanceTests(unittest.TestCase):
             ):
                 write_capability_outputs(
                     [{**rows[0], "output_tokens_status": "raw response text"}],
+                    summary,
+                    table,
+                    summary_path,
+                )
+            with self.assertRaisesRegex(ProvenanceError, "requested-cap invariants"):
+                write_capability_outputs(
+                    [{**rows[0], "requested_cap_status": "available"}],
+                    summary,
+                    table,
+                    summary_path,
+                )
+            with self.assertRaisesRegex(ProvenanceError, "requested-cap invariants"):
+                write_capability_outputs(
+                    [{**rows[0], "requested_max_tokens": 32}],
+                    summary,
+                    table,
+                    summary_path,
+                )
+            with self.assertRaisesRegex(ProvenanceError, "termination invariants"):
+                write_capability_outputs(
+                    [
+                        {
+                            **rows[0],
+                            "finish_reason": "length",
+                            "termination_status": "not_published",
+                            "censoring_status": "unknown",
+                        }
+                    ],
+                    summary,
+                    table,
+                    summary_path,
+                )
+            with self.assertRaisesRegex(ProvenanceError, "termination invariants"):
+                write_capability_outputs(
+                    [
+                        {
+                            **rows[0],
+                            "finish_reason": "stop",
+                            "termination_status": "observed",
+                            "censoring_status": "observed_length",
+                        }
+                    ],
                     summary,
                     table,
                     summary_path,

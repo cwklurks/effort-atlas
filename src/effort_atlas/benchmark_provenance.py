@@ -1103,12 +1103,40 @@ def _validate_output_rows(rows: Sequence[Mapping[str, Any]]) -> None:
             raise ProvenanceError(
                 f"capability row {index} has invalid requested_max_tokens"
             )
+        if (row["requested_cap_status"] == "available") != (
+            row["requested_max_tokens"] is not None
+        ):
+            raise ProvenanceError(
+                f"capability row {index} violates requested-cap invariants"
+            )
         for field in ("prompt_fingerprint_set_digest", "finish_reason"):
             if row[field] is not None and not isinstance(row[field], str):
                 raise ProvenanceError(f"capability row {index} has invalid {field}")
         if row["finish_reason"] not in {None, "length", "stop"}:
             raise ProvenanceError(
                 f"capability row {index} has unsupported finish_reason"
+            )
+        if row["finish_reason"] is None:
+            if row["termination_status"] != "not_published" or row[
+                "censoring_status"
+            ] not in {"unknown", "not_observed_in_archive"}:
+                raise ProvenanceError(
+                    f"capability row {index} violates termination invariants"
+                )
+        elif row["finish_reason"] == "length":
+            if (
+                row["termination_status"] != "observed"
+                or row["censoring_status"] != "observed_length"
+            ):
+                raise ProvenanceError(
+                    f"capability row {index} violates termination invariants"
+                )
+        elif (
+            row["termination_status"] != "observed"
+            or row["censoring_status"] != "observed_nonlength"
+        ):
+            raise ProvenanceError(
+                f"capability row {index} violates termination invariants"
             )
 
 
@@ -1142,5 +1170,9 @@ def write_capability_outputs(
         ),
     )
     table_text = "".join(_canonical_json(row) + "\n" for row in ordered_rows)
+    summary_payload = dict(summary)
+    summary_payload["integrity"] = {
+        "capability_rows_sha256": hashlib.sha256(table_text.encode("utf-8")).hexdigest()
+    }
     _atomic_write(table_path, table_text)
-    _atomic_write(summary_path, _canonical_json(summary) + "\n")
+    _atomic_write(summary_path, _canonical_json(summary_payload) + "\n")
