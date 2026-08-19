@@ -215,7 +215,7 @@ class BenchmarkProvenanceTests(unittest.TestCase):
                 "attempt_count": 1,
                 "source_native_correct_count": 1,
                 "source_native_accuracy": 1.0,
-                "source_native_grade_semantics": "fixture",
+                "source_native_grade_semantics": "MathArena archived correct field",
                 "source_native_grade_status": "available",
                 "source_output_text_match_status": "not_comparable",
                 "source_output_gold_match_status": "not_comparable",
@@ -264,6 +264,28 @@ class BenchmarkProvenanceTests(unittest.TestCase):
                 write_capability_outputs(
                     [{**rows[0], "unrecognized": True}], summary, table, summary_path
                 )
+            with self.assertRaisesRegex(ProvenanceError, "invalid prompt_fingerprint"):
+                write_capability_outputs(
+                    [{**rows[0], "prompt_fingerprint_set_digest": "not-a-hash"}],
+                    summary,
+                    table,
+                    summary_path,
+                )
+            with self.assertRaisesRegex(
+                ProvenanceError, "archived response invariants"
+            ):
+                write_capability_outputs(
+                    [
+                        {
+                            **rows[0],
+                            "archived_response_available": False,
+                            "attempt_count": 1,
+                        }
+                    ],
+                    summary,
+                    table,
+                    summary_path,
+                )
 
     def test_checked_in_manifest_is_structurally_pinned(self):
         manifest = load_manifest(Path("observational/benchmark_sources_manifest.json"))
@@ -303,6 +325,12 @@ class BenchmarkProvenanceTests(unittest.TestCase):
         self.assertEqual(hmmt_2026["source_output_text_mismatch_attempts"], 106)
         self.assertEqual(hmmt_2026["question_by_model_rows"], 990)
         self.assertEqual(hmmt_2026["source_native_correctness_rows"], 979)
+        self.assertEqual(hmmt_2026["archived_response_missing_rows"], 11)
+        self.assertEqual(hmmt_2026["unmaterialized_question_by_model_rows"], 0)
+        self.assertEqual(
+            summary["integrity"]["capability_rows_sha256"],
+            hashlib.sha256(table.read_bytes()).hexdigest(),
+        )
         helm_gemini = [
             row
             for row in rows
