@@ -1018,6 +1018,23 @@ def _validate_output_rows(rows: Sequence[Mapping[str, Any]]) -> None:
                 f"capability row {index} has inconsistent output invalid subcounts"
             )
         output_status = row["output_tokens_status"]
+        allowed_output_statuses = {
+            "available",
+            "partial_invalid_values",
+            "not_published",
+            "zero_values_only",
+            "negative_values_only",
+            "nonfinite_values_only",
+            "invalid_values_only",
+        }
+        unavailable_output_statuses = allowed_output_statuses - {
+            "available",
+            "partial_invalid_values",
+        }
+        if output_status not in allowed_output_statuses:
+            raise ProvenanceError(
+                f"capability row {index} has unsupported output-token status"
+            )
         if row["output_tokens_available"]:
             if row["output_tokens_mean"] is None or output_status not in {
                 "available",
@@ -1030,6 +1047,10 @@ def _validate_output_rows(rows: Sequence[Mapping[str, Any]]) -> None:
                 raise ProvenanceError(
                     f"capability row {index} has inconsistent output-token status"
                 )
+        elif output_status not in unavailable_output_statuses:
+            raise ProvenanceError(
+                f"capability row {index} has unsupported output-token status"
+            )
         elif row["output_tokens_mean"] is not None:
             raise ProvenanceError(
                 f"capability row {index} has mean without usable output tokens"

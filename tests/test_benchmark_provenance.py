@@ -286,6 +286,15 @@ class BenchmarkProvenanceTests(unittest.TestCase):
                     table,
                     summary_path,
                 )
+            with self.assertRaisesRegex(
+                ProvenanceError, "unsupported output-token status"
+            ):
+                write_capability_outputs(
+                    [{**rows[0], "output_tokens_status": "raw response text"}],
+                    summary,
+                    table,
+                    summary_path,
+                )
 
     def test_checked_in_manifest_is_structurally_pinned(self):
         manifest = load_manifest(Path("observational/benchmark_sources_manifest.json"))
