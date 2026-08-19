@@ -178,13 +178,13 @@ class PhaseStatusTests(unittest.TestCase):
         phase_three = next(row for row in data["phases"] if row["id"] == 3)
         self.assertEqual(data["project"]["current_phase"], 3)
         self.assertEqual(phase_three["status"], "in_progress")
-        self.assertEqual(phase_three["progress"], 50)
+        self.assertEqual(phase_three["progress"], 65)
         self.assertEqual(
             phase_three["url"],
             "https://github.com/cwklurks/effort-atlas/pull/6",
         )
-        self.assertIn("separate model", phase_three["gate"])
-        self.assertIn("Codex audits", phase_three["gate"])
+        self.assertIn("dataset", phase_three["gate"])
+        self.assertIn("statistical choices", phase_three["gate"])
         self.assertIn("human", phase_three["gate"].lower())
         self.assertIn("2b9b161", phase_three_checkpoint["result"])
         self.assertIn("19 / 19 mutations", phase_three_checkpoint["result"])
@@ -223,11 +223,14 @@ class PhaseStatusTests(unittest.TestCase):
             if "12_PHASE3_CONNOR_DECISION_WORKSHEET_2026-08-10.md" in decision
         )
 
-        self.assertEqual(data["project"]["updated"], "2026-08-11")
-        self.assertIn("portfolio", data["project"]["summary"])
-        self.assertIn("30-of-33 HMMT-2026", phase_three["summary"])
-        self.assertIn("separate model", phase_three["gate"])
-        self.assertIn("no review artifact authorizes a call", phase_three["gate"])
+        self.assertEqual(data["project"]["updated"], "2026-08-19")
+        self.assertIn("benchmark chapter", data["project"]["summary"])
+        self.assertIn("HMMT-2026 item 25", phase_three["summary"])
+        self.assertIn("dataset", phase_three["gate"])
+        self.assertIn(
+            "no review, report, or Linux handoff authorizes a call",
+            phase_three["gate"],
+        )
         self.assertIn("$2", activity["detail"])
         self.assertIn("no call", activity["detail"].lower())
         self.assertIn("non-frozen", record.lower())

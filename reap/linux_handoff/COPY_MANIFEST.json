@@ -113,8 +113,8 @@
     },
     {
       "path": "reap/CODEX_BRIEFING.md",
-      "sha256": "9e429e9a1eac23ed80f9ab4bb5368d978ebf396aabcc42e0b8c08932f28bca6d",
-      "bytes": 23706,
+      "sha256": "ac9059c008f5b9c2d9b77130188abdfb3c3b13ad727c444a163122882fb7e426",
+      "bytes": 23702,
       "purpose": "canonical project state and mandatory reading order"
     },
     {
@@ -137,8 +137,8 @@
     },
     {
       "path": "reap/linux_handoff/CONTEXT_BUILD_RECEIPT.md",
-      "sha256": "4c39d7a23485018c23f4784b48dbbd34973820182abeebc297f18b5c2a9dfe4b",
-      "bytes": 782,
+      "sha256": "cdb950fc1fd5e14f064dd144111729ad7193aa398ca63c3940098d5d402fbbc8",
+      "bytes": 776,
       "purpose": "context-bundle security and reproducibility receipt"
     },
     {
@@ -149,8 +149,8 @@
     },
     {
       "path": "reap/linux_handoff/REPO_CONTEXT.xml",
-      "sha256": "4346a117747d93395ddf397ca7b8dffe359ba16b06ca4f7b7ba4cf00ad22fe92",
-      "bytes": 1266104,
+      "sha256": "ba670f982fa07f16b092252bf00667faa48f1b7944f9d090c972b16ac77e923c",
+      "bytes": 1267111,
       "purpose": "secret-scanned tracked repository context bundle"
     },
     {
@@ -185,8 +185,8 @@
     },
     {
       "path": "scripts/build_linux_context_pack.sh",
-      "sha256": "864d97d8dadd26db4bd7713284a1045ecc9b2622b25a93f66e017e0164046e8c",
-      "bytes": 1713,
+      "sha256": "dd369352cee3ecddf8b81186dfe76d55edbfcae289175aa907ba1fd29935594b",
+      "bytes": 1854,
       "purpose": "reproducible context-bundle builder"
     },
     {

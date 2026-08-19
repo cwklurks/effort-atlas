@@ -67,7 +67,7 @@ model switching were disabled. The completed run predated the final clean-sessio
 and Codex user-configuration isolation hardening, and internal CLI request counts
 remain unverified. It is therefore non-authoritative and not freeze-eligible. The
 current synthesis is in `reap/15_PHASE3_ADVERSARIAL_SYNTHESIS_2026-08-10.md`.
-The current checkpoint is 250 ordinary tests plus 26 exact-lock Tinker tests. The
+The current checkpoint is 272 ordinary tests plus 26 exact-lock Tinker tests. The
 decision-independent implementation passed final adversarial review at `f9aef0b`
 with no critical or warning findings. All study-call and spend counters remain
 zero. Model agreement cannot authorize spending, provider activation,
@@ -132,7 +132,7 @@ schedule/price/route manifest.
 | D — `codex/analysis-layer`, PR #3 | independently approved after remediation and merged at `7c83085` | complete; Phase 3 methodology decisions are now active |
 | E — `codex/runner` | not implemented | waits on accepted grader interfaces, frozen design inputs, and corrected budget math |
 | Phase 3 — `codex/prereg-v2`, draft PR #6 | external review, completed non-authoritative development relay, current synthesis, and offline safeguards preserved | D03/D04/D06/D09/D11/D12/D13/D15 and Chirag scientific signoff remain open; no call authorized |
-| Post-meeting benchmark provenance — `codex/benchmark-provenance-linux` | exact-source audit, sanitized capability table, plain-language HTML, and verified Linux handoff are under independent review | resolve review findings, pass the canonical offline suite, then publish the branch; no call authorized |
+| Post-meeting benchmark provenance — `codex/benchmark-provenance-linux` | exact-source audit and sanitized capability table are independently approved; plain-language HTML and verified Linux handoff are complete | publish the reviewed branch, then clone and re-verify it on Linux; no call authorized |
 
 The current phase-gate and model-routing plan is in
 `reap/10_PHASE_GATE_PLAN_2026-08-08.md`; the current human decision surface is

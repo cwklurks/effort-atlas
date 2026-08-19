@@ -1,9 +1,9 @@
 # Linux context-bundle build receipt
 
-**Built:** 2026-08-19  
-**Tool:** Repomix 1.14.0  
-**Result:** 109 tracked files, 311,030 estimated tokens, 1,266,104 bytes  
-**SHA-256:** `4346a117747d93395ddf397ca7b8dffe359ba16b06ca4f7b7ba4cf00ad22fe92`
+**Built:** 2026-08-19
+**Tool:** Repomix 1.14.0
+**Result:** 109 tracked files, 311,330 estimated tokens, 1,267,111 bytes
+**SHA-256:** `ba670f982fa07f16b092252bf00667faa48f1b7944f9d090c972b16ac77e923c`
 
 Repomix's default security scan reported no suspicious files. A second build from
 the same worktree produced the same SHA-256. The builder deliberately excludes raw
