@@ -107,6 +107,7 @@ class LinuxHandoffTests(unittest.TestCase):
         self.assertIn("reap/CODEX_BRIEFING.md", context)
         self.assertIn("reap/22_BENCHMARK_PROVENANCE", context)
         self.assertNotIn("--no-security-check", builder)
+        self.assertNotIn("--include-logs", builder)
         self.assertNotIn(
             '<file path="observational/benchmark_question_capabilities.jsonl">',
             context,
@@ -128,8 +129,61 @@ class LinuxHandoffTests(unittest.TestCase):
         self.assertIn("tailscale ping <linux-tailnet-hostname>", bootstrap)
         self.assertIn("tailscale ssh <linux-user>@<linux-tailnet-hostname>", bootstrap)
         self.assertIn("ssh <linux-user>@<linux-tailnet-hostname>", bootstrap)
+        self.assertIn(
+            "git bundle create ../effort-atlas.bundle \\\n  refs/heads/codex/benchmark-provenance-linux",
+            bootstrap,
+        )
+        self.assertNotIn("git bundle create ../effort-atlas.bundle --all", bootstrap)
+        self.assertIn(
+            "uv sync --frozen --python 3.12.8 --extra observational", bootstrap
+        )
+        self.assertIn(
+            "uv venv --no-project --python 3.12.8 .venv/tinker-probe",
+            bootstrap,
+        )
+        self.assertIn(
+            "--require-hashes --strict scripts/tinker_probe_requirements.lock",
+            bootstrap,
+        )
+        self.assertIn(
+            ".venv/bin/python scripts/acquire_benchmark_sources.py --root benchmark_sources",
+            bootstrap,
+        )
+        self.assertNotIn("acquire_benchmark_sources.py --check", bootstrap)
         self.assertNotIn("codex/reap-governance", bootstrap)
         self.assertNotIn("OPENROUTER_API_KEY", bootstrap)
+
+    def test_fallback_bundle_contains_only_the_review_branch(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            bundle = Path(directory) / "effort-atlas.bundle"
+            created = subprocess.run(
+                [
+                    "git",
+                    "-C",
+                    str(ROOT),
+                    "bundle",
+                    "create",
+                    str(bundle),
+                    "refs/heads/codex/benchmark-provenance-linux",
+                ],
+                text=True,
+                capture_output=True,
+                check=False,
+            )
+            self.assertEqual(created.returncode, 0, created.stderr)
+            listed = subprocess.run(
+                ["git", "bundle", "list-heads", str(bundle)],
+                text=True,
+                capture_output=True,
+                check=False,
+            )
+            self.assertEqual(listed.returncode, 0, listed.stderr)
+            refs = [line.split(maxsplit=1)[1] for line in listed.stdout.splitlines()]
+
+        self.assertEqual(
+            refs,
+            ["refs/heads/codex/benchmark-provenance-linux"],
+        )
 
 
 if __name__ == "__main__":

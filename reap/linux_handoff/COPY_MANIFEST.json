@@ -113,7 +113,7 @@
     },
     {
       "path": "reap/CODEX_BRIEFING.md",
-      "sha256": "ac9059c008f5b9c2d9b77130188abdfb3c3b13ad727c444a163122882fb7e426",
+      "sha256": "8e5af05b0a832f8fe874d308d821c51e33f1a3f2772032f1389c937bd65fcfd3",
       "bytes": 23702,
       "purpose": "canonical project state and mandatory reading order"
     },
@@ -131,26 +131,26 @@
     },
     {
       "path": "reap/linux_handoff/BOOTSTRAP_LINUX.md",
-      "sha256": "e67c8665f22b44a50b2ce3cb76f5a9aa47f1a55252783d42e847e3ecf9115176",
-      "bytes": 5125,
+      "sha256": "9d6deb5457729908ec8d56bd425a306233df50ccb44edfa96919ba7e0566014f",
+      "bytes": 5344,
       "purpose": "Linux setup and transfer steps"
     },
     {
       "path": "reap/linux_handoff/CONTEXT_BUILD_RECEIPT.md",
-      "sha256": "ddc790a68d165b02cdd47aed0522ed6836047528632a12e5194df17b7d7c23ae",
-      "bytes": 776,
+      "sha256": "e1e739d4c04b398a2db43d1f3769c9af65b97b421b30014ea6cb832b41e3d14a",
+      "bytes": 840,
       "purpose": "context-bundle security and reproducibility receipt"
     },
     {
       "path": "reap/linux_handoff/CONTEXT_PACK.md",
-      "sha256": "68b00de5b427b5e4fa33b2ea592bbc0a762a16c247e6114b6372caf15231f9b0",
-      "bytes": 5314,
+      "sha256": "164e74b53c2d28e099a95cb0ecaaab735d8127760e739e69dda075cebc0426ca",
+      "bytes": 5476,
       "purpose": "high-density start context"
     },
     {
       "path": "reap/linux_handoff/REPO_CONTEXT.xml",
-      "sha256": "90efeb1713e959160e3b47f396719b83f11382bce3249ec6c3c888eb89554150",
-      "bytes": 1267523,
+      "sha256": "01a5748a9cb90b552b50bc2a5dba5eb82e83c51196b4c9ac3557499829aeaf8e",
+      "bytes": 1266730,
       "purpose": "secret-scanned tracked repository context bundle"
     },
     {
@@ -185,8 +185,8 @@
     },
     {
       "path": "scripts/build_linux_context_pack.sh",
-      "sha256": "dd369352cee3ecddf8b81186dfe76d55edbfcae289175aa907ba1fd29935594b",
-      "bytes": 1854,
+      "sha256": "3f59c13b2028f5c13c4e183053ecd9c40c35f3ef7af1eeb8348861c8379eb0af",
+      "bytes": 1807,
       "purpose": "reproducible context-bundle builder"
     },
     {
@@ -203,8 +203,8 @@
     },
     {
       "path": "src/effort_atlas/benchmark_provenance.py",
-      "sha256": "3069634f6dc3f0805cea0f0a8cfca9666adbd719c24dd6f7c13b75010d30620f",
-      "bytes": 47255,
+      "sha256": "8a727fd67ec0d11da97aa9dc457ef9e5b8fa2046b79a6308a96c734ccae1d788",
+      "bytes": 48618,
       "purpose": "sanitized benchmark capability builder"
     },
     {
@@ -221,14 +221,14 @@
     },
     {
       "path": "tests/test_benchmark_provenance.py",
-      "sha256": "2e031699baacfe8db0613e7182cabac73c7111404d7096e4b0f2de33599a2731",
-      "bytes": 15565,
+      "sha256": "59a169869eb07bf57bca5379bffee449eb747b13055f22dedc874fd1a5528f3f",
+      "bytes": 17733,
       "purpose": "benchmark provenance contract tests"
     },
     {
       "path": "tests/test_linux_handoff.py",
-      "sha256": "e4227296fa9d30b40d009165d7bab99a18b14da12ba9d30c36ea9a1eeae06011",
-      "bytes": 5458,
+      "sha256": "c6b6544bf296494e5ca5d4e537903a258c7ed7099277e9251c8fb7ee01ace24b",
+      "bytes": 7523,
       "purpose": "handoff verifier tests"
     },
     {

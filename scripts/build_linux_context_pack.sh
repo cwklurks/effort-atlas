@@ -18,8 +18,6 @@ cd "$repo_root"
   --output "$temporary" \
   --style xml \
   --parsable-style \
-  --include-logs \
-  --include-logs-count 20 \
   --header-text "REAP Linux orientation bundle. Canonical repository files and current Git state override this convenience copy. Contains no authorization for provider, smoke, or confirmatory calls." \
   --include "AGENTS.md,README.md,pyproject.toml,uv.lock,PREREGISTRATION*.md,reap/**/*.md,reap/phase3_evidence/*.json,reap/status/phase_status.json,observational/RESULTS.md,observational/INPUT_PROVENANCE.md,observational/state_manifest.json,observational/benchmark_sources_manifest.json,observational/benchmark_question_capabilities_summary.json,src/effort_atlas/**/*.py,scripts/**/*.py,scripts/**/*.sh,tests/**/*.py" \
   --ignore "reap/linux_handoff/REPO_CONTEXT*.xml,reap/linux_handoff/CONTEXT_BUILD_RECEIPT.md,reap/next_chapter/index.html,reap/next_chapter/artifact.json,observational/benchmark_question_capabilities.jsonl,tests/fixtures/**,reap/relay_reviews/**,reap/phase3_review_artifacts/**"

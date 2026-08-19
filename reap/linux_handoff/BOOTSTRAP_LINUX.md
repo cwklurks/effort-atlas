@@ -33,7 +33,8 @@ If a network clone is unavailable, create a Git bundle on the Mac and transfer t
 single file by a method you trust:
 
 ```sh
-git bundle create ../effort-atlas.bundle --all
+git bundle create ../effort-atlas.bundle \
+  refs/heads/codex/benchmark-provenance-linux
 ```
 
 Then on Linux:
@@ -89,7 +90,10 @@ does not install either automatically.
 ```sh
 python3 --version
 uv --version
-uv sync --python 3.12.8 --extra observational
+uv sync --frozen --python 3.12.8 --extra observational
+uv venv --no-project --python 3.12.8 .venv/tinker-probe
+uv pip sync --python .venv/tinker-probe/bin/python \
+  --require-hashes --strict scripts/tinker_probe_requirements.lock
 ./scripts/verify_offline.sh
 ```
 
@@ -109,7 +113,7 @@ verification-first downloader from the repository root:
 
 ```sh
 .venv/bin/python scripts/acquire_benchmark_sources.py --download --root benchmark_sources
-.venv/bin/python scripts/acquire_benchmark_sources.py --check --root benchmark_sources
+.venv/bin/python scripts/acquire_benchmark_sources.py --root benchmark_sources
 ```
 
 That downloader is expected to use only revision-pinned public sources, verify

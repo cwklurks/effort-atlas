@@ -66,7 +66,10 @@ get more room to finish?
 ```sh
 git status --short
 python3 scripts/verify_linux_handoff.py
-uv sync --python 3.12.8 --extra observational
+uv sync --frozen --python 3.12.8 --extra observational
+uv venv --no-project --python 3.12.8 .venv/tinker-probe
+uv pip sync --python .venv/tinker-probe/bin/python \
+  --require-hashes --strict scripts/tinker_probe_requirements.lock
 ./scripts/verify_offline.sh
 ```
 
@@ -88,7 +91,7 @@ artifact or infer an unrecorded provider fact.
    unbounded model work or assumed provider behavior.
 
 `reap/linux_handoff/REPO_CONTEXT.xml` collects the main tracked documents, source,
-tests, and recent commit history for fast search in a new agent session. It excludes
+and tests for fast search in a new agent session. It excludes
 raw archives, restricted GPQA content, the 4,248-row derived table, generated HTML,
 and secrets. It is supporting context, not a substitute for exact files or tests.
 
