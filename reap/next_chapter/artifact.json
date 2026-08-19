@@ -1,0 +1,231 @@
+{
+  "surface": "report",
+  "manifest": {
+    "version": 1,
+    "surface": "report",
+    "title": "From public benchmark archives to the next experiment",
+    "description": "A plain-language record of the post-meeting benchmark audit, what the files can answer, and what must happen next.",
+    "generatedAt": "2026-08-19T20:00:00Z",
+    "cards": [],
+    "charts": [
+      {
+        "id": "question_coverage_chart",
+        "title": "Question ID coverage",
+        "subtitle": "Pinned source IDs compared with the IDs represented in the archived evaluation files.",
+        "type": "bar",
+        "dataset": "question_coverage",
+        "sourceId": "capability_summary",
+        "encodings": {
+          "x": {"field": "benchmark", "type": "nominal", "label": "Benchmark"},
+          "y": {"field": "questions", "type": "quantitative", "label": "Question IDs"},
+          "color": {"field": "series", "type": "nominal", "label": "Coverage type"}
+        },
+        "yAxisTitle": "Question IDs",
+        "valueFormat": "number",
+        "layout": "full"
+      }
+    ],
+    "tables": [
+      {
+        "id": "exceptions_table",
+        "title": "Exceptions that change interpretation",
+        "subtitle": "Verified source, missingness, and accounting issues that cannot be hidden inside aggregate counts.",
+        "dataset": "exceptions",
+        "sourceId": "benchmark_audit",
+        "defaultSort": {"field": "issue", "direction": "asc"},
+        "density": "spacious",
+        "layout": "full",
+        "columns": [
+          {"field": "issue", "label": "Issue", "type": "text"},
+          {"field": "result", "label": "What was verified", "type": "text"},
+          {"field": "consequence", "label": "What it means", "type": "text"}
+        ]
+      },
+      {
+        "id": "capabilities_table",
+        "title": "What each archive records",
+        "subtitle": "Question-level fields and the limits that matter for the planned comparison.",
+        "dataset": "archive_capabilities",
+        "sourceId": "benchmark_audit",
+        "defaultSort": {"field": "archive", "direction": "asc"},
+        "density": "spacious",
+        "layout": "full",
+        "columns": [
+          {"field": "archive", "label": "Archive", "type": "text"},
+          {"field": "correctness", "label": "Per-question correctness", "type": "text"},
+          {"field": "output", "label": "Output measure", "type": "text"},
+          {"field": "termination", "label": "Termination", "type": "text"},
+          {"field": "safe_use", "label": "Safe use", "type": "text"}
+        ]
+      },
+      {
+        "id": "today_table",
+        "title": "Today's completed work",
+        "subtitle": "Code and artifacts added without making a model-provider call.",
+        "dataset": "today_work",
+        "sourceId": "source_manifest",
+        "defaultSort": {"field": "order", "direction": "asc"},
+        "density": "spacious",
+        "layout": "full",
+        "columns": [
+          {"field": "order", "label": "Step", "type": "number"},
+          {"field": "deliverable", "label": "Deliverable", "type": "text"},
+          {"field": "plain_result", "label": "Result", "type": "text"},
+          {"field": "status", "label": "Status", "type": "text"}
+        ]
+      }
+    ],
+    "sources": [
+      {"id": "capability_summary", "label": "Sanitized benchmark capability summary", "path": "observational/benchmark_question_capabilities_summary.json"},
+      {"id": "source_manifest", "label": "Pinned benchmark source manifest", "path": "observational/benchmark_sources_manifest.json"},
+      {"id": "benchmark_audit", "label": "Benchmark provenance and capability audit", "path": "reap/22_BENCHMARK_PROVENANCE_AND_CAPABILITY_2026-08-19.md"},
+      {"id": "method_synthesis", "label": "Post-meeting methodology synthesis", "path": "reap/19_METHOD_REVIEW_SYNTHESIS_2026-08-18.md"},
+      {"id": "model_eligibility", "label": "Model-pair eligibility record", "path": "reap/21_MODEL_PAIR_ELIGIBILITY_2026-08-18.md"},
+      {"id": "linux_handoff", "label": "Verified Linux handoff", "path": "reap/linux_handoff/BOOTSTRAP_LINUX.md"}
+    ],
+    "blocks": [
+      {"id": "title", "type": "markdown", "body": "# From public benchmark archives to the next experiment"},
+      {
+        "id": "executive_summary",
+        "type": "markdown",
+        "sourceId": "benchmark_audit",
+        "body": "## Executive Summary\n\n- **Question-level analysis is possible, with limits.** MathArena and HELM both preserve source-native correctness by question, but only HELM's Gemini run has useful observed termination labels.\n- **The archives do not provide one fair token unit across models.** MathArena has accounting anomalies, and HELM's model-specific token fields range from all-zero Gemini values to very different Claude and GPT scales.\n- **One HMMT-2026 item needs a rule before analysis.** Item 25 uses different question text for 106 archived attempts, even though its ID and gold answer match the pinned source.\n- **Today's work is reproducible and cost-free.** Exact public bytes, a sanitized question-by-model table, this report, and a Linux handoff were prepared. No provider calls, smoke calls, or confirmatory runs were made."
+      },
+      {
+        "id": "answerable_heading",
+        "type": "markdown",
+        "sourceId": "benchmark_audit",
+        "body": "## What the archives can answer\n\n**We can say whether an archived model was scored correct on each represented question.** We can also summarize source-native output fields. We cannot yet say that one model uses fewer comparable reasoning tokens, or that a particular wrong response would have become correct with a larger allowance."
+      },
+      {
+        "id": "coverage_explanation",
+        "type": "markdown",
+        "sourceId": "capability_summary",
+        "body": "The chart compares source question IDs with archived or evaluated IDs. HMMT retains every source ID. HELM evaluates 446 of GPQA's 448 source rows because two fixed rows are assigned to HELM's training split. ID coverage is necessary, but it does not prove identical prompt bytes or comparable token accounting."
+      },
+      {"id": "coverage", "type": "chart", "chartId": "question_coverage_chart", "layout": "full"},
+      {
+        "id": "exceptions_heading",
+        "type": "markdown",
+        "sourceId": "benchmark_audit",
+        "body": "## The important exceptions\n\n**The exact files exposed problems that a benchmark name and row count would miss.** These exceptions determine which questions and measurements can enter a defensible model comparison."
+      },
+      {"id": "exceptions", "type": "table", "tableId": "exceptions_table", "layout": "full"},
+      {
+        "id": "capabilities_heading",
+        "type": "markdown",
+        "sourceId": "benchmark_audit",
+        "body": "## What each archive records\n\nThe grades below are **source-native**, not results from REAP's stricter `Final answer:` rule. Token fields stay attached to their original archive and route; they are not comparable across providers unless later evidence proves the same measurement meaning."
+      },
+      {"id": "capabilities", "type": "table", "tableId": "capabilities_table", "layout": "full"},
+      {
+        "id": "today_heading",
+        "type": "markdown",
+        "sourceId": "source_manifest",
+        "body": "## What was completed today\n\n**The project now has a repeatable path from public source bytes to a sanitized capability table.** The raw caches remain outside Git, and restricted GPQA content is not copied into the report or Linux package."
+      },
+      {"id": "today", "type": "table", "tableId": "today_table", "layout": "full"},
+      {
+        "id": "next_steps",
+        "type": "markdown",
+        "sourceId": "model_eligibility",
+        "body": "## Recommended next steps\n\n1. Decide the exact question set, with separate decisions for HMMT-2026 item 25 and items 31–33.\n2. Pin and test the upstream symbolic scorer for every selected answer format.\n3. Re-run power analysis using the verified question count and real archived response-length distributions.\n4. Choose the smallest model portfolio that gives a useful within-route effort intervention; keep cross-provider token comparisons directional unless measurement equivalence is proved.\n5. Finish the one-submission runner, receipt-linked budget gate, and frozen manifest before any human smoke call."
+      },
+      {
+        "id": "linux_section",
+        "type": "markdown",
+        "sourceId": "linux_handoff",
+        "body": "## Continue safely on Linux\n\nThe Linux handoff uses a clean Git branch, a SHA-256 copy manifest, a standard-library verifier, Python 3.12 plus `uv`, a dense context pack, and a copy-ready startup prompt. It deliberately excludes API keys, `.env` files, raw benchmark caches, GPQA question text, and paid-study data. Public benchmark files are reacquired from immutable URLs and verified before use."
+      },
+      {
+        "id": "further_questions",
+        "type": "markdown",
+        "sourceId": "method_synthesis",
+        "body": "## Questions still worth deciding\n\n- Does item 25 get excluded, or can the exact historical wording used by every archived model be pinned and treated as a separate source version?\n- Are HMMT-2026 items 31–33 included as MathArena items despite unresolved official-round provenance?\n- Is the matched-performance frontier an additional analysis while the effort-by-allowance interaction remains primary?\n- Which route pairs, if any, have a genuinely comparable output measure?\n- Does the found-data analysis belong in the main paper as motivation or in supporting material?"
+      },
+      {
+        "id": "caveats",
+        "type": "markdown",
+        "sourceId": "benchmark_audit",
+        "body": "## Caveats and assumptions\n\n- The public archives are exploratory evidence, not confirmatory observations.\n- MathArena does not publish requested caps or finish reasons; its at-cap labels remain inferred elsewhere in the protected observational analysis.\n- HELM has useful termination labels for all 446 Gemini rows: 42 `length` and 404 `stop`. Claude and GPT termination labels are blank.\n- HMMT prompt serialization varies across models, and all three HELM model pairs use different serialized prompt bytes on the same source questions.\n- The historical 16-of-17 prose conflicts with the current 15-of-17 recomputation. This report does not repeat the stale number.\n- No provider calls, smoke calls, confirmatory runs, or experiment spending occurred in this chapter."
+      }
+    ]
+  },
+  "snapshot": {
+    "version": 1,
+    "generatedAt": "2026-08-19T20:00:00Z",
+    "status": "ready",
+    "datasets": {
+      "question_coverage": [
+        {"benchmark": "HMMT 2025", "series": "Source IDs", "questions": 30},
+        {"benchmark": "HMMT 2025", "series": "Archived/evaluated IDs", "questions": 30},
+        {"benchmark": "HMMT 2026", "series": "Source IDs", "questions": 33},
+        {"benchmark": "HMMT 2026", "series": "Archived/evaluated IDs", "questions": 33},
+        {"benchmark": "GPQA / HELM", "series": "Source IDs", "questions": 448},
+        {"benchmark": "GPQA / HELM", "series": "Archived/evaluated IDs", "questions": 446}
+      ],
+      "exceptions": [
+        {"issue": "HMMT-2026 item 25", "affected_attempts": 106, "affected_cells": 28, "result": "106 attempts from 28 models use text that differs from the pinned source; two GLM 5.2 attempts match.", "consequence": "Resolve, version, or exclude this item before a shared-question comparison."},
+        {"issue": "HMMT-2026 missing cells", "affected_attempts": 0, "affected_cells": 11, "result": "Qwen3.5-4B covers 22 of 33 source IDs; the other 29 models cover all 33.", "consequence": "Keep missing cells explicit and use the prespecified missingness analysis."},
+        {"issue": "HMMT-2025 token accounting", "affected_attempts": 127, "affected_cells": 0, "result": "120 zero-token rows and seven negative-token rows were found.", "consequence": "Flag or exclude unusable values; never average them silently."},
+        {"issue": "HMMT-2026 token accounting", "affected_attempts": 1, "affected_cells": 0, "result": "One row has a zero output-token value.", "consequence": "Treat the value as unusable accounting, not a zero-length proof."},
+        {"issue": "HELM Gemini length labels", "affected_attempts": 42, "affected_cells": 42, "result": "42 rows are labeled length and 404 are labeled stop.", "consequence": "This is the only archived model here with complete observed termination labels."},
+        {"issue": "HELM token semantics", "affected_attempts": 1338, "affected_cells": 1338, "result": "Gemini is all zero; Claude ranges 235–4,707; GPT ranges 5–7.", "consequence": "Do not place these fields on one cross-provider token-efficiency axis."}
+      ],
+      "archive_capabilities": [
+        {"archive": "HMMT 2025 / MathArena", "correctness": "Available, source-native", "output": "Available with 120 zero and 7 negative values flagged", "termination": "Not published", "safe_use": "Question-level descriptive accuracy; route-specific output after QC"},
+        {"archive": "HMMT 2026 / MathArena", "correctness": "Available, source-native", "output": "Available with one zero value flagged", "termination": "Not published", "safe_use": "Descriptive analysis after resolving item 25 and missing cells"},
+        {"archive": "HELM Gemini 3 Pro / GPQA", "correctness": "Available, source-native", "output": "All zero; unusable for efficiency", "termination": "Observed: 42 length, 404 stop", "safe_use": "Question-level accuracy and observed length-stop example"},
+        {"archive": "HELM Claude Haiku 4.5 / GPQA", "correctness": "Available, source-native", "output": "Provider-specific: 235–4,707", "termination": "Blank / unknown", "safe_use": "Question-level accuracy only"},
+        {"archive": "HELM GPT-5.1 / GPQA", "correctness": "Available, source-native", "output": "Provider-specific: 5–7", "termination": "Blank / unknown", "safe_use": "Question-level accuracy only"}
+      ],
+      "today_work": [
+        {"order": 1, "deliverable": "Pinned source manifest", "plain_result": "20 immutable public files with byte size, SHA-256, license status, and redistribution rules", "status": "Built and independently reviewed"},
+        {"order": 2, "deliverable": "Acquisition verifier", "plain_result": "Local verification by default; explicit public download only; one attempt; mismatched bytes refused", "status": "Built and tested"},
+        {"order": 3, "deliverable": "Question-by-model capability table", "plain_result": "4,248 sanitized cells with explicit missingness and no raw GPQA content", "status": "Built and tested"},
+        {"order": 4, "deliverable": "Source audit", "plain_result": "Found item 25 text drift, missing HMMT cells, prompt variants, and invalid token accounting", "status": "Recorded"},
+        {"order": 5, "deliverable": "Self-contained HTML chapter", "plain_result": "Plain-language summary, evidence tables, chart, next steps, and caveats", "status": "Generated and verified"},
+        {"order": 6, "deliverable": "Linux continuation package", "plain_result": "Git-first transfer, exact copy manifest, verifier, context pack, and startup prompt", "status": "Built and tested"},
+        {"order": 7, "deliverable": "Provider execution", "plain_result": "No model, smoke, or confirmatory calls; no experiment spending", "status": "$0 / zero calls"}
+      ]
+    }
+  },
+  "sources": [
+    {
+      "id": "capability_summary",
+      "label": "Sanitized benchmark capability summary",
+      "path": "observational/benchmark_question_capabilities_summary.json",
+      "query": {
+        "engine": "sqlite",
+        "language": "sql",
+        "description": "Materializes the six reviewed coverage values plotted in the report from the pinned capability summary.",
+        "sql": "WITH question_coverage(benchmark, series, questions, display_order) AS (VALUES ('HMMT 2025', 'Source IDs', 30, 1), ('HMMT 2025', 'Archived/evaluated IDs', 30, 2), ('HMMT 2026', 'Source IDs', 33, 3), ('HMMT 2026', 'Archived/evaluated IDs', 33, 4), ('GPQA / HELM', 'Source IDs', 448, 5), ('GPQA / HELM', 'Archived/evaluated IDs', 446, 6)) SELECT benchmark, series, questions FROM question_coverage ORDER BY display_order"
+      }
+    },
+    {
+      "id": "source_manifest",
+      "label": "Pinned benchmark source manifest",
+      "path": "observational/benchmark_sources_manifest.json",
+      "query": {
+        "engine": "sqlite",
+        "language": "sql",
+        "description": "Materializes the reviewed completion ledger shown in the report.",
+        "sql": "WITH today_work(order_id, deliverable, plain_result, status) AS (VALUES (1, 'Pinned source manifest', '20 immutable public files with byte size, SHA-256, license status, and redistribution rules', 'Built and independently reviewed'), (2, 'Acquisition verifier', 'Local verification by default; explicit public download only; one attempt; mismatched bytes refused', 'Built and tested'), (3, 'Question-by-model capability table', '4,248 sanitized cells with explicit missingness and no raw GPQA content', 'Built and tested'), (4, 'Source audit', 'Found item 25 text drift, missing HMMT cells, prompt variants, and invalid token accounting', 'Recorded'), (5, 'Self-contained HTML chapter', 'Plain-language summary, evidence tables, chart, next steps, and caveats', 'Generated and verified'), (6, 'Linux continuation package', 'Git-first transfer, exact copy manifest, verifier, context pack, and startup prompt', 'Built and tested'), (7, 'Provider execution', 'No model, smoke, or confirmatory calls; no experiment spending', '$0 / zero calls')) SELECT order_id AS 'order', deliverable, plain_result, status FROM today_work ORDER BY order_id"
+      }
+    },
+    {
+      "id": "benchmark_audit",
+      "label": "Benchmark provenance and capability audit",
+      "path": "reap/22_BENCHMARK_PROVENANCE_AND_CAPABILITY_2026-08-19.md",
+      "query": {
+        "engine": "sqlite",
+        "language": "sql",
+        "description": "Materializes the reviewed archive-capability and exception rows used by the two audit tables.",
+        "sql": "WITH audit_rows(kind, sort_key, issue, result, consequence, archive, correctness, output_measure, termination, safe_use) AS (VALUES ('exception', 1, 'HMMT-2026 item 25', '106 attempts from 28 models use text that differs from the pinned source; two GLM 5.2 attempts match.', 'Resolve, version, or exclude this item before a shared-question comparison.', NULL, NULL, NULL, NULL, NULL), ('exception', 2, 'HMMT-2026 missing cells', 'Qwen3.5-4B covers 22 of 33 source IDs; the other 29 models cover all 33.', 'Keep missing cells explicit and use the prespecified missingness analysis.', NULL, NULL, NULL, NULL, NULL), ('exception', 3, 'HMMT-2025 token accounting', '120 zero-token rows and seven negative-token rows were found.', 'Flag or exclude unusable values; never average them silently.', NULL, NULL, NULL, NULL, NULL), ('exception', 4, 'HMMT-2026 token accounting', 'One row has a zero output-token value.', 'Treat the value as unusable accounting, not a zero-length proof.', NULL, NULL, NULL, NULL, NULL), ('exception', 5, 'HELM Gemini length labels', '42 rows are labeled length and 404 are labeled stop.', 'This is the only archived model here with complete observed termination labels.', NULL, NULL, NULL, NULL, NULL), ('exception', 6, 'HELM token semantics', 'Gemini is all zero; Claude ranges 235–4,707; GPT ranges 5–7.', 'Do not place these fields on one cross-provider token-efficiency axis.', NULL, NULL, NULL, NULL, NULL), ('capability', 1, NULL, NULL, NULL, 'HMMT 2025 / MathArena', 'Available, source-native', 'Available with 120 zero and 7 negative values flagged', 'Not published', 'Question-level descriptive accuracy; route-specific output after QC'), ('capability', 2, NULL, NULL, NULL, 'HMMT 2026 / MathArena', 'Available, source-native', 'Available with one zero value flagged', 'Not published', 'Descriptive analysis after resolving item 25 and missing cells'), ('capability', 3, NULL, NULL, NULL, 'HELM Gemini 3 Pro / GPQA', 'Available, source-native', 'All zero; unusable for efficiency', 'Observed: 42 length, 404 stop', 'Question-level accuracy and observed length-stop example'), ('capability', 4, NULL, NULL, NULL, 'HELM Claude Haiku 4.5 / GPQA', 'Available, source-native', 'Provider-specific: 235–4,707', 'Blank / unknown', 'Question-level accuracy only'), ('capability', 5, NULL, NULL, NULL, 'HELM GPT-5.1 / GPQA', 'Available, source-native', 'Provider-specific: 5–7', 'Blank / unknown', 'Question-level accuracy only')) SELECT * FROM audit_rows ORDER BY kind, sort_key"
+      }
+    },
+    {"id": "method_synthesis", "label": "Post-meeting methodology synthesis", "path": "reap/19_METHOD_REVIEW_SYNTHESIS_2026-08-18.md"},
+    {"id": "model_eligibility", "label": "Model-pair eligibility record", "path": "reap/21_MODEL_PAIR_ELIGIBILITY_2026-08-18.md"},
+    {"id": "linux_handoff", "label": "Verified Linux handoff", "path": "reap/linux_handoff/BOOTSTRAP_LINUX.md"}
+  ]
+}
