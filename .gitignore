@@ -21,6 +21,7 @@ __pycache__/
 .cache_grok45_cap/
 .cache_cap_semantics/
 data/
+benchmark_sources/
 
 # Generated mock sweep outputs and reports
 results/
