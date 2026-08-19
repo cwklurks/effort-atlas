@@ -24375,7 +24375,7 @@ interpreter.
 For the pinned observational pipeline, install its locked optional dependencies
 with `uv sync --python 3.12.8 --extra observational`.
 
-The current canonical verifier collects 89 ordinary project tests and 26 exact-lock
+The current canonical verifier collects 273 ordinary project tests and 26 exact-lock
 Tinker tests. The ordinary lane includes collected rescue-analysis tests enforcing
 the amended answer-rescue definition and shared grader-v2 state validation. One
 archive-backed grader test requires `GRADER_V2_ARCHIVE_ROOT`; the committed

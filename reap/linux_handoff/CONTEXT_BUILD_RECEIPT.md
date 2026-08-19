@@ -2,8 +2,8 @@
 
 **Built:** 2026-08-19
 **Tool:** Repomix 1.14.0
-**Result:** 109 tracked files, 310,632 estimated tokens, 1,266,745 bytes
-**SHA-256:** `83f937ba478c69e149b67d9de95b6eae516859f3769e005ef47dd43faafb8031`
+**Result:** 109 tracked files, 310,632 estimated tokens, 1,266,746 bytes
+**SHA-256:** `0c9945a0662251a912ae927257ef4989d11dc1b8da3cec2f2a4fd6a775781573`
 
 Repomix's default security scan reported no suspicious files. The deterministic
 pack excludes volatile Git history and Git change-frequency sorting. A second
