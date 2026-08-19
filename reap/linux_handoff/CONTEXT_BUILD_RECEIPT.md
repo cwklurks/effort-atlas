@@ -2,12 +2,12 @@
 
 **Built:** 2026-08-19
 **Tool:** Repomix 1.14.0
-**Result:** 109 tracked files, 310,626 estimated tokens, 1,266,730 bytes
-**SHA-256:** `01a5748a9cb90b552b50bc2a5dba5eb82e83c51196b4c9ac3557499829aeaf8e`
+**Result:** 109 tracked files, 310,626 estimated tokens, 1,266,745 bytes
+**SHA-256:** `83f937ba478c69e149b67d9de95b6eae516859f3769e005ef47dd43faafb8031`
 
 Repomix's default security scan reported no suspicious files. The deterministic
-pack excludes volatile Git history, and a second build from the same tracked
-inputs produced the same SHA-256. The builder deliberately excludes raw
+pack excludes volatile Git history and Git change-frequency sorting. A second
+build from the same tracked inputs produced the same SHA-256. The builder excludes raw
 benchmark archives, restricted GPQA content, the full 4,248-row derived table,
 generated HTML, fixtures, review transcripts, credentials, and this receipt itself.
 

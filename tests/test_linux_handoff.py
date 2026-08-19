@@ -108,6 +108,7 @@ class LinuxHandoffTests(unittest.TestCase):
         self.assertIn("reap/22_BENCHMARK_PROVENANCE", context)
         self.assertNotIn("--no-security-check", builder)
         self.assertNotIn("--include-logs", builder)
+        self.assertIn("--no-git-sort-by-changes", builder)
         self.assertNotIn(
             '<file path="observational/benchmark_question_capabilities.jsonl">',
             context,

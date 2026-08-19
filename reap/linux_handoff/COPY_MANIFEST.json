@@ -137,8 +137,8 @@
     },
     {
       "path": "reap/linux_handoff/CONTEXT_BUILD_RECEIPT.md",
-      "sha256": "e1e739d4c04b398a2db43d1f3769c9af65b97b421b30014ea6cb832b41e3d14a",
-      "bytes": 840,
+      "sha256": "177e7e423d074126fc542e2578c95c2d7334703d13aa7f548a413fcf9b1432ef",
+      "bytes": 856,
       "purpose": "context-bundle security and reproducibility receipt"
     },
     {
@@ -149,8 +149,8 @@
     },
     {
       "path": "reap/linux_handoff/REPO_CONTEXT.xml",
-      "sha256": "01a5748a9cb90b552b50bc2a5dba5eb82e83c51196b4c9ac3557499829aeaf8e",
-      "bytes": 1266730,
+      "sha256": "83f937ba478c69e149b67d9de95b6eae516859f3769e005ef47dd43faafb8031",
+      "bytes": 1266745,
       "purpose": "secret-scanned tracked repository context bundle"
     },
     {
@@ -185,8 +185,8 @@
     },
     {
       "path": "scripts/build_linux_context_pack.sh",
-      "sha256": "3f59c13b2028f5c13c4e183053ecd9c40c35f3ef7af1eeb8348861c8379eb0af",
-      "bytes": 1807,
+      "sha256": "4b8593abdc45c8dedbea7bde069ec89b81f5c63a80df71578f7a16143d337e78",
+      "bytes": 1836,
       "purpose": "reproducible context-bundle builder"
     },
     {
@@ -227,8 +227,8 @@
     },
     {
       "path": "tests/test_linux_handoff.py",
-      "sha256": "c6b6544bf296494e5ca5d4e537903a258c7ed7099277e9251c8fb7ee01ace24b",
-      "bytes": 7523,
+      "sha256": "8dcc887e334ebb6c38af4573aa3b2a6cd4cead97bebe4424d653046d37ac6c68",
+      "bytes": 7582,
       "purpose": "handoff verifier tests"
     },
     {
