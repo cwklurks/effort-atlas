@@ -772,8 +772,11 @@ def summarize_capability_rows(
             "model_count": len(models),
             "question_by_model_rows": len(group),
             "expected_question_by_model_rows": len(question_ids) * len(models),
-            "missing_question_by_model_rows": len(question_ids) * len(models)
+            "unmaterialized_question_by_model_rows": len(question_ids) * len(models)
             - len(group),
+            "archived_response_missing_rows": sum(
+                not bool(row.get("archived_response_available")) for row in group
+            ),
             "source_native_correctness_rows": sum(
                 row.get("source_native_correct_count") is not None for row in group
             ),
@@ -831,6 +834,17 @@ def summarize_capability_rows(
         if benchmark == "helm_gpqa_main_cot_v1.15.0":
             benchmark_summary["source_rows_excluded_by_pinned_helm_split"] = 2
         benchmarks.append(benchmark_summary)
+    ordered_rows = sorted(
+        rows,
+        key=lambda row: (
+            str(row["benchmark"]),
+            str(row["model"]),
+            str(row["question_id"]),
+        ),
+    )
+    table_bytes = "".join(_canonical_json(row) + "\n" for row in ordered_rows).encode(
+        "utf-8"
+    )
     return {
         "schema_version": SUMMARY_SCHEMA,
         "row_schema_version": CAPABILITY_SCHEMA,
@@ -841,6 +855,9 @@ def summarize_capability_rows(
             "gpqa_content": "excluded",
         },
         "benchmarks": benchmarks,
+        "integrity": {
+            "capability_rows_sha256": hashlib.sha256(table_bytes).hexdigest()
+        },
     }
 
 
@@ -883,6 +900,39 @@ def _validate_output_rows(rows: Sequence[Mapping[str, Any]]) -> None:
         ):
             if not isinstance(row[field], str):
                 raise ProvenanceError(f"capability row {index} has non-string {field}")
+        allowed_statuses = {
+            "source_native_grade_semantics": {
+                "MathArena archived correct field",
+                "HELM chain_of_thought_correctness",
+            },
+            "source_output_text_match_status": {
+                "matches_source",
+                "mismatch_source",
+                "not_comparable",
+                "not_compared_restricted_source",
+            },
+            "source_output_gold_match_status": {
+                "matches_source",
+                "mismatch_source",
+                "not_comparable",
+                "not_compared_restricted_source",
+            },
+            "requested_cap_status": {"available", "not_published"},
+            "termination_status": {"observed", "not_published"},
+            "censoring_status": {
+                "observed_length",
+                "observed_nonlength",
+                "unknown",
+                "not_observed_in_archive",
+            },
+            "strict_marker_regrade_status": {
+                "not_applied",
+                "not_available_archived_output_is_not_plaintext",
+            },
+        }
+        for field, allowed in allowed_statuses.items():
+            if row[field] not in allowed:
+                raise ProvenanceError(f"capability row {index} has unsupported {field}")
         for field in (
             "output_tokens_invalid_count",
             "output_tokens_zero_count",
@@ -892,6 +942,21 @@ def _validate_output_rows(rows: Sequence[Mapping[str, Any]]) -> None:
         ):
             if not isinstance(row[field], int) or row[field] < 0:
                 raise ProvenanceError(f"capability row {index} has invalid {field}")
+        digest = row["prompt_fingerprint_set_digest"]
+        if digest is not None and (
+            not isinstance(digest, str) or not _SHA256.fullmatch(digest)
+        ):
+            raise ProvenanceError(
+                f"capability row {index} has invalid prompt_fingerprint_set_digest"
+            )
+        if (row["prompt_fingerprint_count"] == 0) != (digest is None):
+            raise ProvenanceError(
+                f"capability row {index} has inconsistent prompt fingerprint count/digest"
+            )
+        if row["archived_response_available"] != (row["attempt_count"] > 0):
+            raise ProvenanceError(
+                f"capability row {index} violates archived response invariants"
+            )
         if row["source_native_correct_count"] is not None and (
             not isinstance(row["source_native_correct_count"], int)
             or row["source_native_correct_count"] < 0
@@ -916,6 +981,99 @@ def _validate_output_rows(rows: Sequence[Mapping[str, Any]]) -> None:
             raise ProvenanceError(
                 f"capability row {index} has out-of-range source-native accuracy"
             )
+        if row["source_native_grade_status"] == "available":
+            if (
+                not row["archived_response_available"]
+                or row["source_native_correct_count"] is None
+                or row["source_native_accuracy"] is None
+                or row["source_native_correct_count"] > row["attempt_count"]
+                or not math.isclose(
+                    row["source_native_accuracy"],
+                    row["source_native_correct_count"] / row["attempt_count"],
+                )
+            ):
+                raise ProvenanceError(
+                    f"capability row {index} violates source-native grade invariants"
+                )
+        elif row["source_native_grade_status"] == "not_archived":
+            if (
+                row["archived_response_available"]
+                or row["source_native_correct_count"] is not None
+                or row["source_native_accuracy"] is not None
+            ):
+                raise ProvenanceError(
+                    f"capability row {index} violates source-native grade invariants"
+                )
+        else:
+            raise ProvenanceError(
+                f"capability row {index} has unknown source-native grade status"
+            )
+        invalid_subcount = (
+            row["output_tokens_zero_count"]
+            + row["output_tokens_negative_count"]
+            + row["output_tokens_nonfinite_count"]
+        )
+        if invalid_subcount != row["output_tokens_invalid_count"]:
+            raise ProvenanceError(
+                f"capability row {index} has inconsistent output invalid subcounts"
+            )
+        output_status = row["output_tokens_status"]
+        if row["output_tokens_available"]:
+            if row["output_tokens_mean"] is None or output_status not in {
+                "available",
+                "partial_invalid_values",
+            }:
+                raise ProvenanceError(
+                    f"capability row {index} violates usable output-token invariants"
+                )
+            if (output_status == "available") != (invalid_subcount == 0):
+                raise ProvenanceError(
+                    f"capability row {index} has inconsistent output-token status"
+                )
+        elif row["output_tokens_mean"] is not None:
+            raise ProvenanceError(
+                f"capability row {index} has mean without usable output tokens"
+            )
+        elif output_status == "zero_values_only" and not (
+            row["output_tokens_zero_count"] > 0
+            and invalid_subcount == row["output_tokens_zero_count"]
+        ):
+            raise ProvenanceError(
+                f"capability row {index} has inconsistent zero-token status"
+            )
+        elif output_status == "not_published" and invalid_subcount != 0:
+            raise ProvenanceError(
+                f"capability row {index} has inconsistent unreported-token status"
+            )
+        elif output_status == "negative_values_only" and not (
+            row["output_tokens_negative_count"] > 0
+            and invalid_subcount == row["output_tokens_negative_count"]
+        ):
+            raise ProvenanceError(
+                f"capability row {index} has inconsistent negative-token status"
+            )
+        elif output_status == "nonfinite_values_only" and not (
+            row["output_tokens_nonfinite_count"] > 0
+            and invalid_subcount == row["output_tokens_nonfinite_count"]
+        ):
+            raise ProvenanceError(
+                f"capability row {index} has inconsistent nonfinite-token status"
+            )
+        elif output_status == "invalid_values_only" and not (
+            invalid_subcount > 0
+            and sum(
+                count > 0
+                for count in (
+                    row["output_tokens_zero_count"],
+                    row["output_tokens_negative_count"],
+                    row["output_tokens_nonfinite_count"],
+                )
+            )
+            > 1
+        ):
+            raise ProvenanceError(
+                f"capability row {index} has inconsistent invalid-token status"
+            )
         if row["requested_max_tokens"] is not None and (
             isinstance(row["requested_max_tokens"], bool)
             or not isinstance(row["requested_max_tokens"], int)
@@ -927,6 +1085,10 @@ def _validate_output_rows(rows: Sequence[Mapping[str, Any]]) -> None:
         for field in ("prompt_fingerprint_set_digest", "finish_reason"):
             if row[field] is not None and not isinstance(row[field], str):
                 raise ProvenanceError(f"capability row {index} has invalid {field}")
+        if row["finish_reason"] not in {None, "length", "stop"}:
+            raise ProvenanceError(
+                f"capability row {index} has unsupported finish_reason"
+            )
 
 
 def _atomic_write(path: Path, content: str) -> None:
