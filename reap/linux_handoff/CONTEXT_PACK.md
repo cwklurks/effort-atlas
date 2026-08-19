@@ -28,18 +28,27 @@ confirmatory experiment has made **zero** paid calls.
 
 ## Where work stands
 
-- Phase 0 governance and the independent Phase-1 branches are reviewed but their
-  integration path remains gated. The current order is B/D integration, preregistration
-  freeze, runner/budget gates, human smoke, then confirmatory collection.
+- Phases 0–2 are merged. The decision-independent Phase-3 safeguards were
+  independently approved at `01aeb98`, but the scientific design is still not
+  frozen. The current order is resolve benchmark/model/statistical choices,
+  preregistration freeze, runner/executable budget gates, human smoke, then
+  confirmatory collection.
 - Tinker SDK 0.25.0 can resubmit. That violates the one-submission rule, so live
   Tinker smoke is blocked rather than merely delayed.
 - The public observational finding is strong but qualified: 427 rows appeared at a
   cap; public MathArena cap detection is inferred, while the HELM Gemini route has
   a published length label. Read `observational/RESULTS.md` for denominators and
   caveats rather than repeating a headline from memory.
-- The current benchmark decision work focuses on HMMT 2025/2026 and HELM GPQA.
-  Their question-level capability/provenance checkpoint is being added separately;
-  use only the committed version and its SHA checks on a new machine.
+- The current benchmark audit covers HMMT 2025/2026 through MathArena and GPQA
+  through HELM. It pins 20 source files and materializes 4,248 sanitized
+  benchmark-model-question cells. Read
+  `reap/22_BENCHMARK_PROVENANCE_AND_CAPABILITY_2026-08-19.md`.
+- HMMT-2026 item 25 has a real text-version mismatch affecting 106 attempts from
+  28 models. Qwen3.5-4B is missing 11 HMMT-2026 cells. These are explicit analysis
+  decisions, not rows to smooth over.
+- HELM evaluates a deliberate 446-question GPQA test split from 448 source rows.
+  Only Gemini has complete termination labels (42 length, 404 stop), and its token
+  field is all zero. HELM token fields are not a comparable cross-provider unit.
 
 ## The research question agreed after the meeting
 
@@ -71,8 +80,17 @@ artifact or infer an unrecorded provider fact.
 2. `reap/18_POST_MEETING_BENCHMARK_AUDIT_2026-08-18.md` — meeting result.
 3. `reap/20_BENCHMARK_COMPARISON_2026-08-18.md` — why candidate archives differ.
 4. `reap/21_MODEL_PAIR_ELIGIBILITY_2026-08-18.md` — when comparisons are allowed.
-5. `reap/02_BUDGET_AND_COSTS.md` and `reap/08_HYPERPARAMETER_DECISIONS.md` — no
+5. `reap/22_BENCHMARK_PROVENANCE_AND_CAPABILITY_2026-08-19.md` — what the pinned
+   public files can and cannot answer at the question level.
+6. `reap/next_chapter/index.html` — self-contained plain-language report of this
+   chapter; its build receipt states the limits of browser verification.
+7. `reap/02_BUDGET_AND_COSTS.md` and `reap/08_HYPERPARAMETER_DECISIONS.md` — no
    unbounded model work or assumed provider behavior.
+
+`reap/linux_handoff/REPO_CONTEXT.xml` collects the main tracked documents, source,
+tests, and recent commit history for fast search in a new agent session. It excludes
+raw archives, restricted GPQA content, the 4,248-row derived table, generated HTML,
+and secrets. It is supporting context, not a substitute for exact files or tests.
 
 ## What “done” looks like for a code task
 

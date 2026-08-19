@@ -8,14 +8,18 @@ import tempfile
 import unittest
 from pathlib import Path
 
-
 ROOT = Path(__file__).resolve().parents[1]
 SCRIPT = ROOT / "scripts" / "verify_linux_handoff.py"
 MANIFEST = ROOT / "reap" / "linux_handoff" / "COPY_MANIFEST.json"
+CONTEXT = ROOT / "reap" / "linux_handoff" / "REPO_CONTEXT.xml"
+CONTEXT_RECEIPT = ROOT / "reap" / "linux_handoff" / "CONTEXT_BUILD_RECEIPT.md"
+CONTEXT_BUILDER = ROOT / "scripts" / "build_linux_context_pack.sh"
 
 
 class LinuxHandoffTests(unittest.TestCase):
-    def run_verifier(self, *args: str, root: Path = ROOT) -> subprocess.CompletedProcess[str]:
+    def run_verifier(
+        self, *args: str, root: Path = ROOT
+    ) -> subprocess.CompletedProcess[str]:
         return subprocess.run(
             [sys.executable, str(SCRIPT), "--repo-root", str(root), *args],
             text=True,
@@ -93,6 +97,38 @@ class LinuxHandoffTests(unittest.TestCase):
 
         self.assertNotEqual(completed.returncode, 0)
         self.assertIn("unsafe manifest path", completed.stderr)
+
+    def test_context_bundle_is_tracked_scanned_and_excludes_large_or_raw_artifacts(
+        self,
+    ) -> None:
+        context = CONTEXT.read_text(encoding="utf-8")
+        builder = CONTEXT_BUILDER.read_text(encoding="utf-8")
+        self.assertIn("REAP Linux orientation bundle", context)
+        self.assertIn("reap/CODEX_BRIEFING.md", context)
+        self.assertIn("reap/22_BENCHMARK_PROVENANCE", context)
+        self.assertNotIn("--no-security-check", builder)
+        self.assertNotIn(
+            '<file path="observational/benchmark_question_capabilities.jsonl">',
+            context,
+        )
+        self.assertNotIn('<file path="reap/next_chapter/index.html">', context)
+        self.assertNotRegex(context, r"sk-or-v1-[A-Za-z0-9_-]{20,}")
+        digest = hashlib.sha256(CONTEXT.read_bytes()).hexdigest()
+        receipt = CONTEXT_RECEIPT.read_text(encoding="utf-8")
+        self.assertIn(digest, receipt)
+        self.assertIn("no suspicious files", receipt.lower())
+
+    def test_bootstrap_targets_the_review_branch_over_tailscale_without_secrets(
+        self,
+    ) -> None:
+        bootstrap = (ROOT / "reap" / "linux_handoff" / "BOOTSTRAP_LINUX.md").read_text(
+            encoding="utf-8"
+        )
+        self.assertIn("codex/benchmark-provenance-linux", bootstrap)
+        self.assertIn("tailscale ping <linux-tailnet-hostname>", bootstrap)
+        self.assertIn("tailscale ssh <linux-user>@<linux-tailnet-hostname>", bootstrap)
+        self.assertNotIn("codex/reap-governance", bootstrap)
+        self.assertNotIn("OPENROUTER_API_KEY", bootstrap)
 
 
 if __name__ == "__main__":

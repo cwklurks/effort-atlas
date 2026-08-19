@@ -119,7 +119,9 @@ per benchmark, archived model, and question, including:
 - requested allowance and finish-label availability where the source provides it;
 - source/output question-text fingerprint agreement without exposing question
   text;
-- serialized prompt fingerprint agreement without exposing prompt text;
+- serialized prompt fingerprint agreement for MathArena without exposing prompt
+  text; the HELM pairwise prompt comparison below comes from the separate exact
+  source-file audit and is not exported in the companion GPQA rows;
 - whether strict REAP final-answer regrading is possible.
 
 It contains 4,248 benchmark-model-question cells, including 11 explicit archive

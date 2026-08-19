@@ -89,7 +89,12 @@ class NextChapterReportTests(unittest.TestCase):
 
     def test_build_receipt_pins_current_report_bytes(self) -> None:
         receipt = (REPORT_ROOT / "BUILD_RECEIPT.md").read_text(encoding="utf-8")
-        for path in (self.artifact_path, self.html_path):
+        for path in (
+            self.artifact_path,
+            self.html_path,
+            ROOT / "observational" / "benchmark_question_capabilities.jsonl",
+            ROOT / "observational" / "benchmark_question_capabilities_summary.json",
+        ):
             digest = hashlib.sha256(path.read_bytes()).hexdigest()
             self.assertIn(digest, receipt)
         self.assertIn("verification: `structural_only`", receipt)

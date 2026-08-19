@@ -18,13 +18,15 @@ import tempfile
 from pathlib import Path, PurePosixPath
 from typing import Any
 
-
 MANIFEST_RELATIVE_PATH = Path("reap/linux_handoff/COPY_MANIFEST.json")
 
 # Keep this list short enough to read, but sufficient to reconstruct the project's
 # safety rules, current research state, and the benchmark-selection decision.
 CRITICAL_PATHS: dict[str, str] = {
     "AGENTS.md": "repository and research safeguards",
+    "observational/benchmark_question_capabilities.jsonl": "sanitized complete question-by-model capability cells",
+    "observational/benchmark_question_capabilities_summary.json": "recomputed benchmark capability summary",
+    "observational/benchmark_sources_manifest.json": "immutable public benchmark source pins",
     "observational/INPUT_PROVENANCE.md": "raw-input reproducibility boundary",
     "observational/RESULTS.md": "exploratory findings and caveats",
     "observational/state_manifest.json": "pinned observational source identifiers",
@@ -38,17 +40,28 @@ CRITICAL_PATHS: dict[str, str] = {
     "reap/19_METHOD_REVIEW_SYNTHESIS_2026-08-18.md": "review synthesis",
     "reap/20_BENCHMARK_COMPARISON_2026-08-18.md": "benchmark comparison",
     "reap/21_MODEL_PAIR_ELIGIBILITY_2026-08-18.md": "model-pair eligibility gate",
+    "reap/22_BENCHMARK_PROVENANCE_AND_CAPABILITY_2026-08-19.md": "plain-language source and capability audit",
     "reap/CODEX_BRIEFING.md": "canonical project state and mandatory reading order",
     "reap/README.md": "program charter and governance",
     "reap/claude_project/PROJECT_BRIEF.md": "canonical collaboration context",
     "reap/linux_handoff/BOOTSTRAP_LINUX.md": "Linux setup and transfer steps",
+    "reap/linux_handoff/CONTEXT_BUILD_RECEIPT.md": "context-bundle security and reproducibility receipt",
     "reap/linux_handoff/CONTEXT_PACK.md": "high-density start context",
+    "reap/linux_handoff/REPO_CONTEXT.xml": "secret-scanned tracked repository context bundle",
     "reap/linux_handoff/START_HERE_PROMPT.md": "copy-ready new-session prompt",
+    "reap/next_chapter/BUILD_RECEIPT.md": "portable report build and verification receipt",
+    "reap/next_chapter/artifact.json": "source-backed next-chapter report input",
+    "reap/next_chapter/index.html": "self-contained next-chapter reader",
+    "scripts/acquire_benchmark_sources.py": "pinned public benchmark acquisition and verification",
+    "scripts/build_linux_context_pack.sh": "reproducible context-bundle builder",
     "scripts/verify_linux_handoff.py": "pre-environment handoff verifier",
     "scripts/verify_offline.sh": "canonical offline verification command",
     "src/effort_atlas/confirmatory.py": "offline ledger and schedule baseline",
+    "src/effort_atlas/benchmark_provenance.py": "sanitized benchmark capability builder",
     "src/effort_atlas/graders.py": "answer-extraction implementation",
     "tests/test_linux_handoff.py": "handoff verifier tests",
+    "tests/test_benchmark_provenance.py": "benchmark provenance contract tests",
+    "tests/test_next_chapter_report.py": "next-chapter report contract tests",
 }
 
 
@@ -66,7 +79,11 @@ def sha256_file(path: Path) -> str:
 
 def safe_relative_path(value: str) -> Path:
     candidate = PurePosixPath(value)
-    if candidate.is_absolute() or ".." in candidate.parts or value != candidate.as_posix():
+    if (
+        candidate.is_absolute()
+        or ".." in candidate.parts
+        or value != candidate.as_posix()
+    ):
         raise VerificationError(f"unsafe manifest path: {value!r}")
     return Path(*candidate.parts)
 
@@ -207,7 +224,9 @@ def write_manifest(repo_root: Path) -> int:
         handle.write(serialized)
         temporary = Path(handle.name)
     os.replace(temporary, destination)
-    print(f"Wrote {destination.relative_to(repo_root)} with {len(payload['critical_files'])} files.")
+    print(
+        f"Wrote {destination.relative_to(repo_root)} with {len(payload['critical_files'])} files."
+    )
     return 0
 
 

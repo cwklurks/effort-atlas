@@ -5,8 +5,8 @@
   "critical_files": [
     {
       "path": "AGENTS.md",
-      "sha256": "8eac79c31718f8edb9ae5dcd80b08b5c73ea6c41556691cf3569cbccd24da3db",
-      "bytes": 5252,
+      "sha256": "26db3b1b0716cbd17ac7e03cc63b49f51d29ee9ce740d0816ad2a26a79c3310c",
+      "bytes": 6053,
       "purpose": "repository and research safeguards"
     },
     {
@@ -20,6 +20,24 @@
       "sha256": "5e03264065ef18cbcd25af26ac5d8af0e5e35062c5f6f3b3124d2e30457037a8",
       "bytes": 3537,
       "purpose": "exploratory findings and caveats"
+    },
+    {
+      "path": "observational/benchmark_question_capabilities.jsonl",
+      "sha256": "b40c4ca819dfbc2c3afc4c7e35251cdb9f3019e7e48add7bc626e84221213f34",
+      "bytes": 4488178,
+      "purpose": "sanitized complete question-by-model capability cells"
+    },
+    {
+      "path": "observational/benchmark_question_capabilities_summary.json",
+      "sha256": "14ecd31855bc594b24f1ded8efca2fd0b1e1bbdefee3b7c3d2ca67986b96a82d",
+      "bytes": 3160,
+      "purpose": "recomputed benchmark capability summary"
+    },
+    {
+      "path": "observational/benchmark_sources_manifest.json",
+      "sha256": "2e5782de18965392d80332b0fd2946378fcaaf84fa3dcfe3610c6c95c1ada7b8",
+      "bytes": 9286,
+      "purpose": "immutable public benchmark source pins"
     },
     {
       "path": "observational/state_manifest.json",
@@ -47,8 +65,8 @@
     },
     {
       "path": "reap/04_DATASET_CANDIDATES.md",
-      "sha256": "6b0490dd872646954e77f9dc959113a0383f39f737d67a7d96069f921ba7a37a",
-      "bytes": 5137,
+      "sha256": "075cd4276ea8fed4d5c9bd0d8910563dc1bc072ed18f0acc03da31a90b4de229",
+      "bytes": 5335,
       "purpose": "dataset scope and risks"
     },
     {
@@ -59,8 +77,8 @@
     },
     {
       "path": "reap/10_PHASE_GATE_PLAN_2026-08-08.md",
-      "sha256": "b5b937c64c0ee9e7dfe740b7f4d26d91c7c9f239965f60b96436d93d3d7b7c43",
-      "bytes": 4379,
+      "sha256": "62f6836d5ff76db221f85e89600bc2bfda40eb644a542b23a8201553f98cac4e",
+      "bytes": 4533,
       "purpose": "phase gates and ownership"
     },
     {
@@ -88,70 +106,136 @@
       "purpose": "model-pair eligibility gate"
     },
     {
+      "path": "reap/22_BENCHMARK_PROVENANCE_AND_CAPABILITY_2026-08-19.md",
+      "sha256": "dd27ffc444c0ba6b927d1f65a1b48949e5f2778b5dfb3d07a28065e7c9f6cb8d",
+      "bytes": 11327,
+      "purpose": "plain-language source and capability audit"
+    },
+    {
       "path": "reap/CODEX_BRIEFING.md",
-      "sha256": "a95c4b5de0458a1e2e3cacf8ac8241364a07bde4732371ed00b01ab3200d0476",
-      "bytes": 15052,
+      "sha256": "9e429e9a1eac23ed80f9ab4bb5368d978ebf396aabcc42e0b8c08932f28bca6d",
+      "bytes": 23706,
       "purpose": "canonical project state and mandatory reading order"
     },
     {
       "path": "reap/README.md",
-      "sha256": "7420be5f64464393ba9155aab26096be90e99110f824b77d71bf787d76054bc3",
-      "bytes": 3808,
+      "sha256": "d2cec59c914a5c322045dc083c405cfbec00f3d02580434897053c8b6f064699",
+      "bytes": 4770,
       "purpose": "program charter and governance"
     },
     {
       "path": "reap/claude_project/PROJECT_BRIEF.md",
-      "sha256": "5c824d83c0aa231d31716b184c9cd1671d16fc6f69dbf843914bf282240572c7",
-      "bytes": 7008,
+      "sha256": "e1852733760a20cc86bffd746cc48c9372e1e9853fdaba225a93d2f871ac1260",
+      "bytes": 9340,
       "purpose": "canonical collaboration context"
     },
     {
       "path": "reap/linux_handoff/BOOTSTRAP_LINUX.md",
-      "sha256": "8ef5f979856f1be7257717423aab0f4d2fa6cd818e61ccf1bfed1db1779a6bae",
-      "bytes": 3904,
+      "sha256": "53e1aa21a85aa30118cfa8fe3740a3bea560203a2a63c1f355f61453f742ab8d",
+      "bytes": 4976,
       "purpose": "Linux setup and transfer steps"
     },
     {
+      "path": "reap/linux_handoff/CONTEXT_BUILD_RECEIPT.md",
+      "sha256": "4c39d7a23485018c23f4784b48dbbd34973820182abeebc297f18b5c2a9dfe4b",
+      "bytes": 782,
+      "purpose": "context-bundle security and reproducibility receipt"
+    },
+    {
       "path": "reap/linux_handoff/CONTEXT_PACK.md",
-      "sha256": "b15945f001a7ad0bd861d80390f2e1f26e3d4c5eaecb8f06755e7138df864e46",
-      "bytes": 4120,
+      "sha256": "68b00de5b427b5e4fa33b2ea592bbc0a762a16c247e6114b6372caf15231f9b0",
+      "bytes": 5314,
       "purpose": "high-density start context"
     },
     {
+      "path": "reap/linux_handoff/REPO_CONTEXT.xml",
+      "sha256": "4346a117747d93395ddf397ca7b8dffe359ba16b06ca4f7b7ba4cf00ad22fe92",
+      "bytes": 1266104,
+      "purpose": "secret-scanned tracked repository context bundle"
+    },
+    {
       "path": "reap/linux_handoff/START_HERE_PROMPT.md",
-      "sha256": "78d05d1ba2841c22ca642fcc5dd419f8d2ea00e850e402c9ea961661cca2a7e9",
-      "bytes": 1684,
+      "sha256": "9420ffd849dced6986847309f2ba4c28397a783c6601a2414c0f834342b6521d",
+      "bytes": 2271,
       "purpose": "copy-ready new-session prompt"
     },
     {
+      "path": "reap/next_chapter/BUILD_RECEIPT.md",
+      "sha256": "908161f3b3b7d7c82ab0ca75e2b643ca37b41ad551bd70d01817d8ca04a219bb",
+      "bytes": 1232,
+      "purpose": "portable report build and verification receipt"
+    },
+    {
+      "path": "reap/next_chapter/artifact.json",
+      "sha256": "5f2449ae2f0997b4fbe8b599ed51b1a4ce86226ceecac86da2b51284a4300b42",
+      "bytes": 21224,
+      "purpose": "source-backed next-chapter report input"
+    },
+    {
+      "path": "reap/next_chapter/index.html",
+      "sha256": "d97eb32d24796a0db0ab6dca9dac64b455d76f2f42e7a6442b4a9982485a1174",
+      "bytes": 449627,
+      "purpose": "self-contained next-chapter reader"
+    },
+    {
+      "path": "scripts/acquire_benchmark_sources.py",
+      "sha256": "eef3c0e6949b81c4eb2db5221cdf50f6e16077bc1b9506865055200fc30a4c42",
+      "bytes": 4591,
+      "purpose": "pinned public benchmark acquisition and verification"
+    },
+    {
+      "path": "scripts/build_linux_context_pack.sh",
+      "sha256": "864d97d8dadd26db4bd7713284a1045ecc9b2622b25a93f66e017e0164046e8c",
+      "bytes": 1713,
+      "purpose": "reproducible context-bundle builder"
+    },
+    {
       "path": "scripts/verify_linux_handoff.py",
-      "sha256": "42164762a063c7c693528e5e5c8bdc046491f9fa48c42f12969e4c6bdd8cba45",
-      "bytes": 9804,
+      "sha256": "dec2ddd755ee7cfb8627c3dd09e433e46ef0b55314c76cf736aa4ee36ddee93b",
+      "bytes": 11161,
       "purpose": "pre-environment handoff verifier"
     },
     {
       "path": "scripts/verify_offline.sh",
-      "sha256": "2bc56b59dc40421597f580e249c07dc1daf1e964bfc12ab56f66dacbf3a48608",
-      "bytes": 434,
+      "sha256": "53da06a7dba74122179557b05299b241f19554d8b4178bccc99e34aa6558bdbc",
+      "bytes": 1120,
       "purpose": "canonical offline verification command"
     },
     {
+      "path": "src/effort_atlas/benchmark_provenance.py",
+      "sha256": "3069634f6dc3f0805cea0f0a8cfca9666adbd719c24dd6f7c13b75010d30620f",
+      "bytes": 47255,
+      "purpose": "sanitized benchmark capability builder"
+    },
+    {
       "path": "src/effort_atlas/confirmatory.py",
-      "sha256": "da610ea60c73fe77cd69b87a5d2472d906872d090425d55518f3c9b3f8f7d921",
-      "bytes": 23541,
+      "sha256": "31d9824cd0d6bde6dc62e60cea766e57f1ac316d65df887ae41727b8dd211143",
+      "bytes": 23927,
       "purpose": "offline ledger and schedule baseline"
     },
     {
       "path": "src/effort_atlas/graders.py",
-      "sha256": "187a7c2cb5219338c4844249b1a47dc04e5a6034c8a16a7fbcbfaaddca1dc464",
-      "bytes": 2336,
+      "sha256": "db8de71ac582650ef1f54887e95fe06cc5599e6df0d7ef274353e9dc7a9ef6bf",
+      "bytes": 5290,
       "purpose": "answer-extraction implementation"
     },
     {
+      "path": "tests/test_benchmark_provenance.py",
+      "sha256": "2e031699baacfe8db0613e7182cabac73c7111404d7096e4b0f2de33599a2731",
+      "bytes": 15565,
+      "purpose": "benchmark provenance contract tests"
+    },
+    {
       "path": "tests/test_linux_handoff.py",
-      "sha256": "35258c8e2b25ec637e552813eaab846eb6319db68cade7f688e7bff41e83e003",
-      "bytes": 3581,
+      "sha256": "160be1bc6fd1ed2e727f78cb26a32b7604cbf317f484fac04fb338ceb1d702d5",
+      "bytes": 5380,
       "purpose": "handoff verifier tests"
+    },
+    {
+      "path": "tests/test_next_chapter_report.py",
+      "sha256": "d1ab33c77d64342eab804993286b9f601eff6e34ccac25c8745712658dec520c",
+      "bytes": 4369,
+      "purpose": "next-chapter report contract tests"
     }
   ],
   "excluded_from_transfer": [

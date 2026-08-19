@@ -28,8 +28,7 @@ the report does not claim viewport, interaction, or source-dialog browser checks
 
 ## SHA-256
 
-- `artifact.json`: `76d64cfa0177a1f47b973d1fee3dd9f4f466c8dbd1eaf0380eb4f533efe240b6`
-- `index.html`: `8efe03b9e25c763832f4bf939f11e2efe2c4e528feb04beba6d7106b711d9a0f`
+- `artifact.json`: `5f2449ae2f0997b4fbe8b599ed51b1a4ce86226ceecac86da2b51284a4300b42`
+- `index.html`: `d97eb32d24796a0db0ab6dca9dac64b455d76f2f42e7a6442b4a9982485a1174`
 - capability table: `b40c4ca819dfbc2c3afc4c7e35251cdb9f3019e7e48add7bc626e84221213f34`
-- capability summary: `f16f8dd3c84210763c5bba816da6cdd609db3294d29757dcea4a33a5a7169156`
-
+- capability summary: `14ecd31855bc594b24f1ded8efca2fd0b1e1bbdefee3b7c3d2ca67986b96a82d`

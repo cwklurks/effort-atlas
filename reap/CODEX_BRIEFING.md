@@ -22,6 +22,7 @@ Point any new Codex session at this file first: **"Read reap/CODEX_BRIEFING.md a
 | 12 | `reap/REVIEW_PR1_ECOSYSTEM_AUDIT.md` | Red-team review of PR #1 and its 8 blocking fixes. |
 | 13 | `observational/RESULTS.md` + `observational/pipeline.py` + `observational/INPUT_PROVENANCE.md` | The free observational study (done, verified). Pipeline is pinned — agents run it, never rewrite its statistics. Input acquisition is not yet clean-checkout reproducible. |
 | 14 | `src/effort_atlas/` + `tests/` | Existing code. `confirmatory.py`, strict grader v2, and the independently approved pre-data analysis layer are merged. Phase 3 methodology and preregistration are now the active gate. |
+| 15 | `reap/18_POST_MEETING_BENCHMARK_AUDIT_2026-08-18.md` through `reap/22_BENCHMARK_PROVENANCE_AND_CAPABILITY_2026-08-19.md` | Post-meeting research question, cross-model method review, model-pair eligibility rules, and the exact public-source capability audit. The self-contained plain-language view is `reap/next_chapter/index.html`. |
 
 ## 2. Project state, in one screen
 
@@ -81,6 +82,20 @@ the current planning rows and rates are not exact-byte-bound freeze authority.
 These safeguards remain non-frozen prerequisites; they are not a runner and
 authorize no execution.
 
+**Post-meeting benchmark checkpoint (2026-08-19):** Connor and Chirag reframed the
+comparison around matched performance and token efficiency on the same questions,
+with the effort-by-allowance intervention still needed to identify censoring. A
+pinned public-source audit now covers MathArena HMMT 2025/2026 and HELM GPQA. It
+verifies 20 exact source files and materializes 4,248 sanitized
+benchmark-model-question cells without exporting GPQA content. HMMT-2026 item 25
+has a text-version mismatch affecting 106 attempts from 28 models, Qwen3.5-4B has
+11 explicit missing HMMT-2026 cells, and HELM's 446 evaluated GPQA rows are a
+deliberate test split from 448 source rows. Only HELM Gemini publishes complete
+termination labels here (42 length, 404 stop), while its token field is all zero;
+the HELM provider token fields are not one comparable unit. These findings narrow
+the design but do not freeze a dataset, model roster, or analysis and authorize no
+call.
+
 **Funding:** $5,000 Tinker credits + ~$200 OpenAI (supervisor) + <$100 OpenRouter. Platform-scoped pools, never mixed. Cost model and gates in `reap/02_BUDGET_AND_COSTS.md`.
 
 **Development model routing:** a direct Fireworks ZDR DeepSeek V4 Flash lane is
@@ -106,7 +121,7 @@ the worksheet compares a 30-item Inkling design, GPT-OSS, Qwen, and Nemotron
 portfolio options. Every value remains planning-only until approval and a frozen
 schedule/price/route manifest.
 
-**Branch / PR state as of 2026-08-10:**
+**Branch / PR state as of 2026-08-19:**
 
 | Work | State | Blocking issue |
 |---|---|---|
@@ -117,6 +132,7 @@ schedule/price/route manifest.
 | D — `codex/analysis-layer`, PR #3 | independently approved after remediation and merged at `7c83085` | complete; Phase 3 methodology decisions are now active |
 | E — `codex/runner` | not implemented | waits on accepted grader interfaces, frozen design inputs, and corrected budget math |
 | Phase 3 — `codex/prereg-v2`, draft PR #6 | external review, completed non-authoritative development relay, current synthesis, and offline safeguards preserved | D03/D04/D06/D09/D11/D12/D13/D15 and Chirag scientific signoff remain open; no call authorized |
+| Post-meeting benchmark provenance — `codex/benchmark-provenance-linux` | exact-source audit, sanitized capability table, plain-language HTML, and verified Linux handoff are under independent review | resolve review findings, pass the canonical offline suite, then publish the branch; no call authorized |
 
 The current phase-gate and model-routing plan is in
 `reap/10_PHASE_GATE_PLAN_2026-08-08.md`; the current human decision surface is
