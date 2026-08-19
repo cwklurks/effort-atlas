@@ -1,0 +1,165 @@
+{
+  "schema_version": 1,
+  "purpose": "Exact, tracked context required for a Linux REAP handoff. This is not a data bundle and contains no credentials.",
+  "transfer_mode": "git_first",
+  "critical_files": [
+    {
+      "path": "AGENTS.md",
+      "sha256": "8eac79c31718f8edb9ae5dcd80b08b5c73ea6c41556691cf3569cbccd24da3db",
+      "bytes": 5252,
+      "purpose": "repository and research safeguards"
+    },
+    {
+      "path": "observational/INPUT_PROVENANCE.md",
+      "sha256": "a5a1f8c7504b2ced248bab49724c92df6687f28b5a3f295f178f336ee6455036",
+      "bytes": 859,
+      "purpose": "raw-input reproducibility boundary"
+    },
+    {
+      "path": "observational/RESULTS.md",
+      "sha256": "5e03264065ef18cbcd25af26ac5d8af0e5e35062c5f6f3b3124d2e30457037a8",
+      "bytes": 3537,
+      "purpose": "exploratory findings and caveats"
+    },
+    {
+      "path": "observational/state_manifest.json",
+      "sha256": "e52322a514edef33d551d63b1e15fecef5e927607b9e44e5a87510032da1b94d",
+      "bytes": 1166,
+      "purpose": "pinned observational source identifiers"
+    },
+    {
+      "path": "pyproject.toml",
+      "sha256": "f7ec822c1d8c1dbd7eb11b485258af66da980774aeb1381852e55c1f1b70ec4f",
+      "bytes": 608,
+      "purpose": "Python package and optional dependency definition"
+    },
+    {
+      "path": "reap/01_EXPERIMENT_OUTLINE_v2.md",
+      "sha256": "bc760032bf8e4c95c6b4c9b5e92ca81ccb5ecd606e5151875a01e0b45ecbb4b9",
+      "bytes": 4822,
+      "purpose": "draft intervention design"
+    },
+    {
+      "path": "reap/02_BUDGET_AND_COSTS.md",
+      "sha256": "c91bb22ff8a3209add356b501f4d72109b9d39bbb98c553f8553c24dde02f8cc",
+      "bytes": 3478,
+      "purpose": "platform-scoped budget model"
+    },
+    {
+      "path": "reap/04_DATASET_CANDIDATES.md",
+      "sha256": "6b0490dd872646954e77f9dc959113a0383f39f737d67a7d96069f921ba7a37a",
+      "bytes": 5137,
+      "purpose": "dataset scope and risks"
+    },
+    {
+      "path": "reap/08_HYPERPARAMETER_DECISIONS.md",
+      "sha256": "c9b4919b38bc2b1e964d0846644aa131adb58c9024f2632f9a20042d52160045",
+      "bytes": 4949,
+      "purpose": "verified and unresolved parameters"
+    },
+    {
+      "path": "reap/10_PHASE_GATE_PLAN_2026-08-08.md",
+      "sha256": "b5b937c64c0ee9e7dfe740b7f4d26d91c7c9f239965f60b96436d93d3d7b7c43",
+      "bytes": 4379,
+      "purpose": "phase gates and ownership"
+    },
+    {
+      "path": "reap/18_POST_MEETING_BENCHMARK_AUDIT_2026-08-18.md",
+      "sha256": "325574d20ab5039c4e04dfa03cbef170d6dada8475ff18affe5ee5f82fca8d1b",
+      "bytes": 8448,
+      "purpose": "post-meeting benchmark audit"
+    },
+    {
+      "path": "reap/19_METHOD_REVIEW_SYNTHESIS_2026-08-18.md",
+      "sha256": "26177088e111c2b69534e214f19a9ae3dc032808477d5b8dd99bb25afeb7932c",
+      "bytes": 9925,
+      "purpose": "review synthesis"
+    },
+    {
+      "path": "reap/20_BENCHMARK_COMPARISON_2026-08-18.md",
+      "sha256": "3c9f3a730fafe99092e33faf36d1376ae1b32cb19488b81b180b774674e3db64",
+      "bytes": 10248,
+      "purpose": "benchmark comparison"
+    },
+    {
+      "path": "reap/21_MODEL_PAIR_ELIGIBILITY_2026-08-18.md",
+      "sha256": "f4e373a9abdfd6cc9e28047274f3dfe3a804923fafb16a28c527fc5f5e0e3132",
+      "bytes": 9767,
+      "purpose": "model-pair eligibility gate"
+    },
+    {
+      "path": "reap/CODEX_BRIEFING.md",
+      "sha256": "a95c4b5de0458a1e2e3cacf8ac8241364a07bde4732371ed00b01ab3200d0476",
+      "bytes": 15052,
+      "purpose": "canonical project state and mandatory reading order"
+    },
+    {
+      "path": "reap/README.md",
+      "sha256": "7420be5f64464393ba9155aab26096be90e99110f824b77d71bf787d76054bc3",
+      "bytes": 3808,
+      "purpose": "program charter and governance"
+    },
+    {
+      "path": "reap/claude_project/PROJECT_BRIEF.md",
+      "sha256": "5c824d83c0aa231d31716b184c9cd1671d16fc6f69dbf843914bf282240572c7",
+      "bytes": 7008,
+      "purpose": "canonical collaboration context"
+    },
+    {
+      "path": "reap/linux_handoff/BOOTSTRAP_LINUX.md",
+      "sha256": "8ef5f979856f1be7257717423aab0f4d2fa6cd818e61ccf1bfed1db1779a6bae",
+      "bytes": 3904,
+      "purpose": "Linux setup and transfer steps"
+    },
+    {
+      "path": "reap/linux_handoff/CONTEXT_PACK.md",
+      "sha256": "b15945f001a7ad0bd861d80390f2e1f26e3d4c5eaecb8f06755e7138df864e46",
+      "bytes": 4120,
+      "purpose": "high-density start context"
+    },
+    {
+      "path": "reap/linux_handoff/START_HERE_PROMPT.md",
+      "sha256": "78d05d1ba2841c22ca642fcc5dd419f8d2ea00e850e402c9ea961661cca2a7e9",
+      "bytes": 1684,
+      "purpose": "copy-ready new-session prompt"
+    },
+    {
+      "path": "scripts/verify_linux_handoff.py",
+      "sha256": "42164762a063c7c693528e5e5c8bdc046491f9fa48c42f12969e4c6bdd8cba45",
+      "bytes": 9804,
+      "purpose": "pre-environment handoff verifier"
+    },
+    {
+      "path": "scripts/verify_offline.sh",
+      "sha256": "2bc56b59dc40421597f580e249c07dc1daf1e964bfc12ab56f66dacbf3a48608",
+      "bytes": 434,
+      "purpose": "canonical offline verification command"
+    },
+    {
+      "path": "src/effort_atlas/confirmatory.py",
+      "sha256": "da610ea60c73fe77cd69b87a5d2472d906872d090425d55518f3c9b3f8f7d921",
+      "bytes": 23541,
+      "purpose": "offline ledger and schedule baseline"
+    },
+    {
+      "path": "src/effort_atlas/graders.py",
+      "sha256": "187a7c2cb5219338c4844249b1a47dc04e5a6034c8a16a7fbcbfaaddca1dc464",
+      "bytes": 2336,
+      "purpose": "answer-extraction implementation"
+    },
+    {
+      "path": "tests/test_linux_handoff.py",
+      "sha256": "35258c8e2b25ec637e552813eaab846eb6319db68cade7f688e7bff41e83e003",
+      "bytes": 3581,
+      "purpose": "handoff verifier tests"
+    }
+  ],
+  "excluded_from_transfer": [
+    "environment variables and .env files",
+    "provider API keys and account credentials",
+    "raw benchmark caches and restricted GPQA text",
+    "provider responses, receipts, smoke data, and confirmatory data",
+    "uncommitted local work not intentionally committed to the branch"
+  ],
+  "refresh_instruction": "After an intentionally committed benchmark-provenance update, run python scripts/verify_linux_handoff.py --write and commit this manifest with the changed tracked context."
+}
