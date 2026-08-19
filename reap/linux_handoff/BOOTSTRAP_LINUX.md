@@ -55,10 +55,16 @@ tailscale status
 tailscale ping <linux-tailnet-hostname>
 ```
 
-Then connect with the Linux account name:
+If Tailscale SSH is enabled on the Linux peer, connect with the Linux account name:
 
 ```sh
 tailscale ssh <linux-user>@<linux-tailnet-hostname>
+```
+
+Otherwise use ordinary SSH over the tailnet address:
+
+```sh
+ssh <linux-user>@<linux-tailnet-hostname>
 ```
 
 If the Linux host can reach GitHub, clone the branch there using the command above.

@@ -131,13 +131,13 @@
     },
     {
       "path": "reap/linux_handoff/BOOTSTRAP_LINUX.md",
-      "sha256": "53e1aa21a85aa30118cfa8fe3740a3bea560203a2a63c1f355f61453f742ab8d",
-      "bytes": 4976,
+      "sha256": "e67c8665f22b44a50b2ce3cb76f5a9aa47f1a55252783d42e847e3ecf9115176",
+      "bytes": 5125,
       "purpose": "Linux setup and transfer steps"
     },
     {
       "path": "reap/linux_handoff/CONTEXT_BUILD_RECEIPT.md",
-      "sha256": "67d79625fb851c6d42c61e43c0d4b0701b6fd6f35bfd23e086ebc3e4ccb97fce",
+      "sha256": "ddc790a68d165b02cdd47aed0522ed6836047528632a12e5194df17b7d7c23ae",
       "bytes": 776,
       "purpose": "context-bundle security and reproducibility receipt"
     },
@@ -149,8 +149,8 @@
     },
     {
       "path": "reap/linux_handoff/REPO_CONTEXT.xml",
-      "sha256": "6a5b8ede12c5f57a85f5f7004b3e9d4ddd707c29903e684f541e8e06e5cfe43b",
-      "bytes": 1267217,
+      "sha256": "90efeb1713e959160e3b47f396719b83f11382bce3249ec6c3c888eb89554150",
+      "bytes": 1267523,
       "purpose": "secret-scanned tracked repository context bundle"
     },
     {
@@ -227,8 +227,8 @@
     },
     {
       "path": "tests/test_linux_handoff.py",
-      "sha256": "160be1bc6fd1ed2e727f78cb26a32b7604cbf317f484fac04fb338ceb1d702d5",
-      "bytes": 5380,
+      "sha256": "e4227296fa9d30b40d009165d7bab99a18b14da12ba9d30c36ea9a1eeae06011",
+      "bytes": 5458,
       "purpose": "handoff verifier tests"
     },
     {

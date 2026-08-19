@@ -127,6 +127,7 @@ class LinuxHandoffTests(unittest.TestCase):
         self.assertIn("codex/benchmark-provenance-linux", bootstrap)
         self.assertIn("tailscale ping <linux-tailnet-hostname>", bootstrap)
         self.assertIn("tailscale ssh <linux-user>@<linux-tailnet-hostname>", bootstrap)
+        self.assertIn("ssh <linux-user>@<linux-tailnet-hostname>", bootstrap)
         self.assertNotIn("codex/reap-governance", bootstrap)
         self.assertNotIn("OPENROUTER_API_KEY", bootstrap)
 
