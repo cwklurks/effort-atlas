@@ -11,11 +11,16 @@ from __future__ import annotations
 
 import hashlib
 import json
+import math
 import os
 import re
 import tempfile
+import zipfile
+from ast import Assign, Name, literal_eval, parse
 from collections import defaultdict
 from collections.abc import Iterable, Mapping, Sequence
+from csv import reader
+from io import StringIO
 from pathlib import Path
 from typing import Any
 from urllib.parse import parse_qs, urlparse
@@ -24,23 +29,46 @@ MANIFEST_SCHEMA = "benchmark-source-manifest-v1"
 CAPABILITY_SCHEMA = "benchmark-question-capability-v1"
 SUMMARY_SCHEMA = "benchmark-question-capability-summary-v1"
 _SHA256 = re.compile(r"^[0-9a-f]{64}$")
-_COMMIT = re.compile(r"[0-9a-f]{40}")
+_COMMIT = re.compile(r"^[0-9a-f]{40}$")
 _ALLOWED_HOSTS = {
     "huggingface.co",
     "storage.googleapis.com",
     "raw.githubusercontent.com",
 }
-_FORBIDDEN_ROW_FIELDS = {
-    "answer",
-    "all_messages",
-    "completion",
-    "gold",
-    "problem",
-    "prompt",
-    "response",
-    "response_text",
-    "user_message",
-}
+_CAPABILITY_FIELDS = frozenset(
+    {
+        "schema_version",
+        "benchmark",
+        "model",
+        "question_id",
+        "source_question_available",
+        "archived_response_available",
+        "attempt_count",
+        "source_native_correct_count",
+        "source_native_accuracy",
+        "source_native_grade_semantics",
+        "source_native_grade_status",
+        "source_output_text_match_status",
+        "source_output_gold_match_status",
+        "prompt_fingerprint_set_digest",
+        "prompt_fingerprint_count",
+        "output_tokens_available",
+        "output_tokens_mean",
+        "output_tokens_invalid_count",
+        "output_tokens_zero_count",
+        "output_tokens_negative_count",
+        "output_tokens_nonfinite_count",
+        "output_tokens_status",
+        "requested_max_tokens",
+        "requested_cap_status",
+        "finish_reason",
+        "termination_status",
+        "censoring_status",
+        "strict_marker_regrade_status",
+    }
+)
+_GPQA_HF_REVISION = re.compile(r"revision\s*=\s*[\"']([0-9a-f]{40})[\"']")
+_GPQA_PASSWORD = re.compile(r"Password for dataset\.zip[^`]*`([^`]+)`", re.IGNORECASE)
 
 
 class ProvenanceError(ValueError):
@@ -75,18 +103,20 @@ def _validate_url(url: str) -> None:
         raise ProvenanceError(f"source URL must be HTTPS on an allowlisted host: {url}")
     if parsed.username or parsed.password:
         raise ProvenanceError("source URL must not contain credentials")
-    if parsed.netloc == "huggingface.co" and "/resolve/" not in parsed.path:
-        raise ProvenanceError(f"Hugging Face URL must pin a resolve revision: {url}")
-    if parsed.netloc == "huggingface.co" and not _COMMIT.search(
-        parsed.path.split("/resolve/", 1)[1].split("/", 1)[0]
-    ):
-        raise ProvenanceError(
-            f"Hugging Face URL must use a 40-character revision: {url}"
+    if parsed.netloc == "huggingface.co":
+        match = re.fullmatch(
+            r"/datasets/[^/]+/[^/]+/resolve/([0-9a-f]{40})/.+", parsed.path
         )
-    if parsed.netloc == "raw.githubusercontent.com" and not _COMMIT.search(parsed.path):
-        raise ProvenanceError(
-            f"GitHub URL must contain a 40-character immutable commit: {url}"
-        )
+        if match is None or not _COMMIT.fullmatch(match.group(1)):
+            raise ProvenanceError(
+                f"Hugging Face URL must pin exactly one 40-character revision: {url}"
+            )
+    if parsed.netloc == "raw.githubusercontent.com":
+        parts = parsed.path.strip("/").split("/")
+        if len(parts) < 4 or not _COMMIT.fullmatch(parts[2]):
+            raise ProvenanceError(
+                f"GitHub URL must pin exactly one 40-character immutable commit: {url}"
+            )
     if parsed.netloc == "storage.googleapis.com":
         generation = parse_qs(parsed.query).get("generation", [])
         if len(generation) != 1 or not generation[0].isdigit():
@@ -106,7 +136,7 @@ def validate_manifest(manifest: Mapping[str, Any]) -> None:
     for index, entry in enumerate(entries, start=1):
         if not isinstance(entry, dict):
             raise ProvenanceError(f"manifest entry {index} must be an object")
-        required = ("source_id", "role", "url", "path", "bytes", "sha256")
+        required = ("source_id", "role", "url", "path", "bytes", "sha256", "policy")
         missing = [name for name in required if name not in entry]
         if missing:
             raise ProvenanceError(
@@ -142,6 +172,23 @@ def validate_manifest(manifest: Mapping[str, Any]) -> None:
         _validate_url(entry["url"])
         seen_ids.add(source_id)
         seen_paths.add(path)
+    policies = manifest.get("source_policies")
+    if not isinstance(policies, Mapping) or not policies:
+        raise ProvenanceError("manifest source_policies must be a non-empty object")
+    for policy_id, policy in policies.items():
+        if not isinstance(policy_id, str) or not isinstance(policy, Mapping):
+            raise ProvenanceError("manifest source policies must be named objects")
+        if not isinstance(policy.get("license"), str) or not isinstance(
+            policy.get("redistribution"), str
+        ):
+            raise ProvenanceError(
+                f"source policy {policy_id!r} needs license and redistribution rules"
+            )
+    unknown_policies = {entry["policy"] for entry in entries} - set(policies)
+    if unknown_policies:
+        raise ProvenanceError(
+            f"manifest entry names unknown policy: {sorted(unknown_policies)}"
+        )
 
 
 def _source_path(root: Path, relative_path: str) -> Path:
@@ -212,6 +259,65 @@ def _content_fingerprint(value: Any) -> str | None:
     return hashlib.sha256(value.encode("utf-8")).hexdigest()
 
 
+def _fingerprint_set_digest(fingerprints: Iterable[str]) -> str | None:
+    values = sorted(set(fingerprints))
+    if not values:
+        return None
+    return hashlib.sha256("\n".join(values).encode("ascii")).hexdigest()
+
+
+def _output_token_summary(values: Iterable[Any]) -> dict[str, Any]:
+    """Treat only finite, strictly-positive lengths as usable token measurements."""
+
+    usable: list[float] = []
+    zero_count = negative_count = nonfinite_count = 0
+    for value in values:
+        if value is None:
+            continue
+        if (
+            isinstance(value, bool)
+            or not isinstance(value, (int, float))
+            or not math.isfinite(value)
+        ):
+            nonfinite_count += 1
+        elif value == 0:
+            zero_count += 1
+        elif value < 0:
+            negative_count += 1
+        else:
+            usable.append(float(value))
+    invalid_count = zero_count + negative_count + nonfinite_count
+    if usable and invalid_count:
+        status = "partial_invalid_values"
+    elif usable:
+        status = "available"
+    elif zero_count and not negative_count and not nonfinite_count:
+        status = "zero_values_only"
+    elif negative_count and not zero_count and not nonfinite_count:
+        status = "negative_values_only"
+    elif nonfinite_count and not zero_count and not negative_count:
+        status = "nonfinite_values_only"
+    elif invalid_count:
+        status = "invalid_values_only"
+    else:
+        status = "not_published"
+    return {
+        "output_tokens_available": bool(usable),
+        "output_tokens_mean": _mean(usable),
+        "output_tokens_invalid_count": invalid_count,
+        "output_tokens_zero_count": zero_count,
+        "output_tokens_negative_count": negative_count,
+        "output_tokens_nonfinite_count": nonfinite_count,
+        "output_tokens_status": status,
+    }
+
+
+def _match_status(source: str | None, observed: set[str]) -> str:
+    if source is None or not observed:
+        return "not_comparable"
+    return "matches_source" if observed == {source} else "mismatch_source"
+
+
 def build_matharena_capability_rows(
     *,
     benchmark: str,
@@ -220,20 +326,21 @@ def build_matharena_capability_rows(
 ) -> list[dict[str, Any]]:
     """Build sanitized source-native rows without copying source problem content."""
 
-    source_text_fingerprints: dict[str, str | None] = {}
+    source_fingerprints: dict[str, tuple[str | None, str | None]] = {}
     for record in source_records:
         if "problem_idx" not in record:
             raise ProvenanceError(f"{benchmark} source row lacks problem_idx")
         question_id = str(record["problem_idx"])
-        if question_id in source_text_fingerprints:
+        if question_id in source_fingerprints:
             raise ProvenanceError(
                 f"{benchmark} source archive repeats question {question_id}"
             )
-        source_text_fingerprints[question_id] = _content_fingerprint(
-            record.get("problem")
+        source_fingerprints[question_id] = (
+            _content_fingerprint(record.get("problem")),
+            _content_fingerprint(record.get("answer")),
         )
-    source_ids = set(source_text_fingerprints)
-    if not source_text_fingerprints:
+    source_ids = set(source_fingerprints)
+    if not source_fingerprints:
         raise ProvenanceError(f"{benchmark} source archive has no questions")
 
     grouped: dict[tuple[str, str], list[Mapping[str, Any]]] = defaultdict(list)
@@ -249,74 +356,93 @@ def build_matharena_capability_rows(
             )
         grouped[(str(record["model_name"]), question_id)].append(record)
 
+    models = sorted({model for model, _ in grouped})
+    if not models:
+        raise ProvenanceError(f"{benchmark} output archive has no models")
     rows: list[dict[str, Any]] = []
-    for (model, question_id), attempts in sorted(grouped.items()):
-        correct_values = [_normalise_bool(record.get("correct")) for record in attempts]
-        if any(value is None for value in correct_values):
-            raise ProvenanceError(
-                f"{benchmark} {model} question {question_id} lacks source-native grade"
-            )
-        output_tokens: list[int | float] = []
-        invalid_output_token_count = 0
-        output_text_fingerprints: set[str] = set()
-        for record in attempts:
-            value = record.get("output_tokens")
-            if value is not None:
-                if (
-                    not isinstance(value, (int, float))
-                    or isinstance(value, bool)
-                    or value < 0
-                ):
-                    invalid_output_token_count += 1
-                else:
-                    output_tokens.append(value)
-            output_fingerprint = _content_fingerprint(record.get("problem"))
-            if output_fingerprint is not None:
-                output_text_fingerprints.add(output_fingerprint)
-        source_fingerprint = source_text_fingerprints[question_id]
-        if source_fingerprint is None or not output_text_fingerprints:
-            text_match_status = "not_comparable"
-        elif output_text_fingerprints == {source_fingerprint}:
-            text_match_status = "matches_source"
-        else:
-            text_match_status = "mismatch_source"
-        rows.append(
-            {
-                "schema_version": CAPABILITY_SCHEMA,
-                "benchmark": benchmark,
-                "model": model,
-                "question_id": question_id,
-                "source_question_available": True,
-                "archived_response_available": True,
-                "attempt_count": len(attempts),
-                "source_native_correct_count": int(
+    for model in models:
+        for question_id in sorted(
+            source_ids, key=lambda value: int(value) if value.isdigit() else value
+        ):
+            attempts = grouped.get((model, question_id), [])
+            source_text, source_gold = source_fingerprints[question_id]
+            if attempts:
+                correct_values = [
+                    _normalise_bool(record.get("correct")) for record in attempts
+                ]
+                if any(value is None for value in correct_values):
+                    raise ProvenanceError(
+                        f"{benchmark} {model} question {question_id} lacks source-native grade"
+                    )
+                output_text_fingerprints = {
+                    fingerprint
+                    for record in attempts
+                    if (fingerprint := _content_fingerprint(record.get("problem")))
+                    is not None
+                }
+                output_gold_fingerprints = {
+                    fingerprint
+                    for record in attempts
+                    if (fingerprint := _content_fingerprint(record.get("gold_answer")))
+                    is not None
+                }
+                prompt_fingerprints = {
+                    fingerprint
+                    for record in attempts
+                    if (
+                        fingerprint := _content_fingerprint(
+                            record.get("user_message", record.get("problem"))
+                        )
+                    )
+                    is not None
+                }
+                grade_count: int | None = int(
                     sum(bool(value) for value in correct_values)
-                ),
-                "source_native_accuracy": float(
-                    sum(bool(value) for value in correct_values) / len(attempts)
-                ),
-                "source_native_grade_semantics": "MathArena archived correct field",
-                "source_output_text_match_status": text_match_status,
-                "output_tokens_available": bool(output_tokens),
-                "output_tokens_mean": _mean(output_tokens),
-                "output_tokens_invalid_count": invalid_output_token_count,
-                "output_tokens_status": (
-                    "partial_invalid_values"
-                    if invalid_output_token_count and output_tokens
-                    else "invalid_values_only"
-                    if invalid_output_token_count
-                    else "available"
-                    if output_tokens
-                    else "not_published"
-                ),
-                "requested_max_tokens": None,
-                "requested_cap_status": "not_published",
-                "finish_reason": None,
-                "termination_status": "not_published",
-                "censoring_status": "not_observed_in_archive",
-                "strict_marker_regrade_status": "not_applied",
-            }
-        )
+                )
+                accuracy: float | None = float(grade_count / len(attempts))
+                grade_status = "available"
+            else:
+                output_text_fingerprints = set()
+                output_gold_fingerprints = set()
+                prompt_fingerprints = set()
+                grade_count = None
+                accuracy = None
+                grade_status = "not_archived"
+            token_summary = _output_token_summary(
+                record.get("output_tokens") for record in attempts
+            )
+            rows.append(
+                {
+                    "schema_version": CAPABILITY_SCHEMA,
+                    "benchmark": benchmark,
+                    "model": model,
+                    "question_id": question_id,
+                    "source_question_available": True,
+                    "archived_response_available": bool(attempts),
+                    "attempt_count": len(attempts),
+                    "source_native_correct_count": grade_count,
+                    "source_native_accuracy": accuracy,
+                    "source_native_grade_semantics": "MathArena archived correct field",
+                    "source_native_grade_status": grade_status,
+                    "source_output_text_match_status": _match_status(
+                        source_text, output_text_fingerprints
+                    ),
+                    "source_output_gold_match_status": _match_status(
+                        source_gold, output_gold_fingerprints
+                    ),
+                    "prompt_fingerprint_set_digest": _fingerprint_set_digest(
+                        prompt_fingerprints
+                    ),
+                    "prompt_fingerprint_count": len(prompt_fingerprints),
+                    **token_summary,
+                    "requested_max_tokens": None,
+                    "requested_cap_status": "not_published",
+                    "finish_reason": None,
+                    "termination_status": "not_published",
+                    "censoring_status": "not_observed_in_archive",
+                    "strict_marker_regrade_status": "not_applied",
+                }
+            )
     return rows
 
 
@@ -390,15 +516,11 @@ def build_helm_capability_rows(
         if not isinstance(stats, Mapping):
             raise ProvenanceError(f"HELM display prediction {instance_id} lacks stats")
         correct = _normalise_bool(stats.get("chain_of_thought_correctness"))
-        output_tokens = stats.get("num_output_tokens")
-        if output_tokens is not None and (
-            not isinstance(output_tokens, (int, float))
-            or isinstance(output_tokens, bool)
-            or output_tokens < 0
-        ):
+        if correct is None:
             raise ProvenanceError(
-                f"HELM output tokens are invalid for {instance_id}: {output_tokens!r}"
+                f"HELM display prediction {instance_id} lacks source-native correctness"
             )
+        output_tokens = stats.get("num_output_tokens")
         finish = _finish_reason(completions[0])
         rows.append(
             {
@@ -412,15 +534,12 @@ def build_helm_capability_rows(
                 "source_native_correct_count": int(bool(correct)),
                 "source_native_accuracy": float(bool(correct)),
                 "source_native_grade_semantics": "HELM chain_of_thought_correctness",
+                "source_native_grade_status": "available",
                 "source_output_text_match_status": "not_compared_restricted_source",
-                "output_tokens_available": output_tokens is not None,
-                "output_tokens_mean": float(output_tokens)
-                if output_tokens is not None
-                else None,
-                "output_tokens_invalid_count": 0,
-                "output_tokens_status": "available"
-                if output_tokens is not None
-                else "not_published",
+                "source_output_gold_match_status": "not_compared_restricted_source",
+                "prompt_fingerprint_set_digest": None,
+                "prompt_fingerprint_count": 0,
+                **_output_token_summary([output_tokens]),
                 "requested_max_tokens": max_tokens,
                 "requested_cap_status": "available",
                 "finish_reason": finish,
@@ -464,6 +583,84 @@ def _pandas_records(path: Path) -> list[dict[str, Any]]:
         raise ProvenanceError(f"could not read parquet {path}: {exc}") from exc
 
 
+def _parse_helm_gpqa_contract(
+    archive_path: Path, scenario_source: str, gpqa_readme: str
+) -> dict[str, Any]:
+    """Read only GPQA row count; never return or print restricted CSV contents."""
+
+    try:
+        tree = parse(scenario_source)
+    except SyntaxError as exc:
+        raise ProvenanceError(
+            "pinned HELM GPQA scenario source is not parseable"
+        ) from exc
+    train_indices: list[int] | None = None
+    for node in tree.body:
+        if isinstance(node, Assign) and any(
+            isinstance(target, Name) and target.id == "TRAIN_EXAMPLE_INDICES"
+            for target in node.targets
+        ):
+            try:
+                mapping = literal_eval(node.value)
+            except ValueError as exc:
+                raise ProvenanceError(
+                    "HELM train-index mapping is not a literal"
+                ) from exc
+            indices = mapping.get("gpqa_main") if isinstance(mapping, dict) else None
+            if not isinstance(indices, list) or not all(
+                isinstance(value, int) for value in indices
+            ):
+                raise ProvenanceError("HELM GPQA main train indices are malformed")
+            train_indices = sorted(indices)
+            break
+    revision_match = _GPQA_HF_REVISION.search(scenario_source)
+    if train_indices is None or revision_match is None:
+        raise ProvenanceError(
+            "HELM GPQA scenario lacks train indices or pinned Hugging Face revision"
+        )
+    password_match = _GPQA_PASSWORD.search(gpqa_readme)
+    if password_match is None:
+        raise ProvenanceError(
+            "pinned GPQA README does not provide the archive password"
+        )
+    try:
+        with zipfile.ZipFile(archive_path) as archive:
+            raw = archive.read(
+                "dataset/gpqa_main.csv", pwd=password_match.group(1).encode("utf-8")
+            )
+    except (KeyError, RuntimeError, zipfile.BadZipFile) as exc:
+        raise ProvenanceError("could not read pinned restricted GPQA main CSV") from exc
+    try:
+        text = raw.decode("utf-8")
+    except UnicodeDecodeError as exc:
+        raise ProvenanceError("restricted GPQA main CSV is not UTF-8") from exc
+    # Parse solely to count CSV records.  No row content escapes this function.
+    csv_reader = reader(StringIO(text))
+    try:
+        next(csv_reader)
+    except StopIteration as exc:
+        raise ProvenanceError("restricted GPQA main CSV has no header") from exc
+    source_row_count = sum(1 for _ in csv_reader)
+    if any(index < 0 or index >= source_row_count for index in train_indices):
+        raise ProvenanceError("HELM GPQA train indices fall outside pinned source rows")
+    return {
+        "source_row_count": source_row_count,
+        "train_indices": train_indices,
+        "hf_revision": revision_match.group(1),
+    }
+
+
+def _validate_helm_release_manifest(release: Any, model_keys: Sequence[str]) -> None:
+    if not isinstance(release, Mapping):
+        raise ProvenanceError("HELM release manifest must be an object")
+    prefix = "gpqa:subset=gpqa_main,use_chain_of_thought=true,use_few_shot=false,model="
+    for model_key in model_keys:
+        if release.get(prefix + model_key) != "v1.15.0":
+            raise ProvenanceError(
+                f"HELM release manifest does not map {model_key} to v1.15.0"
+            )
+
+
 def build_capability_table(
     manifest: Mapping[str, Any], root: Path
 ) -> tuple[list[dict[str, Any]], dict[str, Any]]:
@@ -495,11 +692,26 @@ def build_capability_table(
             )
         )
 
-    for model_key, model_name in (
+    helm_models = (
         ("google_gemini-3-pro-preview", "google_gemini-3-pro-preview"),
         ("anthropic_claude-haiku-4-5-20251001", "anthropic_claude-haiku-4-5-20251001"),
         ("openai_gpt-5.1-2025-11-13", "openai_gpt-5.1-2025-11-13"),
-    ):
+    )
+    contract = _parse_helm_gpqa_contract(
+        path("gpqa-main-source-archive"),
+        path("helm-gpqa-scenario-code").read_text(encoding="utf-8"),
+        path("gpqa-readme").read_text(encoding="utf-8"),
+    )
+    _validate_helm_release_manifest(
+        _read_json(path("helm-release-manifest")),
+        [model_key for model_key, _ in helm_models],
+    )
+    expected_helm_ids = {
+        f"id{index}"
+        for index in range(contract["source_row_count"])
+        if index not in set(contract["train_indices"])
+    }
+    for model_key, model_name in helm_models:
         scenario = _read_json(path(f"helm-{model_key}-scenario"))
         display = _read_json(path(f"helm-{model_key}-display"))
         if not isinstance(scenario, Mapping) or not isinstance(
@@ -515,13 +727,23 @@ def build_capability_table(
             request_states=scenario["request_states"],
             display_predictions=display,
         )
-        # HELM's pinned GPQA scenario marks two of the 448 source rows as train
-        # examples, leaving the 446 published test requests in this run.
-        source_question_counts["helm_gpqa_main_cot_v1.15.0"] = 448
+        observed_ids = {row["question_id"] for row in helm_rows}
+        if observed_ids != expected_helm_ids:
+            raise ProvenanceError(
+                f"HELM request ids for {model_name} do not equal the pinned GPQA test split"
+            )
+        source_question_counts["helm_gpqa_main_cot_v1.15.0"] = contract[
+            "source_row_count"
+        ]
         all_rows.extend(helm_rows)
 
     all_rows.sort(key=lambda row: (row["benchmark"], row["model"], row["question_id"]))
     summary = summarize_capability_rows(all_rows, source_question_counts)
+    summary["helm_gpqa_contract"] = {
+        **contract,
+        "evaluated_question_count": len(expected_helm_ids),
+        "release_version": "v1.15.0",
+    }
     return all_rows, summary
 
 
@@ -558,8 +780,20 @@ def summarize_capability_rows(
             "output_token_rows": sum(
                 bool(row.get("output_tokens_available")) for row in group
             ),
+            "output_token_unusable_rows": sum(
+                not bool(row.get("output_tokens_available")) for row in group
+            ),
             "output_token_invalid_values": sum(
                 int(row.get("output_tokens_invalid_count", 0)) for row in group
+            ),
+            "output_token_zero_values": sum(
+                int(row.get("output_tokens_zero_count", 0)) for row in group
+            ),
+            "output_token_negative_values": sum(
+                int(row.get("output_tokens_negative_count", 0)) for row in group
+            ),
+            "output_token_nonfinite_values": sum(
+                int(row.get("output_tokens_nonfinite_count", 0)) for row in group
             ),
             "requested_cap_rows": sum(
                 row.get("requested_cap_status") == "available" for row in group
@@ -582,6 +816,17 @@ def summarize_capability_rows(
                 for row in group
                 if row.get("source_output_text_match_status") == "mismatch_source"
             ),
+            "source_output_gold_match_rows": sum(
+                row.get("source_output_gold_match_status") == "matches_source"
+                for row in group
+            ),
+            "source_output_gold_mismatch_rows": sum(
+                row.get("source_output_gold_match_status") == "mismatch_source"
+                for row in group
+            ),
+            "prompt_fingerprint_variant_rows": sum(
+                int(row.get("prompt_fingerprint_count", 0)) > 1 for row in group
+            ),
         }
         if benchmark == "helm_gpqa_main_cot_v1.15.0":
             benchmark_summary["source_rows_excluded_by_pinned_helm_split"] = 2
@@ -601,13 +846,87 @@ def summarize_capability_rows(
 
 def _validate_output_rows(rows: Sequence[Mapping[str, Any]]) -> None:
     for index, row in enumerate(rows, start=1):
-        forbidden = _FORBIDDEN_ROW_FIELDS & set(row)
-        if forbidden:
+        fields = set(row)
+        if fields != _CAPABILITY_FIELDS:
+            missing = sorted(_CAPABILITY_FIELDS - fields)
+            extra = sorted(fields - _CAPABILITY_FIELDS)
             raise ProvenanceError(
-                f"forbidden raw content field(s) in capability row {index}: {sorted(forbidden)}"
+                f"capability row {index} must use exact schema; missing={missing}, extra={extra}"
             )
         if row.get("schema_version") != CAPABILITY_SCHEMA:
             raise ProvenanceError(f"capability row {index} has wrong schema version")
+        if (
+            not isinstance(row["benchmark"], str)
+            or not isinstance(row["model"], str)
+            or not isinstance(row["question_id"], str)
+        ):
+            raise ProvenanceError(f"capability row {index} has invalid identity fields")
+        if not isinstance(row["attempt_count"], int) or row["attempt_count"] < 0:
+            raise ProvenanceError(f"capability row {index} has invalid attempt count")
+        for field in (
+            "source_question_available",
+            "archived_response_available",
+            "output_tokens_available",
+        ):
+            if not isinstance(row[field], bool):
+                raise ProvenanceError(f"capability row {index} has non-boolean {field}")
+        for field in (
+            "source_native_grade_semantics",
+            "source_native_grade_status",
+            "source_output_text_match_status",
+            "source_output_gold_match_status",
+            "output_tokens_status",
+            "requested_cap_status",
+            "termination_status",
+            "censoring_status",
+            "strict_marker_regrade_status",
+        ):
+            if not isinstance(row[field], str):
+                raise ProvenanceError(f"capability row {index} has non-string {field}")
+        for field in (
+            "output_tokens_invalid_count",
+            "output_tokens_zero_count",
+            "output_tokens_negative_count",
+            "output_tokens_nonfinite_count",
+            "prompt_fingerprint_count",
+        ):
+            if not isinstance(row[field], int) or row[field] < 0:
+                raise ProvenanceError(f"capability row {index} has invalid {field}")
+        if row["source_native_correct_count"] is not None and (
+            not isinstance(row["source_native_correct_count"], int)
+            or row["source_native_correct_count"] < 0
+        ):
+            raise ProvenanceError(f"capability row {index} has invalid correct count")
+        for field in ("output_tokens_mean", "source_native_accuracy"):
+            value = row[field]
+            if value is not None and (
+                isinstance(value, bool)
+                or not isinstance(value, (int, float))
+                or not math.isfinite(value)
+            ):
+                raise ProvenanceError(f"capability row {index} has invalid {field}")
+        if row["output_tokens_mean"] is not None and row["output_tokens_mean"] <= 0:
+            raise ProvenanceError(
+                f"capability row {index} has non-positive usable output tokens"
+            )
+        if (
+            row["source_native_accuracy"] is not None
+            and not 0 <= row["source_native_accuracy"] <= 1
+        ):
+            raise ProvenanceError(
+                f"capability row {index} has out-of-range source-native accuracy"
+            )
+        if row["requested_max_tokens"] is not None and (
+            isinstance(row["requested_max_tokens"], bool)
+            or not isinstance(row["requested_max_tokens"], int)
+            or row["requested_max_tokens"] <= 0
+        ):
+            raise ProvenanceError(
+                f"capability row {index} has invalid requested_max_tokens"
+            )
+        for field in ("prompt_fingerprint_set_digest", "finish_reason"):
+            if row[field] is not None and not isinstance(row[field], str):
+                raise ProvenanceError(f"capability row {index} has invalid {field}")
 
 
 def _atomic_write(path: Path, content: str) -> None:
