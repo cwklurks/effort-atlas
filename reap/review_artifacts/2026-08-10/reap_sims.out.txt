@@ -1,0 +1,23 @@
+=== Sim 1: H3 one-sided power (alpha=0.05), delta_solve=+0.08 ===
+scenario                       m   n   true I  mean SE   power
+strong (hi@4K trunc 45%)      30   8    0.187    0.059    0.92
+strong (hi@4K trunc 45%)      30  20    0.187    0.039    1.00
+strong (hi@4K trunc 45%)      60   8    0.187    0.042    1.00
+strong (hi@4K trunc 45%)      60  20    0.187    0.028    1.00
+moderate (hi@4K trunc 30%)    30   8    0.104    0.059    0.55
+moderate (hi@4K trunc 30%)    30  20    0.104    0.038    0.87
+moderate (hi@4K trunc 30%)    60   8    0.104    0.042    0.80
+moderate (hi@4K trunc 30%)    60  20    0.104    0.027    0.99
+weak (hi@4K trunc 20%)        30   8    0.047    0.058    0.20
+weak (hi@4K trunc 20%)        30  20    0.047    0.037    0.36
+weak (hi@4K trunc 20%)        60   8    0.047    0.041    0.32
+weak (hi@4K trunc 20%)        60  20    0.047    0.026    0.55
+
+=== Sim 2: H6 upper-bound certification under PERFECT calibration ===
+   m  cells  mean 95% UB  P(certify @0.10)
+  30      4        0.128              0.07
+  30      8        0.147              0.00
+  30     20        0.168              0.00
+  60      4        0.092              0.76
+  60      8        0.104              0.46
+  60     20        0.119              0.02
