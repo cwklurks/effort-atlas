@@ -4,9 +4,9 @@
     "name": "REAP",
     "paper": "Thinking Cut Short",
     "repository": "cwklurks/effort-atlas",
-    "updated": "2026-08-08",
-    "current_phase": 2,
-    "summary": "Phase 1 passed adversarial review; grader-analysis integration is next but remains blocked on human merge decisions."
+    "updated": "2026-08-10",
+    "current_phase": 3,
+    "summary": "Phase 2 is merged; Connor's Phase 3 positions and an integrated model portfolio, dataset, and statistics recommendation are ready for his separate-model review before the remaining human decisions are frozen."
   },
   "safety": {
     "confirmatory_calls": 0,
@@ -18,10 +18,10 @@
     {
       "id": 0,
       "name": "Governance and baseline",
-      "status": "awaiting_merge",
+      "status": "complete",
       "progress": 100,
       "summary": "Durable instructions, locked Python 3.12 environment, clean-checkout tests, and observational provenance.",
-      "gate": "PR #4 is independently approved and awaits human merge.",
+      "gate": "Accepted governance baseline merged to main.",
       "url": "https://github.com/cwklurks/effort-atlas/pull/4"
     },
     {
@@ -35,18 +35,19 @@
     {
       "id": 2,
       "name": "Grader and analysis integration",
-      "status": "blocked",
-      "progress": 0,
-      "summary": "Rebase the analysis layer, resolve shared files, and correct the item-level transition estimand.",
-      "gate": "Human merge/rebase decisions, then one clean and reproducible grader-plus-analysis baseline."
+      "status": "complete",
+      "progress": 100,
+      "summary": "Grader v2 and analysis are integrated and independently approved after transition, calibration, and rescue-validation remediation.",
+      "gate": "Independent statistical re-review passed and PR #3 was human-merged."
     },
     {
       "id": 3,
       "name": "Methodology and preregistration freeze",
-      "status": "blocked",
-      "progress": 0,
-      "summary": "Settle supervisor decisions and freeze prompts, routes, schedules, estimands, seeds, and hashes.",
-      "gate": "All confirmatory choices fixed before outcomes exist."
+      "status": "in_progress",
+      "progress": 45,
+      "summary": "A non-frozen integrated recommendation proposes a balanced Tinker/OpenAI portfolio around the planned 30-of-33 HMMT-2026 core and exposes its symbolic-grader and route gates for independent external review.",
+      "gate": "Connor runs the supplied prompt with a separate model, Codex audits the response, then Connor and Chirag resolve the remaining human scientific choices and freeze exact rules; no review artifact authorizes a call.",
+      "url": "https://github.com/cwklurks/effort-atlas/pull/6"
     },
     {
       "id": 4,
@@ -89,7 +90,7 @@
       "branch": "codex/ecosystem-audit",
       "pr": 1,
       "owner_model": "gpt-5.6-sol / XHigh",
-      "next": "Human review and merge of independently approved PR #1 at 303263e."
+      "next": "Merged to main at the accepted 303263e implementation; retain headline limitations in reporting."
     },
     {
       "id": "B",
@@ -98,7 +99,7 @@
       "branch": "codex/grader-v2",
       "pr": 2,
       "owner_model": "gpt-5.6-sol / High",
-      "next": "Human review and merge of independently approved PR #2 at 9a54f17."
+      "next": "Merged to main and integrated with the analysis layer without fallback extraction."
     },
     {
       "id": "C",
@@ -107,16 +108,16 @@
       "branch": "codex/tinker-probe",
       "pr": 5,
       "owner_model": "gpt-5.6-sol / High",
-      "next": "Human review of PR #5; live stays blocked until an upstream one-attempt SDK path exists."
+      "next": "Merged to main; live stays blocked until an upstream one-attempt SDK path exists."
     },
     {
       "id": "D",
       "name": "Pre-data analysis layer",
-      "status": "blocked",
+      "status": "complete",
       "branch": "codex/analysis-layer",
       "pr": 3,
-      "owner_model": "unassigned until Phase 2",
-      "next": "After human merges, rebase onto grader v2 and correct the item-level transition estimand."
+      "owner_model": "gpt-5.6-sol / XHigh",
+      "next": "Merged to main at 7c83085; analysis interfaces now constrain the Phase 3 preregistration."
     },
     {
       "id": "E",
@@ -130,8 +131,28 @@
   ],
   "verification": [
     {
-      "label": "Current offline suite",
-      "result": "44 / 44 passed; dashboard freshness enforced",
+      "label": "Integrated recommendation and external-review packet",
+      "result": "112 ordinary tests including the private grader archive plus 26 exact-lock Tinker tests passed; the D01-D15 proposal, five zero-call counters, route/grader blockers, required review output, and independently recomputed cost bounds are present; external review remains pending",
+      "status": "passed"
+    },
+    {
+      "label": "Connor Phase 3 decision worksheet",
+      "result": "108 ordinary tests plus 26 exact-lock Tinker tests passed; D01-D15 positions, alternatives, safety/no-call state, and the declared breadth schedule/cost arithmetic are mutation-checked; primary-source links are present",
+      "status": "passed"
+    },
+    {
+      "label": "Phase 3 decision-packet adversarial review",
+      "result": "Approved at 2b9b161: 11 focused checks passed, costs independently recomputed, and 19 / 19 mutations killed",
+      "status": "passed"
+    },
+    {
+      "label": "Phase 2 approved canonical suite",
+      "result": "89 ordinary tests plus 26 exact-lock Tinker tests passed; private 78-row archives verified",
+      "status": "passed"
+    },
+    {
+      "label": "Current verifier orchestration",
+      "result": "Both project and exact-lock Tinker lanes mandatory; dashboard freshness enforced",
       "status": "passed"
     },
     {
@@ -175,12 +196,54 @@
       "status": "passed"
     },
     {
-      "label": "DeepSeek V4 Flash lane",
-      "result": "Disabled: China-hosting opt-in required",
+      "label": "DeepSeek V4 Flash development lane",
+      "result": "Fireworks ZDR development-only lane proposed but disabled until its route configuration and hard dollar ceiling are approved and committed",
       "status": "attention"
     }
   ],
   "activity": [
+    {
+      "date": "2026-08-10",
+      "phase": 3,
+      "title": "Integrated recommendation and external-review prompt prepared",
+      "detail": "A non-frozen proposal recommends a balanced Inkling, GPT-OSS, Nemotron, Qwen, and Terra portfolio plus a conditional same-model OpenRouter anchor. A self-contained prompt lets Connor obtain a separate-model review. The proposal surfaces symbolic HMMT grading and provider qualification as blockers and authorizes no call."
+    },
+    {
+      "date": "2026-08-10",
+      "phase": 3,
+      "title": "Connor's Phase 3 positions recorded",
+      "detail": "A non-frozen worksheet records Connor's choices, every alternative, current dataset/model research, and detailed D07-D12 explanations. The Tinker portfolio is reopened and a future reliability smoke is proposed under a $2 hard ceiling, but the one-submission gate still blocks it and no call is authorized."
+    },
+    {
+      "date": "2026-08-08",
+      "phase": 3,
+      "title": "Phase 3 decision packet technical review passed",
+      "detail": "The advisory D01-D15 packet passed independent technical review with exact cost recomputation and 19/19 killed mutations and is published in draft PR #6. Human choices remain pending; no provider, paid smoke, or confirmatory call was authorized."
+    },
+    {
+      "date": "2026-08-08",
+      "phase": 3,
+      "title": "Phase 3 methodology gate started",
+      "detail": "PR #3 was human-merged. Read-only audits are inventorying supervisor decisions, freeze artifacts, route and budget facts, and the conflict between preregistration-first and smoke-before-freeze instructions."
+    },
+    {
+      "date": "2026-08-08",
+      "phase": 2,
+      "title": "Phase 2 independently approved",
+      "detail": "Final adversarial review at a4818de found no critical or warning findings after calibration, rescue-validation, governance, and mutation-test remediation. Human review and merge of PR #3 remain."
+    },
+    {
+      "date": "2026-08-08",
+      "phase": 2,
+      "title": "Integration review blockers remediated",
+      "detail": "Large-cap length stops now remain in calibration reference denominators, rescue rows use shared grader-v2 validation, and stale verification and development-routing records are corrected."
+    },
+    {
+      "date": "2026-08-08",
+      "phase": 2,
+      "title": "Grader and analysis integration implemented",
+      "detail": "Accepted main was merged into the analysis branch; strict grader state validation, item-level transition mass, and mandatory two-environment offline verification are green. Independent review remains."
+    },
     {
       "date": "2026-08-08",
       "phase": 1,
@@ -237,9 +300,15 @@
     }
   ],
   "decisions": [
-    "Human review and merge of PRs #4, #1, #2, and #5 remains pending; Codex will not merge them.",
+    "The non-frozen 13_PHASE3_INTEGRATED_RECOMMENDATION_2026-08-10.md is an opinionated proposal for Connor's separate-model review, not a human decision or call authorization; its companion prompt requires a claim-by-claim external verdict.",
+    "The non-frozen 12_PHASE3_CONNOR_DECISION_WORKSHEET_2026-08-10.md records Connor's current positions and all alternatives; open questions remain and it authorizes no call.",
+    "Connor supports a planned shared 30-of-33 HMMT-2026 subset, separate arm sampling, standard 32K GPT-OSS-120B, Terra in principle, and descriptive/bootstrap-first analysis; standard Inkling's scientific direction is accepted while its scope/allocation and the broader Tinker model portfolio are reopened.",
+    "A future Tinker reliability smoke is proposed under a $2 hard ceiling only after scientific freeze and a reviewed one-submission runner; no smoke is currently authorized.",
+    "The reviewed D01-D15 recommendations are advisory, remain human-pending, and authorize no calls; smoke may only activate an unchanged frozen panel or omit it.",
+    "PR #3 was human-merged at 7c83085 before Phase 3 began; Codex did not merge it.",
+    "PRs #4, #1, #2, and #5 were human-merged before Phase 2 integration; Codex did not merge them.",
     "Tinker 0.25.0 live probes are blocked because the pinned SDK resubmits internally.",
-    "DeepSeek V4 Flash remains disabled unless China-hosting is explicitly accepted.",
-    "Transition aggregation, calibration metric, cap grid, and final ceilings remain supervisor decisions."
+    "DeepSeek V4 Flash is proposed through a direct Fireworks ZDR development-only lane but remains disabled until its route configuration and hard dollar ceiling are approved and committed.",
+    "The implementation exposes item-level sufficient statistics and expected independent-draw transition mass; supervisor freeze of final analysis choices, calibration metric, cap grid, and ceilings remains pending."
   ]
 }
