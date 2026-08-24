@@ -122,10 +122,14 @@ The two nonzero MathArena exceptions are:
 | s1.1-32B, HMMT 2025 | 1 / 9 | 11.11% |
 
 `observational/RESULTS.md` in this checkout says 16 of 17. That historical line is
-inconsistent with the current summary artifacts. A correction exists on commit
-`7204667` in `codex/observational-headline-correction`, but it is not an ancestor
-of this checkout. Until that correction is integrated, use this meeting-safe
-wording:
+inconsistent with the current summary artifacts. [Corrected 2026-08-24: this
+document originally cited the correction as commit `7204667`, which does not
+exist; per `reap/23_POST_MEETING_REVIEW_2026-08-23.md` item 13 the commit is
+`6b2e69d` on `codex/observational-headline-correction` — a branch not present on
+`origin` as of 2026-08-24 and therefore not mergeable from this clone. The
+correction is now integrated additively as
+`observational/CORRECTION_2026-08-24.md`, recomputed from the committed summary
+parquets.] Use this meeting-safe wording:
 
 > In the current exploratory comparison, 15 of 17 selected groups had zero
 > accuracy among inferred cap rows or observed length stops; MathArena’s cap labels
