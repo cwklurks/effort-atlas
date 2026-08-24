@@ -46,3 +46,13 @@ htmlcov/
 .DS_Store
 .idea/
 .vscode/
+
+# GPQA restricted plaintext (access conditions: never commit or publish question text)
+capabilities/restricted_local/
+
+# Reacquirable benchmark JSONLs (regenerate: python3 capabilities/acquire.py;
+# expected hashes pinned in capabilities/sources_manifest.json)
+capabilities/mmlu_pro.jsonl
+capabilities/ifeval.jsonl
+capabilities/wildbench_v2.jsonl
+capabilities/omni_math.jsonl

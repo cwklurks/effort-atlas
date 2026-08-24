@@ -1,0 +1,110 @@
+{
+ "datasets": {
+  "mmlu_pro.jsonl": {
+   "rows": 12102,
+   "expected": 12102,
+   "count_ok": true,
+   "row_hash_failures": 0,
+   "grading_kinds": {
+    "gold_choice": 12102
+   },
+   "grading_target_failures": 0,
+   "duplicate_source_item_ids": 0,
+   "prompt_chars": {
+    "p50": 162,
+    "p90": 599,
+    "p99": 1535,
+    "max": 4671
+   }
+  },
+  "gpqa_main.jsonl": {
+   "rows": 448,
+   "expected": 448,
+   "count_ok": true,
+   "row_hash_failures": 0,
+   "grading_kinds": {
+    "gold_choice": 448
+   },
+   "grading_target_failures": 0,
+   "duplicate_source_item_ids": 0
+  },
+  "ifeval.jsonl": {
+   "rows": 541,
+   "expected": 541,
+   "count_ok": true,
+   "row_hash_failures": 0,
+   "grading_kinds": {
+    "verifiable_instructions": 541
+   },
+   "grading_target_failures": 0,
+   "duplicate_source_item_ids": 0,
+   "prompt_chars": {
+    "p50": 191,
+    "p90": 329,
+    "p99": 493,
+    "max": 1858
+   }
+  },
+  "wildbench_v2.jsonl": {
+   "rows": 1024,
+   "expected": 1024,
+   "count_ok": true,
+   "row_hash_failures": 0,
+   "grading_kinds": {
+    "judge_checklist": 1024
+   },
+   "grading_target_failures": 0,
+   "duplicate_source_item_ids": 0,
+   "prompt_chars": {
+    "p50": 1404,
+    "p90": 6170,
+    "p99": 10359,
+    "max": 21476
+   }
+  },
+  "omni_math.jsonl": {
+   "rows": 4428,
+   "expected": 4428,
+   "count_ok": true,
+   "row_hash_failures": 0,
+   "grading_kinds": {
+    "gold_answer": 4428
+   },
+   "grading_target_failures": 0,
+   "empty_gold_rows": {
+    "count": 9,
+    "row_indices_first10": [
+     4146,
+     4160,
+     4167,
+     4181,
+     4232,
+     4249,
+     4339,
+     4399,
+     4415
+    ]
+   },
+   "duplicate_source_item_ids": 0,
+   "prompt_chars": {
+    "p50": 225,
+    "p90": 480,
+    "p99": 912,
+    "max": 9009
+   }
+  }
+ },
+ "gpqa_privacy": {
+  "canary_absent": true,
+  "all_content_null": true,
+  "restricted_file_present": true,
+  "sanitized_matches_restricted": true,
+  "restricted_row_hash_failures": 0
+ },
+ "mmlu_pro_first200_categories": {
+  "business": 200
+ },
+ "mmlu_pro_total_categories": 14,
+ "hard_failures": [],
+ "status": "PASS"
+}

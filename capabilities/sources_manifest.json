@@ -1,0 +1,105 @@
+{
+ "schema_version": "capabilities-source-manifest-v1",
+ "purpose": "Pinned original sources for the five HELM-Capabilities benchmarks and the normalized source-item-v1 JSONLs derived from them. Exploratory acquisition artifact; authorizes no provider call.",
+ "helm_context": {
+  "suite": "HELM Capabilities (mmlu_pro, gpqa, ifeval, wildbench, omni_math)",
+  "leaderboard": "https://crfm.stanford.edu/helm/capabilities/latest/",
+  "launch_post": "https://crfm.stanford.edu/2025/03/20/helm-capabilities.html"
+ },
+ "inputs": [
+  {
+   "source_id": "mmlu-pro-test-00000-of-00001.parquet",
+   "role": "question_source",
+   "url": "https://huggingface.co/datasets/TIGER-Lab/MMLU-Pro/resolve/b189ec765aa7ed75c8acfea42df31fdae71f97be/data/test-00000-of-00001.parquet",
+   "revision": "b189ec765aa7ed75c8acfea42df31fdae71f97be",
+   "bytes": 4144185,
+   "sha256": "0e24a191921c2f453518a537a8b2117bd137e7714d4ef1565e9ba06c1ecb9ad8",
+   "hf_lfs_sha256_match": true
+  },
+  {
+   "source_id": "mmlu-pro-validation-00000-of-00001.parquet",
+   "role": "question_source",
+   "url": "https://huggingface.co/datasets/TIGER-Lab/MMLU-Pro/resolve/b189ec765aa7ed75c8acfea42df31fdae71f97be/data/validation-00000-of-00001.parquet",
+   "revision": "b189ec765aa7ed75c8acfea42df31fdae71f97be",
+   "bytes": 42857,
+   "sha256": "139423c23722e480c807ac4a191409a710cfce4eba744c1d641cf88e730e2078",
+   "hf_lfs_sha256_match": true
+  },
+  {
+   "source_id": "omni-math-test.jsonl",
+   "role": "question_source",
+   "url": "https://huggingface.co/datasets/KbsdJames/Omni-MATH/resolve/40ba231d8f16e29ecd40e6407e2c8640145a8f62/test.jsonl",
+   "revision": "40ba231d8f16e29ecd40e6407e2c8640145a8f62",
+   "bytes": 7504961,
+   "sha256": "7c87be8ee41ac7c7a597ef5a5500e84bd2b639a85a06db3da7f69bf9a32ef168",
+   "hf_lfs_sha256_match": "not_lfs_tracked"
+  },
+  {
+   "source_id": "wildbench-test-00000-of-00001.parquet",
+   "role": "question_source",
+   "url": "https://huggingface.co/datasets/allenai/WildBench/resolve/26c49eb39d7d5ce2099b0bbafed5a88dcce954ec/v2/test-00000-of-00001.parquet",
+   "revision": "26c49eb39d7d5ce2099b0bbafed5a88dcce954ec",
+   "bytes": 3695374,
+   "sha256": "e1fbdc5d46deca34e77f92991c23b0476860e26adf2bf28379a3bb3bf00d3ed6",
+   "hf_lfs_sha256_match": true
+  },
+  {
+   "source_id": "ifeval-ifeval_input_data.jsonl",
+   "role": "question_source",
+   "url": "https://huggingface.co/datasets/google/IFEval/resolve/966cd89545d6b6acfd7638bc708b98261ca58e84/ifeval_input_data.jsonl",
+   "revision": "966cd89545d6b6acfd7638bc708b98261ca58e84",
+   "bytes": 207111,
+   "sha256": "6a85310ca8ce15eff755aa08a3a4ff931c7e273e7515ebb3c492ea85fd8288f2",
+   "hf_lfs_sha256_match": "not_lfs_tracked"
+  },
+  {
+   "source_id": "gpqa-main-source-archive",
+   "role": "question_source_restricted",
+   "url": "https://raw.githubusercontent.com/idavidrein/gpqa/d46dc8d5e01b40bcde0bed6bee68a5de953a58f8/dataset.zip",
+   "revision": "d46dc8d5e01b40bcde0bed6bee68a5de953a58f8",
+   "bytes": 2348038,
+   "sha256": "461ae7329f15a3e35f8184d2dac24b990f34fdf12f366ca4062d8e6638cd08dc",
+   "policy": "gpqa_restricted_no_plaintext"
+  }
+ ],
+ "outputs": [
+  {
+   "path": "mmlu_pro.jsonl",
+   "rows": 12102,
+   "bytes": 15048598,
+   "sha256": "c43d179c7ff836241658f6cbae5b0701a5ce99c2e0b6ec609341e0c7a199c3ab"
+  },
+  {
+   "path": "omni_math.jsonl",
+   "rows": 4428,
+   "bytes": 4252683,
+   "sha256": "31ce5b98a66a7ea48c6912f97a8471974fed9d0353359d52a4ea0bffc2095902"
+  },
+  {
+   "path": "wildbench_v2.jsonl",
+   "rows": 1024,
+   "bytes": 4575801,
+   "sha256": "05e09bb12587ace894c14c87340fac79696c53698d6f5f7e8c59a15781898f9e"
+  },
+  {
+   "path": "ifeval.jsonl",
+   "rows": 541,
+   "bytes": 468415,
+   "sha256": "c9eda5e981442850862f1021c6b06844b0855f3f0032fc76d7dcbd9d70596b2e"
+  },
+  {
+   "path": "gpqa_main.jsonl",
+   "rows": 448,
+   "bytes": 300342,
+   "sha256": "4dc813eebad92a7f5f93de270077e04a4028ab1fd6915e1bed2b8c45688db0e3"
+  }
+ ],
+ "restricted_local_outputs": [
+  {
+   "path": "gpqa_main.RESTRICTED.jsonl",
+   "rows": 448,
+   "bytes": 607859,
+   "sha256": "bd7e361aeb3af241ea2fa49024a964190c4e6eb758ec9d56cd352375c87f99c4"
+  }
+ ]
+}
