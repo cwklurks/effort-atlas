@@ -1,0 +1,1232 @@
+{
+ "schema_version": "omni-math-run-ledger-v1",
+ "purpose": "Pinned public HELM Capabilities v1.15.0 omni_math run archives audited in reap/24_OMNI_MATH_HELM_AUDIT_2026-08-24.md. Exploratory audit artifact; authorizes no provider call.",
+ "byte_semantics": "bytes and sha256 are of the HTTP response body as served (GCS decompressive-transcoded where the stored object is gzip; e.g. the gemini-3-pro-preview scenario_state stores 857,809 bytes but serves 7,218,175). x-goog-generation pins the immutable stored object either way.",
+ "release_manifest": {
+  "url": "https://storage.googleapis.com/crfm-helm-public/capabilities/benchmark_output/releases/v1.15.0/runs_to_run_suites.json",
+  "generation": "1781127687715219",
+  "bytes": 29389,
+  "sha256": "92635e3d7973b8b3602d928c831957cc69a6669758e7620a123c3ecc5c02cee2",
+  "matches_observational_manifest_pin": true
+ },
+ "retrieved_utc_date": "2026-08-24",
+ "reproduced": "all derived counts identical across two independent full downloads on 2026-08-24",
+ "files": [
+  {
+   "run": "omni_math:model=amazon_nova-lite-v1:0",
+   "suite": "v1.0.0",
+   "file": "scenario_state.json",
+   "url": "https://storage.googleapis.com/crfm-helm-public/capabilities/benchmark_output/runs/v1.0.0/omni_math:model=amazon_nova-lite-v1:0/scenario_state.json",
+   "generation": "1781127700422354",
+   "bytes": 84901762,
+   "sha256": "0def44c6ef8e4acc88dd1859bc25866c46ef98456b3dfbb9ef288bca72bc68e7"
+  },
+  {
+   "run": "omni_math:model=amazon_nova-lite-v1:0",
+   "suite": "v1.0.0",
+   "file": "display_predictions.json",
+   "url": "https://storage.googleapis.com/crfm-helm-public/capabilities/benchmark_output/runs/v1.0.0/omni_math:model=amazon_nova-lite-v1:0/display_predictions.json",
+   "generation": "1781127700513316",
+   "bytes": 8311467,
+   "sha256": "202c43b824e79015530805c1a50f69bc6cf2be6f428ed3495e4d92dc02e3b776"
+  },
+  {
+   "run": "omni_math:model=amazon_nova-micro-v1:0",
+   "suite": "v1.0.0",
+   "file": "scenario_state.json",
+   "url": "https://storage.googleapis.com/crfm-helm-public/capabilities/benchmark_output/runs/v1.0.0/omni_math:model=amazon_nova-micro-v1:0/scenario_state.json",
+   "generation": "1781127700659440",
+   "bytes": 80079147,
+   "sha256": "2dfd557a3552b0668114018a08f0c0ce8053ce7e811805b8c8ab5918bc60da10"
+  },
+  {
+   "run": "omni_math:model=amazon_nova-micro-v1:0",
+   "suite": "v1.0.0",
+   "file": "display_predictions.json",
+   "url": "https://storage.googleapis.com/crfm-helm-public/capabilities/benchmark_output/runs/v1.0.0/omni_math:model=amazon_nova-micro-v1:0/display_predictions.json",
+   "generation": "1781127700406429",
+   "bytes": 7886076,
+   "sha256": "b1abf74fe587436995048ae6a48720ed3fe3cfaded9224fe0f0eb36884e446f9"
+  },
+  {
+   "run": "omni_math:model=amazon_nova-premier-v1:0",
+   "suite": "v1.12.0",
+   "file": "scenario_state.json",
+   "url": "https://storage.googleapis.com/crfm-helm-public/capabilities/benchmark_output/runs/v1.12.0/omni_math:model=amazon_nova-premier-v1:0/scenario_state.json",
+   "generation": "1781127712743134",
+   "bytes": 83782210,
+   "sha256": "fc5e0af1aded286e753a827259cb5ac805f46be9c8546924999065e709d16178"
+  },
+  {
+   "run": "omni_math:model=amazon_nova-premier-v1:0",
+   "suite": "v1.12.0",
+   "file": "display_predictions.json",
+   "url": "https://storage.googleapis.com/crfm-helm-public/capabilities/benchmark_output/runs/v1.12.0/omni_math:model=amazon_nova-premier-v1:0/display_predictions.json",
+   "generation": "1781127712739149",
+   "bytes": 8169983,
+   "sha256": "8415c816575ac16d1b4ed0b46b35de5aaaa28a0858ca8fa27a1f0209b21ea27b"
+  },
+  {
+   "run": "omni_math:model=amazon_nova-pro-v1:0",
+   "suite": "v1.0.0",
+   "file": "scenario_state.json",
+   "url": "https://storage.googleapis.com/crfm-helm-public/capabilities/benchmark_output/runs/v1.0.0/omni_math:model=amazon_nova-pro-v1:0/scenario_state.json",
+   "generation": "1781127701046237",
+   "bytes": 70733528,
+   "sha256": "e1f98be2e47e762d21398a2481ea6606c02aa8884b548e619759eca3898d66a4"
+  },
+  {
+   "run": "omni_math:model=amazon_nova-pro-v1:0",
+   "suite": "v1.0.0",
+   "file": "display_predictions.json",
+   "url": "https://storage.googleapis.com/crfm-helm-public/capabilities/benchmark_output/runs/v1.0.0/omni_math:model=amazon_nova-pro-v1:0/display_predictions.json",
+   "generation": "1781127700697471",
+   "bytes": 7430161,
+   "sha256": "cd6f11a36b8e5a63fdbfe2c894394d34d289ecb71424b132f299aec424419a18"
+  },
+  {
+   "run": "omni_math:model=anthropic_claude-3-5-haiku-20241022",
+   "suite": "v1.0.0",
+   "file": "scenario_state.json",
+   "url": "https://storage.googleapis.com/crfm-helm-public/capabilities/benchmark_output/runs/v1.0.0/omni_math:model=anthropic_claude-3-5-haiku-20241022/scenario_state.json",
+   "generation": "1781127700716895",
+   "bytes": 47156204,
+   "sha256": "7bb3daded3acfeaf61a7303a63cdfbd68c514a6190a885645088f00654491a10"
+  },
+  {
+   "run": "omni_math:model=anthropic_claude-3-5-haiku-20241022",
+   "suite": "v1.0.0",
+   "file": "display_predictions.json",
+   "url": "https://storage.googleapis.com/crfm-helm-public/capabilities/benchmark_output/runs/v1.0.0/omni_math:model=anthropic_claude-3-5-haiku-20241022/display_predictions.json",
+   "generation": "1781127700724989",
+   "bytes": 6388420,
+   "sha256": "ede747115fa28d2ad4021fe565dbad1f52338b559b1a7144cae52a1f54897675"
+  },
+  {
+   "run": "omni_math:model=anthropic_claude-3-5-sonnet-20241022",
+   "suite": "v1.0.0",
+   "file": "scenario_state.json",
+   "url": "https://storage.googleapis.com/crfm-helm-public/capabilities/benchmark_output/runs/v1.0.0/omni_math:model=anthropic_claude-3-5-sonnet-20241022/scenario_state.json",
+   "generation": "1781127701380946",
+   "bytes": 45798367,
+   "sha256": "0b4f6399d029504a31393a5f4f06ce81b1bd1b3b60ff3a7a147a64893f050696"
+  },
+  {
+   "run": "omni_math:model=anthropic_claude-3-5-sonnet-20241022",
+   "suite": "v1.0.0",
+   "file": "display_predictions.json",
+   "url": "https://storage.googleapis.com/crfm-helm-public/capabilities/benchmark_output/runs/v1.0.0/omni_math:model=anthropic_claude-3-5-sonnet-20241022/display_predictions.json",
+   "generation": "1781127701034704",
+   "bytes": 6236893,
+   "sha256": "4aaf100a9ede0f69217e4ed29dd497369e214b8c243796347cdbc47f3a113c4d"
+  },
+  {
+   "run": "omni_math:model=anthropic_claude-3-7-sonnet-20250219",
+   "suite": "v1.0.0",
+   "file": "scenario_state.json",
+   "url": "https://storage.googleapis.com/crfm-helm-public/capabilities/benchmark_output/runs/v1.0.0/omni_math:model=anthropic_claude-3-7-sonnet-20250219/scenario_state.json",
+   "generation": "1781127701149626",
+   "bytes": 73034154,
+   "sha256": "e3616b314de029f565c3501e4c9622aa994815b2560a2ed4346f3425254cf16e"
+  },
+  {
+   "run": "omni_math:model=anthropic_claude-3-7-sonnet-20250219",
+   "suite": "v1.0.0",
+   "file": "display_predictions.json",
+   "url": "https://storage.googleapis.com/crfm-helm-public/capabilities/benchmark_output/runs/v1.0.0/omni_math:model=anthropic_claude-3-7-sonnet-20250219/display_predictions.json",
+   "generation": "1781127701380299",
+   "bytes": 7627248,
+   "sha256": "802f25456bfbedc7b83bb448b10e53a528229f83d7a4eb2ab93d03cdb1d0802c"
+  },
+  {
+   "run": "omni_math:model=anthropic_claude-haiku-4-5-20251001",
+   "suite": "v1.15.0",
+   "file": "scenario_state.json",
+   "url": "https://storage.googleapis.com/crfm-helm-public/capabilities/benchmark_output/runs/v1.15.0/omni_math:model=anthropic_claude-haiku-4-5-20251001/scenario_state.json",
+   "generation": "1781127722223114",
+   "bytes": 99429592,
+   "sha256": "0fdae979541d85b60bb78133d537f423a44c8ef69ce326faa013379be12660fb"
+  },
+  {
+   "run": "omni_math:model=anthropic_claude-haiku-4-5-20251001",
+   "suite": "v1.15.0",
+   "file": "display_predictions.json",
+   "url": "https://storage.googleapis.com/crfm-helm-public/capabilities/benchmark_output/runs/v1.15.0/omni_math:model=anthropic_claude-haiku-4-5-20251001/display_predictions.json",
+   "generation": "1781127722185919",
+   "bytes": 8538143,
+   "sha256": "d4385014a1404402080f1c37579277b8b96516653db202ce1d55f5303c7b757c"
+  },
+  {
+   "run": "omni_math:model=anthropic_claude-opus-4-20250514",
+   "suite": "v1.6.0",
+   "file": "scenario_state.json",
+   "url": "https://storage.googleapis.com/crfm-helm-public/capabilities/benchmark_output/runs/v1.6.0/omni_math:model=anthropic_claude-opus-4-20250514/scenario_state.json",
+   "generation": "1781127732984396",
+   "bytes": 95549548,
+   "sha256": "94622fb9e3dc7724b77fc6660b270916f4e9f4e6e14ada4ec3d20c032af0dca1"
+  },
+  {
+   "run": "omni_math:model=anthropic_claude-opus-4-20250514",
+   "suite": "v1.6.0",
+   "file": "display_predictions.json",
+   "url": "https://storage.googleapis.com/crfm-helm-public/capabilities/benchmark_output/runs/v1.6.0/omni_math:model=anthropic_claude-opus-4-20250514/display_predictions.json",
+   "generation": "1781127733014395",
+   "bytes": 8796816,
+   "sha256": "f2def6fadc2a33a4b9029708c1a8c4c0f2452e707742c7893ca613c91d7d8535"
+  },
+  {
+   "run": "omni_math:model=anthropic_claude-opus-4-20250514-thinking-10k",
+   "suite": "v1.6.0",
+   "file": "scenario_state.json",
+   "url": "https://storage.googleapis.com/crfm-helm-public/capabilities/benchmark_output/runs/v1.6.0/omni_math:model=anthropic_claude-opus-4-20250514-thinking-10k/scenario_state.json",
+   "generation": "1781127732977715",
+   "bytes": 83840180,
+   "sha256": "9c17b90d603ef47ba5b69698f903c6ca647ad46899eba2a1c7798c39c3079522"
+  },
+  {
+   "run": "omni_math:model=anthropic_claude-opus-4-20250514-thinking-10k",
+   "suite": "v1.6.0",
+   "file": "display_predictions.json",
+   "url": "https://storage.googleapis.com/crfm-helm-public/capabilities/benchmark_output/runs/v1.6.0/omni_math:model=anthropic_claude-opus-4-20250514-thinking-10k/display_predictions.json",
+   "generation": "1781127732793764",
+   "bytes": 16375557,
+   "sha256": "b97bffea5c4ec0755f6f8870b8d4bbe33f4c167ddfbd8cdbf1bebba51ab18f0e"
+  },
+  {
+   "run": "omni_math:model=anthropic_claude-sonnet-4-20250514",
+   "suite": "v1.6.0",
+   "file": "scenario_state.json",
+   "url": "https://storage.googleapis.com/crfm-helm-public/capabilities/benchmark_output/runs/v1.6.0/omni_math:model=anthropic_claude-sonnet-4-20250514/scenario_state.json",
+   "generation": "1781127733269401",
+   "bytes": 98988030,
+   "sha256": "2180098751974055e1057bcaaeedb22c12fed6699591eeee75f03dab337706ff"
+  },
+  {
+   "run": "omni_math:model=anthropic_claude-sonnet-4-20250514",
+   "suite": "v1.6.0",
+   "file": "display_predictions.json",
+   "url": "https://storage.googleapis.com/crfm-helm-public/capabilities/benchmark_output/runs/v1.6.0/omni_math:model=anthropic_claude-sonnet-4-20250514/display_predictions.json",
+   "generation": "1781127733168871",
+   "bytes": 9117108,
+   "sha256": "05f3599294510a139bfd27497207d119b615cb113a9ca9f919fe1b5f67b19157"
+  },
+  {
+   "run": "omni_math:model=anthropic_claude-sonnet-4-20250514-thinking-10k",
+   "suite": "v1.6.0",
+   "file": "scenario_state.json",
+   "url": "https://storage.googleapis.com/crfm-helm-public/capabilities/benchmark_output/runs/v1.6.0/omni_math:model=anthropic_claude-sonnet-4-20250514-thinking-10k/scenario_state.json",
+   "generation": "1781127733066151",
+   "bytes": 87508112,
+   "sha256": "42de18d492422af28a998ce38642dd9822edf87e82b5bcaffde7529d39a1d659"
+  },
+  {
+   "run": "omni_math:model=anthropic_claude-sonnet-4-20250514-thinking-10k",
+   "suite": "v1.6.0",
+   "file": "display_predictions.json",
+   "url": "https://storage.googleapis.com/crfm-helm-public/capabilities/benchmark_output/runs/v1.6.0/omni_math:model=anthropic_claude-sonnet-4-20250514-thinking-10k/display_predictions.json",
+   "generation": "1781127733068139",
+   "bytes": 16501402,
+   "sha256": "af931012bb06635eda43b56417765721ea9cd6ae5a669817cce784005dec63dc"
+  },
+  {
+   "run": "omni_math:model=anthropic_claude-sonnet-4-5-20250929",
+   "suite": "v1.13.0",
+   "file": "scenario_state.json",
+   "url": "https://storage.googleapis.com/crfm-helm-public/capabilities/benchmark_output/runs/v1.13.0/omni_math:model=anthropic_claude-sonnet-4-5-20250929/scenario_state.json",
+   "generation": "1781127718345076",
+   "bytes": 95255896,
+   "sha256": "562801237470a7f1f3a83a4daea6f4b41572368329401d954ce230b63eefe78f"
+  },
+  {
+   "run": "omni_math:model=anthropic_claude-sonnet-4-5-20250929",
+   "suite": "v1.13.0",
+   "file": "display_predictions.json",
+   "url": "https://storage.googleapis.com/crfm-helm-public/capabilities/benchmark_output/runs/v1.13.0/omni_math:model=anthropic_claude-sonnet-4-5-20250929/display_predictions.json",
+   "generation": "1781127718301296",
+   "bytes": 8641232,
+   "sha256": "6e935a88bd16d092eb78602de9a8e6d9924e4446da3a8a74d7b95e0c1d998928"
+  },
+  {
+   "run": "omni_math:model=deepseek-ai_deepseek-r1-0528",
+   "suite": "v1.7.0",
+   "file": "scenario_state.json",
+   "url": "https://storage.googleapis.com/crfm-helm-public/capabilities/benchmark_output/runs/v1.7.0/omni_math:model=deepseek-ai_deepseek-r1-0528/scenario_state.json",
+   "generation": "1781127734005808",
+   "bytes": 35990849,
+   "sha256": "7f2490bcb2ae9482f30994cef2b78974a0643f2127501bdbfb7e3d009bf8d8a3"
+  },
+  {
+   "run": "omni_math:model=deepseek-ai_deepseek-r1-0528",
+   "suite": "v1.7.0",
+   "file": "display_predictions.json",
+   "url": "https://storage.googleapis.com/crfm-helm-public/capabilities/benchmark_output/runs/v1.7.0/omni_math:model=deepseek-ai_deepseek-r1-0528/display_predictions.json",
+   "generation": "1781127734187610",
+   "bytes": 34346291,
+   "sha256": "674a5a4d8cd5a5b3157630bc383ebd79cd6da5c62b43b34a80ebe80c8372d29a"
+  },
+  {
+   "run": "omni_math:model=deepseek-ai_deepseek-v3",
+   "suite": "v1.0.0",
+   "file": "scenario_state.json",
+   "url": "https://storage.googleapis.com/crfm-helm-public/capabilities/benchmark_output/runs/v1.0.0/omni_math:model=deepseek-ai_deepseek-v3/scenario_state.json",
+   "generation": "1781127701469256",
+   "bytes": 17258559,
+   "sha256": "ce3ef87d9f2230f4e4e5d04a748976c0291be28d5ffd0c9bc6e91c4be5f43940"
+  },
+  {
+   "run": "omni_math:model=deepseek-ai_deepseek-v3",
+   "suite": "v1.0.0",
+   "file": "display_predictions.json",
+   "url": "https://storage.googleapis.com/crfm-helm-public/capabilities/benchmark_output/runs/v1.0.0/omni_math:model=deepseek-ai_deepseek-v3/display_predictions.json",
+   "generation": "1781127701166178",
+   "bytes": 15660727,
+   "sha256": "cf41004b4b6cd8a08410dccb4e1e55b937b702ddb08165462d66e295c8fa1eb9"
+  },
+  {
+   "run": "omni_math:model=google_gemini-1.5-flash-002",
+   "suite": "v1.0.0",
+   "file": "scenario_state.json",
+   "url": "https://storage.googleapis.com/crfm-helm-public/capabilities/benchmark_output/runs/v1.0.0/omni_math:model=google_gemini-1.5-flash-002/scenario_state.json",
+   "generation": "1781127701418971",
+   "bytes": 8573858,
+   "sha256": "6045272ebe784fdcda640c8e1dbb0d35665e4f7ae9573a1d71c1940988a08929"
+  },
+  {
+   "run": "omni_math:model=google_gemini-1.5-flash-002",
+   "suite": "v1.0.0",
+   "file": "display_predictions.json",
+   "url": "https://storage.googleapis.com/crfm-helm-public/capabilities/benchmark_output/runs/v1.0.0/omni_math:model=google_gemini-1.5-flash-002/display_predictions.json",
+   "generation": "1781127701437205",
+   "bytes": 6967009,
+   "sha256": "a218044abe72ed04b204dd3e0ad06780ea2ec44bb9215180e0ebc4140a081654"
+  },
+  {
+   "run": "omni_math:model=google_gemini-1.5-pro-002",
+   "suite": "v1.0.0",
+   "file": "scenario_state.json",
+   "url": "https://storage.googleapis.com/crfm-helm-public/capabilities/benchmark_output/runs/v1.0.0/omni_math:model=google_gemini-1.5-pro-002/scenario_state.json",
+   "generation": "1781127701562694",
+   "bytes": 8378599,
+   "sha256": "488aeab7b1495e40328b70fc6dd3a7755c61e1535024e7ae782a21f00060a3a5"
+  },
+  {
+   "run": "omni_math:model=google_gemini-1.5-pro-002",
+   "suite": "v1.0.0",
+   "file": "display_predictions.json",
+   "url": "https://storage.googleapis.com/crfm-helm-public/capabilities/benchmark_output/runs/v1.0.0/omni_math:model=google_gemini-1.5-pro-002/display_predictions.json",
+   "generation": "1781127701426484",
+   "bytes": 6775618,
+   "sha256": "80790f0d71bb92bbfa270bac1b833b0adc23a5ccde9ac2d6c143575be8a1779f"
+  },
+  {
+   "run": "omni_math:model=google_gemini-2.0-flash-001",
+   "suite": "v1.0.0",
+   "file": "scenario_state.json",
+   "url": "https://storage.googleapis.com/crfm-helm-public/capabilities/benchmark_output/runs/v1.0.0/omni_math:model=google_gemini-2.0-flash-001/scenario_state.json",
+   "generation": "1781127702801713",
+   "bytes": 11208689,
+   "sha256": "76f046e718c1155a09065ac5664d6f98523e5375a10a1ebee3116c770a606b7b"
+  },
+  {
+   "run": "omni_math:model=google_gemini-2.0-flash-001",
+   "suite": "v1.0.0",
+   "file": "display_predictions.json",
+   "url": "https://storage.googleapis.com/crfm-helm-public/capabilities/benchmark_output/runs/v1.0.0/omni_math:model=google_gemini-2.0-flash-001/display_predictions.json",
+   "generation": "1781127701822877",
+   "bytes": 9601632,
+   "sha256": "8bbad3ca6c5fe5efba4a45f1f27c253497f46bc98ac96497c7611c74ced1b81e"
+  },
+  {
+   "run": "omni_math:model=google_gemini-2.0-flash-lite-preview-02-05",
+   "suite": "v1.0.0",
+   "file": "scenario_state.json",
+   "url": "https://storage.googleapis.com/crfm-helm-public/capabilities/benchmark_output/runs/v1.0.0/omni_math:model=google_gemini-2.0-flash-lite-preview-02-05/scenario_state.json",
+   "generation": "1781127701945271",
+   "bytes": 12805671,
+   "sha256": "c8a49e1ef4cf6289ee88de30006921c1c8bcb7a522da00e257bbbb28cc208712"
+  },
+  {
+   "run": "omni_math:model=google_gemini-2.0-flash-lite-preview-02-05",
+   "suite": "v1.0.0",
+   "file": "display_predictions.json",
+   "url": "https://storage.googleapis.com/crfm-helm-public/capabilities/benchmark_output/runs/v1.0.0/omni_math:model=google_gemini-2.0-flash-lite-preview-02-05/display_predictions.json",
+   "generation": "1781127701820876",
+   "bytes": 11168524,
+   "sha256": "d19928f751972f4ff657cfd22512240d2c79f3b6947f103d5c788e2e50bd9e90"
+  },
+  {
+   "run": "omni_math:model=google_gemini-2.5-flash-lite",
+   "suite": "v1.11.0",
+   "file": "scenario_state.json",
+   "url": "https://storage.googleapis.com/crfm-helm-public/capabilities/benchmark_output/runs/v1.11.0/omni_math:model=google_gemini-2.5-flash-lite/scenario_state.json",
+   "generation": "1781127709997702",
+   "bytes": 42704622,
+   "sha256": "6bf7323679211a6ddb3b147e402454af15ed11820537766cd25cb9f93cd5d6ca"
+  },
+  {
+   "run": "omni_math:model=google_gemini-2.5-flash-lite",
+   "suite": "v1.11.0",
+   "file": "display_predictions.json",
+   "url": "https://storage.googleapis.com/crfm-helm-public/capabilities/benchmark_output/runs/v1.11.0/omni_math:model=google_gemini-2.5-flash-lite/display_predictions.json",
+   "generation": "1781127709816766",
+   "bytes": 41094937,
+   "sha256": "597feef850b90abca321add6b78ce4ca7e0a64e3a6867959b9c90255d504928b"
+  },
+  {
+   "run": "omni_math:model=google_gemini-2.5-flash-preview-04-17",
+   "suite": "v1.4.0",
+   "file": "scenario_state.json",
+   "url": "https://storage.googleapis.com/crfm-helm-public/capabilities/benchmark_output/runs/v1.4.0/omni_math:model=google_gemini-2.5-flash-preview-04-17/scenario_state.json",
+   "generation": "1781127729182445",
+   "bytes": 6524307,
+   "sha256": "dd0766c140e5a7747bed75c45efca961c842d74325bfe04509285ac0bacfce3d"
+  },
+  {
+   "run": "omni_math:model=google_gemini-2.5-flash-preview-04-17",
+   "suite": "v1.4.0",
+   "file": "display_predictions.json",
+   "url": "https://storage.googleapis.com/crfm-helm-public/capabilities/benchmark_output/runs/v1.4.0/omni_math:model=google_gemini-2.5-flash-preview-04-17/display_predictions.json",
+   "generation": "1781127728855567",
+   "bytes": 4904005,
+   "sha256": "ecb2115082c5a20de03b57eb365795a5b497f9771f9ec5da0b486ad0c5c8ec28"
+  },
+  {
+   "run": "omni_math:model=google_gemini-2.5-pro-preview-03-25",
+   "suite": "v1.4.0",
+   "file": "scenario_state.json",
+   "url": "https://storage.googleapis.com/crfm-helm-public/capabilities/benchmark_output/runs/v1.4.0/omni_math:model=google_gemini-2.5-pro-preview-03-25/scenario_state.json",
+   "generation": "1781127729536855",
+   "bytes": 7635836,
+   "sha256": "b939a94ecfcf7d1698806731b4e4fe6e85ab3e81cc2f7a11f6b9c77f2ce364cb"
+  },
+  {
+   "run": "omni_math:model=google_gemini-2.5-pro-preview-03-25",
+   "suite": "v1.4.0",
+   "file": "display_predictions.json",
+   "url": "https://storage.googleapis.com/crfm-helm-public/capabilities/benchmark_output/runs/v1.4.0/omni_math:model=google_gemini-2.5-pro-preview-03-25/display_predictions.json",
+   "generation": "1781127729248841",
+   "bytes": 6019075,
+   "sha256": "25edc85825445a5d6467ae1ef2dcc09c165f1fb563784a85c7103d941bfc2eae"
+  },
+  {
+   "run": "omni_math:model=google_gemini-3-pro-preview",
+   "suite": "v1.15.0",
+   "file": "scenario_state.json",
+   "url": "https://storage.googleapis.com/crfm-helm-public/capabilities/benchmark_output/runs/v1.15.0/omni_math:model=google_gemini-3-pro-preview/scenario_state.json",
+   "generation": "1781127722550845",
+   "bytes": 7218175,
+   "sha256": "5818ff973687b31dbbb27ebd6ad8de0879aec79cc356581f5b5f352e80e4ae98"
+  },
+  {
+   "run": "omni_math:model=google_gemini-3-pro-preview",
+   "suite": "v1.15.0",
+   "file": "display_predictions.json",
+   "url": "https://storage.googleapis.com/crfm-helm-public/capabilities/benchmark_output/runs/v1.15.0/omni_math:model=google_gemini-3-pro-preview/display_predictions.json",
+   "generation": "1781127722438775",
+   "bytes": 5498120,
+   "sha256": "ff63eca3af572d038ac3b1791404b1e618f9cff82533973d25ac704c6bafda74"
+  },
+  {
+   "run": "omni_math:model=ibm_granite-3.3-8b-instruct",
+   "suite": "v1.10.0",
+   "file": "scenario_state.json",
+   "url": "https://storage.googleapis.com/crfm-helm-public/capabilities/benchmark_output/runs/v1.10.0/omni_math:model=ibm_granite-3.3-8b-instruct/scenario_state.json",
+   "generation": "1781127708884471",
+   "bytes": 122692002,
+   "sha256": "b651d8c6ac47d72b6751a8323f3446fae28a9a1ada624a479aa78bcaa3eb9005"
+  },
+  {
+   "run": "omni_math:model=ibm_granite-3.3-8b-instruct",
+   "suite": "v1.10.0",
+   "file": "display_predictions.json",
+   "url": "https://storage.googleapis.com/crfm-helm-public/capabilities/benchmark_output/runs/v1.10.0/omni_math:model=ibm_granite-3.3-8b-instruct/display_predictions.json",
+   "generation": "1781127708221311",
+   "bytes": 9952826,
+   "sha256": "cd09015a318cbd9fb3156ccdd789a27583cec927e45b57f61b50710b4698eaea"
+  },
+  {
+   "run": "omni_math:model=ibm_granite-4.0-h-small",
+   "suite": "v1.14.0",
+   "file": "scenario_state.json",
+   "url": "https://storage.googleapis.com/crfm-helm-public/capabilities/benchmark_output/runs/v1.14.0/omni_math:model=ibm_granite-4.0-h-small/scenario_state.json",
+   "generation": "1781127720083742",
+   "bytes": 110053511,
+   "sha256": "d210d446a6d3f3b6cc185f2a9ab383d9d62965d66cdf3c15b8637ede549a1bdc"
+  },
+  {
+   "run": "omni_math:model=ibm_granite-4.0-h-small",
+   "suite": "v1.14.0",
+   "file": "display_predictions.json",
+   "url": "https://storage.googleapis.com/crfm-helm-public/capabilities/benchmark_output/runs/v1.14.0/omni_math:model=ibm_granite-4.0-h-small/display_predictions.json",
+   "generation": "1781127720217579",
+   "bytes": 10291397,
+   "sha256": "7801ec4184c36ba7bb3ce18235c77360811886cb4258d2c1b4435b5e9eba8c76"
+  },
+  {
+   "run": "omni_math:model=ibm_granite-4.0-micro",
+   "suite": "v1.14.0",
+   "file": "scenario_state.json",
+   "url": "https://storage.googleapis.com/crfm-helm-public/capabilities/benchmark_output/runs/v1.14.0/omni_math:model=ibm_granite-4.0-micro/scenario_state.json",
+   "generation": "1781127720248852",
+   "bytes": 122784774,
+   "sha256": "121ddf0646abc575c2fb1b8dc52e66fdb10bac229f988d892e6cbd791c06df50"
+  },
+  {
+   "run": "omni_math:model=ibm_granite-4.0-micro",
+   "suite": "v1.14.0",
+   "file": "display_predictions.json",
+   "url": "https://storage.googleapis.com/crfm-helm-public/capabilities/benchmark_output/runs/v1.14.0/omni_math:model=ibm_granite-4.0-micro/display_predictions.json",
+   "generation": "1781127720336613",
+   "bytes": 11365828,
+   "sha256": "c9c3d6013db2b1b37322a56e997c57eda8b5b431e05adaecc1afe0db2e7a50fb"
+  },
+  {
+   "run": "omni_math:model=meta_llama-3.1-405b-instruct-turbo",
+   "suite": "v1.0.0",
+   "file": "scenario_state.json",
+   "url": "https://storage.googleapis.com/crfm-helm-public/capabilities/benchmark_output/runs/v1.0.0/omni_math:model=meta_llama-3.1-405b-instruct-turbo/scenario_state.json",
+   "generation": "1781127702190539",
+   "bytes": 104198318,
+   "sha256": "4a895af5cf4471ffeb4d82b28b55d4170a6cb7d8b7f279a06ec8be1fd5c03215"
+  },
+  {
+   "run": "omni_math:model=meta_llama-3.1-405b-instruct-turbo",
+   "suite": "v1.0.0",
+   "file": "display_predictions.json",
+   "url": "https://storage.googleapis.com/crfm-helm-public/capabilities/benchmark_output/runs/v1.0.0/omni_math:model=meta_llama-3.1-405b-instruct-turbo/display_predictions.json",
+   "generation": "1781127701838947",
+   "bytes": 9201609,
+   "sha256": "92fb8996358eddfe2d7e98867561e39ca35ab7120bde49b6b88ea8a041d48cdb"
+  },
+  {
+   "run": "omni_math:model=meta_llama-3.1-70b-instruct-turbo",
+   "suite": "v1.0.0",
+   "file": "scenario_state.json",
+   "url": "https://storage.googleapis.com/crfm-helm-public/capabilities/benchmark_output/runs/v1.0.0/omni_math:model=meta_llama-3.1-70b-instruct-turbo/scenario_state.json",
+   "generation": "1781127702201923",
+   "bytes": 150947753,
+   "sha256": "64856ee03d2e3f9a754d8b46a0754fc273ec5893cb37b11d0af6c4a285a6e6ff"
+  },
+  {
+   "run": "omni_math:model=meta_llama-3.1-70b-instruct-turbo",
+   "suite": "v1.0.0",
+   "file": "display_predictions.json",
+   "url": "https://storage.googleapis.com/crfm-helm-public/capabilities/benchmark_output/runs/v1.0.0/omni_math:model=meta_llama-3.1-70b-instruct-turbo/display_predictions.json",
+   "generation": "1781127702176019",
+   "bytes": 11704206,
+   "sha256": "69f5380e2ebf2dab949375acab9de59f77cd98a1473255ec49bc6027b1b5ab5c"
+  },
+  {
+   "run": "omni_math:model=meta_llama-3.1-8b-instruct-turbo",
+   "suite": "v1.0.0",
+   "file": "scenario_state.json",
+   "url": "https://storage.googleapis.com/crfm-helm-public/capabilities/benchmark_output/runs/v1.0.0/omni_math:model=meta_llama-3.1-8b-instruct-turbo/scenario_state.json",
+   "status": "download_failed_404"
+  },
+  {
+   "run": "omni_math:model=meta_llama-3.1-8b-instruct-turbo",
+   "suite": "v1.0.0",
+   "file": "display_predictions.json",
+   "url": "https://storage.googleapis.com/crfm-helm-public/capabilities/benchmark_output/runs/v1.0.0/omni_math:model=meta_llama-3.1-8b-instruct-turbo/display_predictions.json",
+   "generation": "1781127702189047",
+   "bytes": 16953739,
+   "sha256": "b5c00d2c8fcc67066f9dc75988b5b1fb18226a3504108735c65d65a96cd314fa"
+  },
+  {
+   "run": "omni_math:model=meta_llama-4-maverick-17b-128e-instruct-fp8",
+   "suite": "v1.2.0",
+   "file": "scenario_state.json",
+   "url": "https://storage.googleapis.com/crfm-helm-public/capabilities/benchmark_output/runs/v1.2.0/omni_math:model=meta_llama-4-maverick-17b-128e-instruct-fp8/scenario_state.json",
+   "generation": "1781127723767625",
+   "bytes": 124970752,
+   "sha256": "8f7710de92ae79e26a4c74d8a2ff01bece8f65ce32b8b64c118b83c7a12f5d95"
+  },
+  {
+   "run": "omni_math:model=meta_llama-4-maverick-17b-128e-instruct-fp8",
+   "suite": "v1.2.0",
+   "file": "display_predictions.json",
+   "url": "https://storage.googleapis.com/crfm-helm-public/capabilities/benchmark_output/runs/v1.2.0/omni_math:model=meta_llama-4-maverick-17b-128e-instruct-fp8/display_predictions.json",
+   "generation": "1781127723733278",
+   "bytes": 10667337,
+   "sha256": "6d795a1886a9d6527b5395abc8f5e836e735a4bd9c2aeda7beb446142771e8d1"
+  },
+  {
+   "run": "omni_math:model=meta_llama-4-scout-17b-16e-instruct",
+   "suite": "v1.2.0",
+   "file": "scenario_state.json",
+   "url": "https://storage.googleapis.com/crfm-helm-public/capabilities/benchmark_output/runs/v1.2.0/omni_math:model=meta_llama-4-scout-17b-16e-instruct/scenario_state.json",
+   "generation": "1781127723945040",
+   "bytes": 128572916,
+   "sha256": "4a2935c3bd7e39bc9652d2c5f6fd318313def385369981a7b8d6b413ce38ffdd"
+  },
+  {
+   "run": "omni_math:model=meta_llama-4-scout-17b-16e-instruct",
+   "suite": "v1.2.0",
+   "file": "display_predictions.json",
+   "url": "https://storage.googleapis.com/crfm-helm-public/capabilities/benchmark_output/runs/v1.2.0/omni_math:model=meta_llama-4-scout-17b-16e-instruct/display_predictions.json",
+   "generation": "1781127723710797",
+   "bytes": 11115265,
+   "sha256": "a736835c7eefc13b2412e69a69791f0b0ec5c53d9cfa00a0401ce0383d845ba1"
+  },
+  {
+   "run": "omni_math:model=mistralai_mistral-7b-instruct-v0.3",
+   "suite": "v1.0.0",
+   "file": "scenario_state.json",
+   "url": "https://storage.googleapis.com/crfm-helm-public/capabilities/benchmark_output/runs/v1.0.0/omni_math:model=mistralai_mistral-7b-instruct-v0.3/scenario_state.json",
+   "generation": "1781127702528323",
+   "bytes": 79931962,
+   "sha256": "c7baa686bc317b30f7574216dee5cc579ab6f33cae8b7406bfaf74fe07519062"
+  },
+  {
+   "run": "omni_math:model=mistralai_mistral-7b-instruct-v0.3",
+   "suite": "v1.0.0",
+   "file": "display_predictions.json",
+   "url": "https://storage.googleapis.com/crfm-helm-public/capabilities/benchmark_output/runs/v1.0.0/omni_math:model=mistralai_mistral-7b-instruct-v0.3/display_predictions.json",
+   "generation": "1781127702283852",
+   "bytes": 7668898,
+   "sha256": "0ded09ca39ba37b7fdc910610b78a321d22789b6cefc3c49635a094ff8e4b736"
+  },
+  {
+   "run": "omni_math:model=mistralai_mistral-large-2411",
+   "suite": "v1.1.0",
+   "file": "scenario_state.json",
+   "url": "https://storage.googleapis.com/crfm-helm-public/capabilities/benchmark_output/runs/v1.1.0/omni_math:model=mistralai_mistral-large-2411/scenario_state.json",
+   "generation": "1781127707535588",
+   "bytes": 80484746,
+   "sha256": "9a58216303538693a0bf30310ad9b8518f233d2a750e2abcab4e693ca9dc0a1c"
+  },
+  {
+   "run": "omni_math:model=mistralai_mistral-large-2411",
+   "suite": "v1.1.0",
+   "file": "display_predictions.json",
+   "url": "https://storage.googleapis.com/crfm-helm-public/capabilities/benchmark_output/runs/v1.1.0/omni_math:model=mistralai_mistral-large-2411/display_predictions.json",
+   "generation": "1781127707193367",
+   "bytes": 7647509,
+   "sha256": "2be0965c51f6d16865c419c0adfa4c85740bec327fcc5decc6a250792ad5f0f0"
+  },
+  {
+   "run": "omni_math:model=mistralai_mistral-small-2503",
+   "suite": "v1.1.0",
+   "file": "scenario_state.json",
+   "url": "https://storage.googleapis.com/crfm-helm-public/capabilities/benchmark_output/runs/v1.1.0/omni_math:model=mistralai_mistral-small-2503/scenario_state.json",
+   "generation": "1781127707519826",
+   "bytes": 84098408,
+   "sha256": "1f4dca7557b6a78094cfb698ae53db35f5233519fca569064664ffa336397e0e"
+  },
+  {
+   "run": "omni_math:model=mistralai_mistral-small-2503",
+   "suite": "v1.1.0",
+   "file": "display_predictions.json",
+   "url": "https://storage.googleapis.com/crfm-helm-public/capabilities/benchmark_output/runs/v1.1.0/omni_math:model=mistralai_mistral-small-2503/display_predictions.json",
+   "generation": "1781127707525559",
+   "bytes": 8222197,
+   "sha256": "9c01c89e392abfda8c4e46102fbcec7f331710e1524f0432427ad18ee4623d13"
+  },
+  {
+   "run": "omni_math:model=mistralai_mixtral-8x22b-instruct-v0.1",
+   "suite": "v1.0.0",
+   "file": "scenario_state.json",
+   "url": "https://storage.googleapis.com/crfm-helm-public/capabilities/benchmark_output/runs/v1.0.0/omni_math:model=mistralai_mixtral-8x22b-instruct-v0.1/scenario_state.json",
+   "status": "download_failed_404"
+  },
+  {
+   "run": "omni_math:model=mistralai_mixtral-8x22b-instruct-v0.1",
+   "suite": "v1.0.0",
+   "file": "display_predictions.json",
+   "url": "https://storage.googleapis.com/crfm-helm-public/capabilities/benchmark_output/runs/v1.0.0/omni_math:model=mistralai_mixtral-8x22b-instruct-v0.1/display_predictions.json",
+   "status": "download_failed_404"
+  },
+  {
+   "run": "omni_math:model=mistralai_mixtral-8x7b-instruct-v0.1",
+   "suite": "v1.0.0",
+   "file": "scenario_state.json",
+   "url": "https://storage.googleapis.com/crfm-helm-public/capabilities/benchmark_output/runs/v1.0.0/omni_math:model=mistralai_mixtral-8x7b-instruct-v0.1/scenario_state.json",
+   "generation": "1781127702540062",
+   "bytes": 64779890,
+   "sha256": "f9a851163dd2f60f55615ff9b97cf1385bd8ccca423d5fea339a6d0bd26e3767"
+  },
+  {
+   "run": "omni_math:model=mistralai_mixtral-8x7b-instruct-v0.1",
+   "suite": "v1.0.0",
+   "file": "display_predictions.json",
+   "url": "https://storage.googleapis.com/crfm-helm-public/capabilities/benchmark_output/runs/v1.0.0/omni_math:model=mistralai_mixtral-8x7b-instruct-v0.1/display_predictions.json",
+   "generation": "1781127702531075",
+   "bytes": 6778965,
+   "sha256": "077d1f5d8a29fca32cbfc6ff3aacb7b312778d03f2af44d6d53381a980176596"
+  },
+  {
+   "run": "omni_math:model=moonshotai_kimi-k2-instruct",
+   "suite": "v1.9.0",
+   "file": "scenario_state.json",
+   "url": "https://storage.googleapis.com/crfm-helm-public/capabilities/benchmark_output/runs/v1.9.0/omni_math:model=moonshotai_kimi-k2-instruct/scenario_state.json",
+   "generation": "1781127737562131",
+   "bytes": 375895224,
+   "sha256": "046956115a1ba44a3186283af09b16fe5d4f314d8b29807f74ace11f8a899d79"
+  },
+  {
+   "run": "omni_math:model=moonshotai_kimi-k2-instruct",
+   "suite": "v1.9.0",
+   "file": "display_predictions.json",
+   "url": "https://storage.googleapis.com/crfm-helm-public/capabilities/benchmark_output/runs/v1.9.0/omni_math:model=moonshotai_kimi-k2-instruct/display_predictions.json",
+   "generation": "1781127737498703",
+   "bytes": 25301369,
+   "sha256": "ef1968fb442c71a3d6a34df656c52c9a8e70b9f723b19960f9d64dde1f5b803d"
+  },
+  {
+   "run": "omni_math:model=openai_gpt-4.1-2025-04-14",
+   "suite": "v1.3.0",
+   "file": "scenario_state.json",
+   "url": "https://storage.googleapis.com/crfm-helm-public/capabilities/benchmark_output/runs/v1.3.0/omni_math:model=openai_gpt-4.1-2025-04-14/scenario_state.json",
+   "generation": "1781127726622245",
+   "bytes": 190463646,
+   "sha256": "5a5f48c2fc284a54e59686400418b4e6150be4ca0af2d68cfeca7da9820bc395"
+  },
+  {
+   "run": "omni_math:model=openai_gpt-4.1-2025-04-14",
+   "suite": "v1.3.0",
+   "file": "display_predictions.json",
+   "url": "https://storage.googleapis.com/crfm-helm-public/capabilities/benchmark_output/runs/v1.3.0/omni_math:model=openai_gpt-4.1-2025-04-14/display_predictions.json",
+   "generation": "1781127726259751",
+   "bytes": 13983089,
+   "sha256": "57e7c17d602fd9bf43e1316be60ea9b7faa8996643576fcf0ecaa2f0b9df53c1"
+  },
+  {
+   "run": "omni_math:model=openai_gpt-4.1-mini-2025-04-14",
+   "suite": "v1.3.0",
+   "file": "scenario_state.json",
+   "url": "https://storage.googleapis.com/crfm-helm-public/capabilities/benchmark_output/runs/v1.3.0/omni_math:model=openai_gpt-4.1-mini-2025-04-14/scenario_state.json",
+   "generation": "1781127726657659",
+   "bytes": 213710513,
+   "sha256": "4646c8b8430997fc8c4dd0e75cc68228043ea837c43f8257f08e005ebedb1f69"
+  },
+  {
+   "run": "omni_math:model=openai_gpt-4.1-mini-2025-04-14",
+   "suite": "v1.3.0",
+   "file": "display_predictions.json",
+   "url": "https://storage.googleapis.com/crfm-helm-public/capabilities/benchmark_output/runs/v1.3.0/omni_math:model=openai_gpt-4.1-mini-2025-04-14/display_predictions.json",
+   "generation": "1781127726542575",
+   "bytes": 15525356,
+   "sha256": "14bfe5d1264fbce0a8284ba5f04cd97ec1a1950bd60e5c24c454df6323535d11"
+  },
+  {
+   "run": "omni_math:model=openai_gpt-4.1-nano-2025-04-14",
+   "suite": "v1.3.0",
+   "file": "scenario_state.json",
+   "url": "https://storage.googleapis.com/crfm-helm-public/capabilities/benchmark_output/runs/v1.3.0/omni_math:model=openai_gpt-4.1-nano-2025-04-14/scenario_state.json",
+   "generation": "1781127726615502",
+   "bytes": 181527633,
+   "sha256": "d04aa5c3e8fd2ea307a1a8e00ee182f20441a42233c2d546c9da13c1907e1d2b"
+  },
+  {
+   "run": "omni_math:model=openai_gpt-4.1-nano-2025-04-14",
+   "suite": "v1.3.0",
+   "file": "display_predictions.json",
+   "url": "https://storage.googleapis.com/crfm-helm-public/capabilities/benchmark_output/runs/v1.3.0/omni_math:model=openai_gpt-4.1-nano-2025-04-14/display_predictions.json",
+   "generation": "1781127726636321",
+   "bytes": 14449804,
+   "sha256": "b3ea6bed1802b12d83508c8fa205679a4e86617cc749ab69065aef2a90950efc"
+  },
+  {
+   "run": "omni_math:model=openai_gpt-4o-2024-11-20",
+   "suite": "v1.0.0",
+   "file": "scenario_state.json",
+   "url": "https://storage.googleapis.com/crfm-helm-public/capabilities/benchmark_output/runs/v1.0.0/omni_math:model=openai_gpt-4o-2024-11-20/scenario_state.json",
+   "generation": "1781127702833239",
+   "bytes": 95676786,
+   "sha256": "78c953bc2420c8d290c75ec0cfd93b06f3cad6f46835f97923cd478d9c80da8a"
+  },
+  {
+   "run": "omni_math:model=openai_gpt-4o-2024-11-20",
+   "suite": "v1.0.0",
+   "file": "display_predictions.json",
+   "url": "https://storage.googleapis.com/crfm-helm-public/capabilities/benchmark_output/runs/v1.0.0/omni_math:model=openai_gpt-4o-2024-11-20/display_predictions.json",
+   "generation": "1781127702768802",
+   "bytes": 9360414,
+   "sha256": "1f8217fb58a14fed31175e4327544d815dc6d1167376de7cc578507e3452530e"
+  },
+  {
+   "run": "omni_math:model=openai_gpt-4o-mini-2024-07-18",
+   "suite": "v1.0.0",
+   "file": "scenario_state.json",
+   "url": "https://storage.googleapis.com/crfm-helm-public/capabilities/benchmark_output/runs/v1.0.0/omni_math:model=openai_gpt-4o-mini-2024-07-18/scenario_state.json",
+   "generation": "1781127702835361",
+   "bytes": 90824549,
+   "sha256": "9b93eac7edce6cff9912ab24105fefebcb45a6affc94a40544b861212a117b5f"
+  },
+  {
+   "run": "omni_math:model=openai_gpt-4o-mini-2024-07-18",
+   "suite": "v1.0.0",
+   "file": "display_predictions.json",
+   "url": "https://storage.googleapis.com/crfm-helm-public/capabilities/benchmark_output/runs/v1.0.0/omni_math:model=openai_gpt-4o-mini-2024-07-18/display_predictions.json",
+   "generation": "1781127702854833",
+   "bytes": 8832800,
+   "sha256": "0b401e78d38e6cad009b97bcb72accd34af8d5f3ac12c4879d19864f4583020e"
+  },
+  {
+   "run": "omni_math:model=openai_gpt-5-2025-08-07",
+   "suite": "v1.12.0",
+   "file": "scenario_state.json",
+   "url": "https://storage.googleapis.com/crfm-helm-public/capabilities/benchmark_output/runs/v1.12.0/omni_math:model=openai_gpt-5-2025-08-07/scenario_state.json",
+   "generation": "1781127712838242",
+   "bytes": 40817030,
+   "sha256": "f655a9e8c0c403d8cb7863dbb51b29a0733cf2f538d0e31979727ea38b2d3a16"
+  },
+  {
+   "run": "omni_math:model=openai_gpt-5-2025-08-07",
+   "suite": "v1.12.0",
+   "file": "display_predictions.json",
+   "url": "https://storage.googleapis.com/crfm-helm-public/capabilities/benchmark_output/runs/v1.12.0/omni_math:model=openai_gpt-5-2025-08-07/display_predictions.json",
+   "generation": "1781127713820827",
+   "bytes": 17396381,
+   "sha256": "3ef9e1152482eda1abc9278076ca641b7465f3340f6b883aa6d4411cb7937fa3"
+  },
+  {
+   "run": "omni_math:model=openai_gpt-5-mini-2025-08-07",
+   "suite": "v1.12.0",
+   "file": "scenario_state.json",
+   "url": "https://storage.googleapis.com/crfm-helm-public/capabilities/benchmark_output/runs/v1.12.0/omni_math:model=openai_gpt-5-mini-2025-08-07/scenario_state.json",
+   "generation": "1781127712831072",
+   "bytes": 46684187,
+   "sha256": "592a926ffae6bc68aaee29f5117c687e622fae637edcadf364e820c4f2eefb8b"
+  },
+  {
+   "run": "omni_math:model=openai_gpt-5-mini-2025-08-07",
+   "suite": "v1.12.0",
+   "file": "display_predictions.json",
+   "url": "https://storage.googleapis.com/crfm-helm-public/capabilities/benchmark_output/runs/v1.12.0/omni_math:model=openai_gpt-5-mini-2025-08-07/display_predictions.json",
+   "generation": "1781127712838460",
+   "bytes": 10481264,
+   "sha256": "255b5faf0ce00d2f0f4f1e95075966884b9fb2c73913aa9a54960ed3a5ba07eb"
+  },
+  {
+   "run": "omni_math:model=openai_gpt-5-nano-2025-08-07",
+   "suite": "v1.12.0",
+   "file": "scenario_state.json",
+   "url": "https://storage.googleapis.com/crfm-helm-public/capabilities/benchmark_output/runs/v1.12.0/omni_math:model=openai_gpt-5-nano-2025-08-07/scenario_state.json",
+   "generation": "1781127714069586",
+   "bytes": 42512929,
+   "sha256": "07c85111576782011010893fcdba0dddaa002df5328666dc7c2568a213f0a43d"
+  },
+  {
+   "run": "omni_math:model=openai_gpt-5-nano-2025-08-07",
+   "suite": "v1.12.0",
+   "file": "display_predictions.json",
+   "url": "https://storage.googleapis.com/crfm-helm-public/capabilities/benchmark_output/runs/v1.12.0/omni_math:model=openai_gpt-5-nano-2025-08-07/display_predictions.json",
+   "generation": "1781127712826593",
+   "bytes": 19734858,
+   "sha256": "5d93cf849b1a973152ab0197c8fe4b2701dddbe06802402ea0eb54805c01b27f"
+  },
+  {
+   "run": "omni_math:model=openai_gpt-5.1-2025-11-13",
+   "suite": "v1.15.0",
+   "file": "scenario_state.json",
+   "url": "https://storage.googleapis.com/crfm-helm-public/capabilities/benchmark_output/runs/v1.15.0/omni_math:model=openai_gpt-5.1-2025-11-13/scenario_state.json",
+   "generation": "1781127722623971",
+   "bytes": 131752417,
+   "sha256": "91a766d1286b34eb8ca545df4b33715dc782e309662ceb4638205d7520d7b236"
+  },
+  {
+   "run": "omni_math:model=openai_gpt-5.1-2025-11-13",
+   "suite": "v1.15.0",
+   "file": "display_predictions.json",
+   "url": "https://storage.googleapis.com/crfm-helm-public/capabilities/benchmark_output/runs/v1.15.0/omni_math:model=openai_gpt-5.1-2025-11-13/display_predictions.json",
+   "generation": "1781127722525839",
+   "bytes": 10782575,
+   "sha256": "676330d32ad01cef6af7895ef76a6c2851deb1250180f63e4e12ad52299a3c25"
+  },
+  {
+   "run": "omni_math:model=openai_gpt-oss-120b",
+   "suite": "v1.11.0",
+   "file": "scenario_state.json",
+   "url": "https://storage.googleapis.com/crfm-helm-public/capabilities/benchmark_output/runs/v1.11.0/omni_math:model=openai_gpt-oss-120b/scenario_state.json",
+   "generation": "1781127710264541",
+   "bytes": 457627830,
+   "sha256": "874fb0cb9f94462f446ad8ef029a228d7716a90bd721ba15fb8843e4305f2e01"
+  },
+  {
+   "run": "omni_math:model=openai_gpt-oss-120b",
+   "suite": "v1.11.0",
+   "file": "display_predictions.json",
+   "url": "https://storage.googleapis.com/crfm-helm-public/capabilities/benchmark_output/runs/v1.11.0/omni_math:model=openai_gpt-oss-120b/display_predictions.json",
+   "generation": "1781127709990775",
+   "bytes": 8292500,
+   "sha256": "81cac47a3df7a4830573d03a6201f705fceff74fbee13b106f8f0c074910ddfa"
+  },
+  {
+   "run": "omni_math:model=openai_gpt-oss-20b",
+   "suite": "v1.12.0",
+   "file": "scenario_state.json",
+   "url": "https://storage.googleapis.com/crfm-helm-public/capabilities/benchmark_output/runs/v1.12.0/omni_math:model=openai_gpt-oss-20b/scenario_state.json",
+   "generation": "1781127714897711",
+   "bytes": 746367332,
+   "sha256": "3e57e3e7a0f47e637579562addf455ec5528eab385d937807c3c8b3e8028b236"
+  },
+  {
+   "run": "omni_math:model=openai_gpt-oss-20b",
+   "suite": "v1.12.0",
+   "file": "display_predictions.json",
+   "url": "https://storage.googleapis.com/crfm-helm-public/capabilities/benchmark_output/runs/v1.12.0/omni_math:model=openai_gpt-oss-20b/display_predictions.json",
+   "generation": "1781127715000705",
+   "bytes": 5324890,
+   "sha256": "5940d2d1ba2fbc40754ed07a45a332bb1157b304c1f8f05b5c48dd711faa739e"
+  },
+  {
+   "run": "omni_math:model=openai_o3-2025-04-16",
+   "suite": "v1.4.0",
+   "file": "scenario_state.json",
+   "url": "https://storage.googleapis.com/crfm-helm-public/capabilities/benchmark_output/runs/v1.4.0/omni_math:model=openai_o3-2025-04-16/scenario_state.json",
+   "generation": "1781127729278992",
+   "bytes": 55678701,
+   "sha256": "def9a0d072f3873f8e857f6ba08eebcfaa240967a3351e7f2f50dd022999b9c8"
+  },
+  {
+   "run": "omni_math:model=openai_o3-2025-04-16",
+   "suite": "v1.4.0",
+   "file": "display_predictions.json",
+   "url": "https://storage.googleapis.com/crfm-helm-public/capabilities/benchmark_output/runs/v1.4.0/omni_math:model=openai_o3-2025-04-16/display_predictions.json",
+   "generation": "1781127729328188",
+   "bytes": 6633974,
+   "sha256": "4fc3608c6b79d23d0547e33a2a45f7864db19e882b7e1a19e22083c709a35c3b"
+  },
+  {
+   "run": "omni_math:model=openai_o4-mini-2025-04-16",
+   "suite": "v1.4.0",
+   "file": "scenario_state.json",
+   "url": "https://storage.googleapis.com/crfm-helm-public/capabilities/benchmark_output/runs/v1.4.0/omni_math:model=openai_o4-mini-2025-04-16/scenario_state.json",
+   "generation": "1781127729506333",
+   "bytes": 43725026,
+   "sha256": "11813dae1fb79a101fce4f5dfe73bfdfdc17ee0e3d1e797ad380470cd37e9202"
+  },
+  {
+   "run": "omni_math:model=openai_o4-mini-2025-04-16",
+   "suite": "v1.4.0",
+   "file": "display_predictions.json",
+   "url": "https://storage.googleapis.com/crfm-helm-public/capabilities/benchmark_output/runs/v1.4.0/omni_math:model=openai_o4-mini-2025-04-16/display_predictions.json",
+   "generation": "1781127729286312",
+   "bytes": 5921989,
+   "sha256": "5500b0accd5ecfef3b143f8be793340fe8c5c477f270b18c2c1ea8e0daaf7164"
+  },
+  {
+   "run": "omni_math:model=qwen_qwen2.5-72b-instruct-turbo",
+   "suite": "v1.0.0",
+   "file": "scenario_state.json",
+   "url": "https://storage.googleapis.com/crfm-helm-public/capabilities/benchmark_output/runs/v1.0.0/omni_math:model=qwen_qwen2.5-72b-instruct-turbo/scenario_state.json",
+   "status": "download_failed_404"
+  },
+  {
+   "run": "omni_math:model=qwen_qwen2.5-72b-instruct-turbo",
+   "suite": "v1.0.0",
+   "file": "display_predictions.json",
+   "url": "https://storage.googleapis.com/crfm-helm-public/capabilities/benchmark_output/runs/v1.0.0/omni_math:model=qwen_qwen2.5-72b-instruct-turbo/display_predictions.json",
+   "generation": "1781127703172712",
+   "bytes": 8663749,
+   "sha256": "4c4091b9e524320b3d4dc434d7386d85c0c865b1a48e05460f6207ac05e263ef"
+  },
+  {
+   "run": "omni_math:model=qwen_qwen2.5-7b-instruct-turbo",
+   "suite": "v1.0.0",
+   "file": "scenario_state.json",
+   "url": "https://storage.googleapis.com/crfm-helm-public/capabilities/benchmark_output/runs/v1.0.0/omni_math:model=qwen_qwen2.5-7b-instruct-turbo/scenario_state.json",
+   "generation": "1781127703218325",
+   "bytes": 92657033,
+   "sha256": "c62bc5c3f0848555eed274a76e8d17851507718439464443d31db4cad541342f"
+  },
+  {
+   "run": "omni_math:model=qwen_qwen2.5-7b-instruct-turbo",
+   "suite": "v1.0.0",
+   "file": "display_predictions.json",
+   "url": "https://storage.googleapis.com/crfm-helm-public/capabilities/benchmark_output/runs/v1.0.0/omni_math:model=qwen_qwen2.5-7b-instruct-turbo/display_predictions.json",
+   "generation": "1781127703473132",
+   "bytes": 8225943,
+   "sha256": "11f41f2703779b015f7ccdc1782cc48cfad1f840b9ce8ed6d12957e2d787606b"
+  },
+  {
+   "run": "omni_math:model=qwen_qwen3-235b-a22b-fp8-tput",
+   "suite": "v1.5.0",
+   "file": "scenario_state.json",
+   "url": "https://storage.googleapis.com/crfm-helm-public/capabilities/benchmark_output/runs/v1.5.0/omni_math:model=qwen_qwen3-235b-a22b-fp8-tput/scenario_state.json",
+   "generation": "1781127731000509",
+   "bytes": 1091487223,
+   "sha256": "3a12060398041dac11384f084e393e2ded420c049f7ba910be777f9411e0b67e"
+  },
+  {
+   "run": "omni_math:model=qwen_qwen3-235b-a22b-fp8-tput",
+   "suite": "v1.5.0",
+   "file": "display_predictions.json",
+   "url": "https://storage.googleapis.com/crfm-helm-public/capabilities/benchmark_output/runs/v1.5.0/omni_math:model=qwen_qwen3-235b-a22b-fp8-tput/display_predictions.json",
+   "generation": "1781127730824522",
+   "bytes": 22069003,
+   "sha256": "554758e3596a57806dccf11e7af182bc2dd57270a19cd1bfe714161bbcd067ce"
+  },
+  {
+   "run": "omni_math:model=qwen_qwen3-235b-a22b-instruct-2507-fp8",
+   "suite": "v1.12.0",
+   "file": "scenario_state.json",
+   "url": "https://storage.googleapis.com/crfm-helm-public/capabilities/benchmark_output/runs/v1.12.0/omni_math:model=qwen_qwen3-235b-a22b-instruct-2507-fp8/scenario_state.json",
+   "generation": "1781127714934513",
+   "bytes": 670299310,
+   "sha256": "1488e96a195f95b3993efd2bae906ab484c3d448e40c69e4bcdbe6776e498807"
+  },
+  {
+   "run": "omni_math:model=qwen_qwen3-235b-a22b-instruct-2507-fp8",
+   "suite": "v1.12.0",
+   "file": "display_predictions.json",
+   "url": "https://storage.googleapis.com/crfm-helm-public/capabilities/benchmark_output/runs/v1.12.0/omni_math:model=qwen_qwen3-235b-a22b-instruct-2507-fp8/display_predictions.json",
+   "generation": "1781127713959580",
+   "bytes": 34598808,
+   "sha256": "fd0d82ee74599a97fa2eb6e3432aa24fb4ca3030bbd816829afee8bb9743e0d9"
+  },
+  {
+   "run": "omni_math:model=qwen_qwen3-next-80b-a3b-thinking",
+   "suite": "v1.13.0",
+   "file": "scenario_state.json",
+   "url": "https://storage.googleapis.com/crfm-helm-public/capabilities/benchmark_output/runs/v1.13.0/omni_math:model=qwen_qwen3-next-80b-a3b-thinking/scenario_state.json",
+   "generation": "1781127718403490",
+   "bytes": 33835103,
+   "sha256": "29268b6bd2072fd198b0044386452ba8c6ad3d79d21c1421c6bcc863b9ba3312"
+  },
+  {
+   "run": "omni_math:model=qwen_qwen3-next-80b-a3b-thinking",
+   "suite": "v1.13.0",
+   "file": "display_predictions.json",
+   "url": "https://storage.googleapis.com/crfm-helm-public/capabilities/benchmark_output/runs/v1.13.0/omni_math:model=qwen_qwen3-next-80b-a3b-thinking/display_predictions.json",
+   "generation": "1781127718356499",
+   "bytes": 32176803,
+   "sha256": "ccd75097c0254281197e97328a61c3252252888c64eb0f9d759e5170e3531532"
+  },
+  {
+   "run": "omni_math:model=writer_palmyra-fin",
+   "suite": "v1.1.0",
+   "file": "scenario_state.json",
+   "url": "https://storage.googleapis.com/crfm-helm-public/capabilities/benchmark_output/runs/v1.1.0/omni_math:model=writer_palmyra-fin/scenario_state.json",
+   "generation": "1781127707578540",
+   "bytes": 89327815,
+   "sha256": "96f2f3ba22f38f41e9ad149dfe330f3b4db5b38f2f959dcdf8e1f9912259fa9c"
+  },
+  {
+   "run": "omni_math:model=writer_palmyra-fin",
+   "suite": "v1.1.0",
+   "file": "display_predictions.json",
+   "url": "https://storage.googleapis.com/crfm-helm-public/capabilities/benchmark_output/runs/v1.1.0/omni_math:model=writer_palmyra-fin/display_predictions.json",
+   "generation": "1781127707835557",
+   "bytes": 8744068,
+   "sha256": "157bbd4c9dc968b6ab917c47ad9f3624ae1aec4382d22dc22d974090654db616"
+  },
+  {
+   "run": "omni_math:model=writer_palmyra-med",
+   "suite": "v1.5.0",
+   "file": "scenario_state.json",
+   "url": "https://storage.googleapis.com/crfm-helm-public/capabilities/benchmark_output/runs/v1.5.0/omni_math:model=writer_palmyra-med/scenario_state.json",
+   "generation": "1781127731118225",
+   "bytes": 7376938,
+   "sha256": "99f9ad1d00c47a7055c27533a62aa08aedfbbff8f40624dbcf66f0461c2dee1f"
+  },
+  {
+   "run": "omni_math:model=writer_palmyra-med",
+   "suite": "v1.5.0",
+   "file": "display_predictions.json",
+   "url": "https://storage.googleapis.com/crfm-helm-public/capabilities/benchmark_output/runs/v1.5.0/omni_math:model=writer_palmyra-med/display_predictions.json",
+   "generation": "1781127731103485",
+   "bytes": 5707662,
+   "sha256": "86f9a055c2d5728bf19a3466982ec314480417f386dd80307a5115b44a1e5a60"
+  },
+  {
+   "run": "omni_math:model=writer_palmyra-x-004",
+   "suite": "v1.0.0",
+   "file": "scenario_state.json",
+   "url": "https://storage.googleapis.com/crfm-helm-public/capabilities/benchmark_output/runs/v1.0.0/omni_math:model=writer_palmyra-x-004/scenario_state.json",
+   "generation": "1781127703268335",
+   "bytes": 96781976,
+   "sha256": "7e8d13094cbdce99d9d2841b07c501a62cbb9eac69ca1cca463df079bd4befab"
+  },
+  {
+   "run": "omni_math:model=writer_palmyra-x-004",
+   "suite": "v1.0.0",
+   "file": "display_predictions.json",
+   "url": "https://storage.googleapis.com/crfm-helm-public/capabilities/benchmark_output/runs/v1.0.0/omni_math:model=writer_palmyra-x-004/display_predictions.json",
+   "generation": "1781127703230705",
+   "bytes": 8993952,
+   "sha256": "8223878a4c2a32f381bfb1340e0b8638fa29b42d1fae62f571d558cf3188fe66"
+  },
+  {
+   "run": "omni_math:model=writer_palmyra-x5",
+   "suite": "v1.5.0",
+   "file": "scenario_state.json",
+   "url": "https://storage.googleapis.com/crfm-helm-public/capabilities/benchmark_output/runs/v1.5.0/omni_math:model=writer_palmyra-x5/scenario_state.json",
+   "generation": "1781127731177993",
+   "bytes": 12074307,
+   "sha256": "6d560a6a151735b3374b9644dbc615df110b7551f577a311b4a0e43908f5ea81"
+  },
+  {
+   "run": "omni_math:model=writer_palmyra-x5",
+   "suite": "v1.5.0",
+   "file": "display_predictions.json",
+   "url": "https://storage.googleapis.com/crfm-helm-public/capabilities/benchmark_output/runs/v1.5.0/omni_math:model=writer_palmyra-x5/display_predictions.json",
+   "generation": "1781127731202637",
+   "bytes": 10407183,
+   "sha256": "4451dad419c7882184d66c1dbe344b8046a80290df1617527c89e84fdcae8f2e"
+  },
+  {
+   "run": "omni_math:model=xai_grok-3-beta",
+   "suite": "v1.3.0",
+   "file": "scenario_state.json",
+   "url": "https://storage.googleapis.com/crfm-helm-public/capabilities/benchmark_output/runs/v1.3.0/omni_math:model=xai_grok-3-beta/scenario_state.json",
+   "generation": "1781127726849161",
+   "bytes": 331507881,
+   "sha256": "d686642e5b8535558cf65cf182780cb3c1c6a30c982330a10e7e9edd19532770"
+  },
+  {
+   "run": "omni_math:model=xai_grok-3-beta",
+   "suite": "v1.3.0",
+   "file": "display_predictions.json",
+   "url": "https://storage.googleapis.com/crfm-helm-public/capabilities/benchmark_output/runs/v1.3.0/omni_math:model=xai_grok-3-beta/display_predictions.json",
+   "generation": "1781127726634803",
+   "bytes": 23328751,
+   "sha256": "24dbeeec5edebb6208a130e9c275a4862c357a373a9d5e17be832f759d11c56b"
+  },
+  {
+   "run": "omni_math:model=xai_grok-3-mini-beta",
+   "suite": "v1.3.0",
+   "file": "scenario_state.json",
+   "url": "https://storage.googleapis.com/crfm-helm-public/capabilities/benchmark_output/runs/v1.3.0/omni_math:model=xai_grok-3-mini-beta/scenario_state.json",
+   "generation": "1781127726929567",
+   "bytes": 21777333,
+   "sha256": "f31222ff135c3ed0a76992404e52d4c6d8aeed2d053f63495f594aa32a18d8bb"
+  },
+  {
+   "run": "omni_math:model=xai_grok-3-mini-beta",
+   "suite": "v1.3.0",
+   "file": "display_predictions.json",
+   "url": "https://storage.googleapis.com/crfm-helm-public/capabilities/benchmark_output/runs/v1.3.0/omni_math:model=xai_grok-3-mini-beta/display_predictions.json",
+   "generation": "1781127726859236",
+   "bytes": 3103561,
+   "sha256": "a5be75732ed3f041a0a5700eec9330819904c080733e134650c76b62b1096cbd"
+  },
+  {
+   "run": "omni_math:model=xai_grok-4-0709",
+   "suite": "v1.9.0",
+   "file": "scenario_state.json",
+   "url": "https://storage.googleapis.com/crfm-helm-public/capabilities/benchmark_output/runs/v1.9.0/omni_math:model=xai_grok-4-0709/scenario_state.json",
+   "generation": "1781127737823251",
+   "bytes": 14713613,
+   "sha256": "5446dca6cdea3a0a8a672b03f9ec2b5fcabe5ec3e81dac6ca2047a2e3c1a86d3"
+  },
+  {
+   "run": "omni_math:model=xai_grok-4-0709",
+   "suite": "v1.9.0",
+   "file": "display_predictions.json",
+   "url": "https://storage.googleapis.com/crfm-helm-public/capabilities/benchmark_output/runs/v1.9.0/omni_math:model=xai_grok-4-0709/display_predictions.json",
+   "generation": "1781127737619971",
+   "bytes": 3329901,
+   "sha256": "b5c2f2d069bd2459643b4cacd1b49b04086ccf5d90b79462057df0150ecc387a"
+  },
+  {
+   "run": "omni_math:model=zai-org_glm-4.5-air-fp8",
+   "suite": "v1.11.0",
+   "file": "scenario_state.json",
+   "url": "https://storage.googleapis.com/crfm-helm-public/capabilities/benchmark_output/runs/v1.11.0/omni_math:model=zai-org_glm-4.5-air-fp8/scenario_state.json",
+   "generation": "1781127710220595",
+   "bytes": 1269442111,
+   "sha256": "47437bc7d6bc3381fac512a767e7fff2581a630150d34eaefa56aa61f7058706"
+  },
+  {
+   "run": "omni_math:model=zai-org_glm-4.5-air-fp8",
+   "suite": "v1.11.0",
+   "file": "display_predictions.json",
+   "url": "https://storage.googleapis.com/crfm-helm-public/capabilities/benchmark_output/runs/v1.11.0/omni_math:model=zai-org_glm-4.5-air-fp8/display_predictions.json",
+   "generation": "1781127710163502",
+   "bytes": 34157677,
+   "sha256": "f8740c3580ddca6f6b56df52284cdf37a1577cd4f1d0f1d2ca457475a7c17e36"
+  },
+  {
+   "run": "omni_math:num_output_tokens=2048,model=allenai_olmo-2-0325-32b-instruct",
+   "suite": "v1.8.0",
+   "file": "scenario_state.json",
+   "url": "https://storage.googleapis.com/crfm-helm-public/capabilities/benchmark_output/runs/v1.8.0/omni_math:num_output_tokens=2048,model=allenai_olmo-2-0325-32b-instruct/scenario_state.json",
+   "generation": "1781127735955733",
+   "bytes": 63532443,
+   "sha256": "e6308e019099e2ed6ae4a9e12f930cdd542721649daf9ee6d0bde094637e7f95"
+  },
+  {
+   "run": "omni_math:num_output_tokens=2048,model=allenai_olmo-2-0325-32b-instruct",
+   "suite": "v1.8.0",
+   "file": "display_predictions.json",
+   "url": "https://storage.googleapis.com/crfm-helm-public/capabilities/benchmark_output/runs/v1.8.0/omni_math:num_output_tokens=2048,model=allenai_olmo-2-0325-32b-instruct/display_predictions.json",
+   "generation": "1781127735890677",
+   "bytes": 7320499,
+   "sha256": "92d4dd60d5064d4f9aee6c087bb00865948cb8feeeab0078209b3d35876ed8f5"
+  },
+  {
+   "run": "omni_math:num_output_tokens=2048,model=allenai_olmo-2-1124-13b-instruct",
+   "suite": "v1.8.0",
+   "file": "scenario_state.json",
+   "url": "https://storage.googleapis.com/crfm-helm-public/capabilities/benchmark_output/runs/v1.8.0/omni_math:num_output_tokens=2048,model=allenai_olmo-2-1124-13b-instruct/scenario_state.json",
+   "generation": "1781127735954724",
+   "bytes": 74354517,
+   "sha256": "f3edd755a85aa5445c22e08b24f3a503ba264636baf96a22ca83fe00f7c2ad18"
+  },
+  {
+   "run": "omni_math:num_output_tokens=2048,model=allenai_olmo-2-1124-13b-instruct",
+   "suite": "v1.8.0",
+   "file": "display_predictions.json",
+   "url": "https://storage.googleapis.com/crfm-helm-public/capabilities/benchmark_output/runs/v1.8.0/omni_math:num_output_tokens=2048,model=allenai_olmo-2-1124-13b-instruct/display_predictions.json",
+   "generation": "1781127736174984",
+   "bytes": 7905587,
+   "sha256": "0df0f8ac3a83e7cb5c9180ef8e5ed079cf6906b021e94b0f0f01b6dc91e47a39"
+  },
+  {
+   "run": "omni_math:num_output_tokens=2048,model=allenai_olmo-2-1124-7b-instruct",
+   "suite": "v1.8.0",
+   "file": "scenario_state.json",
+   "url": "https://storage.googleapis.com/crfm-helm-public/capabilities/benchmark_output/runs/v1.8.0/omni_math:num_output_tokens=2048,model=allenai_olmo-2-1124-7b-instruct/scenario_state.json",
+   "generation": "1781127736170713",
+   "bytes": 86452426,
+   "sha256": "61860b3bbab9a50c7a9fa03b112e036cce130206f3f1afa9d43e0528dfe10854"
+  },
+  {
+   "run": "omni_math:num_output_tokens=2048,model=allenai_olmo-2-1124-7b-instruct",
+   "suite": "v1.8.0",
+   "file": "display_predictions.json",
+   "url": "https://storage.googleapis.com/crfm-helm-public/capabilities/benchmark_output/runs/v1.8.0/omni_math:num_output_tokens=2048,model=allenai_olmo-2-1124-7b-instruct/display_predictions.json",
+   "generation": "1781127735926468",
+   "bytes": 8718161,
+   "sha256": "16ad192437e6eb5821700cb7fe4296144bf2d2429ab1d01eec15bb4507894a56"
+  },
+  {
+   "run": "omni_math:num_output_tokens=2048,model=allenai_olmoe-1b-7b-0125-instruct",
+   "suite": "v1.8.0",
+   "file": "scenario_state.json",
+   "url": "https://storage.googleapis.com/crfm-helm-public/capabilities/benchmark_output/runs/v1.8.0/omni_math:num_output_tokens=2048,model=allenai_olmoe-1b-7b-0125-instruct/scenario_state.json",
+   "generation": "1781127736261672",
+   "bytes": 49854955,
+   "sha256": "eeb2ed885588e43d4f4e16f04281a36e466ca53c153346f3a47f5e70ae8f7f95"
+  },
+  {
+   "run": "omni_math:num_output_tokens=2048,model=allenai_olmoe-1b-7b-0125-instruct",
+   "suite": "v1.8.0",
+   "file": "display_predictions.json",
+   "url": "https://storage.googleapis.com/crfm-helm-public/capabilities/benchmark_output/runs/v1.8.0/omni_math:num_output_tokens=2048,model=allenai_olmoe-1b-7b-0125-instruct/display_predictions.json",
+   "generation": "1781127736229599",
+   "bytes": 6249553,
+   "sha256": "44be2d02c1dbd9390b2f4fa98ef3da0e7c9d7ae3125547017bb0a9864c2806ce"
+  },
+  {
+   "run": "omni_math:num_output_tokens=2048,model=marin-community_marin-8b-instruct",
+   "suite": "v1.8.0",
+   "file": "scenario_state.json",
+   "url": "https://storage.googleapis.com/crfm-helm-public/capabilities/benchmark_output/runs/v1.8.0/omni_math:num_output_tokens=2048,model=marin-community_marin-8b-instruct/scenario_state.json",
+   "generation": "1781127736432477",
+   "bytes": 86926035,
+   "sha256": "06e3847cca7ac38d6e6ce1431d4210571062f1f39f09869f41cf287ce50e793a"
+  },
+  {
+   "run": "omni_math:num_output_tokens=2048,model=marin-community_marin-8b-instruct",
+   "suite": "v1.8.0",
+   "file": "display_predictions.json",
+   "url": "https://storage.googleapis.com/crfm-helm-public/capabilities/benchmark_output/runs/v1.8.0/omni_math:num_output_tokens=2048,model=marin-community_marin-8b-instruct/display_predictions.json",
+   "generation": "1781127736240209",
+   "bytes": 8527189,
+   "sha256": "1a6164d966708b2d20f1f8946f9f298a76f56b15e2c5b16102020bad8519fba0"
+  }
+ ]
+}
