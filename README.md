@@ -69,7 +69,7 @@ mechanistic language requires additional evidence described in the protocol.
   rerun record.
 - [public_artifacts/](public_artifacts/): sanitized exploratory metadata and billing
   receipts. Prompts, gold labels, visible responses, and reasoning traces are omitted.
-- [OUTREACH_RESEARCH.md](OUTREACH_RESEARCH.md): literature and reviewer-selection
+- [OUTREACH_RESEARCH.md](docs/outreach/OUTREACH_RESEARCH.md): literature and reviewer-selection
   dossier. It is not evidence of endorsement.
 
 Exploratory and confirmatory rows are never pooled. Earlier accuracy numbers that

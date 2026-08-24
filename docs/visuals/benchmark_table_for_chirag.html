@@ -1,0 +1,357 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <title>Benchmark table for Chirag</title>
+  <style>
+    :root {
+      --ink: #172033;
+      --muted: #5d6678;
+      --line: #dfe4ec;
+      --surface: #ffffff;
+      --soft: #f5f7fa;
+      --blue: #1458d6;
+      --green: #16734a;
+      --amber: #8b5a00;
+      --red: #a2382e;
+      --shadow: 0 12px 30px rgba(23, 32, 51, 0.08);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      background: #eef2f7;
+      color: var(--ink);
+      font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      font-size: 15px;
+      line-height: 1.55;
+    }
+
+    main {
+      width: min(1480px, calc(100% - 32px));
+      margin: 28px auto 64px;
+      padding: 36px;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      background: var(--surface);
+      box-shadow: var(--shadow);
+    }
+
+    header {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 20px;
+      align-items: start;
+      padding-bottom: 24px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    h1, h2 { margin-top: 0; letter-spacing: -0.025em; }
+    h1 { margin-bottom: 8px; font-size: clamp(28px, 4vw, 48px); line-height: 1.04; }
+    h2 { margin-bottom: 12px; font-size: 21px; }
+    p { margin: 0 0 12px; }
+    a { color: var(--blue); }
+
+    .eyebrow {
+      margin-bottom: 8px;
+      color: var(--blue);
+      font-size: 12px;
+      font-weight: 750;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .subtitle { max-width: 900px; color: var(--muted); font-size: 17px; }
+
+    .status {
+      padding: 7px 11px;
+      border: 1px solid #bbd0fb;
+      border-radius: 999px;
+      background: #edf3ff;
+      color: #174aa7;
+      font-size: 12px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .takeaway {
+      margin: 24px 0;
+      padding: 20px 22px;
+      border-left: 5px solid var(--blue);
+      border-radius: 10px;
+      background: #f2f6ff;
+      font-size: 19px;
+      font-weight: 650;
+    }
+
+    .terms {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(140px, 1fr));
+      gap: 10px;
+      margin-bottom: 28px;
+    }
+
+    .term {
+      padding: 12px 14px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: var(--soft);
+    }
+
+    .term strong { display: block; margin-bottom: 2px; }
+    .term span { color: var(--muted); font-size: 13px; }
+
+    .table-wrap {
+      overflow-x: auto;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+    }
+
+    table {
+      width: 100%;
+      min-width: 1260px;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+
+    th, td {
+      padding: 13px 12px;
+      border-right: 1px solid var(--line);
+      border-bottom: 1px solid var(--line);
+      text-align: left;
+      vertical-align: top;
+    }
+
+    th:last-child, td:last-child { border-right: 0; }
+    tbody tr:last-child td { border-bottom: 0; }
+    tbody tr:nth-child(even) { background: #fafbfc; }
+
+    th {
+      position: sticky;
+      top: 0;
+      background: #eef2f7;
+      color: #485267;
+      font-size: 11px;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    td:first-child { width: 170px; font-weight: 700; }
+    .yes { color: var(--green); font-weight: 700; }
+    .partial { color: var(--amber); font-weight: 700; }
+    .no { color: var(--red); font-weight: 700; }
+
+    .note {
+      margin-top: 10px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 18px;
+      margin-top: 28px;
+    }
+
+    .card {
+      padding: 20px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: var(--surface);
+    }
+
+    .card ol, .card ul { margin: 0; padding-left: 22px; }
+    .card li + li { margin-top: 9px; }
+
+    blockquote {
+      margin: 0;
+      padding: 0;
+      color: #354058;
+    }
+
+    blockquote p + p { margin-top: 12px; }
+
+    .recommendation {
+      grid-column: 1 / -1;
+      border-color: #b9d9c9;
+      background: #f2fbf6;
+    }
+
+    footer {
+      margin-top: 26px;
+      padding-top: 18px;
+      border-top: 1px solid var(--line);
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    @media (max-width: 900px) {
+      main { width: 100%; margin: 0; padding: 24px 18px 44px; border: 0; border-radius: 0; }
+      header { grid-template-columns: 1fr; }
+      .status { width: fit-content; }
+      .terms, .grid { grid-template-columns: 1fr; }
+      .recommendation { grid-column: auto; }
+    }
+
+    @media print {
+      @page { size: landscape; margin: 0.38in; }
+      body { background: #fff; font-size: 10pt; }
+      main { width: 100%; margin: 0; padding: 0; border: 0; box-shadow: none; }
+      header { padding-bottom: 12px; }
+      h1 { font-size: 25pt; }
+      .takeaway { margin: 12px 0; padding: 12px 14px; font-size: 12pt; }
+      .terms { grid-template-columns: repeat(5, 1fr); gap: 6px; margin-bottom: 12px; }
+      .term { padding: 7px 8px; }
+      .table-wrap { overflow: visible; }
+      table { min-width: 0; font-size: 7.3pt; }
+      th, td { padding: 6px; }
+      th { position: static; }
+      .grid { gap: 10px; margin-top: 14px; }
+      .card { padding: 12px; break-inside: avoid; }
+      .script-card { grid-column: 1 / -1; }
+      a { color: inherit; text-decoration: none; }
+      footer { margin-top: 12px; }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <header>
+      <div>
+        <div class="eyebrow">Thinking Cut Short / REAP</div>
+        <h1>Benchmark comparison for Chirag</h1>
+        <p class="subtitle">What the public archives let us measure question by question, where they fall short, and why the controlled experiment is still needed.</p>
+        <p style="margin-top:10px"><a href="chirag_meeting_master.html">Open the meeting command center</a></p>
+      </div>
+      <div class="status">Planning only · zero provider calls</div>
+    </header>
+
+    <div class="takeaway">The archives support question-level accuracy comparisons. They do not provide one common token unit or a complete record of why every response stopped.</div>
+
+    <section aria-labelledby="terms-heading">
+      <h2 id="terms-heading">Names in plain language</h2>
+      <div class="terms">
+        <div class="term"><strong>MathArena</strong><span>Public model attempts on recent math competitions</span></div>
+        <div class="term"><strong>HMMT</strong><span>Harvard-MIT Mathematics Tournament</span></div>
+        <div class="term"><strong>AIME</strong><span>American Invitational Mathematics Examination</span></div>
+        <div class="term"><strong>HELM</strong><span>Stanford evaluation project</span></div>
+        <div class="term"><strong>GPQA</strong><span>Difficult graduate-level science questions</span></div>
+      </div>
+    </section>
+
+    <section aria-labelledby="table-heading">
+      <h2 id="table-heading">The table Chirag asked for</h2>
+      <div class="table-wrap" role="region" aria-label="Scrollable benchmark comparison" tabindex="0">
+        <table>
+          <thead>
+            <tr>
+              <th>Archive</th>
+              <th>Domain and questions</th>
+              <th>Per-question correctness</th>
+              <th>Output amount</th>
+              <th>Token exhaustion</th>
+              <th>Honest use</th>
+              <th>Main limitation</th>
+              <th>Source</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>MathArena HMMT 2025</td>
+              <td>Competition math<br><strong>30 questions</strong></td>
+              <td><span class="yes">Yes.</span> Exact-source audit: 64 models, all 30 questions, four attempts per model-question pair.</td>
+              <td><span class="partial">Yes, after checks.</span> Reports output tokens; 120 zero and 7 negative values must be flagged.</td>
+              <td><span class="no">Not confirmed.</span> No requested cap or finish reason. Near-cap status is inferred.</td>
+              <td>Question-level accuracy and route-specific output comparisons. Cleanest audited math source for IDs and question text.</td>
+              <td>Three or four prompt-wrapper variants appear across models.</td>
+              <td><a href="https://huggingface.co/datasets/MathArena/hmmt_feb_2025_outputs/tree/bac3e9b78124aa8811c4aae3d590f03b467643f4">Pinned archive</a></td>
+            </tr>
+            <tr>
+              <td>MathArena HMMT 2026</td>
+              <td>Competition math<br><strong>33 MathArena items</strong></td>
+              <td><span class="yes">Yes.</span> 29 of 30 models cover all 33; Qwen3.5-4B covers 22.</td>
+              <td><span class="partial">Yes, after checks.</span> One zero-token row is unusable.</td>
+              <td><span class="no">Not confirmed.</span> No requested cap or finish reason.</td>
+              <td>Question-level accuracy and route-specific output comparisons after source and missingness rules are fixed.</td>
+              <td>Item 25 has two text versions. Official-round provenance for items 31 to 33 is unverified.</td>
+              <td><a href="https://huggingface.co/datasets/MathArena/hmmt_feb_2026_outputs/tree/1e888131281fc0fca080fd220e8bc6d830937564">Pinned archive</a></td>
+            </tr>
+            <tr>
+              <td>MathArena AIME 2026</td>
+              <td>Competition math<br><strong>30 questions</strong></td>
+              <td><span class="yes">Yes in the archive.</span></td>
+              <td><span class="yes">Yes in the archive.</span></td>
+              <td><span class="no">Not confirmed.</span> No requested cap or finish reason.</td>
+              <td>Larger descriptive math comparison and response-length priors.</td>
+              <td>Exact source, prompt, and missing-cell audit still needs to be extended to this archive.</td>
+              <td><a href="https://huggingface.co/datasets/MathArena/aime_2026_outputs/tree/76ce7a0aa77f0710f3cfb818ff1193e6dea56210">Pinned archive</a></td>
+            </tr>
+            <tr>
+              <td>MathArena BRUMO 2025</td>
+              <td>Competition math<br><strong>30 questions</strong></td>
+              <td><span class="yes">Yes in the archive.</span></td>
+              <td><span class="yes">Yes in the archive.</span></td>
+              <td><span class="no">Not confirmed.</span> No requested cap or finish reason.</td>
+              <td>Another descriptive math comparison and response-length priors.</td>
+              <td>Exact-source audit is still needed. The dataset card has a naming inconsistency.</td>
+              <td><a href="https://huggingface.co/datasets/MathArena/brumo_2025_outputs/tree/12ca8f115d73526d25a36b72e4bfefb18b76d6be">Pinned archive</a></td>
+            </tr>
+            <tr>
+              <td>HELM GPQA</td>
+              <td>Graduate-level science<br><strong>446 evaluated questions</strong> from 448 source rows</td>
+              <td><span class="yes">Yes.</span> Gemini, Claude, and GPT cover the same 446 test IDs. Two source rows are fixed training examples.</td>
+              <td><span class="no">Not comparable.</span> Gemini is all zero; Claude is 235 to 4,707; GPT is 5 to 7.</td>
+              <td><span class="partial">Gemini only.</span> At a 14,096 cap: 42 length, 404 stop. Claude and GPT labels are blank.</td>
+              <td>Non-math question-level accuracy. Gemini is a clean example of observed length stops; all 42 were scored wrong.</td>
+              <td>Provider token fields differ, and archived text cannot be regraded with REAP's strict final-answer rule.</td>
+              <td><a href="https://crfm.stanford.edu/helm/capabilities/latest/">HELM v1.15.0</a></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="note"><strong>Do not combine 123 and 446 into one sample.</strong> MathArena and HELM use different domains, models, prompts, grades, and token measurements.</p>
+    </section>
+
+    <div class="grid">
+      <section class="card script-card" aria-labelledby="script-heading">
+        <h2 id="script-heading">Two-minute explanation</h2>
+        <blockquote>
+          <p>I built the benchmark table you asked for. All five public archives let us see whether a model got each question right. The four MathArena sets give us 123 math questions and output-token counts. HELM gives us 446 science questions answered by the same three archived models.</p>
+          <p>The limitation is that token exhaustion is not measured the same way. MathArena does not publish the requested cap or the reason a response stopped, so it can only suggest truncation. HELM is stronger for one model: Gemini has 42 responses explicitly labeled as stopping for length, and all 42 were scored wrong. But HELM's token fields are not comparable across providers.</p>
+          <p>So the public data can show the pattern and help us plan. It cannot tell us what a cut-off response would have answered with more room. That is why we still need the controlled experiment with fixed prompts, known limits, recorded stop reasons, and repeats.</p>
+        </blockquote>
+      </section>
+
+      <section class="card" aria-labelledby="questions-heading">
+        <h2 id="questions-heading">Questions for Chirag</h2>
+        <ol>
+          <li>Use all 123 MathArena questions for the descriptive section, but a smaller fixed set for the controlled experiment?</li>
+          <li>Exclude HMMT-2026 item 25 from historical cross-model comparisons, or report its two versions separately?</li>
+          <li>Include items 31 to 33 as MathArena source items with the provenance caveat?</li>
+          <li>Keep effort by allowance as primary and cross-model matched-performance comparisons as secondary?</li>
+          <li>Rerun power analysis with verified counts and real response-length data before fixing caps and repeats?</li>
+        </ol>
+      </section>
+
+      <section class="card" aria-labelledby="observational-heading">
+        <h2 id="observational-heading">If the observational result comes up</h2>
+        <p>"In the current exploratory comparison, 427 MathArena generations ended at or near an apparent cap. After combining the predeclared MathArena comparison with the observed HELM Gemini group, 15 of 17 selected groups had zero accuracy among inferred cap rows or observed length stops. The other two were below 12 percent."</p>
+        <p class="note">MathArena cap status is inferred. HELM Gemini stop status is observed. Use 15 of 17 from the current recomputation, not the older 16-of-17 line.</p>
+      </section>
+
+      <section class="card recommendation" aria-labelledby="recommendation-heading">
+        <h2 id="recommendation-heading">Recommended position</h2>
+        <p>Use the public archives as descriptive evidence and planning data. Use the controlled experiment for causal claims. Keep token comparisons within a pinned route unless accounting units are proved comparable. Start the controlled math panel from HMMT 2025, then add HMMT 2026 only with explicit rules for item 25 and items 31 to 33.</p>
+      </section>
+    </div>
+
+    <footer>
+      Prepared 2026-08-21 from the pinned source manifest, sanitized capability summary, and the dated benchmark audits in <code>reap/20_BENCHMARK_COMPARISON_2026-08-18.md</code> and <code>reap/22_BENCHMARK_PROVENANCE_AND_CAPABILITY_2026-08-19.md</code>. Exploratory planning only. No provider call was made.
+    </footer>
+  </main>
+</body>
+</html>

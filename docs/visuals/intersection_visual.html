@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The intersection — his half, your half, one wall</title>
+<style>
+  .viz-root {
+    color-scheme: light;
+    --surface-1: #fcfcfb; --page: #f9f9f7;
+    --ink-1: #0b0b0b; --ink-2: #52514e; --muted: #898781;
+    --grid: #e1e0d9; --axis: #c3c2b7; --border: rgba(11,11,11,0.10);
+    --resp: #2a78d6; --chop: #eb6834; --band: #cde2fb; --prompt: #d9d7d0;
+    --good: #0ca30c;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:where(:not([data-theme="light"])) .viz-root {
+      color-scheme: dark;
+      --surface-1: #1a1a19; --page: #0d0d0d;
+      --ink-1: #ffffff; --ink-2: #c3c2b7; --muted: #898781;
+      --grid: #2c2c2a; --axis: #383835; --border: rgba(255,255,255,0.10);
+      --resp: #3987e5; --chop: #d95926; --band: #16304f; --prompt: #3a3a37;
+      --good: #0ca30c;
+    }
+  }
+  :root[data-theme="dark"] .viz-root {
+    color-scheme: dark;
+    --surface-1: #1a1a19; --page: #0d0d0d;
+    --ink-1: #ffffff; --ink-2: #c3c2b7; --muted: #898781;
+    --grid: #2c2c2a; --axis: #383835; --border: rgba(255,255,255,0.10);
+    --resp: #3987e5; --chop: #d95926; --band: #16304f; --prompt: #3a3a37;
+    --good: #0ca30c;
+  }
+  * { box-sizing: border-box; margin: 0; }
+  body { background: var(--page); }
+  .viz-root { font-family: system-ui, -apple-system, "Segoe UI", sans-serif; color: var(--ink-1); background: var(--page); line-height: 1.55; padding: 32px 16px 64px; }
+  .wrap { max-width: 780px; margin: 0 auto; }
+  h1 { font-size: 26px; letter-spacing: -0.02em; }
+  .sub { color: var(--ink-2); margin-top: 6px; font-size: 15px; }
+  section { background: var(--surface-1); border: 1px solid var(--border); border-radius: 12px; padding: 22px; margin-top: 22px; }
+  .num { display: inline-flex; width: 26px; height: 26px; border-radius: 50%; background: var(--resp); color: #fff; font-weight: 700; font-size: 14px; align-items: center; justify-content: center; margin-right: 8px; }
+  h2 { font-size: 18px; display: flex; align-items: center; }
+  .cap { color: var(--ink-2); font-size: 14.5px; margin-top: 10px; max-width: 64ch; }
+  .cap b { color: var(--ink-1); }
+  svg { display: block; margin-top: 14px; }
+  svg text { font-family: system-ui, -apple-system, "Segoe UI", sans-serif; }
+  .big { font-size: 15.5px; margin-top: 12px; color: var(--ink-1); font-weight: 600; }
+</style>
+</head>
+<body>
+<div class="viz-root">
+<div class="wrap">
+
+  <h1>The intersection — one wall, two kinds of damage</h1>
+  <div class="sub">Why his note and your experiment are one paper.</div>
+
+  <!-- PANEL 1 -->
+  <section>
+    <h2><span class="num">1</span>The same wall breaks two different things</h2>
+    <svg viewBox="0 0 760 250" role="img" aria-label="One wall, two damages">
+      <!-- central chopped response -->
+      <line x1="240" y1="46" x2="440" y2="46" stroke="var(--chop)" stroke-width="10" stroke-linecap="round"/>
+      <line x1="440" y1="32" x2="440" y2="60" stroke="var(--ink-2)" stroke-width="3"/>
+      <text x="452" y="56" font-size="12.5" fill="var(--ink-2)">the wall</text>
+      <text x="240" y="26" font-size="13" fill="var(--ink-2)">a response, chopped mid-thought</text>
+      <!-- two arrows down -->
+      <line x1="300" y1="66" x2="180" y2="110" stroke="var(--muted)" stroke-width="2"/>
+      <line x1="400" y1="66" x2="560" y2="110" stroke="var(--muted)" stroke-width="2"/>
+      <!-- left card -->
+      <rect x="40" y="118" width="320" height="100" rx="10" fill="var(--band)" opacity="0.55"/>
+      <text x="60" y="146" font-size="13.5" font-weight="700" fill="var(--ink-1)">Damage 1: the LENGTH data lies</text>
+      <text x="60" y="168" font-size="13" fill="var(--ink-2)">The log records where the wall was,</text>
+      <text x="60" y="186" font-size="13" fill="var(--ink-2)">not how long the answer really was.</text>
+      <text x="60" y="208" font-size="13" font-weight="600" fill="var(--resp)">→ Chirag's half of the paper</text>
+      <!-- right card -->
+      <rect x="400" y="118" width="320" height="100" rx="10" fill="var(--band)" opacity="0.55"/>
+      <text x="420" y="146" font-size="13.5" font-weight="700" fill="var(--ink-1)">Damage 2: the SCORE lies</text>
+      <text x="420" y="168" font-size="13" fill="var(--ink-2)">No final answer was written, so the</text>
+      <text x="420" y="186" font-size="13" fill="var(--ink-2)">grader marks it wrong — same as a bad answer.</text>
+      <text x="420" y="208" font-size="13" font-weight="600" fill="var(--chop)">→ your half of the paper</text>
+    </svg>
+    <p class="cap">A chopped response damages <b>two</b> datasets at once: the length column (it records a floor as if it were a length) and the score column (a never-written answer counts the same as a wrong one). His note handles the first. Your experiment handles the second.</p>
+  </section>
+
+  <!-- PANEL 2 -->
+  <section>
+    <h2><span class="num">2</span>How the wall fakes "thinking more makes it dumber"</h2>
+    <svg viewBox="0 0 760 300" role="img" aria-label="Effort and wall hits">
+      <!-- shared wall -->
+      <line x1="560" y1="30" x2="560" y2="238" stroke="var(--ink-2)" stroke-width="2.5"/>
+      <text x="568" y="42" font-size="12.5" fill="var(--ink-2)">the wall (output cap)</text>
+      <!-- low effort group -->
+      <text x="40" y="30" font-size="13.5" font-weight="700" fill="var(--ink-1)">Lower effort — shorter answers</text>
+      <g stroke="var(--resp)" stroke-width="8" stroke-linecap="round">
+        <line x1="40" y1="52" x2="300" y2="52"/><line x1="40" y1="76" x2="230" y2="76"/><line x1="40" y1="100" x2="350" y2="100"/>
+      </g>
+      <g fill="var(--resp)"><circle cx="300" cy="52" r="6"/><circle cx="230" cy="76" r="6"/><circle cx="350" cy="100" r="6"/></g>
+      <line x1="40" y1="124" x2="560" y2="124" stroke="var(--chop)" stroke-width="8" stroke-linecap="round"/>
+      <line x1="560" y1="115" x2="560" y2="133" stroke="var(--chop)" stroke-width="4"/>
+      <text x="600" y="80" font-size="13.5" font-weight="600" fill="var(--ink-1)">pilot: 25/30 ✓</text>
+      <text x="600" y="99" font-size="12.5" fill="var(--ink-2)">4 hit the wall</text>
+      <!-- high effort group -->
+      <text x="40" y="168" font-size="13.5" font-weight="700" fill="var(--ink-1)">Higher effort — longer answers</text>
+      <g stroke="var(--resp)" stroke-width="8" stroke-linecap="round">
+        <line x1="40" y1="190" x2="430" y2="190"/>
+      </g>
+      <circle cx="430" cy="190" r="6" fill="var(--resp)"/>
+      <g stroke="var(--chop)" stroke-width="8" stroke-linecap="round">
+        <line x1="40" y1="214" x2="560" y2="214"/><line x1="40" y1="238" x2="560" y2="238"/>
+      </g>
+      <g stroke="var(--chop)" stroke-width="4">
+        <line x1="560" y1="205" x2="560" y2="223"/><line x1="560" y1="229" x2="560" y2="247"/>
+      </g>
+      <text x="600" y="196" font-size="13.5" font-weight="600" fill="var(--ink-1)">pilot: 21/30 ✓</text>
+      <text x="600" y="215" font-size="12.5" fill="var(--ink-2)">9 hit the wall</text>
+      <!-- bottom band -->
+      <rect x="40" y="262" width="680" height="32" rx="8" fill="var(--band)" opacity="0.55"/>
+      <text x="56" y="283" font-size="13" fill="var(--ink-1)">All 13 wall-hits had no final answer → all 13 scored as WRONG. The "decline" might just be the wall.</text>
+    </svg>
+    <p class="cap">Turning effort up makes answers longer, and longer answers hit the wall more. At the small cap the high-effort column collects more chopped non-answers — each one a zero that says nothing about reasoning quality. That's how a wall manufactures an "overthinking" curve. Your 78-response bug was this exact machine running silently.</p>
+  </section>
+
+  <!-- PANEL 3 -->
+  <section>
+    <h2><span class="num">3</span>The test: raise the wall and watch the gap</h2>
+    <svg viewBox="0 0 760 280" role="img" aria-label="The 2x2 test">
+      <!-- left: small wall -->
+      <text x="60" y="28" font-size="13.5" font-weight="700" fill="var(--ink-1)">Small wall (measured)</text>
+      <circle cx="120" cy="70" r="8" fill="var(--resp)"/>
+      <text x="138" y="75" font-size="13" fill="var(--ink-2)">lower effort: 83.3%</text>
+      <circle cx="120" cy="150" r="8" fill="var(--chop)"/>
+      <text x="138" y="155" font-size="13" fill="var(--ink-2)">higher effort: 70.0%</text>
+      <line x1="120" y1="82" x2="120" y2="138" stroke="var(--muted)" stroke-width="2" stroke-dasharray="4 4"/>
+      <text x="60" y="195" font-size="13.5" font-weight="600" fill="var(--ink-1)">gap: −13.3 points</text>
+      <!-- right: big wall -->
+      <text x="420" y="28" font-size="13.5" font-weight="700" fill="var(--ink-1)">Big wall (the experiment)</text>
+      <circle cx="480" cy="70" r="8" fill="var(--resp)"/>
+      <text x="498" y="75" font-size="13" fill="var(--ink-2)">lower effort: ?</text>
+      <circle cx="480" cy="118" r="8" fill="var(--chop)"/>
+      <text x="498" y="123" font-size="13" fill="var(--ink-2)">higher effort: ?</text>
+      <line x1="480" y1="82" x2="480" y2="106" stroke="var(--muted)" stroke-width="2" stroke-dasharray="4 4"/>
+      <text x="420" y="195" font-size="13.5" font-weight="600" fill="var(--ink-1)">gap: ? ← this is what we buy</text>
+      <!-- outcomes band -->
+      <rect x="40" y="216" width="680" height="52" rx="10" fill="var(--band)" opacity="0.55"/>
+      <text x="56" y="238" font-size="13" fill="var(--ink-1)"><tspan font-weight="700">Gap shrinks</tspan> and the wall-hits disappear → the wall was faking it (token starvation).</text>
+      <text x="56" y="258" font-size="13" fill="var(--ink-1)"><tspan font-weight="700">Gap survives</tspan> with room to finish → the decline is real ("completed negative scaling").</text>
+    </svg>
+    <p class="cap">Same items, same grading — only effort and wall height change. Like giving the careful student more exam time: if the gap closes, the clock was doing it; if it stays, careful thinking really was hurting. Either outcome is a publishable answer, which is why the result gets reported whichever way it lands.</p>
+  </section>
+
+  <!-- PANEL 4 -->
+  <section>
+    <h2><span class="num">4</span>Why the two halves need different tools — the seam of the paper</h2>
+    <svg viewBox="0 0 760 300" role="img" aria-label="Repair versus rerun">
+      <!-- left card: length -->
+      <rect x="40" y="20" width="330" height="200" rx="10" fill="var(--band)" opacity="0.45"/>
+      <text x="60" y="48" font-size="13.5" font-weight="700" fill="var(--ink-1)">LENGTH — repairable</text>
+      <line x1="60" y1="80" x2="230" y2="80" stroke="var(--chop)" stroke-width="9" stroke-linecap="round"/>
+      <line x1="230" y1="70" x2="230" y2="90" stroke="var(--chop)" stroke-width="4"/>
+      <line x1="238" y1="80" x2="330" y2="80" stroke="var(--chop)" stroke-width="3" stroke-dasharray="3 6" opacity="0.6"/>
+      <text x="60" y="118" font-size="13" fill="var(--ink-2)">A true length EXISTS — it's just</text>
+      <text x="60" y="136" font-size="13" fill="var(--ink-2)">hidden past the wall. "At least this</text>
+      <text x="60" y="154" font-size="13" fill="var(--ink-2)">long" is real, usable information.</text>
+      <text x="60" y="190" font-size="13.5" font-weight="600" fill="var(--resp)">Fix: honest counting (Kaplan-Meier)</text>
+      <!-- right card: correctness -->
+      <rect x="390" y="20" width="330" height="200" rx="10" fill="var(--band)" opacity="0.45"/>
+      <text x="410" y="48" font-size="13.5" font-weight="700" fill="var(--ink-1)">CORRECTNESS — not repairable</text>
+      <line x1="410" y1="80" x2="580" y2="80" stroke="var(--chop)" stroke-width="9" stroke-linecap="round"/>
+      <line x1="580" y1="70" x2="580" y2="90" stroke="var(--chop)" stroke-width="4"/>
+      <text x="600" y="85" font-size="15" fill="var(--muted)">…nothing</text>
+      <text x="410" y="118" font-size="13" fill="var(--ink-2)">The answer NEVER EXISTED. There is</text>
+      <text x="410" y="136" font-size="13" fill="var(--ink-2)">no "at least this correct" to count.</text>
+      <text x="410" y="154" font-size="13" fill="var(--ink-2)">Nothing hidden — just absent.</text>
+      <text x="410" y="190" font-size="13.5" font-weight="600" fill="var(--chop)">Fix: run it again with a bigger wall</text>
+      <!-- bottom seam -->
+      <rect x="40" y="240" width="680" height="46" rx="10" fill="var(--band)" opacity="0.7"/>
+      <text x="56" y="259" font-size="13.5" font-weight="700" fill="var(--ink-1)">The seam: his curve says HOW OFTEN the wall strikes at any height.</text>
+      <text x="56" y="278" font-size="13.5" font-weight="700" fill="var(--ink-1)">Your 2×2 measures WHAT EACH STRIKE COSTS the scoreboard.</text>
+    </svg>
+    <p class="big">Repair versus rerun. One wall, two consequences, one paper — and the seam between the halves is exactly the sentence "an unwritten answer isn't hidden data, it's no data."</p>
+  </section>
+
+</div>
+</div>
+</body>
+</html>

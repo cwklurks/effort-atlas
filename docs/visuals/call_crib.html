@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Call crib — Chirag, 11am</title>
+<style>
+  :root {
+    color-scheme: light dark;
+    --bg: #f9f9f7; --card: #fcfcfb; --ink: #0b0b0b; --ink2: #52514e; --muted: #898781;
+    --blue: #2a78d6; --orange: #eb6834; --band: #cde2fb; --border: rgba(11,11,11,0.12);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg: #0d0d0d; --card: #1a1a19; --ink: #ffffff; --ink2: #c3c2b7; --muted: #898781;
+      --blue: #3987e5; --orange: #d95926; --band: #16304f; --border: rgba(255,255,255,0.14); }
+  }
+  * { box-sizing: border-box; margin: 0; }
+  body { background: var(--bg); color: var(--ink); font-family: system-ui, -apple-system, "Segoe UI", sans-serif; line-height: 1.5; padding: 20px 14px 60px; }
+  .wrap { max-width: 760px; margin: 0 auto; }
+  h1 { font-size: 20px; margin-bottom: 14px; }
+  /* always-visible panic strip */
+  .panic { background: var(--card); border: 2px solid var(--blue); border-radius: 12px; padding: 16px 18px; margin-bottom: 18px; }
+  .panic p { font-size: 16px; margin: 7px 0; }
+  .panic b { color: var(--blue); }
+  .panic .esc { color: var(--orange); font-weight: 600; }
+  details { background: var(--card); border: 1px solid var(--border); border-radius: 10px; margin-bottom: 10px; }
+  summary { cursor: pointer; padding: 13px 16px; font-weight: 700; font-size: 15.5px; list-style: none; }
+  summary::before { content: "▸ "; color: var(--blue); }
+  details[open] summary::before { content: "▾ "; }
+  .body { padding: 2px 18px 16px; font-size: 14.5px; color: var(--ink2); }
+  .body p { margin: 8px 0; }
+  .body b, .body strong { color: var(--ink); }
+  .body li { margin: 6px 0 6px 18px; }
+  .say { border-left: 3px solid var(--blue); padding: 8px 12px; background: color-mix(in srgb, var(--band) 40%, var(--card)); border-radius: 0 8px 8px 0; margin: 8px 0; font-style: normal; color: var(--ink); }
+  .qa dt { font-weight: 700; color: var(--ink); margin-top: 10px; }
+  .qa dd { margin: 4px 0 0 0; }
+  .tag { display: inline-block; font-size: 11px; font-weight: 700; letter-spacing: .06em; color: var(--muted); text-transform: uppercase; margin-right: 6px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Call crib — Chirag, 11:00</h1>
+
+  <div class="panic" style="border-color: var(--orange); margin-bottom: 12px;">
+    <p><span class="tag">The claim</span>The field believes <b>"more reasoning effort sometimes makes models score worse"</b> (overthinking). But benchmarks have output walls, walls delete answers mid-thought, graders score deletions as wrong — and high effort writes longer, so it hits walls more. <b>So how much of the "decline" is real, and how much is the wall?</b> Nobody checks. That's the paper.</p>
+    <p><span class="tag">The test</span>Raise the wall so thinking can finish, and watch the effort penalty. Shrinks → it was the wall (token starvation). Survives → real (completed negative scaling). Plus Chirag's half: the honest way to count what walls do to lengths. Together: <b>before calling a decline "overthinking," prove the model was allowed to finish.</b></p>
+    <p><span class="tag">The call</span><b>First working meeting.</b> He's said yes — you lead as first author, he supervises. Two jobs: show him the experiment (he needs it to pick short vs long) and understand his new math (listen, take notes).</p>
+    <p><span class="tag">Winning</span>Leave with 3 decisions made — <b>format + ARR cycle · his note / authorship / Meta review · writing workflow</b> — plus who does what by when, and a regular call cadence. Not winning = a pleasant chat where nothing gets decided and scheduling dies again. You prevent that in the last 5 minutes by reading the decisions back out loud.</p>
+  </div>
+
+  <div class="panic">
+    <p><span class="tag">Pitch·10s</span>"Same 30 problems, two effort levels, two walls. <b>Does the effort penalty survive when the model has room to finish?</b> Either answer is the finding."</p>
+    <p><span class="tag">Gap</span>low − high effort accuracy, per wall. Pilot: 83.3 − 70.0 = <b>13.3 pts</b> at 20k. Closes → wall. Survives → real. Half → both, as measured.</p>
+    <p><span class="tag">0.453</span><b>1 − (7/8 × 5/6 × 3/4)</b> = 1 − 0.547. Checkpoints = where responses finished. Capped rows count in denominators until their wall, never as finishers.</p>
+    <p><span class="tag">Seam</span>Cut response: true length exists (hidden) → <b>KM counts it</b>. True answer never existed → <b>rerun bigger</b>. Never cross them.</p>
+    <p><span class="tag">Escape</span><span class="esc">"I verified that numerically, but I can't derive it — can you walk me through it?"</span></p>
+    <p><span class="tag">Win = 3</span>format+cycle · his note/authorship/Meta · writing workflow. Rest → "let me put that in an email."</p>
+    <p><span class="tag">Never say</span>"first" · "unbiased" · "decomposes the effect" · "overthinking" as proven (→ "completed negative scaling")</p>
+  </div>
+
+  <details open>
+    <summary>Setup: tabs & call shape</summary>
+    <div class="body">
+      <p><b>Tabs:</b> ① Google Doc outline · ② PREREGISTRATION.md (pinned commit) · ③ amendment · ④ schedule_manifest.json · ⑤ visual explainer (only if math comes up — click, don't lecture). Share the browser <b>window</b>, not the screen.</p>
+      <p><b>Shape:</b> intros (long, let it run) → his new math (LISTEN) → your pitch/tour → short-vs-long → AI workflow → wrap. You talk ~15 min. Silence after you speak = him thinking. Count to three.</p>
+    </div>
+  </details>
+
+  <details>
+    <summary>Intro story (he'll ask first)</summary>
+    <div class="body">
+      <p class="say">"I was measuring how the reasoning-effort setting changes accuracy on AIME, and I got a clean pattern where more effort made the model worse. Felt like a real finding. Then I noticed 78 responses all had exactly 4,096 completion tokens — the endpoint had been silently cutting them off, and my finding was an artifact. So I went looking for how to handle measurements that get cut off before they finish, found survival analysis, then your note. So I emailed you."</p>
+      <p>Lead with the bug, not achievements. It shows you check your own results.</p>
+    </div>
+  </details>
+
+  <details>
+    <summary>60-second experiment pitch</summary>
+    <div class="body">
+      <p class="say">"It's a 2-by-2. Same 30 AIME problems, four ways: medium and max effort, crossed with walls at 20,000 and about 49,000. Only those two knobs change. The 20k condition reproduces my pilot — max looked 13 points worse but hit the wall twice as often. 49,152 isn't arbitrary: one real response needed 38,603 tokens to finish. The result is one comparison — the effort gap at each wall. Shrinks with room → starvation. Survives → completed negative scaling. Two routes as separate panels, one generation per cell, $27, all preregistered. Nothing has run: grader fix, budget amendment, and route probes come first."</p>
+      <p><b>Then hand it over:</b> "Does that fit short, in your view?" · If <b>short</b> → "what gets cut — your framework deep in the appendix?" + "Is NAACL/COLING via the October cycle okay, or ACL, which is the January cycle?" · If <b>long</b> → "my crunch is Nov–Jan, which sections would you carry through winter?"</p>
+    </div>
+  </details>
+
+  <details>
+    <summary>My four data stories (recite from bold)</summary>
+    <div class="body">
+      <p><b>Main point:</b> <span class="say" style="display:block">"I'd set a max-tokens limit; the endpoint silently ignored it and used its own 4,096 default. My grader still extracted a number from every response, so nothing errored — all I saw was high effort scoring worse. Then I found 78 responses at <b>exactly</b> 4,096: identical counts mean a machine cutoff, not model behavior. That burn is why I pull billing receipts on everything — and receipts then caught another route billing 2.75× past the cap I set."</span></p>
+      <ul>
+        <li><b>Bug:</b> 78 rows at exactly 4,096 · parameter ignored → endpoint default · no length flag, zero parse errors · fake decline curve · invalidated, not repaired.</li>
+        <li><b>Pilot</b> (30 AIME, Inkling/Together, 20k): medium <b>25/30 = 83.3%</b>, 4 wall-hits · max <b>21/30 = 70.0%</b>, 9 wall-hits · all <b>13</b> unanswered → wrong · thinking ~6,700 vs ~12,500 tokens · one rescue correct at <b>38,603</b> → big wall 49,152.</li>
+        <li><b>Audit</b> (4 routes, 2k probes, receipts): 3 cap-inclusive + honest · Grok billed <b>54,969 on a 20,000 request = 2.75×</b>, no length flag · Inkling documented nowhere · cost ~2¢.</li>
+        <li><b>Design</b> (prereg Jul 22, commit bc941bf, $0): Inkling med/max × 20k/49,152 (120) · GLM high/xhigh × 4,096/32k (120; 4,096 recreates the bug) · +3 smoke = <b>243 calls</b>, <b>$27</b> · seed 20260722, hashed order, Wilson + 10k item-clustered bootstrap · 1 amendment · owed: grader fix, budget amendment (<b>$0.58→$1.40</b>/M), passthrough check, near-cap probes.</li>
+      </ul>
+    </div>
+  </details>
+
+  <details>
+    <summary>0.453 walkthrough (spoken)</summary>
+    <div class="body">
+      <p class="say">"Eight responses. Three finished on their own — 128, 192, 256. Five were capped — 128, 192, 256, 256, 384. I only care about lengths where something finished. At 128 all eight are going, one finishes: 7/8 get past. At 192 six are left — the finisher and the capped one from 128 are gone — one finishes: 5/6. At 256 four are left, and here's the subtle part: the two capped exactly at 256 still count, they produced 256 tokens without stopping. One finishes: 3/4. Multiply: 0.547 still going, so 0.453 finished by 256. Capped rows sit in denominators while visible, then drop out — never as finishers. Count the at-256 ones the other way and the answer moves by 0.20, which is why the convention must be stated."</p>
+    </div>
+  </details>
+
+  <details>
+    <summary>Six decision lines</summary>
+    <div class="body">
+      <ol>
+        <li><b>Format:</b> "Before short or long — nothing paid has run, the critical path is offline code and amendments, so pick after you see that."</li>
+        <li><b>Budget:</b> "GLM input went $0.58 → $1.40/M since I preregistered, so I need a dated budget amendment either way."</li>
+        <li><b>His note:</b> "It's on your site — fold it in, post first and cite, or keep separate?" + "Does Meta need internal review before we submit?"</li>
+        <li><b>KM:</b> "In my cells every response has the same cap, so below it KM equals counting — descriptive for me; its real home is your section."</li>
+        <li><b>Title:</b> "I want to retitle to 'completed negative scaling' while the amendment window is open."</li>
+        <li><b>Writing:</b> "We type every sentence ourselves in Overleaf; tools stay on checking, not writing."</li>
+      </ol>
+    </div>
+  </details>
+
+  <details>
+    <summary>Quick answers (8 likely questions)</summary>
+    <div class="body">
+      <dl class="qa">
+        <dt>What was his note solving?</dt><dd>Logs from shared prompt+answer windows record where the wall was, not real lengths — counting from logs undercounts long answers systematically.</dd>
+        <dt>Why chop a copy?</dt><dd>Real chopped logs have no answer key. Chop a copy where truth is kept → every method's guess can be graded. Trust is earned before use where truth doesn't exist.</dd>
+        <dt>Why no mean/median?</dt><dd>Longest observation capped → curve never reaches zero → tail unknowable (no mean); curve stalls at 0.547, never crosses 0.5 (no median). Fix: restricted mean to a pre-chosen horizon.</dd>
+        <dt>Why not KM on accuracy?</dt><dd>Hidden length exists ("at least this long" is information). Hidden answer doesn't — never written. Repair lengths by counting; retest scores with a bigger wall (new draw, not continuation).</dd>
+        <dt>Just one buggy endpoint?</dt><dd>Three layers: the 4,096 default was one endpoint (anecdote) · audit: 4 routes, 2 behaviors, one billing 2.75×, none documented (variance) · walls delete answers + graders count deletions wrong + effort hits walls more (universal mechanism).</dd>
+        <dt>Roles?</dt><dd>"You: statistician + supervisor — censoring framework, Helpfulness, the formalism's boundary. Me: experimentalist + first author — harness, audit, runs, empirical sections. The paper is the merger: your framework, my intervention, one wall."</dd>
+        <dt>Independence in his Helpfulness data?</dt><dd>Questionable — cap = 512 − prompt, so if long prompts pair with long answers, cutting is informative; his KM undershoots truth on both splits, which leans that way. Fix I understand: stratify by prompt length + average. "But I can't derive the conditional estimators — walk me through it?"</dd>
+        <dt>"One generation per cell isn't an experiment."</dt><dd>Correct for run-to-run noise, and unclaimed — it buys a narrow audited pass under $27, reported as effect size + interval, never a verdict. If the paper needs replicates: amend + top up (~$56.56), gladly.</dd>
+      </dl>
+    </div>
+  </details>
+
+  <details>
+    <summary>Recovery lines + close</summary>
+    <div class="body">
+      <ul>
+        <li>"I verified that numerically, but I can't derive it — can you walk me through it?"</li>
+        <li>"I know the picture, not the proof. Is the picture enough for this decision?"</li>
+        <li>"I don't know that one — I'll write it down and send you an answer tomorrow."</li>
+        <li>"Can you say that again in slower words? I don't want to nod along to something I can't defend."</li>
+      </ul>
+      <p><b>Last 5 min:</b> read decisions back out loud → owners + dates → "Would a 30-minute call every other week work?" → "Thanks for taking this on — I'll keep everything in a state where you can check any number."</p>
+    </div>
+  </details>
+
+</div>
+</body>
+</html>

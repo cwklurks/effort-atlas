@@ -1,0 +1,1601 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <title>Chirag meeting runner</title>
+  <style>
+    :root {
+      --ink: #182034;
+      --muted: #526078;
+      --line: #d8e0eb;
+      --surface: #ffffff;
+      --canvas: #eef2f6;
+      --nav-surface: #f7f9fc;
+      --blue: #1557d5;
+      --blue-dark: #0d3f9f;
+      --blue-soft: #edf3ff;
+      --green: #14633f;
+      --green-soft: #edf8f1;
+      --amber: #7a4b00;
+      --amber-soft: #fff5dc;
+      --red: #8e302a;
+      --red-soft: #fff0ee;
+      --space-xs: 4px;
+      --space-sm: 8px;
+      --space-md: 12px;
+      --space-lg: 16px;
+      --space-xl: 24px;
+      --space-2xl: 32px;
+      --space-3xl: 48px;
+      --radius-sm: 8px;
+      --radius-md: 12px;
+      --control-height: 44px;
+    }
+
+    * { box-sizing: border-box; }
+    [hidden] { display: none !important; }
+
+    html {
+      min-width: 320px;
+      background: var(--canvas);
+    }
+
+    body {
+      margin: 0;
+      background: var(--canvas);
+      color: var(--ink);
+      font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      font-size: 15px;
+      line-height: 1.5;
+    }
+
+    button,
+    input,
+    textarea {
+      font: inherit;
+    }
+
+    button,
+    a {
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    button:focus-visible,
+    a:focus-visible,
+    input:focus-visible,
+    textarea:focus-visible,
+    summary:focus-visible {
+      outline: 3px solid rgba(21, 87, 213, 0.3);
+      outline-offset: 2px;
+    }
+
+    h1,
+    h2,
+    h3,
+    p,
+    blockquote {
+      margin-top: 0;
+    }
+
+    h1,
+    h2,
+    h3 {
+      letter-spacing: -0.02em;
+      text-wrap: balance;
+    }
+
+    .stage-title:focus {
+      outline: none;
+    }
+
+    h1,
+    h2 {
+      margin-bottom: var(--space-md);
+      font-size: 2rem;
+      line-height: 1.08;
+    }
+
+    h3 {
+      margin-bottom: var(--space-sm);
+      font-size: 1rem;
+    }
+
+    p {
+      margin-bottom: var(--space-md);
+      text-wrap: pretty;
+    }
+
+    a {
+      color: var(--blue-dark);
+    }
+
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 30;
+      display: flex;
+      min-height: 64px;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--space-lg);
+      padding: var(--space-sm) max(18px, calc((100vw - 1320px) / 2));
+      border-bottom: 1px solid var(--line);
+      background: rgba(255, 255, 255, 0.97);
+      backdrop-filter: blur(10px);
+    }
+
+    .brand {
+      display: grid;
+      gap: 1px;
+      min-width: 160px;
+    }
+
+    .brand strong {
+      font-size: 0.9rem;
+    }
+
+    .brand span {
+      color: var(--muted);
+      font-size: 0.75rem;
+    }
+
+    .toolbar-actions {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: var(--space-sm);
+    }
+
+    .timer {
+      display: flex;
+      align-items: center;
+      gap: var(--space-sm);
+      min-width: 220px;
+      padding-right: var(--space-md);
+      border-right: 1px solid var(--line);
+    }
+
+    .timer-copy {
+      display: grid;
+      min-width: 82px;
+      line-height: 1.2;
+    }
+
+    .timer-copy strong {
+      font-variant-numeric: tabular-nums;
+      font-size: 0.85rem;
+    }
+
+    .timer-copy span {
+      color: var(--green);
+      font-size: 0.7rem;
+      font-weight: 700;
+    }
+
+    .timer-copy span.late {
+      color: var(--red);
+    }
+
+    .button,
+    .link-button {
+      display: inline-flex;
+      min-height: var(--control-height);
+      align-items: center;
+      justify-content: center;
+      gap: var(--space-sm);
+      padding: 0 var(--space-lg);
+      border: 1px solid var(--line);
+      border-radius: var(--radius-sm);
+      background: var(--surface);
+      color: var(--ink);
+      cursor: pointer;
+      font-weight: 700;
+      text-decoration: none;
+    }
+
+    .button:hover,
+    .link-button:hover {
+      border-color: #aebbd0;
+      background: #f8faff;
+    }
+
+    .button.primary {
+      border-color: var(--blue);
+      background: var(--blue);
+      color: #fff;
+    }
+
+    .button.primary:hover {
+      background: var(--blue-dark);
+    }
+
+    .button.quiet {
+      min-height: 36px;
+      padding: 0 var(--space-md);
+      font-size: 0.78rem;
+    }
+
+    .button:disabled {
+      cursor: not-allowed;
+      opacity: 0.45;
+    }
+
+    .progress-track {
+      position: fixed;
+      top: 63px;
+      right: 0;
+      left: 0;
+      z-index: 31;
+      height: 3px;
+      background: #dce4ef;
+    }
+
+    .progress-value {
+      width: 16.6667%;
+      height: 100%;
+      background: var(--blue);
+      transition: width 180ms ease-out;
+    }
+
+    .shell {
+      display: grid;
+      grid-template-columns: 250px minmax(0, 1fr);
+      gap: var(--space-xl);
+      width: min(1320px, calc(100% - 36px));
+      margin: var(--space-xl) auto;
+    }
+
+    .stage-rail {
+      position: sticky;
+      top: 88px;
+      align-self: start;
+      overflow: hidden;
+      border: 1px solid var(--line);
+      border-radius: var(--radius-md);
+      background: var(--nav-surface);
+    }
+
+    .rail-heading {
+      padding: var(--space-lg);
+      border-bottom: 1px solid var(--line);
+    }
+
+    .rail-heading strong {
+      display: block;
+      margin-bottom: 2px;
+      font-size: 0.85rem;
+    }
+
+    .rail-heading span {
+      color: var(--muted);
+      font-size: 0.75rem;
+    }
+
+    .stage-tabs {
+      display: grid;
+      padding: var(--space-sm);
+      gap: var(--space-xs);
+    }
+
+    .stage-tab {
+      display: grid;
+      grid-template-columns: 52px minmax(0, 1fr);
+      min-height: var(--control-height);
+      align-items: center;
+      gap: var(--space-md);
+      width: 100%;
+      padding: var(--space-sm) var(--space-md);
+      border: 0;
+      border-radius: var(--radius-sm);
+      background: transparent;
+      color: #33405a;
+      cursor: pointer;
+      text-align: left;
+    }
+
+    .stage-tab:hover {
+      background: #edf1f7;
+    }
+
+    .stage-tab[aria-current="step"] {
+      background: var(--blue);
+      color: #fff;
+    }
+
+    .stage-tab time {
+      font-size: 0.7rem;
+      font-variant-numeric: tabular-nums;
+      font-weight: 800;
+    }
+
+    .stage-tab span {
+      font-size: 0.82rem;
+      font-weight: 750;
+    }
+
+    .rail-actions {
+      display: grid;
+      gap: var(--space-sm);
+      padding: var(--space-md);
+      border-top: 1px solid var(--line);
+      background: var(--surface);
+    }
+
+    .rail-actions .button {
+      justify-content: flex-start;
+      min-height: 40px;
+      font-size: 0.8rem;
+    }
+
+    .presenter {
+      min-width: 0;
+    }
+
+    .stage {
+      min-height: calc(100vh - 148px);
+      padding: var(--space-2xl);
+      border: 1px solid var(--line);
+      border-radius: var(--radius-md);
+      background: var(--surface);
+      animation: stage-in 180ms ease-out both;
+    }
+
+    .stage-content {
+      max-width: 920px;
+    }
+
+    .stage-meta {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--space-md);
+      margin-bottom: var(--space-xl);
+      color: var(--muted);
+      font-size: 0.78rem;
+      font-weight: 750;
+    }
+
+    .stage-meta time {
+      color: var(--blue-dark);
+    }
+
+    .purpose {
+      max-width: 70ch;
+      margin-bottom: var(--space-xl);
+      color: var(--muted);
+      font-size: 1rem;
+    }
+
+    .script {
+      margin: 0 0 var(--space-xl);
+      padding: var(--space-xl);
+      border: 1px solid #bfd0f5;
+      border-radius: var(--radius-md);
+      background: var(--blue-soft);
+    }
+
+    .script-label {
+      display: block;
+      margin-bottom: var(--space-sm);
+      color: var(--blue-dark);
+      font-size: 0.75rem;
+      font-weight: 800;
+    }
+
+    .script blockquote {
+      max-width: 72ch;
+      margin-bottom: 0;
+      color: #263a60;
+      font-size: 1.08rem;
+      line-height: 1.55;
+    }
+
+    .problem-line {
+      display: grid;
+      grid-template-columns: 120px minmax(0, 1fr);
+      gap: var(--space-lg);
+      align-items: start;
+      padding: var(--space-lg) 0;
+      border-top: 1px solid var(--line);
+      border-bottom: 1px solid var(--line);
+    }
+
+    .problem-line strong {
+      color: var(--blue-dark);
+      font-size: 0.8rem;
+    }
+
+    .problem-line p {
+      margin: 0;
+      font-weight: 650;
+    }
+
+    .checkpoint {
+      display: flex;
+      align-items: flex-start;
+      gap: var(--space-md);
+      margin-top: var(--space-xl);
+      padding: var(--space-md) var(--space-lg);
+      border-radius: var(--radius-sm);
+      background: var(--green-soft);
+      color: #244c3a;
+    }
+
+    .checkpoint strong {
+      flex: 0 0 auto;
+    }
+
+    .benchmark-table {
+      width: 100%;
+      margin-bottom: var(--space-xl);
+      border-collapse: collapse;
+      font-size: 0.9rem;
+    }
+
+    .benchmark-table th,
+    .benchmark-table td {
+      padding: var(--space-md);
+      border-bottom: 1px solid var(--line);
+      text-align: left;
+      vertical-align: top;
+    }
+
+    .benchmark-table th {
+      color: var(--muted);
+      font-size: 0.74rem;
+      font-weight: 800;
+    }
+
+    .benchmark-table tbody th {
+      color: var(--ink);
+      font-size: 0.9rem;
+    }
+
+    .table-action {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--space-lg);
+      margin-bottom: var(--space-lg);
+    }
+
+    .table-action p {
+      margin: 0;
+      color: var(--muted);
+    }
+
+    .clarification {
+      margin-bottom: var(--space-xl);
+      padding: var(--space-md) var(--space-lg);
+      border-radius: var(--radius-sm);
+      background: var(--amber-soft);
+      color: #5f420d;
+    }
+
+    .answer-list {
+      display: grid;
+      gap: var(--space-lg);
+      margin-bottom: var(--space-xl);
+    }
+
+    .answer-row {
+      display: grid;
+      grid-template-columns: 44px minmax(0, 1fr);
+      gap: var(--space-lg);
+      padding-bottom: var(--space-lg);
+      border-bottom: 1px solid var(--line);
+    }
+
+    .answer-mark {
+      display: grid;
+      width: 44px;
+      height: 44px;
+      place-items: center;
+      border-radius: 50%;
+      background: var(--green-soft);
+      color: var(--green);
+      font-weight: 850;
+    }
+
+    .answer-mark.partial {
+      background: var(--amber-soft);
+      color: var(--amber);
+    }
+
+    .answer-row p {
+      margin: 0;
+      color: var(--muted);
+    }
+
+    .audit-strip {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-lg);
+      padding: var(--space-lg) 0;
+      border-top: 1px solid var(--line);
+      border-bottom: 1px solid var(--line);
+    }
+
+    .audit-strip div {
+      min-width: 160px;
+      flex: 1;
+    }
+
+    .audit-strip strong {
+      display: block;
+      color: var(--blue-dark);
+      font-size: 1.15rem;
+    }
+
+    .audit-strip span {
+      color: var(--muted);
+      font-size: 0.78rem;
+    }
+
+    .censor-flow {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: var(--space-lg);
+      margin-bottom: var(--space-xl);
+    }
+
+    .censor-step {
+      padding-top: var(--space-md);
+      border-top: 3px solid var(--line);
+    }
+
+    .censor-step.active {
+      border-top-color: var(--blue);
+    }
+
+    .censor-step strong {
+      display: block;
+      margin-bottom: var(--space-xs);
+    }
+
+    .censor-step p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 0.88rem;
+    }
+
+    .main-question {
+      margin-bottom: var(--space-lg);
+      padding: var(--space-lg);
+      border-radius: var(--radius-sm);
+      background: var(--green-soft);
+      color: #214c38;
+      font-size: 1rem;
+      font-weight: 700;
+    }
+
+    details.optional {
+      border-top: 1px solid var(--line);
+    }
+
+    details.optional summary {
+      min-height: var(--control-height);
+      padding: var(--space-md) 0;
+      color: var(--blue-dark);
+      cursor: pointer;
+      font-weight: 750;
+    }
+
+    details.optional ul {
+      margin: 0 0 var(--space-lg);
+      padding-left: var(--space-xl);
+    }
+
+    details.optional li + li {
+      margin-top: var(--space-sm);
+    }
+
+    .recommendation {
+      margin-bottom: var(--space-xl);
+      padding: var(--space-xl);
+      border-radius: var(--radius-md);
+      background: var(--green-soft);
+    }
+
+    .recommendation h3 {
+      color: var(--green);
+    }
+
+    .recommendation p:last-child {
+      margin-bottom: 0;
+    }
+
+    .decision-fields {
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr;
+      gap: var(--space-lg);
+      margin-top: var(--space-xl);
+    }
+
+    label {
+      display: grid;
+      gap: var(--space-sm);
+      color: var(--muted);
+      font-size: 0.78rem;
+      font-weight: 750;
+    }
+
+    input,
+    textarea {
+      width: 100%;
+      min-height: var(--control-height);
+      padding: var(--space-md);
+      border: 1px solid #aeb9ca;
+      border-radius: var(--radius-sm);
+      background: #fff;
+      color: var(--ink);
+    }
+
+    textarea {
+      min-height: 88px;
+      resize: vertical;
+    }
+
+    .readback {
+      display: grid;
+      gap: var(--space-lg);
+      margin-bottom: var(--space-xl);
+    }
+
+    .readback-item {
+      display: grid;
+      grid-template-columns: 150px minmax(0, 1fr);
+      gap: var(--space-lg);
+      padding-bottom: var(--space-md);
+      border-bottom: 1px solid var(--line);
+    }
+
+    .readback-item strong {
+      color: var(--muted);
+      font-size: 0.78rem;
+    }
+
+    .readback-item span {
+      font-weight: 700;
+    }
+
+    .stage-controls {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--space-lg);
+      margin-top: var(--space-xl);
+      padding: var(--space-lg);
+      border: 1px solid var(--line);
+      border-radius: var(--radius-md);
+      background: var(--surface);
+    }
+
+    .control-status {
+      color: var(--muted);
+      font-size: 0.78rem;
+      text-align: center;
+    }
+
+    .control-status strong {
+      display: block;
+      color: var(--ink);
+      font-size: 0.85rem;
+    }
+
+    dialog {
+      width: min(720px, calc(100% - 32px));
+      max-height: calc(100vh - 48px);
+      overflow: auto;
+      padding: 0;
+      border: 0;
+      border-radius: var(--radius-md);
+      background: var(--surface);
+      color: var(--ink);
+    }
+
+    dialog::backdrop {
+      background: rgba(24, 32, 52, 0.48);
+    }
+
+    .dialog-head {
+      position: sticky;
+      top: 0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--space-lg);
+      padding: var(--space-lg) var(--space-xl);
+      border-bottom: 1px solid var(--line);
+      background: var(--surface);
+    }
+
+    .dialog-head h2 {
+      margin: 0;
+      font-size: 1.2rem;
+    }
+
+    .dialog-body {
+      padding: var(--space-xl);
+    }
+
+    .dialog-body h3 {
+      margin-top: var(--space-xl);
+    }
+
+    .dialog-body h3:first-child {
+      margin-top: 0;
+    }
+
+    .fact-list {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: var(--space-md);
+      margin: 0;
+    }
+
+    .fact-list div {
+      padding: var(--space-md) 0;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .fact-list dt {
+      color: var(--blue-dark);
+      font-weight: 850;
+    }
+
+    .fact-list dd {
+      margin: var(--space-xs) 0 0;
+      color: var(--muted);
+      font-size: 0.82rem;
+    }
+
+    .preflight-list,
+    .backup-list {
+      margin: 0;
+      padding-left: var(--space-xl);
+    }
+
+    .preflight-list li + li,
+    .backup-list li + li {
+      margin-top: var(--space-sm);
+    }
+
+    .mobile-stage-picker {
+      display: none;
+    }
+
+    .noscript {
+      margin: var(--space-lg);
+      padding: var(--space-lg);
+      background: var(--red-soft);
+      color: var(--red);
+    }
+
+    @keyframes stage-in {
+      from { opacity: 0; transform: translateY(4px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @media (max-width: 980px) {
+      .topbar {
+        position: static;
+        align-items: flex-start;
+        flex-direction: column;
+      }
+
+      .toolbar-actions {
+        width: 100%;
+        justify-content: space-between;
+      }
+
+      .progress-track {
+        position: static;
+      }
+
+      .shell {
+        grid-template-columns: 1fr;
+        margin-top: var(--space-lg);
+      }
+
+      .stage-rail {
+        position: static;
+      }
+
+      .rail-heading,
+      .stage-tabs {
+        display: none;
+      }
+
+      .rail-actions {
+        display: flex;
+        flex-wrap: wrap;
+        border-top: 0;
+      }
+
+      .mobile-stage-picker {
+        display: grid;
+        gap: var(--space-sm);
+        padding: var(--space-md);
+      }
+
+      .mobile-stage-picker label {
+        display: block;
+      }
+
+      .mobile-stage-picker select {
+        width: 100%;
+        min-height: var(--control-height);
+        margin-top: var(--space-xs);
+        padding: 0 var(--space-md);
+        border: 1px solid #aeb9ca;
+        border-radius: var(--radius-sm);
+        background: #fff;
+        color: var(--ink);
+        font: inherit;
+      }
+
+      .stage {
+        min-height: auto;
+      }
+    }
+
+    @media (max-width: 680px) {
+      body {
+        font-size: 14px;
+      }
+
+      .topbar,
+      .shell {
+        width: 100%;
+      }
+
+      .topbar {
+        padding: var(--space-md);
+      }
+
+      .toolbar-actions {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        align-items: stretch;
+      }
+
+      .timer {
+        grid-column: 1 / -1;
+        width: 100%;
+        padding: 0 0 var(--space-sm);
+        border-right: 0;
+        border-bottom: 1px solid var(--line);
+      }
+
+      .toolbar-actions > .button,
+      .toolbar-actions > .link-button {
+        width: 100%;
+      }
+
+      .shell {
+        gap: 0;
+        margin: 0;
+      }
+
+      .stage-rail,
+      .stage,
+      .stage-controls {
+        border-right: 0;
+        border-left: 0;
+        border-radius: 0;
+      }
+
+      .rail-actions a {
+        display: none;
+      }
+
+      .stage {
+        padding: var(--space-xl) var(--space-lg);
+        padding-bottom: calc(var(--control-height) + var(--space-3xl));
+      }
+
+      .stage-meta {
+        margin-bottom: var(--space-lg);
+      }
+
+      .table-action {
+        align-items: stretch;
+        flex-direction: column;
+      }
+
+      .benchmark-table {
+        display: block;
+        overflow-x: auto;
+      }
+
+      .censor-flow,
+      .decision-fields,
+      .fact-list {
+        grid-template-columns: 1fr;
+      }
+
+      .problem-line,
+      .readback-item {
+        grid-template-columns: 1fr;
+        gap: var(--space-sm);
+      }
+
+      .stage-controls {
+        position: sticky;
+        bottom: 0;
+        z-index: 20;
+        margin: 0;
+        padding: var(--space-md);
+      }
+
+      .control-status {
+        display: none;
+      }
+
+      .stage-controls .button {
+        min-width: 0;
+        flex: 1;
+        padding: 0 var(--space-sm);
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *,
+      *::before,
+      *::after {
+        scroll-behavior: auto !important;
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+
+    @media print {
+      @page { margin: 0.45in; }
+
+      body {
+        background: #fff;
+        color: #000;
+        font-size: 10pt;
+      }
+
+      .topbar,
+      .progress-track,
+      .stage-rail,
+      .stage-controls,
+      dialog,
+      .button,
+      .link-button {
+        display: none !important;
+      }
+
+      .shell {
+        display: block;
+        width: 100%;
+        margin: 0;
+      }
+
+      .stage,
+      .stage[hidden] {
+        display: block !important;
+        min-height: 0;
+        margin-bottom: 18pt;
+        padding: 0 0 16pt;
+        border: 0;
+        border-bottom: 1px solid #bbb;
+        border-radius: 0;
+        break-inside: avoid;
+        animation: none;
+      }
+
+      .stage-meta {
+        margin-bottom: 8pt;
+      }
+
+      .script {
+        padding: 10pt;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <strong>Chirag meeting runner</strong>
+      <span>Benchmark review and censoring definition</span>
+    </div>
+
+    <div class="toolbar-actions">
+      <div class="timer" aria-label="Meeting timer">
+        <div class="timer-copy">
+          <strong id="timerDisplay">00:00 / 30:00</strong>
+          <span id="paceStatus">Timer not started</span>
+        </div>
+        <button class="button quiet" id="timerToggle" type="button">Start timer</button>
+        <button class="button quiet" id="timerReset" type="button">Reset</button>
+      </div>
+      <button class="button quiet" type="button" data-open-dialog="preflightDialog">Before meeting</button>
+      <a class="link-button button quiet" href="benchmark_table_for_chirag.html">Open table</a>
+    </div>
+  </header>
+
+  <div class="progress-track" aria-hidden="true">
+    <div class="progress-value" id="progressValue"></div>
+  </div>
+
+  <div class="shell">
+    <aside class="stage-rail" aria-label="Meeting stages">
+      <div class="rail-heading">
+        <strong>30-minute path</strong>
+        <span>Only the current stage appears.</span>
+      </div>
+
+      <div class="mobile-stage-picker">
+        <label for="stagePicker">Current stage</label>
+        <select id="stagePicker">
+          <option value="0">0-3 min: Frame the meeting</option>
+          <option value="1">3-10 min: Show the table</option>
+          <option value="2">10-15 min: Answer the assignment</option>
+          <option value="3">15-23 min: Explain censoring</option>
+          <option value="4">23-27 min: Agree on next work</option>
+          <option value="5">27-30 min: Read it back</option>
+        </select>
+      </div>
+
+      <div class="stage-tabs" role="list">
+        <button class="stage-tab" type="button" data-stage-target="0" aria-current="step">
+          <time>0-3</time><span>Frame the meeting</span>
+        </button>
+        <button class="stage-tab" type="button" data-stage-target="1">
+          <time>3-10</time><span>Show the table</span>
+        </button>
+        <button class="stage-tab" type="button" data-stage-target="2">
+          <time>10-15</time><span>Answer the assignment</span>
+        </button>
+        <button class="stage-tab" type="button" data-stage-target="3">
+          <time>15-23</time><span>Explain censoring</span>
+        </button>
+        <button class="stage-tab" type="button" data-stage-target="4">
+          <time>23-27</time><span>Agree on next work</span>
+        </button>
+        <button class="stage-tab" type="button" data-stage-target="5">
+          <time>27-30</time><span>Read it back</span>
+        </button>
+      </div>
+
+      <div class="rail-actions">
+        <button class="button" type="button" data-open-dialog="factsDialog">Facts and backup</button>
+        <a class="button" href="CHIRAG_MEETING_DECISIONS.md">Decision notes</a>
+        <a class="button" href="CHIRAG_MEETING_MASTER_GUIDE.md">Full text guide</a>
+      </div>
+    </aside>
+
+    <div class="presenter">
+      <main id="meetingStages">
+        <section class="stage" id="stage-frame" data-stage="0" aria-labelledby="frameTitle">
+          <div class="stage-content">
+            <div class="stage-meta">
+              <time>0 to 3 minutes</time>
+              <span>Goal: establish what you completed</span>
+            </div>
+            <h1 class="stage-title" id="frameTitle" tabindex="-1">Frame the meeting</h1>
+            <p class="purpose">Start with the assignment Chirag gave you. Do not begin with providers, models, or the full experiment plan.</p>
+
+            <div class="script">
+              <span class="script-label">Say this</span>
+              <blockquote>I made the benchmark table you asked for and checked the public files at the question level. I can show which archives give us correctness, token use, and a usable sign that a response reached its limit. After that, I want to make sure I understand the censoring comparison you had in mind and agree on the next thing I should build.</blockquote>
+            </div>
+
+            <div class="problem-line">
+              <strong>Core question</strong>
+              <p>When two models reach similar accuracy on the same questions, how many output tokens does each need, and how does accounting for cut-off responses change that comparison?</p>
+            </div>
+
+            <div class="checkpoint">
+              <strong>Move on when:</strong>
+              <span>Chirag understands that you completed the table and that this meeting is about reviewing it.</span>
+            </div>
+          </div>
+        </section>
+
+        <section class="stage" id="stage-table" data-stage="1" aria-labelledby="tableTitle" hidden>
+          <div class="stage-content">
+            <div class="stage-meta">
+              <time>3 to 10 minutes</time>
+              <span>Goal: present the deliverable</span>
+            </div>
+            <h2 class="stage-title" id="tableTitle" tabindex="-1">Show the benchmark table</h2>
+
+            <div class="table-action">
+              <p>Share the table on screen. Stay on the two rows below unless Chirag asks for more detail.</p>
+              <a class="link-button" href="benchmark_table_for_chirag.html">Open benchmark table</a>
+            </div>
+
+            <table class="benchmark-table">
+              <thead>
+                <tr>
+                  <th>Archive</th>
+                  <th>Problems</th>
+                  <th>Per-question grade</th>
+                  <th>Token and stopping data</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <th>MathArena</th>
+                  <td>123 math questions across four competitions</td>
+                  <td>Yes</td>
+                  <td>Output-token count is present. Requested cap and finish reason are absent, so censoring is inferred.</td>
+                </tr>
+                <tr>
+                  <th>HELM GPQA</th>
+                  <td>446 science questions per reviewed model run</td>
+                  <td>Yes</td>
+                  <td>All reviewed runs requested 14,096 tokens. Only Gemini has usable labels: 42 length stops and 404 normal stops.</td>
+                </tr>
+              </tbody>
+            </table>
+
+            <div class="clarification">
+              <strong>Brief clarification:</strong> HELM here means Stanford's Holistic Evaluation of Language Models, specifically its GPQA evaluation. It is not Humanity's Last Exam.
+            </div>
+
+            <div class="script">
+              <span class="script-label">Your conclusion</span>
+              <blockquote>Both archives support question-level accuracy. MathArena has broader model coverage but inferred censoring. HELM Gemini gives us one cleaner observed censoring example. Neither archive alone proves that raising the cap would have made a wrong answer correct.</blockquote>
+            </div>
+          </div>
+        </section>
+
+        <section class="stage" id="stage-answer" data-stage="2" aria-labelledby="answerTitle" hidden>
+          <div class="stage-content">
+            <div class="stage-meta">
+              <time>10 to 15 minutes</time>
+              <span>Goal: answer Chirag's assignment directly</span>
+            </div>
+            <h2 class="stage-title" id="answerTitle" tabindex="-1">Give the two direct answers</h2>
+
+            <div class="answer-list">
+              <div class="answer-row">
+                <div class="answer-mark">Yes</div>
+                <div>
+                  <h3>Can we see whether each model got each question right?</h3>
+                  <p>MathArena and the reviewed HELM files contain a source-native grade for each archived model-question response.</p>
+                </div>
+              </div>
+              <div class="answer-row">
+                <div class="answer-mark partial">Partly</div>
+                <div>
+                  <h3>Can we tell whether token exhaustion caused a wrong answer?</h3>
+                  <p>HELM Gemini shows that a response was wrong and length-stopped. That does not prove the cap caused the error. MathArena does not publish a finish reason.</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="script">
+              <span class="script-label">What the table means</span>
+              <blockquote>From the public archives, we can recover per-question correctness and output amount. Most archives do not record whether the output limit stopped a response. The Gemini GPQA run is the one exception, with 42 length stops. We can use these archives to select questions and describe the relationship between correctness and output amount, but we cannot use them to prove that a token limit caused an error. In our experiment, we will reuse suitable questions, assign different output limits, and record the limit, token use, stopping reason, and correctness for every attempt. We can then test whether more room reduces cutoffs and improves answer completion and accuracy.</blockquote>
+            </div>
+
+            <details class="optional">
+              <summary>If he asks how you verified the fields</summary>
+              <div class="audit-strip" aria-label="Question-level audit counts">
+                <div><strong>1,920</strong><span>HMMT 2025 rows</span></div>
+                <div><strong>990</strong><span>HMMT 2026 expected rows, including 11 visible gaps</span></div>
+                <div><strong>1,338</strong><span>HELM GPQA rows</span></div>
+                <div><strong>4,248 total</strong><span>Question-by-model cells audited</span></div>
+              </div>
+              <p>I built one sanitized row for every expected benchmark, model, and question combination. Missing rows stay visible instead of disappearing from the denominator. HMMT 2025, HMMT 2026, and HELM are covered now. AIME and BRUMO still need the same exact-source check.</p>
+            </details>
+          </div>
+        </section>
+
+        <section class="stage" id="stage-censoring" data-stage="3" aria-labelledby="censoringTitle" hidden>
+          <div class="stage-content">
+            <div class="stage-meta">
+              <time>15 to 23 minutes</time>
+              <span>Goal: confirm the adjusted comparison</span>
+            </div>
+            <h2 class="stage-title" id="censoringTitle" tabindex="-1">Explain where censoring enters</h2>
+
+            <div class="censor-flow">
+              <div class="censor-step">
+                <strong>Completed response</strong>
+                <p>We observe its full output length and its score.</p>
+              </div>
+              <div class="censor-step active">
+                <strong>Cut-off response</strong>
+                <p>At cap C, we know only that its natural length would exceed C.</p>
+              </div>
+              <div class="censor-step">
+                <strong>Adjusted length</strong>
+                <p>The estimator uses that lower bound. It does not invent the missing answer.</p>
+              </div>
+            </div>
+
+            <div class="script">
+              <span class="script-label">Say this</span>
+              <blockquote>The performance axis should stay as observed accuracy. The unadjusted efficiency curve would use the raw observed token summary. The adjusted curve would use a censoring-aware length summary. Because HELM uses one common 14,096-token cap, the public archive cannot tell us how far the 42 cut-off responses would have continued without an added tail model or data from other caps.</blockquote>
+            </div>
+
+            <div class="main-question">Ask: Is that the adjusted-versus-unadjusted comparison you meant?</div>
+
+            <details class="optional">
+              <summary>Only if Chirag wants to choose the statistical method now</summary>
+              <ul>
+                <li>Should the adjusted result stop at a range supported by the data, or use a model that extrapolates beyond 14,096 tokens?</li>
+                <li>Does "same performance" mean matching the models' overall accuracy across settings?</li>
+                <li>What minimum number of shared questions and length stops would he consider credible?</li>
+              </ul>
+            </details>
+          </div>
+        </section>
+
+        <section class="stage" id="stage-next" data-stage="4" aria-labelledby="nextTitle" hidden>
+          <div class="stage-content">
+            <div class="stage-meta">
+              <time>23 to 27 minutes</time>
+              <span>Goal: leave with one assigned artifact</span>
+            </div>
+            <h2 class="stage-title" id="nextTitle" tabindex="-1">Agree on the next piece of work</h2>
+
+            <div class="recommendation">
+              <h3>Your recommendation</h3>
+              <p>Finish the exact-source audit for AIME and BRUMO so the full MathArena table is defensible. Then draft the data schema for a controlled Model A versus Model B comparison.</p>
+            </div>
+
+            <div class="main-question">Ask: Does this table answer what you wanted? If it does, should I finish the remaining source audit next, or would the controlled data schema be more useful for our next meeting?</div>
+
+            <details class="optional">
+              <summary>If he prefers an analysis example first</summary>
+              <p>Offer a HELM Gemini identification check: compare completed-only and capped-at-limit summaries, then show what remains unknown beyond the common cap.</p>
+            </details>
+
+            <div class="decision-fields">
+              <label>
+                Next deliverable
+                <input id="deliverableInput" data-persist="deliverable" placeholder="Example: finish AIME and BRUMO source audit">
+              </label>
+              <label>
+                Owner
+                <input id="ownerInput" data-persist="owner" placeholder="Connor">
+              </label>
+              <label>
+                Due date
+                <input id="dateInput" data-persist="date" placeholder="Month day">
+              </label>
+            </div>
+
+            <div class="checkpoint">
+              <strong>Do not promise:</strong>
+              <span>No paid or confirmatory collection begins from this meeting. The design and execution gates remain unfinished.</span>
+            </div>
+          </div>
+        </section>
+
+        <section class="stage" id="stage-close" data-stage="5" aria-labelledby="closeTitle" hidden>
+          <div class="stage-content">
+            <div class="stage-meta">
+              <time>27 to 30 minutes</time>
+              <span>Goal: prevent ambiguity after the call</span>
+            </div>
+            <h2 class="stage-title" id="closeTitle" tabindex="-1">Read the decisions back</h2>
+
+            <div class="readback">
+              <div class="readback-item"><strong>Table verdict</strong><span id="tableVerdictOutput">Confirm verbally</span></div>
+              <div class="readback-item"><strong>Next deliverable</strong><span id="deliverableOutput">Not recorded yet</span></div>
+              <div class="readback-item"><strong>Owner and date</strong><span id="ownerDateOutput">Not recorded yet</span></div>
+            </div>
+
+            <label>
+              Table verdict or censoring definition
+              <textarea id="verdictInput" data-persist="verdict" placeholder="Write the exact decision in one or two sentences"></textarea>
+            </label>
+
+            <label>
+              Next meeting
+              <input id="nextMeetingInput" data-persist="nextMeeting" placeholder="Date and time">
+            </label>
+
+            <div class="script">
+              <span class="script-label">Close with this</span>
+              <blockquote>Let me read back what I wrote so I do not turn an open question into a decision later. We agreed that [read the table and censoring decision]. My next deliverable is [read it] by [date]. Is that accurate, and when should we review it?</blockquote>
+            </div>
+
+            <div class="checkpoint">
+              <strong>Before leaving:</strong>
+              <span>Confirm Slack, share the table, make sure your parents have Chirag's email, and set the next meeting.</span>
+            </div>
+          </div>
+        </section>
+      </main>
+
+      <footer class="stage-controls" aria-label="Stage navigation">
+        <button class="button" id="previousStage" type="button" disabled>Back</button>
+        <div class="control-status">
+          <strong id="controlStageName">Frame the meeting</strong>
+          <span id="controlStageCount">Stage 1 of 6</span>
+        </div>
+        <button class="button primary" id="nextStage" type="button">Next: Show the table</button>
+      </footer>
+    </div>
+  </div>
+
+  <dialog id="preflightDialog" aria-labelledby="preflightTitle">
+    <div class="dialog-head">
+      <h2 id="preflightTitle">Before the meeting</h2>
+      <button class="button quiet" type="button" data-close-dialog>Close</button>
+    </div>
+    <div class="dialog-body">
+      <ol class="preflight-list">
+        <li>Open this runner and the benchmark table.</li>
+        <li>Test your microphone and screen sharing.</li>
+        <li>Read the opening and censoring script aloud once.</li>
+        <li>Remember four numbers: 123, 446, 42 of 446, and 4,248.</li>
+        <li>Create the free Slack workspace and share Chirag's email with your parents.</li>
+      </ol>
+      <p class="checkpoint"><strong>Meeting rule:</strong><span>Stay on the active stage. Open backup facts only when Chirag asks.</span></p>
+    </div>
+  </dialog>
+
+  <dialog id="factsDialog" aria-labelledby="factsTitle">
+    <div class="dialog-head">
+      <h2 id="factsTitle">Facts and backup</h2>
+      <button class="button quiet" type="button" data-close-dialog>Close</button>
+    </div>
+    <div class="dialog-body">
+      <h3>Numbers</h3>
+      <dl class="fact-list">
+        <div><dt>123</dt><dd>MathArena questions across four competition archives</dd></div>
+        <div><dt>446</dt><dd>HELM GPQA questions per reviewed model run</dd></div>
+        <div><dt>42 of 446</dt><dd>Gemini responses labeled length; all scored wrong</dd></div>
+        <div><dt>4,248</dt><dd>Question-by-model cells in the current audit</dd></div>
+        <div><dt>427</dt><dd>MathArena generations at or near an apparent cap in the separate observational study</dd></div>
+        <div><dt>15 of 17</dt><dd>Selected observational groups with zero accuracy among inferred cap rows or observed length stops</dd></div>
+      </dl>
+
+      <h3>Item status</h3>
+      <ul class="backup-list">
+        <li>Chirag already approved including HMMT-2026 items 31 to 33 for the current scope. Do not reopen that decision.</li>
+        <li>HMMT-2026 question 25 has two archived text versions.</li>
+        <li>AIME and BRUMO still need the same exact-source audit.</li>
+        <li>The four MathArena competitions should not be pooled automatically as one homogeneous sample.</li>
+      </ul>
+
+      <h3>Topics to defer</h3>
+      <ul class="backup-list">
+        <li>Final model portfolio and provider routes</li>
+        <li>Exact effort values, caps, repeats, and power simulation</li>
+        <li>Runner, budget gates, and preregistration freeze</li>
+        <li>Paid calls of any kind</li>
+      </ul>
+    </div>
+  </dialog>
+
+  <noscript><p class="noscript">This meeting runner needs JavaScript for stage navigation. Use the full Markdown guide instead.</p></noscript>
+
+  <script>
+    (() => {
+      const stageData = [
+        { id: "stage-frame", name: "Frame the meeting", start: 0, end: 180 },
+        { id: "stage-table", name: "Show the table", start: 180, end: 600 },
+        { id: "stage-answer", name: "Answer the assignment", start: 600, end: 900 },
+        { id: "stage-censoring", name: "Explain censoring", start: 900, end: 1380 },
+        { id: "stage-next", name: "Agree on next work", start: 1380, end: 1620 },
+        { id: "stage-close", name: "Read it back", start: 1620, end: 1800 }
+      ];
+
+      const stages = [...document.querySelectorAll("[data-stage]")];
+      const tabs = [...document.querySelectorAll("[data-stage-target]")];
+      const picker = document.getElementById("stagePicker");
+      const previousButton = document.getElementById("previousStage");
+      const nextButton = document.getElementById("nextStage");
+      const progressValue = document.getElementById("progressValue");
+      const controlStageName = document.getElementById("controlStageName");
+      const controlStageCount = document.getElementById("controlStageCount");
+      let currentStage = 0;
+
+      function stageFromHash() {
+        const hash = window.location.hash.slice(1);
+        const index = stageData.findIndex((stage) => stage.id === hash);
+        return index >= 0 ? index : 0;
+      }
+
+      function showStage(index, options = {}) {
+        const boundedIndex = Math.max(0, Math.min(stageData.length - 1, index));
+        currentStage = boundedIndex;
+
+        stages.forEach((stage, stageIndex) => {
+          stage.hidden = stageIndex !== boundedIndex;
+        });
+
+        tabs.forEach((tab, tabIndex) => {
+          if (tabIndex === boundedIndex) {
+            tab.setAttribute("aria-current", "step");
+          } else {
+            tab.removeAttribute("aria-current");
+          }
+        });
+
+        picker.value = String(boundedIndex);
+        previousButton.disabled = boundedIndex === 0;
+        previousButton.textContent = boundedIndex === 0 ? "Back" : `Back: ${stageData[boundedIndex - 1].name}`;
+        nextButton.disabled = boundedIndex === stageData.length - 1;
+        nextButton.textContent = boundedIndex === stageData.length - 1 ? "Meeting complete" : `Next: ${stageData[boundedIndex + 1].name}`;
+        controlStageName.textContent = stageData[boundedIndex].name;
+        controlStageCount.textContent = `Stage ${boundedIndex + 1} of ${stageData.length}`;
+        progressValue.style.width = `${((boundedIndex + 1) / stageData.length) * 100}%`;
+
+        if (options.updateHash !== false) {
+          history.replaceState(null, "", `#${stageData[boundedIndex].id}`);
+        }
+
+        if (options.focus !== false) {
+          stages[boundedIndex].querySelector(".stage-title").focus({ preventScroll: true });
+        }
+      }
+
+      tabs.forEach((tab) => {
+        tab.addEventListener("click", () => showStage(Number(tab.dataset.stageTarget)));
+      });
+
+      picker.addEventListener("change", () => showStage(Number(picker.value)));
+      previousButton.addEventListener("click", () => showStage(currentStage - 1));
+      nextButton.addEventListener("click", () => showStage(currentStage + 1));
+
+      window.addEventListener("hashchange", () => {
+        showStage(stageFromHash(), { updateHash: false });
+      });
+
+      document.addEventListener("keydown", (event) => {
+        const target = event.target;
+        const isTyping = target.matches("input, textarea, select") || target.isContentEditable;
+        if (isTyping || document.querySelector("dialog[open]")) return;
+
+        if (event.key === "ArrowRight") {
+          event.preventDefault();
+          showStage(currentStage + 1);
+        } else if (event.key === "ArrowLeft") {
+          event.preventDefault();
+          showStage(currentStage - 1);
+        } else if (/^[1-6]$/.test(event.key)) {
+          event.preventDefault();
+          showStage(Number(event.key) - 1);
+        }
+      });
+
+      document.querySelectorAll("[data-open-dialog]").forEach((button) => {
+        button.addEventListener("click", () => {
+          document.getElementById(button.dataset.openDialog).showModal();
+        });
+      });
+
+      document.querySelectorAll("[data-close-dialog]").forEach((button) => {
+        button.addEventListener("click", () => button.closest("dialog").close());
+      });
+
+      document.querySelectorAll("dialog").forEach((dialog) => {
+        dialog.addEventListener("click", (event) => {
+          if (event.target === dialog) dialog.close();
+        });
+      });
+
+      const timerDisplay = document.getElementById("timerDisplay");
+      const paceStatus = document.getElementById("paceStatus");
+      const timerToggle = document.getElementById("timerToggle");
+      const timerReset = document.getElementById("timerReset");
+      let elapsedSeconds = 0;
+      let timerStartedAt = null;
+      let timerInterval = null;
+
+      function formatTime(seconds) {
+        const minutes = Math.floor(seconds / 60);
+        const remaining = seconds % 60;
+        return `${String(minutes).padStart(2, "0")}:${String(remaining).padStart(2, "0")}`;
+      }
+
+      function expectedStageForTime(seconds) {
+        const index = stageData.findIndex((stage) => seconds < stage.end);
+        return index === -1 ? stageData.length - 1 : index;
+      }
+
+      function updateTimer() {
+        const seconds = timerStartedAt === null
+          ? elapsedSeconds
+          : elapsedSeconds + Math.floor((Date.now() - timerStartedAt) / 1000);
+        const cappedSeconds = Math.min(seconds, 5999);
+        timerDisplay.textContent = `${formatTime(cappedSeconds)} / 30:00`;
+
+        if (timerStartedAt === null && elapsedSeconds === 0) {
+          paceStatus.textContent = "Timer not started";
+          paceStatus.classList.remove("late");
+          return;
+        }
+
+        const expectedStage = expectedStageForTime(seconds);
+        if (seconds >= 1800) {
+          paceStatus.textContent = "Wrap up now";
+          paceStatus.classList.add("late");
+        } else if (currentStage < expectedStage) {
+          paceStatus.textContent = `Move to: ${stageData[expectedStage].name}`;
+          paceStatus.classList.add("late");
+        } else {
+          paceStatus.textContent = "On pace";
+          paceStatus.classList.remove("late");
+        }
+      }
+
+      function stopTimer() {
+        if (timerStartedAt !== null) {
+          elapsedSeconds += Math.floor((Date.now() - timerStartedAt) / 1000);
+        }
+        timerStartedAt = null;
+        window.clearInterval(timerInterval);
+        timerInterval = null;
+        timerToggle.textContent = elapsedSeconds > 0 ? "Resume timer" : "Start timer";
+        updateTimer();
+      }
+
+      timerToggle.addEventListener("click", () => {
+        if (timerStartedAt !== null) {
+          stopTimer();
+          return;
+        }
+        timerStartedAt = Date.now();
+        timerToggle.textContent = "Pause timer";
+        timerInterval = window.setInterval(updateTimer, 500);
+        updateTimer();
+      });
+
+      timerReset.addEventListener("click", () => {
+        stopTimer();
+        elapsedSeconds = 0;
+        timerToggle.textContent = "Start timer";
+        updateTimer();
+      });
+
+      const persistedFields = [...document.querySelectorAll("[data-persist]")];
+      function storageGet(key) {
+        try {
+          return localStorage.getItem(`chirag-meeting-${key}`) || "";
+        } catch {
+          return "";
+        }
+      }
+
+      function storageSet(key, value) {
+        try {
+          localStorage.setItem(`chirag-meeting-${key}`, value);
+        } catch {
+          return;
+        }
+      }
+
+      function updateReadback() {
+        const deliverable = document.getElementById("deliverableInput").value.trim();
+        const owner = document.getElementById("ownerInput").value.trim();
+        const date = document.getElementById("dateInput").value.trim();
+        const verdict = document.getElementById("verdictInput").value.trim();
+        document.getElementById("deliverableOutput").textContent = deliverable || "Not recorded yet";
+        document.getElementById("ownerDateOutput").textContent = [owner, date].filter(Boolean).join(" by ") || "Not recorded yet";
+        document.getElementById("tableVerdictOutput").textContent = verdict || "Confirm verbally";
+      }
+
+      persistedFields.forEach((field) => {
+        field.value = storageGet(field.dataset.persist);
+        field.addEventListener("input", () => {
+          storageSet(field.dataset.persist, field.value);
+          updateReadback();
+        });
+      });
+
+      showStage(stageFromHash(), { updateHash: false, focus: false });
+      updateReadback();
+      updateTimer();
+    })();
+  </script>
+</body>
+</html>

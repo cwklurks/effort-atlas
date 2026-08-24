@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>What Chirag's note is about — in four pictures</title>
+<style>
+  .viz-root {
+    color-scheme: light;
+    --surface-1: #fcfcfb; --page: #f9f9f7;
+    --ink-1: #0b0b0b; --ink-2: #52514e; --muted: #898781;
+    --grid: #e1e0d9; --axis: #c3c2b7; --border: rgba(11,11,11,0.10);
+    --resp: #2a78d6; --chop: #eb6834; --band: #cde2fb; --prompt: #d9d7d0;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:where(:not([data-theme="light"])) .viz-root {
+      color-scheme: dark;
+      --surface-1: #1a1a19; --page: #0d0d0d;
+      --ink-1: #ffffff; --ink-2: #c3c2b7; --muted: #898781;
+      --grid: #2c2c2a; --axis: #383835; --border: rgba(255,255,255,0.10);
+      --resp: #3987e5; --chop: #d95926; --band: #16304f; --prompt: #3a3a37;
+    }
+  }
+  :root[data-theme="dark"] .viz-root {
+    color-scheme: dark;
+    --surface-1: #1a1a19; --page: #0d0d0d;
+    --ink-1: #ffffff; --ink-2: #c3c2b7; --muted: #898781;
+    --grid: #2c2c2a; --axis: #383835; --border: rgba(255,255,255,0.10);
+    --resp: #3987e5; --chop: #d95926; --band: #16304f; --prompt: #3a3a37;
+  }
+  * { box-sizing: border-box; margin: 0; }
+  body { background: var(--page); }
+  .viz-root { font-family: system-ui, -apple-system, "Segoe UI", sans-serif; color: var(--ink-1); background: var(--page); line-height: 1.55; padding: 32px 16px 64px; }
+  .wrap { max-width: 780px; margin: 0 auto; }
+  h1 { font-size: 26px; letter-spacing: -0.02em; }
+  .sub { color: var(--ink-2); margin-top: 6px; font-size: 15px; }
+  section { background: var(--surface-1); border: 1px solid var(--border); border-radius: 12px; padding: 22px; margin-top: 22px; }
+  .num { display: inline-flex; width: 26px; height: 26px; border-radius: 50%; background: var(--resp); color: #fff; font-weight: 700; font-size: 14px; align-items: center; justify-content: center; margin-right: 8px; }
+  h2 { font-size: 18px; display: flex; align-items: center; }
+  .cap { color: var(--ink-2); font-size: 14.5px; margin-top: 10px; max-width: 64ch; }
+  .cap b { color: var(--ink-1); }
+  svg { display: block; margin-top: 14px; }
+  svg text { font-family: system-ui, -apple-system, "Segoe UI", sans-serif; }
+  .big { font-size: 15.5px; margin-top: 12px; color: var(--ink-1); font-weight: 600; }
+</style>
+</head>
+<body>
+<div class="viz-root">
+<div class="wrap">
+
+  <h1>What Chirag's note is about — in four pictures</h1>
+  <div class="sub">No formulas. Just the story.</div>
+
+  <!-- PANEL 1 -->
+  <section>
+    <h2><span class="num">1</span>The question: how long do responses actually run?</h2>
+    <svg viewBox="0 0 760 210" role="img" aria-label="Responses of different lengths">
+      <g stroke="var(--resp)" stroke-width="10" stroke-linecap="round">
+        <line x1="30" y1="30"  x2="180" y2="30"/>
+        <line x1="30" y1="62"  x2="360" y2="62"/>
+        <line x1="30" y1="94"  x2="120" y2="94"/>
+        <line x1="30" y1="126" x2="560" y2="126"/>
+        <line x1="30" y1="158" x2="260" y2="158"/>
+      </g>
+      <g fill="var(--resp)">
+        <circle cx="180" cy="30" r="7"/><circle cx="360" cy="62" r="7"/><circle cx="120" cy="94" r="7"/>
+        <circle cx="560" cy="126" r="7"/><circle cx="260" cy="158" r="7"/>
+      </g>
+      <line x1="330" y1="12" x2="330" y2="176" stroke="var(--muted)" stroke-width="1.5" stroke-dasharray="5 5"/>
+      <text x="338" y="24" font-size="13" fill="var(--muted)">256 tokens</text>
+      <line x1="30" y1="182" x2="720" y2="182" stroke="var(--axis)" stroke-width="1.5"/>
+      <text x="30" y="204" font-size="13" fill="var(--muted)">response length →</text>
+    </svg>
+    <p class="cap">Every answer a model writes has a length. If you run models for real (cost, speed, memory) or study them (like this paper), you want to know the <b>spread of lengths</b> — for example, what share of responses are shorter than some line you draw, like 256 tokens. Here, with all five lengths visible, you can just count: 3 of 5 are left of the line. Easy. <b>The whole note is about what happens when you can't see the full bars.</b></p>
+  </section>
+
+  <!-- PANEL 2 -->
+  <section>
+    <h2><span class="num">2</span>The problem: the system chops long answers, so the data lies</h2>
+    <svg viewBox="0 0 760 260" role="img" aria-label="Context window chops responses">
+      <text x="30" y="22" font-size="13.5" font-weight="600" fill="var(--ink-1)">The model gets 512 tokens TOTAL — question + answer share the box</text>
+      <!-- row A: short prompt -->
+      <rect x="30" y="40" width="120" height="18" rx="4" fill="var(--prompt)"/>
+      <text x="36" y="54" font-size="12" fill="var(--ink-2)">question</text>
+      <line x1="150" y1="49" x2="470" y2="49" stroke="var(--resp)" stroke-width="10" stroke-linecap="round"/>
+      <circle cx="470" cy="49" r="7" fill="var(--resp)"/>
+      <text x="560" y="54" font-size="12.5" fill="var(--ink-2)">short question → room to finish ✓</text>
+      <!-- row B: long prompt -->
+      <rect x="30" y="84" width="330" height="18" rx="4" fill="var(--prompt)"/>
+      <text x="36" y="98" font-size="12" fill="var(--ink-2)">long question</text>
+      <line x1="360" y1="93" x2="542" y2="93" stroke="var(--chop)" stroke-width="10" stroke-linecap="round"/>
+      <line x1="542" y1="82" x2="542" y2="104" stroke="var(--chop)" stroke-width="4"/>
+      <line x1="550" y1="93" x2="640" y2="93" stroke="var(--chop)" stroke-width="3" stroke-dasharray="3 6" opacity="0.55"/>
+      <text x="648" y="97" font-size="14" fill="var(--chop)">?</text>
+      <!-- the wall -->
+      <line x1="542" y1="34" x2="542" y2="112" stroke="var(--ink-2)" stroke-width="2"/>
+      <text x="548" y="120" font-size="12" fill="var(--ink-2)">the 512 wall</text>
+      <!-- takeaway strip -->
+      <rect x="30" y="150" width="690" height="86" rx="10" fill="var(--band)" opacity="0.55"/>
+      <text x="50" y="178" font-size="13.5" fill="var(--ink-1)" font-weight="600">What the log file records for the chopped answer: length = 182 tokens.</text>
+      <text x="50" y="200" font-size="13.5" fill="var(--ink-1)">Its real length? Unknown — all you truly know is "at least 182."</text>
+      <text x="50" y="222" font-size="13.5" fill="var(--ink-2)">And the longer the real answer, the more likely it gets chopped — the lie hits the longest ones.</text>
+    </svg>
+    <p class="cap">So you can't just count lengths from the logs. Throw the chopped rows away and you've deleted exactly the long answers — everything looks short. Treat the chopped length as the real length — same problem. <b>Both easy fixes shrink your answer, sometimes by double.</b></p>
+  </section>
+
+  <!-- PANEL 3 -->
+  <section>
+    <h2><span class="num">3</span>Doctors solved this exact problem 70 years ago</h2>
+    <svg viewBox="0 0 760 250" role="img" aria-label="Medical study analogy">
+      <text x="30" y="22" font-size="13.5" font-weight="600" fill="var(--ink-1)">A 5-year medical study: how long do patients live after treatment?</text>
+      <g stroke="var(--resp)" stroke-width="8" stroke-linecap="round">
+        <line x1="30" y1="52"  x2="240" y2="52"/>
+        <line x1="30" y1="84"  x2="140" y2="84"/>
+      </g>
+      <g fill="var(--resp)">
+        <circle cx="240" cy="52" r="6"/><circle cx="140" cy="84" r="6"/>
+      </g>
+      <text x="255" y="56" font-size="12" fill="var(--ink-2)">event observed — exact time known</text>
+      <g stroke="var(--chop)" stroke-width="8" stroke-linecap="round">
+        <line x1="30" y1="116" x2="470" y2="116"/>
+        <line x1="30" y1="148" x2="470" y2="148"/>
+      </g>
+      <g stroke="var(--chop)" stroke-width="3" stroke-dasharray="3 6" opacity="0.55">
+        <line x1="478" y1="116" x2="580" y2="116"/>
+        <line x1="478" y1="148" x2="580" y2="148"/>
+      </g>
+      <text x="590" y="120" font-size="12" fill="var(--chop)">still alive when the</text>
+      <text x="590" y="136" font-size="12" fill="var(--chop)">study ended —</text>
+      <text x="590" y="152" font-size="12" fill="var(--chop)">"at least 5 years"</text>
+      <line x1="470" y1="36" x2="470" y2="166" stroke="var(--ink-2)" stroke-width="2"/>
+      <text x="463" y="182" font-size="12" fill="var(--ink-2)" text-anchor="end">study ends (year 5)</text>
+      <!-- mapping -->
+      <rect x="30" y="196" width="690" height="42" rx="10" fill="var(--band)" opacity="0.55"/>
+      <text x="50" y="222" font-size="13.5" fill="var(--ink-1)">patient = response &nbsp;·&nbsp; “event” = the answer ends on its own &nbsp;·&nbsp; study ending = hitting the wall</text>
+    </svg>
+    <p class="cap">You'd never throw away the patients who outlived the study — they're your best evidence of long survival. Medicine built a standard tool (<b>Kaplan-Meier, 1958</b>) that uses "at least this long" information properly. <b>Chirag's note is one sentence: a chopped response is a patient who outlived the study, so use the same tool.</b></p>
+  </section>
+
+  <!-- PANEL 4 -->
+  <section>
+    <h2><span class="num">4</span>His experiment: break data on purpose, where you know the truth</h2>
+    <svg viewBox="0 0 760 290" role="img" aria-label="The rigged demo">
+      <!-- step 1 -->
+      <text x="30" y="24" font-size="13.5" font-weight="600" fill="var(--ink-1)">Step 1 — complete corpus (lengths known)</text>
+      <g stroke="var(--resp)" stroke-width="8" stroke-linecap="round">
+        <line x1="40" y1="44" x2="200" y2="44"/><line x1="40" y1="68" x2="330" y2="68"/><line x1="40" y1="92" x2="120" y2="92"/>
+      </g>
+      <g fill="var(--resp)"><circle cx="200" cy="44" r="6"/><circle cx="330" cy="68" r="6"/><circle cx="120" cy="92" r="6"/></g>
+      <!-- step 2 -->
+      <text x="410" y="24" font-size="13.5" font-weight="600" fill="var(--ink-1)">Step 2 — chop a copy (fake window)</text>
+      <g stroke="var(--resp)" stroke-width="8" stroke-linecap="round"><line x1="420" y1="44" x2="580" y2="44"/></g>
+      <circle cx="580" cy="44" r="6" fill="var(--resp)"/>
+      <line x1="420" y1="68" x2="610" y2="68" stroke="var(--chop)" stroke-width="8" stroke-linecap="round"/>
+      <line x1="610" y1="58" x2="610" y2="78" stroke="var(--chop)" stroke-width="4"/>
+      <g stroke="var(--resp)" stroke-width="8" stroke-linecap="round"><line x1="420" y1="92" x2="500" y2="92"/></g>
+      <circle cx="500" cy="92" r="6" fill="var(--resp)"/>
+      <!-- step 3 scoreboard -->
+      <text x="30" y="140" font-size="13.5" font-weight="600" fill="var(--ink-1)">Step 3 — ask each method: "what share of answers are short?" Then check against the truth.</text>
+      <!-- scoreboard bars: scale x: value v -> 40 + v*640 ; using toy values -->
+      <text x="40" y="172" font-size="13" fill="var(--ink-2)">throw chopped rows away</text>
+      <rect x="260" y="160" width="440" height="14" rx="4" fill="var(--muted)" opacity="0.75"/>
+      <text x="694" y="171" font-size="12.5" fill="#fff" text-anchor="end">100%</text>
+      <text x="40" y="200" font-size="13" fill="var(--ink-2)">pretend chop = real end</text>
+      <rect x="260" y="188" width="385" height="14" rx="4" fill="var(--muted)" opacity="0.75"/>
+      <text x="655" y="200" font-size="12.5" fill="var(--ink-1)">87.5%</text>
+      <text x="40" y="228" font-size="13" fill="var(--ink-2)">Kaplan-Meier</text>
+      <rect x="260" y="216" width="199" height="14" rx="4" fill="var(--resp)"/>
+      <text x="469" y="228" font-size="12.5" fill="var(--ink-1)" font-weight="600">45.3%</text>
+      <text x="40" y="262" font-size="13" fill="var(--ink-2)">Same eight toy responses, three totally different answers — only the treatment of chopped rows differs.</text>
+      <text x="40" y="282" font-size="13" fill="var(--ink-2)">On his real corpus the truth was knowable: 49.1%. Kaplan-Meier landed within about 2 points of it.</text>
+    </svg>
+    <p class="big">That's the note: the chop is the problem, the doctors' tool is the fix, and the rigged demo is the proof — checked against a truth he built in on purpose.</p>
+    <p class="cap">And the link to your half of the paper: his curve says <b>how often</b> a given cap chops responses. Your experiment measures <b>what that chopping does to accuracy scores</b>. Same wall, two kinds of damage — that's why it's one paper.</p>
+  </section>
+
+</div>
+</div>
+</body>
+</html>
