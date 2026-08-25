@@ -60,9 +60,9 @@ embeds a canary string to detect leaks). Therefore:
 ## Reproduce and verify (this is the part to be able to say out loud)
 
 ```bash
-pip install huggingface_hub pandas pyarrow
-python3 capabilities/acquire.py      # re-downloads pinned revisions, verifies hashes, rebuilds JSONLs
-python3 capabilities/validate.py     # recounts, recomputes every row hash, writes validation_report.json
+uv sync --python 3.12.8 --extra capabilities   # or: pip install huggingface_hub pandas pyarrow
+uv run python capabilities/acquire.py    # re-downloads pinned revisions, verifies hashes, rebuilds JSONLs
+uv run python capabilities/validate.py   # recounts, recomputes every row hash, writes validation_report.json
 ```
 
 Two independent `acquire.py` runs produce **byte-identical** JSONLs (verified 2026-08-23).

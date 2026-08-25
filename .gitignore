@@ -44,6 +44,7 @@ htmlcov/
 
 # Editor and operating-system files
 .DS_Store
+.obsidian/
 .idea/
 .vscode/
 

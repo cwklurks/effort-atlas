@@ -29,8 +29,8 @@
     },
     {
       "path": "pyproject.toml",
-      "sha256": "f7ec822c1d8c1dbd7eb11b485258af66da980774aeb1381852e55c1f1b70ec4f",
-      "bytes": 608,
+      "sha256": "c544fe558101940c6c1960ac5d24e1e79347d964e89f0e1965e8849f4a3a5d6d",
+      "bytes": 690,
       "purpose": "Python package and optional dependency definition"
     },
     {
@@ -77,8 +77,8 @@
     },
     {
       "path": "reap/20_BENCHMARK_COMPARISON_2026-08-18.md",
-      "sha256": "3c9f3a730fafe99092e33faf36d1376ae1b32cb19488b81b180b774674e3db64",
-      "bytes": 10248,
+      "sha256": "43ce659f4358ffd80e695cfc976d1f0fd1bd26402c9f3d8ab084e392084b0bf7",
+      "bytes": 10555,
       "purpose": "benchmark comparison"
     },
     {
@@ -131,8 +131,8 @@
     },
     {
       "path": "scripts/verify_offline.sh",
-      "sha256": "2bc56b59dc40421597f580e249c07dc1daf1e964bfc12ab56f66dacbf3a48608",
-      "bytes": 434,
+      "sha256": "bf5ee2e54a38b3f9432f7b3862b58bd25e5cc3ad8cd7fe5340d49ab61f3becfa",
+      "bytes": 922,
       "purpose": "canonical offline verification command"
     },
     {
