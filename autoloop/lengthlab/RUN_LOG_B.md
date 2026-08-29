@@ -128,3 +128,7 @@ RESULT 20260829-0319/28: 0.187500  reverted (best 0.185000)
 
 RESULT 20260829-0319/29: 0.185000  reverted (best 0.185000)
 
+## 20260829-0319/30 HYPOTHESIS: The alpha lever's fine bisection has now pinned the type-I cliff tightly between 0.074 (confirmed safe, score 0.1875 - a real gain over 0.073's 0.185 but short of the required >0.006 margin) and 0.075 (confirmed catastrophic gate failure, score 0.000 from hypothesis 25), with no lever outside alpha (items, Johnson correction stacking) producing any gain since hypothesis 21, so the highest-expected-value remaining probe is to split this narrower 0.074-0.075 gap rather than abandon the family - moving DESIGN["alpha"] to 0.0745 (halfway between the confirmed-safe 0.074 and the confirmed-catastrophic 0.075) should cross at least one more worst-case-scenario null-rejection threshold beyond what 0.074 reached, extending the same +0.0025-per-0.001-step gain rate just far enough to clear the 0.006 keep margin over the current best (0.185), while staying strictly below the known-catastrophic 0.075 boundary to avoid repeating hypothesis 25's total gate failure.
+
+RESULT 20260829-0319/30: 0.000000  reverted (best 0.185000)
+
