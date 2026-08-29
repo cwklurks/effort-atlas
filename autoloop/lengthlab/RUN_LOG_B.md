@@ -35,3 +35,7 @@ RESULT 20260829-0319/8: 0.115000  reverted (best 0.137500)
 
 RESULT 20260829-0319/9: 0.147500  KEPT (new best)
 
+## 20260829-0319/10 HYPOTHESIS: The Yuen trimmed test (hypothesis 9) only probed a single trim fraction (10%), but the robust-statistics literature (Wilcox) finds 20% symmetric trimming is generally the better efficiency/robustness tradeoff against exactly the kind of occasional extreme per-item DiD values produced by the heavy-tailed tail_pareto power scenario (plausibly the binding worst-case), while the exact symmetry-about-0 argument from hypothesis 9 that preserves type-I control holds for any fixed trim fraction (not just 10%) - so raising TRIM from 0.10 to 0.20 in the existing Yuen test should further shrink the worst-case scenario's SE and increase minimum power without inflating type-I.
+
+RESULT 20260829-0319/10: 0.130000  reverted (best 0.147500)
+
