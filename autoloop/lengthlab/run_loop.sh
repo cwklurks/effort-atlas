@@ -120,7 +120,7 @@ run git or the metric. No network."
     $REVIEW_CMD "$RPROMPT" >/dev/null 2>>"$LAB/agent_err.log" || true
     git checkout -q -- "$EDITABLE" || true   # reviewer must not leave edits
     revert_out_of_scope
-    git add -- "$LOG"; git commit -qm "loop$LOOP $SESSION/$i: reviewer strategy"
+    git add -- "$LOG"; git commit -qm "loop$LOOP $SESSION/$i: reviewer strategy" || true
     echo "[$LOOP] reviewer note appended"
   fi
 done
