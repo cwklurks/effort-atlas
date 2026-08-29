@@ -243,3 +243,7 @@ RESULT 20260829-0319/54: 0.000000  reverted (best 0.970000)
 
 RESULT 20260829-0319/55: 0.000000  reverted (best 0.970000)
 
+## 20260829-0319/56 HYPOTHESIS: The TRIM sweep on the current n_items=148, alpha=0.079 two-cell statistic (did=hi_big-hi_sm) has so far only probed g=floor(148*TRIM) at g=14 (TRIM=0.10, current best, 388/400 worst-case rejections), g=16 (TRIM=0.11, hypothesis 47, 389/400, gate-safe), and g=20 (TRIM=0.14, hypothesis 51, also 389/400, gate-safe) - a flat plateau at 389 across g=16-20 - but the single intermediate point g=15 (TRIM in [0.10135,0.10811), e.g. 0.105) has never been tested, and since it sits strictly between two already-confirmed-gate-safe points (g=14 and g=16) it should also pass the type-I gate; setting TRIM=0.105 (g=15, alpha=0.079, n_items=148, n_reps=2 unchanged) fills this one remaining ungridded point in the TRIM sweep, testing whether the 388->389 crossing already occurs at g=15 (matching the g=16-20 plateau) rather than exactly at g=16, without inflating type-I since the exact symmetry-about-0 of did under every null scenario (hypothesis 8/9/31) holds for any fixed trim fraction.
+
+RESULT 20260829-0319/56: 0.970000  reverted (best 0.970000)
+
