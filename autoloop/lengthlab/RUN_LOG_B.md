@@ -318,3 +318,7 @@ RESULT 20260829-0319/70: 0.000000  reverted (best 0.980000)
 
 RESULT 20260829-0319/71: 0.972500  reverted (best 0.980000)
 
+
+## 20260829-0319/72 HYPOTHESIS: Hypothesis 71 showed raising TRIM from 0.10 to 0.15 on the current combined statistic (did=(hi_big-hi_sm)+0.5*(lo_big-lo_sm), alpha=0.05, n_items=148, n_reps=2, current best 0.980000) strictly hurt worst-case power (0.972500, gate-safe but a real loss) - but only the upward direction from the 0.10 baseline has ever been probed on this fresh stream, while the downward direction (less trimming/Winsorizing, keeping more of the tail information that the added lo term may have changed the outlier structure of) has never been tested here even though every TRIM value from 0.08 up passed the type-I gate cleanly on the old statistic's stream; lowering TRIM from 0.10 to 0.08 (g=floor(148*0.08)=11, alpha=0.05, n_items=148, n_reps=2, LO_WEIGHT=0.5 unchanged) tests whether this fresh combined-statistic stream's optimum actually sits below 0.10 rather than above it, since symmetric trimming of an exactly-symmetric-about-0 (under every null scenario) distribution stays centered at 0 regardless of the trim fraction (hypothesis 8/9/31/62), so this should not inflate type-I while potentially retaining more genuine signal from items that hypothesis 71's heavier trim was discarding, increasing worst-case power.
+RESULT 20260829-0319/72: 0.980000  reverted (best 0.980000)
+
