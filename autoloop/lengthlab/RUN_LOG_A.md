@@ -178,3 +178,7 @@ RESULT 20260828-2127/30: 0.024594  reverted (best 0.024558)
 
 RESULT 20260828-2127/31: 0.024557  reverted (best 0.024558)
 
+## 20260828-2127/32 HYPOTHESIS: The two closest single-lever near-ties this session touch disjoint branches and have never been stacked together - log-space quantile interpolation for the IDENTIFIED median (cen_frac<0.5) and q90 (cen_frac<0.10), from 2127/31 (0.024557, the single closest miss of the whole session, delta -0.000001), and the reviewer's ranked-option-1 bound-respecting clamps for the UNIDENTIFIED branches (median/q90 floored at the empirical clamped-data quantile when unidentified, p_ge beyond cap capped at cen_frac and forced nonincreasing), from 2119/3 (0.024492, delta -0.000066) - so combine them, using the SAME log-space quantile (computed once on the clamped data) both as the identified-branch estimate and as the bound-clamp's comparison floor for the unidentified branch (consistent with the 2127/11 lesson that piecemeal reuse of different quantile definitions between the identified estimate and the clamp comparison left value on the table), since both individually moved the score in the right direction via mechanistically distinct routes (reparametrizing the interpolation space vs. one-sided bound enforcement) and were never tested in combination.
+
+RESULT 20260828-2127/32: 0.024491  reverted (best 0.024558)
+
