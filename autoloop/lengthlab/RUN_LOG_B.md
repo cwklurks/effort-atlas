@@ -251,3 +251,7 @@ RESULT 20260829-0319/56: 0.970000  reverted (best 0.970000)
 
 RESULT 20260829-0319/57: 0.972500  reverted (best 0.970000)
 
+## 20260829-0319/58 HYPOTHESIS: The TRIM sweep on the current n_items=148, alpha=0.079 two-cell statistic has now been probed at g=14/15/16/20/29 (TRIM 0.10-0.20), showing exactly one crossing (388->389 between g=15 and g=16) and then a flat 389/400 plateau across the entire g=16-29 span (hypotheses 47/51/56/57 all 0.972500) - a wide enough flat run to suggest crossings are sparse rather than continuous, meaning the next one (needed to reach the >=391/400 keep margin) likely sits well past g=29 rather than just beyond it, and since every gate failure ever observed on this statistic came from raising alpha or reincorporating the lo-effort cells, never from raising TRIM alone (TRIM=0 was the sole trimming-side catastrophe; every TRIM>0 tested, 0.08 through 0.20, passed the gate cleanly), a substantially larger step remains the lowest-risk lever left to probe; pushing TRIM to 0.25 (g=floor(148*0.25)=37, kept=74 items, alpha=0.079, n_items=148, n_reps=2 unchanged) searches meaningfully past the mapped plateau for a second crossing without inflating type-I, since the exact symmetry-about-0 of did under every null scenario (hypothesis 8/9/31) holds for any fixed trim fraction and no gate failure has ever come from raising TRIM alone.
+
+RESULT 20260829-0319/58: 0.000000  reverted (best 0.970000)
+
