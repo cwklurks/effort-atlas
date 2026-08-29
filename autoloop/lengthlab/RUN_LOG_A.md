@@ -114,3 +114,7 @@ RESULT 20260828-2127/18: 0.024344  reverted (best 0.024558)
 
 RESULT 20260828-2127/19: 0.030967  reverted (best 0.024558)
 
+## 20260828-2127/20 HYPOTHESIS: The best result found all session remains the three-way stack from 2127/18 (bound clamps + median_unbiased identified-quantile interpolation + EM-sigma shrinkage toward the cross-regime-typical 0.85, at 0.024344, still short of the 0.003 margin) built on top of 2127/17's untuned shrinkage strength (k=10, chosen arbitrarily, never swept), so re-implement that exact validated three-way stack unchanged but sweep the one hyperparameter no attempt has tuned - increase the sigma-shrinkage pseudo-count from k=10 to k=25 - since a stronger pull toward the tightly-clustered (0.5-1.1) cross-regime sigma value should further stabilize the noisiest censoring-starved fits (mix_heavy/tail_pareto/ln_long at small caps) that drove the single largest gain found this session, while remaining a no-op wherever dozens of uncensored points already pin sigma down (the well-specified low-censoring regimes where every stronger structural change has lost ground).
+
+RESULT 20260828-2127/20: 0.024381  reverted (best 0.024558)
+
