@@ -164,3 +164,9 @@ RESULT 20260828-2127/27: 0.024545  reverted (best 0.024558)
 
 RESULT 20260828-2127/28: 0.024751  reverted (best 0.024558)
 
+## 20260828-2127/29 HYPOTHESIS: Both reviewer strategies are now exhausted (fit/tail-level replacement: 4 bad losses; diagnostic-gated blends/clamps/interpolation/shrinkage/bagging on the unidentified parametric branches or on the fit-vs-empirical gate: 24 more attempts, every one a near-tie or a loss, with 2127/10's bagging applied only to a bootstrap-refit of the parametric fit used for the UNIDENTIFIED branch), so apply a genuinely untried mechanism to the one thing left almost completely alone all session - the raw empirical order-statistic itself on the IDENTIFIED median (cen_frac<0.5) and q90 (cen_frac<0.10) branches: replace the single sample quantile of the clamped data with a bagged quantile estimator (average the quantile computed on each of 25 bootstrap resamples, with replacement, of the same n=500 clamped values, using a fixed-seed RNG for determinism), since Efron-style quantile bagging is known to reduce the sampling variance of an order statistic by smoothing its step-function empirical CDF, is mechanically distinct from both the deterministic beta-weighted Harrell-Davis smoothing already tried and lost slightly (0.024694) and from 2127/10's bagging of the parametric fit (0.024865, which bagged the wrong branch), and leaves the fit, the tail extrapolation, and every p_ge branch completely untouched.
+
+RESULT 20260828-2127/29: pending
+
+RESULT 20260828-2127/29: 0.024948  reverted (best 0.024558)
+
