@@ -50,3 +50,7 @@ RESULT 20260828-2127/3: 0.024545  reverted (best 0.024558)
 
 RESULT 20260828-2127/4: 0.024479  reverted (best 0.024558)
 
+## 20260828-2127/5 HYPOTHESIS: The reviewer's 2119/2 tail/branch strategy is now exhausted (ranked options 1-3 all tried, plus the follow-up quantile-interpolation-type idea and its combination with option 1, all near-tied at best), so stay in the one family that has never lost ground (the identified empirical median/q90 branches) but go further than swapping numpy's interpolation type - replace the order-statistic quantile with the Harrell-Davis quantile estimator (a smooth beta-weighted average over all order statistics, implemented from scratch via a regularized incomplete beta function since scipy is unavailable), since HD is a genuinely different estimator with materially lower finite-sample variance than any single-interpolation-type order statistic, applies on nearly every cell (any regime/cap/seed where censoring is below the 0.5/0.10 identification thresholds), and never touches the load-bearing lognormal fit or tail extrapolation that all fit/tail-level attempts have shown are fragile.
+
+RESULT 20260828-2127/5: 0.024694  reverted (best 0.024558)
+
