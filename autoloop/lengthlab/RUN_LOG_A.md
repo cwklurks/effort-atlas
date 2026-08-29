@@ -160,3 +160,7 @@ RESULT 20260828-2127/26: 0.024535  reverted (best 0.024558)
 
 RESULT 20260828-2127/27: 0.024545  reverted (best 0.024558)
 
+## 20260828-2127/28 HYPOTHESIS: The reviewer's 2127/20 strategy (diagnostic-gated blends/hard-gates of the fit against identified data, tried six ways across 21-27, every one a near-tie or a loss) is exhausted, and every prior tail-branch correction (Hill/Pareto replacement, min-clamp against cen_frac, sigma-inflation) either replaced the tail's functional form or only ever pulled it downward, so try a genuinely untried, purely multiplicative continuity correction on the one boundary condition none of them enforced: at c=cap the unidentified parametric tail (used for c>cap) and the exactly-identified empirical branch (used for c<=cap, where p_ge(cap)=cen_frac exactly) currently disagree whenever the lognormal fit's own SF(cap) != cen_frac, producing a level discontinuity right at the report cap; rescale the parametric tail for c>cap by the constant factor cen_frac/lognormal_sf(mu,sigma,cap) (falling back to no rescaling when lognormal_sf(cap) is numerically ~0) so it is pinned to the known-exact cen_frac at the boundary and decays with the fit's own shape beyond it, which is a smooth two-sided recalibration (can rescale up or down, unlike the one-sided min-clamp from 2119/3) that leaves median, q90, the fit itself, and every identified p_ge(c<=cap) value completely untouched.
+
+RESULT 20260828-2127/28: 0.024751  reverted (best 0.024558)
+
