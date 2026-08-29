@@ -28,5 +28,9 @@ RESULT 20260828-2119/2: 0.024703  reverted (best 0.024558)
 
 3. Use the identified region as a validation set for the tail branch. Before trusting any parametric output, compare the fitted lognormal's p_ge at the identified caps (c <= cap, where truth-level empirical values are exact) against those empirical values; if the mean absolute gap exceeds a small tolerance (say 0.03), declare the fit misspecified for this sample and swap only the unidentified outputs to bound-based defaults (q90 = cap when 0.10 <= cen_frac, p_ge(c>cap) = cen_frac scaled by the empirical exceedance decay between the two largest identified caps). This is per-sample model checking, which no prior attempt tried — the fit itself is never altered.
 
-(c) Do NOT retry: any further modification of the lognormal fitting procedure or its global tail level (mixture EM, quantile-matched fits, cen_frac re-anchoring, threshold smoothing) — four straight reverts closed that family.
+(c) Do NOT retry: any further modification of the lognormal fitting procedure or its global tail level (mixture EM, quantile-matched fits, cen_frac re-anchoring, threshold smoothing) - four straight reverts closed that family.
+
+## 20260828-2119/3 HYPOTHESIS: Apply the reviewer's ranked-option-1 bound-respecting clamps unchanged - when the parametric branch is used for median (cen_frac >= 0.5) or q90 (cen_frac >= 0.10), take the max with the corresponding empirical clamped-data quantile (a valid lower bound), and for c > cap clamp p_ge to be no larger than cen_frac and enforce it is nonincreasing in c - since these are one-sided corrections that only fire on provable bound violations and are exact no-ops otherwise, unlike the four prior attempts that all globally altered the fit or its tail level.
+
+RESULT 20260828-2119/3: 0.024492  reverted (best 0.024558)
 
