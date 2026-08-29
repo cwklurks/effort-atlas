@@ -64,3 +64,7 @@ RESULT 20260829-0319/15: 0.152500  reverted (best 0.147500)
 
 RESULT 20260829-0319/16: 0.132500  reverted (best 0.147500)
 
+## 20260829-0319/17 HYPOTHESIS: Hypothesis 15's Johnson-corrected Yuen test (skew estimated from the trimmed central subsample sorted_did[g:n-g], TRIM=0.10) came closest to the keep threshold (0.1525 vs required >0.1535), and hypothesis 16 showed that moving TRIM in the *decreasing* direction (0.05) hurts badly (0.1325) because it lets more outlier-driven noise back into the mean/SE/skew estimates before the explicit correction can absorb it - the untested direction is increasing TRIM instead, since hypothesis 10 already showed TRIM=0.20 hurts the *uncorrected* Yuen test (0.130), but that was measured without the Johnson correction that specifically exists to fix the very skew/outlier-driven normal-approximation bias that heavier trimming would otherwise create; testing TRIM=0.15 (interpolating between 0.10's near-miss and 0.20's known-bad uncorrected result) with the same hypothesis-15 correction structure (trimmed-subsample skew, Winsorized SE, trimmed mean) should locate a point where more outlier suppression plus the explicit correction jointly beat 0.10's near-miss.
+
+RESULT 20260829-0319/17: 0.100000  reverted (best 0.147500)
+
