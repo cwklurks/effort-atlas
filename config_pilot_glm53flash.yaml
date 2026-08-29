@@ -1,0 +1,79 @@
+# Phase-2 candidate: GLM-5.3-Flash length pilot, same 200 x 5 selection and the
+# same 32k cap as the Inkling pilot. Status: DRY-RUN / MOCK ONLY, proposed in
+# reap/28_MULTIMODEL_CANDIDATES_2026-08-29.md and inert until the 2026-08-30
+# meeting approves it. `pilot.enabled` stays false; budget fields stay null.
+#
+# Model facts (openrouter.ai, read 2026-08-29): z-ai/glm-5.3-flash, open
+# weights, 16 hosts. Reasoning is ALWAYS ON for this model with effort levels
+# low/high/max, so it has no zero-effort baseline. Listing price $0.075 in /
+# $0.25 out per Mtok; the PINNED host's actual rate must be re-pinned at
+# preflight along with the probe (reasoning.effort accepted and echoed,
+# reasoning tokens in usage, finish_reason=length at cap, pin honored).
+#
+# Route: together is pinned by default to keep the serving stack identical to
+# the Inkling pilot; z-ai is the first-party alternative. VERIFY at preflight
+# that together hosts this model at the priced rate, else re-pin to z-ai and
+# update pricing + max_price together.
+
+provider:
+  name: openrouter_pilot_glm53flash_together
+  base_url_env: OPENROUTER_BASE_URL
+  default_base_url: https://openrouter.ai/api/v1
+  api_key_env: OPENROUTER_API_KEY
+  env_file_override: true
+  model: "z-ai/glm-5.3-flash"
+  max_completion_tokens: 32000       # explicit on every request (safeguard 3)
+  timeout_s: 3600
+  max_retries: 0                     # one attempt per item, never resubmit
+  default_headers:
+    X-OpenRouter-Metadata: enabled
+  request_extra_body:
+    provider:
+      only: [together]
+      allow_fallbacks: false
+      require_parameters: true
+      max_price:                     # listing rate 2026-08-29; re-pin at preflight
+        prompt: 0.075
+        completion: 0.25
+
+effort:
+  mode: openrouter_reasoning
+  param_name: reasoning
+  levels: [low, high, max]           # native ladder; reasoning cannot be off
+  ordinal: {low: 1, high: 2, max: 3}
+
+pilot:
+  enabled: false                     # live gate; humans flip this after approval
+  label: exploratory_length_pilot_glm53flash_v1
+  selection: capabilities/selections/selection_first200_v1.json   # Chirag decision 2; keep in lockstep with the Inkling config
+  datasets: [mmlu_pro, gpqa_main, ifeval, wildbench_v2, omni_math] # WildBench: decision 3
+  wrapper_seed: 20260830
+  request_seed: 20260830
+  cap: 32000                         # identical cap across models; the cap is the treatment
+  report_caps: [4096, 8000, 14096, 16000, 20000]
+  circuit_breaker_consecutive_errors: 5
+
+pricing:
+  input_per_mtok: 0.075              # listing rate; UNVERIFIED for the pinned host
+  output_per_mtok: 0.25
+  expected_input_tokens: 900
+  expected_output_tokens: {low: 3000, high: 6000, max: 10000}   # guesses until probe
+  cap_bounds_billable_tokens: true
+
+budget:
+  # 1,000 items x 3 levels = 3,000 calls.
+  # Worst case per call at cap: ~$0.0081 -> ~$4.85/dataset, ~$24.20 total.
+  # Expected at the guesses above: ~$0.99/dataset, ~$4.94 total.
+  per_dataset_ceiling_usd: 6.00
+  total_ceiling_usd: 30.00
+  reserve_margin_usd: 10.00
+  balance_verified_usd: null         # read from the OpenRouter account page
+  balance_verified_on: null          # ISO date of that reading
+  preflight_approved_by: null        # who approved, in writing, and when
+  receipt_mismatch_stop_fraction: 0.20
+
+paths:
+  data: capabilities
+  results: results_pilot/glm53flash_together
+  reports: results_pilot/glm53flash_together/reports
+  cache: .cache_pilot/glm53flash_together
