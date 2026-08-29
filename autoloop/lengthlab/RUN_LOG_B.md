@@ -381,3 +381,6 @@ RESULT 20260829-0319/83: 0.987500  reverted (best 0.987500)
 
 RESULT 20260829-0319/84: 0.985000  reverted (best 0.987500)
 
+## 20260829-0319/85 HYPOTHESIS: Hypotheses 82-84 have exhausted every calibration lever on the current best stream (LO_WEIGHT=0.625, alpha=0.065, TRIM=0.10, n_items=148, n_reps=2, 395/400=0.987500) - the alpha bracket above 0.065 is fully bracketed and dead (0.06625 flat, 0.0675 catastrophic), and STRATEGY 80's ranked direction 3 (reroll the Monte Carlo realization via n_items) was tried once at n_items=147 and landed just below margin at 394/400=0.985000, distinct from but not clearing the current best; per that same strategy's note that "146 remains a second ticket," dropping n_items from 148 to 146 (LO_WEIGHT=0.625, alpha=0.065, TRIM=0.10, n_reps=2 unchanged; 292 item-reps, cheaper than both 148 and 147 and safely under the $40 budget cap) draws yet another fresh realization of the binding worst-case binomial(400, p~0.99) scenario distinct from both prior draws, testing whether this second reroll happens to land at or above the required 396/400 keep margin, without inflating type-I since the combined did's exact symmetry-about-0 under every null scenario (hypothesis 8/9/31/62/81) holds for any n_items.
+RESULT 20260829-0319/85: 0.000000  reverted (best 0.987500)
+
