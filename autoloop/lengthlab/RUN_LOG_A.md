@@ -136,3 +136,7 @@ RESULT 20260828-2127/20: 0.024381  reverted (best 0.024558)
 
 RESULT 20260828-2127/21: 0.026680  reverted (best 0.024558)
 
+## 20260828-2127/22 HYPOTHESIS: The reviewer's 2127/20 strategy ranked option 1 (soft inverse-variance blend of the identified median/q90 with the parametric lognormal quantile, gated by a fit-quality diagnostic d) was tried at 2127/21 and lost badly (0.026680), and the strategy notes explicitly flag option 3 - a hard gate instead of a soft blend - as the fallback "if the soft blends underdeliver," so implement that hard-gate variant exactly as specified: compute d = mean over c<=cap of |lognormal_sf(mu,sigma,c) - empirical p_ge(c)| (falling back to "uncertified" when no cap is <= the sample's cap), and when d < 0.015 emit ALL eight outputs (median, q90, every p_ge for every requested cap) from the fitted lognormal, otherwise emit exactly the untouched baseline outputs, since trusting the fit fully only when it passes per-sample validation is the mirror image of 2127/2 (which swapped to bounds when the fit FAILED validation and lost) and has never been tried, while the hard binary switch avoids the soft blend's apparent over-trust of the fit on borderline-d samples.
+
+RESULT 20260828-2127/22: 0.024571  reverted (best 0.024558)
+
