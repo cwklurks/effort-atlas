@@ -96,3 +96,7 @@ RESULT 20260828-2127/15: pending
 
 RESULT 20260828-2127/15: 0.028266  reverted (best 0.024558)
 
+## 20260828-2127/16 HYPOTHESIS: All fifteen prior attempts either replaced/re-anchored the lognormal fit's distributional assumptions or its global tail level (closed, every attempt lost badly), or layered corrective clamps/blends/interpolation-swaps/shrinkage/bagging/Cornish-Fisher on top of the fit's own output (near-ties or losses), or lightly tuned the fit's initialization and iteration budget without changing its numerical stability (tied at baseline) - but none directly regularized the EM fit's own sigma against runaway inflation, so clamp the EM-fitted sigma to [0.2, 2.5] at every iteration (a wide margin outside the 0.4-1.6 sigma range spanning every visible and holdout single/mixture regime generator), since near-total right-censoring (cen_frac -> 1, common in mix_heavy/tail_pareto at cap=8000) can push the inverse-Mills-ratio E-step correction into runaway sigma inflation that produces a small number of extreme, high-error median/q90/tail outputs, while well-converged fits on well-specified regimes never approach the clamp bounds and are therefore untouched.
+
+RESULT 20260828-2127/16: 0.024558  reverted (best 0.024558)
+
