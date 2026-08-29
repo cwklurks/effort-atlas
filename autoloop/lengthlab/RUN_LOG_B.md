@@ -43,3 +43,8 @@ RESULT 20260829-0319/10: 0.130000  reverted (best 0.147500)
 
 RESULT 20260829-0319/11: 0.117500  reverted (best 0.147500)
 
+## 20260829-0319/12 HYPOTHESIS: Hypotheses 1 and 6 showed that cutting n_reps from 2 to 1 (doubling n_items at fixed item-rep budget) hurt power under the plain mean/SD one-sided test because n_reps=1 discretizes each cell to {0,1}, adding a measurement-resolution noise term on top of the continuous between/within variance tradeoff - but that discreteness-driven penalty was measured before the Yuen trimmed test (hypothesis 9, current best) was introduced, and trimming is precisely the mechanism that should blunt the extra noise from coarse {0,1} cells (by capping the influence of the resulting extreme per-item DiD values) while still capturing the between-item variance reduction from having twice as many items; since cost is proportional to n_items*n_reps (confirmed by hypothesis 6), reallocating the current best's 145 items x 2 reps (290 item-reps) to 290 items x 1 rep at the same expected spend, now analyzed with the existing Yuen trim=0.10 one-sided test, should recover the between-item variance gain that the untrimmed test could not realize.
+
+
+RESULT 20260829-0319/12: 0.107500  reverted (best 0.147500)
+
