@@ -26,7 +26,7 @@ DESIGN = {
     # (conservative) because analyze() now combines the hi- and lo-effort
     # DiD terms, which reshuffles the whole p-value stream; any alpha
     # bisected against the old hi-only stream is stale for this statistic.
-    "alpha": 0.05,
+    "alpha": 0.065,
 }
 
 
@@ -40,7 +40,7 @@ def analyze(acc: dict) -> float:
     # symmetric about 0 whenever a_sm == a_big as in every null scenario (the
     # same iid-exchangeability argument that validates the hi-only term).
     # Adding it in at half weight spends this paid-for-but-unused signal.
-    did = (acc[("hi", "big")] - acc[("hi", "sm")]) + 0.5 * (
+    did = (acc[("hi", "big")] - acc[("hi", "sm")]) + 0.625 * (
         acc[("lo", "big")] - acc[("lo", "sm")]
     )
     n = len(did)

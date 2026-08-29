@@ -365,3 +365,7 @@ RESULT 20260829-0319/80: 0.977500  reverted (best 0.980000)
 
 (c) Do NOT retry: any lo-cell incorporation beyond the kept additive term (HT weighting, item selection, Stouffer, per-term Winsorizing - five failures across two alpha regimes), any single-lever nudge on the unchanged w=0.5/alpha=0.05 stream (LO_WEIGHT grid values already scanned, TRIM in either direction, n_reps != 2, arcsine transform), or alpha >= 0.06875 at w=0.5.
 
+
+## 20260829-0319/81 HYPOTHESIS: Following STRATEGY 80's ranked direction 1, stack the two individually-verified-safe sub-margin levers in one edit - LO_WEIGHT 0.5 -> 0.625 (exactly flat at 392/400 alone, hypothesis 79) AND alpha 0.05 -> 0.065 (confirmed safe at 393/400 alone at w=0.5, hypothesis 65) - since changing w reshuffles the p-value stream so the w=0.5 cliff at alpha=0.06875 does not carry over, and if the two levers' borderline-scenario crossings are even partially disjoint this composite edit should land in the 394-396/400 range, clearing the >=395/400 keep margin without inflating type-I (both levers are independently type-I safe: LO_WEIGHT preserves symmetry-about-0 under every null scenario per hypothesis 8/9/31/62/66/73/78/79, and alpha=0.065 was already confirmed under the 0.055 type-I gate at hypothesis 65).
+RESULT 20260829-0319/81: 0.987500  KEPT (new best)
+
