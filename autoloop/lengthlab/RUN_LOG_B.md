@@ -290,3 +290,7 @@ RESULT 20260829-0319/63: 0.980000  reverted (best 0.980000)
 
 RESULT 20260829-0319/64: 0.000000  reverted (best 0.980000)
 
+## 20260829-0319/65 HYPOTHESIS: Hypotheses 63 and 64 now tightly bracket the true alpha cliff for the reset combined statistic (did = (hi_big-hi_sm) + 0.5*(lo_big-lo_sm), TRIM=0.10, n_items=148, n_reps=2) between alpha=0.06 (confirmed safe but flat, 0.980000) and alpha=0.07 (confirmed catastrophic type-I gate failure, 0.000000) - a much narrower interval than the raw 0.05-0.07 span tested so far, exactly matching the bisect-the-bracket pattern that repeatedly localized keep-worthy or gate-safe points for the ancestor hi-only statistic (hypotheses 37/39, 43/44, 48-50) rather than guessing another coarse jump; setting DESIGN["alpha"] to the midpoint of this new bracket, 0.065 (TRIM=0.10, n_items=148, n_reps=2 unchanged), should land strictly between the confirmed-safe 0.06 and confirmed-catastrophic 0.07 points, testing whether crossing additional borderline worst-case-scenario p-values beyond the flat 0.06 probe is possible without inflating type-I, since the exact symmetry-about-0 of did under every null scenario (hypothesis 8/9/31/62) holds for any alpha below the true cliff.
+
+RESULT 20260829-0319/65: 0.982500  reverted (best 0.980000)
+
