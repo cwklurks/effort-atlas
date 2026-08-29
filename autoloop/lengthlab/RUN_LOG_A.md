@@ -82,3 +82,7 @@ RESULT 20260828-2127/11: 0.024479  reverted (best 0.024558)
 
 RESULT 20260828-2127/12: 0.024544  reverted (best 0.024558)
 
+## 20260828-2127/13 HYPOTHESIS: All twelve prior attempts this session targeted either the lognormal fit/tail-level itself (closed, four straight losses) or the reviewer's bound-clamp/blend/interpolation/shrinkage corrections layered on top of the fit's own (mu, sigma) output (six more attempts, all near-ties or losses), but none exploited a genuinely untapped piece of exact information: whenever cen_frac is in [0.10, 0.5), the median is exactly empirically identified while q90 is not, yet the current parametric q90 branch (cen_frac>=0.10) still derives q90 purely from the fit's own possibly-biased mu, so re-anchor the lognormal location parameter to the known empirical median (replace mu with log(empirical median) while keeping the fit's sigma) before extrapolating to the 90th percentile in that sub-range only, since this removes location-bias exactly where ground truth is already known without touching the fit itself, the tail branch, or the cen_frac>=0.5 median-unidentified case.
+
+RESULT 20260828-2127/13: 0.030145  reverted (best 0.024558)
+
