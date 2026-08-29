@@ -116,3 +116,7 @@ RESULT 20260829-0319/25: 0.000000  reverted (best 0.177500)
 
 RESULT 20260829-0319/26: 0.185000  KEPT (new best)
 
+## 20260829-0319/27 HYPOTHESIS: The alpha lever's breaking point is now bracketed tightly - confirmed safe at 0.072 (score 0.185, current best) and confirmed catastrophic gate failure at 0.075 (score 0.000, hypothesis 25) - and hypothesis 26's own bisection logic (halving the 0.070-0.075 gap to land safely at 0.072) worked, so applying the same cautious-bisection discipline to the new, much narrower 0.072-0.075 gap means stepping only a small fraction of the way rather than jumping to the 0.0735 midpoint, since the earlier jump from 0.070 (safe) to 0.075 (catastrophic) spanned just 0.005 and a 0.0015 jump to the midpoint is already 30% of that fatal span; moving DESIGN["alpha"] a conservative +0.001 to 0.073 (matching the scale of the smallest previously-confirmed-safe increments, e.g. 0.06->0.065) tests whether the null-rejection-count jump that caused 0.075's failure begins closer to 0.073 or closer to 0.075, spending a modest additional slice of the same unspent Monte Carlo gate slack without risking a repeat of hypothesis 25's total gate failure.
+
+RESULT 20260829-0319/27: 0.185000  reverted (best 0.185000)
+
