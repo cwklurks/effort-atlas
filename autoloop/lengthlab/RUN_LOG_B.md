@@ -400,3 +400,7 @@ RESULT 20260829-0319/88: 0.987500  reverted (best 0.987500)
 
 RESULT 20260829-0319/89: 0.987500  reverted (best 0.987500)
 
+
+## 20260829-0319/90 HYPOTHESIS: On the current best stream (LO_WEIGHT=0.625, alpha=0.065, TRIM=0.10, n_items=148, n_reps=2, 395/400=0.987500) the TRIM axis has only been probed once since the composite stack was created - hypothesis 86 confirmed TRIM=0.11 (g=floor(148*0.11)=16) is catastrophic on this exact stream, while TRIM=0.10 (g=floor(148*0.10)=14) remains the confirmed-safe current best - leaving the intermediate integer trim count g=15 (TRIM in [0.1014,0.1081), e.g. 0.105) completely untested; this is the exact bisect-the-bracket pattern between a confirmed-safe point and a confirmed-catastrophic point that produced every real gain in this log (hypotheses 43-44, 63-69, 81), rather than an outward extension past a known edge (which has failed on every other lever at this point: alpha to 0.0675 hyp82, n_items to 146 hyp85, LO_WEIGHT to 0.6875 hyp87); setting TRIM to 0.105 (LO_WEIGHT=0.625, alpha=0.065, n_items=148, n_reps=2 unchanged) tests whether this single untested intermediate trim count crosses one more borderline worst-case-scenario p-value to clear the required >=396/400 keep margin, while a one-g-count difference from the confirmed-safe g=14 is far less likely to hit whatever numerical/asymmetry mechanism made the two-count jump to g=16 catastrophic.
+RESULT 20260829-0319/90: 0.987500  reverted (best 0.987500)
+
