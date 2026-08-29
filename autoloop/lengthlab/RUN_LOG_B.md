@@ -11,3 +11,7 @@ RESULT 20260829-0319/2: 0.122500  KEPT (new best)
 
 RESULT 20260829-0319/3: 0.122500  reverted (best 0.122500)
 
+## 20260829-0319/4 HYPOTHESIS: The baseline design (130 items x 2 reps) only spends about $35.05 of the $40.00 budget, leaving roughly 12% of spend unused, so raising n_items to 145 (keeping n_reps=2, the ratio that already pairs well with the one-sided test) spends the idle budget headroom (projected mean cost ~$39.07, safely under $40) to shrink the paired t-test's standard error by ~1/sqrt(145/130) and increase worst-case power with no downside, since it changes total N rather than the items:reps ratio already probed by hypothesis 1.
+
+RESULT 20260829-0319/4: 0.137500  KEPT (new best)
+

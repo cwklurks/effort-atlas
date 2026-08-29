@@ -20,7 +20,7 @@ from __future__ import annotations
 import numpy as np
 
 DESIGN = {
-    "n_items": 130,   # item clusters (AIME-style items, GPQA rows, ...)
+    "n_items": 145,   # item clusters (AIME-style items, GPQA rows, ...)
     "n_reps": 2,      # replicate responses per item per cell
     "alpha": 0.05,
 }
