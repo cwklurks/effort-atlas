@@ -27,3 +27,7 @@ RESULT 20260829-0319/6: 0.125000  reverted (best 0.137500)
 
 RESULT 20260829-0319/7: 0.122500  reverted (best 0.137500)
 
+
+## 20260829-0319/8 HYPOTHESIS: Under every null scenario (a_sm==a_big) each item's DiD is, conditional on its own d_i, a sum of two independent differences of iid draws (hi_big-hi_sm and lo_big-lo_sm), each itself symmetric about 0, so their difference is symmetric about 0 for every d_i and hence marginally symmetric about 0 too - this exact (not just asymptotic) symmetry means a one-sided sign-flip permutation test on the same t-statistic gives exact finite-sample calibration instead of relying on the normal-CDF approximation used since hypothesis 2, which should recover any power the CLT approximation's conservatism (from n=145's finite-sample skew/discreteness) is currently leaving on the table, without inflating type-I since the sign-flip null is exact by construction.
+RESULT 20260829-0319/8: 0.115000  reverted (best 0.137500)
+
