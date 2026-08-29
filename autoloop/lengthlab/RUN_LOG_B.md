@@ -124,3 +124,7 @@ RESULT 20260829-0319/27: 0.185000  reverted (best 0.185000)
 
 RESULT 20260829-0319/28: 0.187500  reverted (best 0.185000)
 
+## 20260829-0319/29 HYPOTHESIS: Hypothesis 15's Johnson (1978) skewness-corrected Yuen test (skew from the trimmed central subsample sorted_did[g:n-g], TRIM=0.10, Winsorized SE and trimmed mean unchanged) was the best-ever analysis-side variant measured at the old alpha=0.05 baseline (0.1525 vs plain Yuen's 0.1475, a +0.005/~3.4% relative gain), but it was only ever stacked on top of alpha=0.065 (hypothesis 23, which reverted against the since-superseded 0.1775 best) and never retested against the current best design (145 items x 2 reps, alpha=0.072, hypothesis 26) after the alpha lever's subsequent fine bisection (0.073 flat, 0.074 insufficient, 0.075 catastrophic) - since the Johnson correction changes the actual per-scenario p-values themselves (not just the threshold they're compared against), it can unlock rejection-count crossings that a pure alpha nudge cannot reach even where alpha alone went flat (hypothesis 27's 0.072->0.073 no-op), so stacking this same correction on the current best's alpha=0.072 should compound with the banked alpha gains and clear the 0.006 keep margin without inflating type-I, since the correction's expectation remains exactly zero under every null scenario regardless of what alpha it is thresholded against (trimmed-subsample skewness of an exactly-symmetric-about-0 distribution is 0 in expectation, per hypothesis 8/9/15).
+
+RESULT 20260829-0319/29: 0.185000  reverted (best 0.185000)
+
