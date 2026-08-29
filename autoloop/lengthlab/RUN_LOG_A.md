@@ -12,3 +12,7 @@ RESULT 20260828-2107/2: 0.026344  reverted (best 0.024558)
 
 RESULT 20260828-2119/1: 0.041739  reverted (best 0.024558)
 
+## 20260828-2119/2 HYPOTHESIS: Leave the Tobit-lognormal fit and the beyond-cap p_ge extrapolation untouched (three straight attempts to change the parametric tail model or its anchoring all made things worse), and instead replace the hard cen_frac threshold switches for median (0.5) and q90 (0.10) with a smoothstep blend between the empirical cap-substituted estimate and the parametric estimate over a narrow band around each threshold, since Monte Carlo noise in cen_frac at n=500 likely pushes borderline samples back and forth across the hard cutoff, adding avoidable variance right at the identifiability boundary that a smooth handoff should reduce without touching the parts of the estimator three prior attempts already showed are fragile.
+
+RESULT 20260828-2119/2: 0.024703  reverted (best 0.024558)
+
