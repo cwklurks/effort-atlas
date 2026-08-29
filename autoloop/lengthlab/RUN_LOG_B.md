@@ -474,3 +474,7 @@ RESULT 20260829-0319/104: 0.952500  reverted (best 0.987500)
 
 RESULT 20260829-0319/105: 0.982500  reverted (best 0.987500)
 
+## 20260829-0319/106 HYPOTHESIS: Following the same structural-change-then-bisect-alpha-upward pattern that produced the log's three largest keeps (hypotheses 31, 62, 81), hypothesis 105's Wilcoxon signed-rank test on the current combined did = hi_diff + 0.625*lo_diff (drop exact-zero ties, tie-corrected ranks, continuity-corrected normal approximation) was only ever tested at the conservative alpha=0.05 anchor (0.982500 = 393/400, the closest of any post-Yuen structural alternative to the current 395/400 best, versus pooling's 384/400 and the sign test's 380-381/400), and its alpha has never been bisected upward on this specific stream; raising DESIGN["alpha"] from 0.05 to 0.065 (matching the value independently confirmed type-I-safe under the 27/400 gate on the closely related additive Yuen stream, LO_WEIGHT=0.625, n_items=148, n_reps=2 unchanged, TRIM removed as no longer applicable) should spend the same kind of unspent calibration headroom that the alpha-bisection chain (62->65->67->81) exploited on the Yuen stream, pushing this fresh, tie-corrected-but-otherwise-distribution-free rank stream past the required >=398/400 keep margin without inflating type-I, since the signed-rank statistic's null distribution depends only on did's exact symmetry-about-0 under every null scenario (established since hypothesis 8/9/31/62), which holds regardless of alpha.
+
+RESULT 20260829-0319/106: 0.000000  reverted (best 0.987500)
+
