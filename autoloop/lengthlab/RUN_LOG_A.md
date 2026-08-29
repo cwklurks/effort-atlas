@@ -170,3 +170,7 @@ RESULT 20260828-2127/29: pending
 
 RESULT 20260828-2127/29: 0.024948  reverted (best 0.024558)
 
+## 20260828-2127/30 HYPOTHESIS: Both reviewer strategies (fit/tail-level replacement, and diagnostic-gated or interpolation/smoothing corrections on the identified median/q90/p_ge branches) are exhausted after 29 attempts spanning model-based shrinkage, blending, and resampling, but every prior correction to the identified p_ge(c<=cap) branch either left the raw binomial proportion untouched or pulled it toward a model-dependent target (the lognormal fit's SF, via flat or James-Stein pseudo-counts, both of which underperformed since the target itself carries regime-dependent bias) - so apply the classical, distribution-free Jeffreys/Krichevsky-Trofimov add-1/2 correction (p = (count + 0.5) / (n + 1)) to the exactly-identified p_ge(c<=cap) proportions only, a minimax-optimal small-sample point estimator for a binomial proportion under squared error that pulls only slightly toward 0.5 with no dependence on the (possibly misspecified) lognormal fit, leaving the median, q90, the fit itself, and every unidentified/tail branch completely untouched, since this is mechanistically distinct from every model-anchored shrinkage attempt this session (no external distributional assumption, uniformly applicable regardless of regime, and bounded to a tiny effect size given n=500).
+
+RESULT 20260828-2127/30: 0.024594  reverted (best 0.024558)
+
