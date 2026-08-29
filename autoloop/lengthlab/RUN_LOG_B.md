@@ -95,3 +95,7 @@ RESULT 20260829-0319/20: 0.170000  KEPT (new best)
 
 RESULT 20260829-0319/21: 0.177500  KEPT (new best)
 
+## 20260829-0319/22 HYPOTHESIS: Following the reviewer strategy's ranked direction 3 (a distinct, unspent lever orthogonal to the type-I gate slack already spent by hypotheses 20-21's alpha increases), the current best design (145 items x 2 reps, alpha=0.065) still only spends ~$39.07 of the $40.00 budget per hypothesis 4's cost estimate (~$0.1347/item-rep from 290 item-reps), so raising n_items from 145 to 148 (296 item-reps, projected mean cost ~$39.87, safely under $40) should shrink the paired Yuen test's standard error by a further ~1% (1/sqrt(148/145)) and increase worst-case power on every scenario without touching alpha or the analyze() test, since it spends idle dollar headroom rather than the Monte Carlo type-I slack the last two kept steps already drew down.
+
+RESULT 20260829-0319/22: 0.175000  reverted (best 0.177500)
+
