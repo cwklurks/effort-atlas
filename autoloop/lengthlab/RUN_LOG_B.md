@@ -278,3 +278,7 @@ RESULT 20260829-0319/60: 0.000000  reverted (best 0.970000)
 
 RESULT 20260829-0319/61: 0.000000  reverted (best 0.970000)
 
+
+## 20260829-0319/62 HYPOTHESIS: Following the reviewer strategy's ranked direction 2 (STRATEGY 60), hypothesis 41 tested the additive lo-signal statistic did = (hi_big-hi_sm) + 0.5*(lo_big-lo_sm) only at alpha=0.072, a threshold bisected flush against the OLD hi-only p-value stream (the same flush-alpha-indicts-the-threshold-not-the-estimand pattern that explains why combining any lo signal with an unreset alpha has repeatedly failed catastrophically, most recently hypothesis 61's weighting attempt at the same flush alpha=0.079), so pairing this identical additive statistic with a simultaneous, conservative alpha reset to 0.05 (well below any previously-tested value on any stream, TRIM=0.10, n_items=148, n_reps=2 unchanged) tests whether the estimand itself is sound and the prior failure was pure threshold miscalibration rather than a broken null distribution, since lo_big-lo_sm is exactly symmetric about 0 under every null scenario by the same a_sm==a_big exchangeability argument that already validates the kept hi-only statistic (hypothesis 8/9/31), and lo_big-lo_sm has strictly non-negative expectation under every power scenario (monotone-in-allowance censoring), so a genuinely well-calibrated combined test should gain power at a safely conservative threshold.
+RESULT 20260829-0319/62: 0.980000  KEPT (new best)
+

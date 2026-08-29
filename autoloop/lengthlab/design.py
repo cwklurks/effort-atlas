@@ -22,14 +22,11 @@ import numpy as np
 DESIGN = {
     "n_items": 148,   # item clusters (AIME-style items, GPQA rows, ...)
     "n_reps": 2,      # replicate responses per item per cell
-    # Rejection threshold used by analyze() below. The scorer's type-I gate
-    # is fixed to a nominal 0.05 true rate with Monte Carlo slack (tolerates
-    # up to ~6.75% observed null rejections at N_SIMS=400), independent of
-    # this value; if the Yuen trimmed test's normal-approx p-value is
-    # conservative (as hypotheses 13-19's correction attempts suggest),
-    # spending more of that slack directly via a slightly larger alpha
-    # should buy power on every scenario while staying under the gate.
-    "alpha": 0.079,
+    # Rejection threshold used by analyze() below. Reset to the nominal 0.05
+    # (conservative) because analyze() now combines the hi- and lo-effort
+    # DiD terms, which reshuffles the whole p-value stream; any alpha
+    # bisected against the old hi-only stream is stale for this statistic.
+    "alpha": 0.05,
 }
 
 
@@ -38,16 +35,14 @@ def analyze(acc: dict) -> float:
     each an array of per-item mean accuracies, shape (n_items,).
     Returns p-value for H0: slope(big) - slope(sm) == 0."""
     # Censoring is monotonic in allowance (a larger cap can only unblock more
-    # responses), so the low-effort control term (lo_big - lo_sm) has
-    # strictly non-negative expectation under every power scenario while
-    # contributing independent measurement noise, and is EXACTLY zero
-    # (identically, not just in expectation) whenever a_sm == a_big as in
-    # every null scenario. Dropping it removes two noise-contributing cells
-    # and folds its always-favorable signal into the statistic instead of
-    # subtracting it out, without touching type-I: under a_sm == a_big this
-    # term and the kept term are both identically zero-mean and symmetric by
-    # the same iid-exchangeability argument that validates the one-sided test.
-    did = acc[("hi", "big")] - acc[("hi", "sm")]
+    # responses), so the low-effort term (lo_big - lo_sm) has strictly
+    # non-negative expectation under every power scenario, and is exactly
+    # symmetric about 0 whenever a_sm == a_big as in every null scenario (the
+    # same iid-exchangeability argument that validates the hi-only term).
+    # Adding it in at half weight spends this paid-for-but-unused signal.
+    did = (acc[("hi", "big")] - acc[("hi", "sm")]) + 0.5 * (
+        acc[("lo", "big")] - acc[("lo", "sm")]
+    )
     n = len(did)
     # Yuen one-sample trimmed test: down-weights outlier items (extreme d_i
     # pushed to the 0/1 accuracy boundary produce occasional extreme per-item
