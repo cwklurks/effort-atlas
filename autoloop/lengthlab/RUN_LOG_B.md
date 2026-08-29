@@ -48,3 +48,7 @@ RESULT 20260829-0319/11: 0.117500  reverted (best 0.147500)
 
 RESULT 20260829-0319/12: 0.107500  reverted (best 0.147500)
 
+## 20260829-0319/13 HYPOTHESIS: The exact sign-flip symmetry of per-item DiD under every null scenario (established in hypothesis 8) guarantees the population skewness of DiD is exactly 0 under the null, whereas power scenarios - especially the heavy-tailed tail_pareto regime - leave residual skewness in the post-trim Winsorized data that biases the current Yuen one-sided z-test's normal approximation (a known finite-sample inaccuracy the trimming alone does not fix), so applying a Johnson (1978) skewness-corrected adjustment t_J = t + skew*(2t^2+1)/(6*sqrt(h)) (skew and effective size h=n-2g computed from the existing Winsorized array) before taking the normal-CDF p-value should correct that bias and increase worst-case power, since the correction has zero expectation under every null scenario (true skew=0) but a nonzero, accuracy-improving expectation under skewed power scenarios.
+
+RESULT 20260829-0319/13: 0.150000  reverted (best 0.147500)
+
