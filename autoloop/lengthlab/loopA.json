@@ -1,0 +1,40 @@
+{
+  "name": "lengthlab-recovery",
+  "description": "Censoring-aware length estimator: minimize recovery error of median/q90/P(length>=c) vs generator truth on visible regimes.",
+  "metric": {
+    "cmd": "bash autoloop/lengthlab/metric_recovery.sh",
+    "direction": "min",
+    "min_delta": 0.003,
+    "min_delta_basis": "2x sd of 5 baseline runs (mean 0.026611, sd 0.001470, 2026-08-28)"
+  },
+  "editable": [
+    "autoloop/lengthlab/estimators.py"
+  ],
+  "protected": [
+    "autoloop/lengthlab/generator.py",
+    "autoloop/lengthlab/score_recovery.py",
+    "autoloop/lengthlab/score_power.py",
+    "autoloop/lengthlab/final_eval.py",
+    "autoloop/lengthlab/metric_recovery.sh",
+    "autoloop/lengthlab/metric_power.sh",
+    "autoloop/lengthlab/loopA.json",
+    "autoloop/lengthlab/loopB.json",
+    "PREREGISTRATION.md",
+    "PREREGISTRATION_AMENDMENT_2026-07-22.md",
+    "confirmatory_artifacts/",
+    "observational/pipeline.py",
+    "src/effort_atlas/",
+    "capabilities/",
+    "tests/",
+    "reap/",
+    "docs/",
+    "config.yaml",
+    "config_pilot_inkling.yaml"
+  ],
+  "rules": [
+    "No network. No provider calls. Never import effort_atlas.client.",
+    "One hypothesis per iteration, written to the run log before scoring.",
+    "AGENTS.md safeguards 1, 2, 5 apply verbatim; a protected path is read-only.",
+    "Final numbers come from final_eval.py (human-run, holdout seed), never from this metric."
+  ]
+}

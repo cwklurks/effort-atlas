@@ -1,0 +1,42 @@
+{
+  "name": "lengthlab-power",
+  "description": "2x2 design search: maximize worst-case detection power at fixed budget, hard-gated on type-I calibration.",
+  "metric": {
+    "cmd": "bash autoloop/lengthlab/metric_power.sh",
+    "direction": "max",
+    "min_delta": 0.006,
+    "min_delta_basis": "2x sd of 5 baseline runs (mean 0.074500, sd 0.002915, 2026-08-28)"
+  },
+  "editable": [
+    "autoloop/lengthlab/design.py"
+  ],
+  "protected": [
+    "autoloop/lengthlab/generator.py",
+    "autoloop/lengthlab/score_recovery.py",
+    "autoloop/lengthlab/score_power.py",
+    "autoloop/lengthlab/final_eval.py",
+    "autoloop/lengthlab/estimators.py",
+    "autoloop/lengthlab/metric_recovery.sh",
+    "autoloop/lengthlab/metric_power.sh",
+    "autoloop/lengthlab/loopA.json",
+    "autoloop/lengthlab/loopB.json",
+    "PREREGISTRATION.md",
+    "PREREGISTRATION_AMENDMENT_2026-07-22.md",
+    "confirmatory_artifacts/",
+    "observational/pipeline.py",
+    "src/effort_atlas/",
+    "capabilities/",
+    "tests/",
+    "reap/",
+    "docs/",
+    "config.yaml",
+    "config_pilot_inkling.yaml"
+  ],
+  "rules": [
+    "No network. No provider calls. Never import effort_atlas.client.",
+    "A score of 0.0 means a hard gate failed (type-I calibration or budget); read score_power.py --json to see which before hypothesizing.",
+    "One hypothesis per iteration, written to the run log before scoring.",
+    "AGENTS.md safeguards 1, 2, 5 apply verbatim; a protected path is read-only.",
+    "Final numbers come from final_eval.py (human-run, holdout seed), never from this metric."
+  ]
+}
