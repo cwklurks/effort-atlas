@@ -78,3 +78,7 @@ RESULT 20260828-2127/11: pending
 
 RESULT 20260828-2127/11: 0.024479  reverted (best 0.024558)
 
+## 20260828-2127/12 HYPOTHESIS: Add a continuous, per-sample soft blend (weight set by a model-misspecification diagnostic: the mean absolute gap between the fitted lognormal's survival function and the exactly-identified empirical p_ge at caps <= cap) between the parametric median/q90/p_ge-beyond-cap outputs and their previously-validated bound-respecting values (median/q90 >= cap when unidentified, p_ge beyond cap <= cen_frac and nonincreasing), since the two hard-switch endpoints of this idea have already been tried separately (the always-on bound clamp near-tied at 0.024492 in 2119/3, and a hard diagnostic-triggered heuristic swap lost badly at 0.034380 in 2127/2), suggesting the right answer may be a continuous point between full trust in the fit and full trust in the bound rather than either extreme.
+
+RESULT 20260828-2127/12: 0.024544  reverted (best 0.024558)
+
