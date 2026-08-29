@@ -60,3 +60,7 @@ RESULT 20260829-0319/14: 0.145000  reverted (best 0.147500)
 
 RESULT 20260829-0319/15: 0.152500  reverted (best 0.147500)
 
+## 20260829-0319/16 HYPOTHESIS: Hypothesis 15's Johnson correction (skew estimated from the trimmed central subsample sorted_did[g:n-g], TRIM=0.10) came closest to the keep threshold (0.1525 vs required >0.1535), and the pattern across 13/14/15 shows the correction's benefit grows as the skew estimate is drawn from a cleaner, less-distorted subset of the data - but TRIM=0.10 still discards 10% of items per tail before the skewness/mean/SE are ever computed, destroying real between-item signal that a lighter trim would keep, so shrinking TRIM to 0.05 (letting the explicit Johnson skewness correction, not blunt trimming, absorb residual outlier-driven asymmetry from the heavy-tailed tail_pareto scenario) while keeping the same trimmed-subsample skewness estimator and Winsorized SE from hypothesis 15 should retain more genuine signal and push worst-case power past the keep threshold without inflating type-I, since a symmetric-about-0 trim/subsample argument (hypothesis 8/9) holds for any fixed trim fraction.
+
+RESULT 20260829-0319/16: 0.132500  reverted (best 0.147500)
+
