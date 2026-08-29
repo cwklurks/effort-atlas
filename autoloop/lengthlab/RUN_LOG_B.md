@@ -247,3 +247,7 @@ RESULT 20260829-0319/55: 0.000000  reverted (best 0.970000)
 
 RESULT 20260829-0319/56: 0.970000  reverted (best 0.970000)
 
+## 20260829-0319/57 HYPOTHESIS: The TRIM sweep on the current n_items=148, alpha=0.079 two-cell statistic (did=hi_big-hi_sm) has only ever been probed up to TRIM=0.14 (g=floor(148*0.14)=20), where it plateaus at 389/400 across g=15-20 (TRIM 0.105-0.14, hypotheses 47/51/56 all 0.972500), while every catastrophic type-I gate failure ever observed on this statistic came from either alpha>=0.080 or reincorporating the lo-effort cells - never from a large TRIM value alone (TRIM=0 was the sole trimming-side catastrophe, hypothesis 33; every TRIM>0 tested, 0.08 through 0.14, passed the gate cleanly) - so no cliff has ever been located on the high-TRIM side and the 0.105-0.14 plateau is the only evidence available, which is consistent with crossings being sparse (only one crossing, 388->389, was found across the entire 0.08-0.14 range) rather than the lever being fully exhausted; pushing TRIM to 0.20 (g=floor(148*0.20)=29, alpha=0.079, n_items=148, n_reps=2 unchanged) tests a substantially wider, still class-safe step past the plateau to search for an additional borderline-p-value crossing in the worst-case scenario, without inflating type-I since the exact symmetry-about-0 of did under every null scenario (hypothesis 8/9/31) holds for any fixed trim fraction and no gate failure has ever been observed from raising TRIM alone.
+
+RESULT 20260829-0319/57: 0.972500  reverted (best 0.970000)
+
