@@ -294,3 +294,7 @@ RESULT 20260829-0319/64: 0.000000  reverted (best 0.980000)
 
 RESULT 20260829-0319/65: 0.982500  reverted (best 0.980000)
 
+## 20260829-0319/66 HYPOTHESIS: Hypothesis 62 reset alpha to a conservative 0.05 when reincorporating the lo-effort term into did = (hi_big-hi_sm) + 0.5*(lo_big-lo_sm) (new best, 0.980000), and hypotheses 63-65 have since shown this alpha=0.05 baseline has real, if fine-grained, unspent gate slack (0.06 flat, 0.065 a genuine but sub-margin gain at 0.9825, 0.07 catastrophic) - but every one of 63-65 tuned the alpha threshold while leaving the LO_WEIGHT coefficient fixed at the arbitrary value 0.5 first chosen in hypothesis 41 purely to "cap the added noise", never itself bisected or tuned as an independent lever; since lo_big-lo_sm is exactly symmetric about 0 under every null scenario regardless of what fixed scalar it is multiplied by (the same exchangeability argument that already validates the statistic at weight 0.5, hypothesis 8/9/31/62), and has strictly non-negative expectation under every power scenario (monotone-in-allowance censoring), raising LO_WEIGHT from 0.5 to 0.75 while holding alpha at the independently-confirmed-safe conservative 0.05 (TRIM=0.10, n_items=148, n_reps=2 unchanged) should raise the statistic's expected value under every power scenario without touching the null p-value calibration lever at all, testing a genuinely fresh, never-tuned axis distinct from every alpha/TRIM/n_items probe already exhausted in hypotheses 43-65.
+
+RESULT 20260829-0319/66: 0.980000  reverted (best 0.980000)
+
