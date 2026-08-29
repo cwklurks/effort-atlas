@@ -254,3 +254,7 @@ RESULT 20260828-2127/45: 0.024717  reverted (best 0.024558)
 
 RESULT 20260828-2127/46: 0.033546  reverted (best 0.024558)
 
+## 20260828-2127/47 HYPOTHESIS: 2127/28's unbounded multiplicative continuity rescale of the beyond-cap tail (r = cen_frac / lognormal_sf(cap), applied to every c>cap) was the mildest-losing "big lever" attempt this whole session (0.024751, delta +0.000193, versus +0.004 to +0.11 losses for every mixture/localized-fit/ensemble/flat-extrapolation alternative), which suggests the mechanism is directionally sound but a small number of samples where lognormal_sf(cap) is tiny (heavy censoring on misspecified regimes) produce an extreme, destabilizing rescale factor r that overcorrects the tail - a failure mode never isolated since no prior attempt bounded r itself. So re-implement the same continuity rescale but clamp the multiplicative factor r to [0.5, 2.0] before applying it (falling back to r=1, i.e. the untouched lognormal tail, whenever lognormal_sf(cap) < 1e-6), and additionally apply the already-validated near-tied safety rails from 2119/3 on top (clamp every c>cap value to <= cen_frac, and force the c>cap sequence nonincreasing in c), since bounding the correction's magnitude while keeping its boundary-continuity direction should recover most of 2127/28's near-miss without the extreme-r cases that likely drove its small loss, and every other branch (fit, median, q90, identified p_ge) stays completely untouched.
+
+RESULT 20260828-2127/47: 0.024751  reverted (best 0.024558)
+
