@@ -72,3 +72,9 @@ RESULT 20260828-2127/9: 0.024679  reverted (best 0.024558)
 
 RESULT 20260828-2127/10: 0.024865  reverted (best 0.024558)
 
+## 20260828-2127/11 HYPOTHESIS: Ten single-factor attempts this session (fit replacement, tail re-anchoring, quantile-matched fit, threshold smoothing, all three reviewer-ranked tail/branch options, quantile-interpolation swap, Harrell-Davis, p_ge shrinkage x2, bootstrap bagging) have each individually lost or near-tied, but the two provably one-sided, zero-cost-when-inactive corrections from this family - the reviewer's ranked-option-1 bound clamps (median/q90 lower-bounded by the empirical clamped-data quantile when unidentified, p_ge beyond cap upper-bounded by cen_frac and forced nonincreasing) and the median_unbiased quantile interpolation for the identified empirical branches - were each individually near-tied and, when stacked together at 2127/4, produced this session's best score (0.024479); since no fresh idea outside that family has survived contact with this scorer, re-implement that same validated combination carefully and completely from scratch (including applying median_unbiased interpolation consistently to the clamp's own empirical-quantile comparisons, which the original piecemeal attempts may not have done), on the chance that a more complete, consistent implementation closes more of the remaining gap than the earlier partial versions did.
+
+RESULT 20260828-2127/11: pending
+
+RESULT 20260828-2127/11: 0.024479  reverted (best 0.024558)
+
