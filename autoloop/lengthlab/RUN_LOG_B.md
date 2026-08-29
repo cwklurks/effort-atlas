@@ -255,3 +255,7 @@ RESULT 20260829-0319/57: 0.972500  reverted (best 0.970000)
 
 RESULT 20260829-0319/58: 0.000000  reverted (best 0.970000)
 
+
+## 20260829-0319/59 HYPOTHESIS: Hypothesis 58 showed the high-TRIM plateau (389/400 flat across g=16-29, TRIM 0.11-0.20) breaks catastrophically at g=37 (TRIM=0.25, total type-I gate failure), tightly bracketing the true cliff between g=29 (confirmed safe, 389/400) and g=37 (confirmed catastrophic) for the first time on this lever, exactly mirroring the pattern where bisecting a tightly-bracketed safe/catastrophic interval (rather than a coarse jump) is what has repeatedly located keep-worthy or gate-safe points elsewhere in this log (alpha hypotheses 43/44, 48-50); bisecting this new TRIM bracket at its midpoint, raising TRIM from 0.20 to 0.225 (g=floor(148*0.225)=33, alpha=0.079, n_items=148, n_reps=2 unchanged), should land safely below the confirmed-catastrophic g=37 while testing whether a second power-crossing exists between the mapped g=29 plateau and the cliff, without inflating type-I since the exact symmetry-about-0 of did under every null scenario (hypothesis 8/9/31) holds for any fixed trim fraction below the cliff.
+RESULT 20260829-0319/59: 0.000000  reverted (best 0.970000)
+
