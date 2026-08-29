@@ -120,3 +120,7 @@ RESULT 20260829-0319/26: 0.185000  KEPT (new best)
 
 RESULT 20260829-0319/27: 0.185000  reverted (best 0.185000)
 
+## 20260829-0319/28 HYPOTHESIS: Hypothesis 27's conservative +0.001 step (alpha 0.072->0.073) produced an identical score (0.185000) to 0.072, which under the scorer's fully deterministic fixed-seed simulation (base_seed is a constant, so the same 400 draws per scenario are reused every run) means no simulated p-value in the binding worst-case scenario happened to fall in the (0.072, 0.073) interval - not that the alpha lever is exhausted - so the true next crossing point could lie anywhere between 0.073 (confirmed flat/safe) and 0.075 (confirmed catastrophic type-I gate failure, hypothesis 25), and bisecting that narrower 0.073-0.075 gap (as hypothesis 26's successful 0.070-0.075 bisection did) by stepping to the midpoint DESIGN["alpha"] = 0.074 should land far enough past 0.073 to cross at least one more worst-case-scenario p-value (increasing power) while staying strictly below the known-catastrophic 0.075 boundary, avoiding a repeat of hypothesis 25's gate failure.
+
+RESULT 20260829-0319/28: 0.187500  reverted (best 0.185000)
+
