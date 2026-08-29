@@ -37,7 +37,17 @@ def analyze(acc: dict) -> float:
     """acc keys: (effort, allowance) in {("lo","sm"),("hi","sm"),("lo","big"),("hi","big")}
     each an array of per-item mean accuracies, shape (n_items,).
     Returns p-value for H0: slope(big) - slope(sm) == 0."""
-    did = (acc[("hi", "big")] - acc[("lo", "big")]) - (acc[("hi", "sm")] - acc[("lo", "sm")])
+    # Censoring is monotonic in allowance (a larger cap can only unblock more
+    # responses), so the low-effort control term (lo_big - lo_sm) has
+    # strictly non-negative expectation under every power scenario while
+    # contributing independent measurement noise, and is EXACTLY zero
+    # (identically, not just in expectation) whenever a_sm == a_big as in
+    # every null scenario. Dropping it removes two noise-contributing cells
+    # and folds its always-favorable signal into the statistic instead of
+    # subtracting it out, without touching type-I: under a_sm == a_big this
+    # term and the kept term are both identically zero-mean and symmetric by
+    # the same iid-exchangeability argument that validates the one-sided test.
+    did = acc[("hi", "big")] - acc[("hi", "sm")]
     n = len(did)
     # Yuen one-sample trimmed test: down-weights outlier items (extreme d_i
     # pushed to the 0/1 accuracy boundary produce occasional extreme per-item
