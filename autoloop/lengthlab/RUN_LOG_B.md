@@ -160,3 +160,7 @@ RESULT 20260829-0319/36: 0.000000  reverted (best 0.957500)
 
 RESULT 20260829-0319/37: 0.960000  reverted (best 0.957500)
 
+## 20260829-0319/38 HYPOTHESIS: Hypothesis 37 bisected the new two-cell statistic's alpha cliff to the 0.078(confirmed safe, 0.960000)-0.085(confirmed catastrophic gate failure, 0.000000) band, but 0.078 itself only gained +0.0025 over the current best (0.9575), short of the >0.006 keep margin (needs the worst-case scenario's rejection count to climb by at least 3 more out of 400, since the score is quantized in 1/400 steps), and the old four-cell statistic's analogous cliff-bisection episodes (hypotheses 26-30) showed the true cliff can sit extremely close to the last-confirmed-safe point (0.074 safe vs 0.075 catastrophic, just 0.001 apart) rather than at the geometric midpoint of a wide bracket - so rather than repeating a full-interval bisection to 0.0815 (which risks landing on or past an equally narrow cliff just above 0.078), stepping DESIGN["alpha"] cautiously from 0.078 to 0.080 (leaving TRIM=0.10, n_items=145, n_reps=2 unchanged) tests a point roughly 2x hypothesis 37's step size past the last confirmed-safe value while still leaving a comfortable margin below the confirmed-catastrophic 0.085, aiming to cross enough additional borderline worst-case-scenario p-values to clear the keep margin without repeating hypothesis 36's total gate failure.
+
+RESULT 20260829-0319/38: 0.000000  reverted (best 0.957500)
+
