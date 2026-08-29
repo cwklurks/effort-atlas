@@ -56,3 +56,7 @@ RESULT 20260829-0319/13: 0.150000  reverted (best 0.147500)
 
 RESULT 20260829-0319/14: 0.145000  reverted (best 0.147500)
 
+## 20260829-0319/15 HYPOTHESIS: Johnson's skewness correction beat the plain Yuen test when the skewness input came from the Winsorized array (hypothesis 13, closest to date at 0.150) but did worse when computed from the raw untrimmed array (hypothesis 14, 0.145), showing the correction wants outlier influence suppressed - but Winsorizing itself creates artificial ties at the clip boundary that distort the third central moment used for the skew estimate, so computing skewness instead from the actual trimmed central subsample sorted_did[g:n-g] (the same slice already used for trimmed_mean, with outliers excluded rather than clipped-and-kept) should give a cleaner residual-skewness estimate free of clip-boundary artifacts, while the Winsorized SE keeps scaling the test statistic exactly as before, further increasing worst-case power without inflating type-I since this trimmed subsample remains exactly symmetric about 0 in expectation under every null scenario (per hypothesis 8/9's symmetric-trim-of-symmetric-distribution argument).
+
+RESULT 20260829-0319/15: 0.152500  reverted (best 0.147500)
+
