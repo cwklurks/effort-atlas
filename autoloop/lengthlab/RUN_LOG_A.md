@@ -68,3 +68,7 @@ RESULT 20260828-2127/8: 0.024558  reverted (best 0.024558)
 
 RESULT 20260828-2127/9: 0.024679  reverted (best 0.024558)
 
+## 20260828-2127/10 HYPOTHESIS: Apply bootstrap bagging (resample-and-refit averaging, B=9, using the existing unmodified _lognormal_mle_censored fit as a black box) to the lognormal quantile output used only for the unidentified median (cen_frac>=0.5) and q90 (cen_frac>=0.10) parametric branches, leaving the fitting procedure itself, the p_ge tail extrapolation, and the identified empirical branches completely untouched, since this is a genuinely new variance-reduction family (ensemble averaging over resampled refits) distinct from all nine prior bias-correction/clamp/interpolation/shrinkage attempts this session, and small-sample censored-MLE quantile estimates under heavy censoring are exactly the kind of unstable estimator that bagging is known to stabilize without altering the fitting math the reviewer flagged as load-bearing.
+
+RESULT 20260828-2127/10: 0.024865  reverted (best 0.024558)
+
