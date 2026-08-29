@@ -1,0 +1,68 @@
+# Exploratory Inkling length pilot: 200 items x 5 HELM-Capabilities datasets.
+# Status: DRY-RUN / MOCK ONLY. `pilot.enabled` stays false until the preflight
+# document (reap/25_INKLING_PILOT_PREFLIGHT.md) is approved in writing and the
+# budget fields below are filled from the live account page.
+#
+# Route: OpenRouter -> Together, the route already cap-semantics-audited in
+# July (config_cap_inkling.yaml). Tinker is not wired here: safeguard 8
+# (one-submission proof) is unresolved. Chirag decision 1.
+
+provider:
+  name: openrouter_pilot_inkling_together
+  base_url_env: OPENROUTER_BASE_URL
+  default_base_url: https://openrouter.ai/api/v1
+  api_key_env: OPENROUTER_API_KEY
+  env_file_override: true
+  model: "thinkingmachines/inkling"
+  max_completion_tokens: 32000       # explicit on every request (safeguard 3)
+  timeout_s: 3600
+  max_retries: 0                     # one attempt per item, never resubmit
+  default_headers:
+    X-OpenRouter-Metadata: enabled
+  request_extra_body:
+    provider:
+      only: [together]
+      allow_fallbacks: false
+      require_parameters: true
+      max_price:                     # July figures; re-pin in the preflight doc
+        prompt: 1.00
+        completion: 4.05
+
+effort:
+  mode: openrouter_reasoning
+  param_name: reasoning
+  levels: [medium]                   # one level; a second is Chirag decision 4
+  ordinal: {medium: 1}
+
+pilot:
+  enabled: false                     # live gate; humans flip this after approval
+  label: exploratory_length_pilot_v1
+  selection: capabilities/selections/selection_first200_v1.json   # Chirag decision 2
+  datasets: [mmlu_pro, gpqa_main, ifeval, wildbench_v2, omni_math] # WildBench: decision 3
+  wrapper_seed: 20260830
+  request_seed: 20260830
+  cap: 32000
+  report_caps: [4096, 8000, 14096, 16000, 20000]   # P(length >= c) per dataset
+  circuit_breaker_consecutive_errors: 5
+
+pricing:
+  input_per_mtok: 1.00               # UNVERIFIED since July; re-pin with date
+  output_per_mtok: 4.05
+  expected_input_tokens: 900
+  expected_output_tokens: {medium: 5000}
+  cap_bounds_billable_tokens: true
+
+budget:
+  per_dataset_ceiling_usd: 30.00
+  total_ceiling_usd: 60.00           # placeholder; set below (balance - reserve)
+  reserve_margin_usd: 10.00
+  balance_verified_usd: null         # read from the OpenRouter account page
+  balance_verified_on: null          # ISO date of that reading
+  preflight_approved_by: null        # who approved, in writing, and when
+  receipt_mismatch_stop_fraction: 0.20
+
+paths:
+  data: capabilities
+  results: results_pilot/inkling_together
+  reports: results_pilot/inkling_together/reports
+  cache: .cache_pilot/inkling_together

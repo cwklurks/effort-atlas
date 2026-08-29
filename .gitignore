@@ -57,3 +57,8 @@ capabilities/mmlu_pro.jsonl
 capabilities/ifeval.jsonl
 capabilities/wildbench_v2.jsonl
 capabilities/omni_math.jsonl
+
+# Exploratory Inkling length pilot: response text and model-call caches never
+# enter git (GPQA-safe by construction; ledgers and manifests are content-free)
+results_pilot/
+.cache_pilot/

@@ -87,8 +87,14 @@ class InklingClient:
         item_id: str,
         max_tokens: int | None = None,
         seed: int | None = None,
+        messages: list[dict] | None = None,
     ) -> Completion:
-        key = self._cache_key(prompt, effort, max_tokens=max_tokens, seed=seed)
+        """`messages` (optional) sends a multi-turn chat history instead of a
+        single user turn; `prompt` is then only used by mock mode and for the
+        cache key alongside the canonical messages."""
+        key = self._cache_key(
+            prompt, effort, max_tokens=max_tokens, seed=seed, messages=messages
+        )
         cached = self._cache_get(key)
         if cached is not None:
             return Completion(**cached, cached=True)
@@ -101,6 +107,7 @@ class InklingClient:
                 effort,
                 max_tokens=max_tokens,
                 seed=seed,
+                messages=messages,
             )
 
         self._cache_put(key, result)
@@ -113,8 +120,10 @@ class InklingClient:
         effort: str | float,
         max_tokens: int | None = None,
         seed: int | None = None,
+        messages: list[dict] | None = None,
     ) -> dict:
         pcfg, ecfg = self.cfg["provider"], self.cfg["effort"]
+        chat_history = messages
         messages = []
         kwargs: dict = {}
         if ecfg["mode"] == "system":
@@ -154,7 +163,12 @@ class InklingClient:
             }
         if seed is not None:
             kwargs["seed"] = seed
-        messages.append({"role": "user", "content": prompt})
+        if chat_history:
+            messages.extend(
+                {"role": m["role"], "content": m["content"]} for m in chat_history
+            )
+        else:
+            messages.append({"role": "user", "content": prompt})
 
         last_err: Exception | None = None
         for attempt in range(pcfg["max_retries"] + 1):
@@ -352,6 +366,7 @@ class InklingClient:
         effort: str | float,
         max_tokens: int | None = None,
         seed: int | None = None,
+        messages: list[dict] | None = None,
     ) -> str:
         pcfg = self.cfg["provider"]
         identity = {
@@ -360,6 +375,8 @@ class InklingClient:
             "model": pcfg["model"],
             "mock": self.mock,
         }
+        if messages is not None:
+            identity["messages"] = messages
         # Preserve the historical key exactly when no explicit budget axis is
         # configured. New budgeted runs include the requested cap so results
         # from different censoring conditions can never collide.
