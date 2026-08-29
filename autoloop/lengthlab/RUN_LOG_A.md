@@ -353,3 +353,6 @@ RESULT 20260828-2127/65: 0.025995  reverted (best 0.024558)
 
 RESULT 20260828-2127/66: 0.023298  reverted (best 0.024558)
 
+## 20260828-2127/67 HYPOTHESIS: Adopt reviewer's 2127/60 ranked option 2 (untried: the pinned-mixture option 1 is now exhausted after six variants 61-66 all landing at delta -0.0022 to -0.0029, just short of the 0.003 margin, and 66 showed isolating p_ge-only substitution regresses badly while q90 substitution carries the gain) - for the parametric q90 branch only (cen_frac in [0.10, 0.90)), replace q90 = lognormal_q(mu, sigma, 0.90) with the exact-anchor inversion q90 = cap * exp(sigma * (z10 - zc)) where z10 = Phi^-1(0.90) and zc = Phi^-1(1 - cen_frac), keeping the Tobit fit's sigma (stable, bulk-estimated from the whole sample) but replacing its LEVEL with the exactly-identified empirical point S(cap) = cen_frac, since this isolates exactly the q90-level correction that seemed to drive the mixture's gain without any likelihood-iterated mixture fitting, unstable EM, or touching p_ge/median at all - the lowest-risk untried direction from the reviewer's ranked list.
+RESULT 20260828-2127/67: 0.027133  reverted (best 0.024558)
+
