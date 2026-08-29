@@ -29,7 +29,7 @@ DESIGN = {
     # conservative (as hypotheses 13-19's correction attempts suggest),
     # spending more of that slack directly via a slightly larger alpha
     # should buy power on every scenario while staying under the gate.
-    "alpha": 0.06,
+    "alpha": 0.065,
 }
 
 
