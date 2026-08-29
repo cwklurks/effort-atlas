@@ -144,3 +144,7 @@ RESULT 20260829-0319/32: 0.957500  reverted (best 0.957500)
 
 RESULT 20260829-0319/33: 0.000000  reverted (best 0.957500)
 
+
+## 20260829-0319/34 HYPOTHESIS: Hypothesis 31 replaced the four-cell DiD with the coarse two-cell statistic did = hi_big - hi_sm (values in {-1,-0.5,0,0.5,1} at n_reps=2), under which did=+1 is the maximal-signal event rather than noise (hypothesis 33's own diagnosis), and hypothesis 33 confirmed that eliminating trimming entirely (TRIM=0, the plain mean/SD test) causes a catastrophic type-I gate failure on this highly discrete null distribution - but hypothesis 33 jumped all the way from TRIM=0.10 to TRIM=0.0 in one step, conflating "some trimming is needed to control the discreteness-driven type-I blowup" with "0.10 is the right amount"; stepping only partway, from TRIM=0.10 to TRIM=0.08 (discarding floor(145*0.08)=11 items per tail instead of 14, i.e. keeping 6 more items - some of them likely at the informative did=+1 extreme - in the trimmed mean/Winsorized SE computation), should recover some of that suppressed signal and increase worst-case power while remaining far enough from the proven-catastrophic TRIM=0 edge to keep the type-I gate's discreteness-driven anticonservativeness in check, since alpha (0.072) and n_items/n_reps (145x2) are left untouched.
+RESULT 20260829-0319/34: 0.955000  reverted (best 0.957500)
+
