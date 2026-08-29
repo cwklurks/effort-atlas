@@ -194,3 +194,9 @@ RESULT 20260828-2127/34: 0.024424  reverted (best 0.024558)
 
 RESULT 20260828-2127/35: 0.025469  reverted (best 0.024558)
 
+## 20260828-2127/36 HYPOTHESIS: The reviewer's 2127/20 strategy is now exhausted (all three ranked diagnostic-gate options tried across 21-24, every one a near-tie or a loss) and 35 more single-lever/combo attempts have orbited baseline within ~2e-4, but the session's single best full result remains 2127/18's three-way stack (bound-respecting clamps + median_unbiased identified-quantile interpolation + EM-sigma shrinkage toward 0.85 with weight k/(k+n_uncensored), k=10, at 0.024344) and the only shrinkage-strength data point besides k=10 is k=25 (worse, 0.024381 at 2127/20), a monotonic-looking pattern (k=0 equivalent to 2127/4's 0.024479 without sigma shrink -> k=10's 0.024344 -> k=25's 0.024381) suggesting an interior optimum near but not exactly at k=10 that has never been probed from the other side, so re-implement that exact validated three-way stack unchanged but sweep the shrinkage pseudo-count down to k=5 (weaker shrinkage, more trust in the per-sample EM sigma) to test whether the optimum lies below 10 rather than at or above it.
+
+RESULT 20260828-2127/36: pending
+
+RESULT 20260828-2127/36: 0.024399  reverted (best 0.024558)
+
