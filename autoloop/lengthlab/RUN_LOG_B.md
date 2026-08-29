@@ -111,3 +111,8 @@ RESULT 20260829-0319/24: 0.182500  reverted (best 0.177500)
 
 RESULT 20260829-0319/25: 0.000000  reverted (best 0.177500)
 
+## 20260829-0319/26 HYPOTHESIS: The alpha lever's per-step score gain has been decelerating smoothly with diminishing but positive slope (0.05->0.06: +0.0225 over +0.01 alpha, 0.06->0.065: +0.0075 over +0.005 alpha, 0.065->0.07: +0.0050 over +0.005 alpha, each roughly 2/3 of the prior slope) right up until the single large +0.005 jump to 0.075 fell off a cliff into total type-I gate failure (0.000), so the true breaking point almost certainly lies strictly between 0.070 (confirmed safe, 0.1825) and 0.075 (confirmed unsafe) rather than being adjacent to 0.070 itself; stepping only halfway, to DESIGN["alpha"] = 0.072, should stay comfortably clear of that cliff while extrapolating the observed decelerating-slope trend (~0.67x per step) predicts a further ~0.0027 gain over 0.07's 0.1825 (i.e. roughly 0.185), enough to clear the required >0.006 margin over the current best (0.1775) that the single +0.005 step from 0.065->0.07 (hypothesis 24) narrowly missed.
+
+
+RESULT 20260829-0319/26: 0.185000  KEPT (new best)
+
