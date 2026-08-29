@@ -34,3 +34,7 @@ RESULT 20260828-2119/2: 0.024703  reverted (best 0.024558)
 
 RESULT 20260828-2119/3: 0.024492  reverted (best 0.024558)
 
+
+## 20260828-2127/1 HYPOTHESIS: Following the reviewer's ranked option 2 (option 1 was tried at 2119/3 and only near-tied), replace the lognormal-fit extrapolation used for p_ge at c > cap with a Hill-estimator Pareto tail anchored at the empirically-identified P(X>=cap) (=cen_frac), using a tail index estimated from the top quartile of uncensored observations below cap and falling back to the existing lognormal sf when too few exceedances are available, since mix_heavy/tail_pareto regimes decay slower than lognormal beyond the cap while this leaves the fit, median, and q90 branches completely untouched.
+RESULT 20260828-2127/1: 0.037882  reverted (best 0.024558)
+
