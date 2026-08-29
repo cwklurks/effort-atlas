@@ -183,3 +183,7 @@ RESULT 20260829-0319/40: 0.955000  reverted (best 0.957500)
 
 (c) Do NOT retry: TRIM values (0/0.08/0.10/0.12 fully bracket it, 0.10 wins), n_reps != 2, alpha >= 0.080 on the current statistic, or any p-value-calibration surgery (Johnson/bootstrap/permutation/Wilcoxon/Huber - 8 failures, zero keeps across both statistics).
 
+## 20260829-0319/41 HYPOTHESIS: Following the reviewer strategy's ranked direction 1, the lo-effort cells (lo_big, lo_sm) were dropped entirely by hypothesis 31 even though censoring is monotonic in allowance so lo_big-lo_sm has strictly non-negative expectation under every power scenario (paid-for signal, not just noise) while remaining exactly zero-mean and symmetric under every null scenario (a_sm==a_big), so reincorporating it as ADDED signal at half weight - did = (hi_big - hi_sm) + 0.5*(lo_big - lo_sm), fed into the same unchanged Yuen trimmed one-sided machinery (TRIM=0.10, alpha=0.072, 145 items x 2 reps) - should raise the statistic's expectation under every power scenario without inflating type-I (the added term stays symmetric about 0 under every null, preserving the same exchangeability argument as hypothesis 31/8/9), while the 0.5 weight caps the added measurement-noise variance relative to using the full-weight term.
+
+RESULT 20260829-0319/41: 0.000000  reverted (best 0.957500)
+
