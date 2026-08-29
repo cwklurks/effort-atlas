@@ -187,3 +187,7 @@ RESULT 20260829-0319/40: 0.955000  reverted (best 0.957500)
 
 RESULT 20260829-0319/41: 0.000000  reverted (best 0.957500)
 
+## 20260829-0319/42 HYPOTHESIS: Following the reviewer strategy's ranked direction 2, n_items has stayed at 145 through every post-hypothesis-31 change to the point estimate (32-41), and the only prior test of raising it to 148 (hypothesis 22) was measured against the old four-cell Yuen-trimmed DiD statistic before hypothesis 31 replaced it with the coarse two-cell did = hi_big - hi_sm, so that measurement is stale for the current statistic - increasing n_items from 145 to 148 (296 item-reps at n_reps=2, projected mean cost ~$39.87, safely under the $40 cap using the established ~$0.1347/item-rep rate) both shrinks the Yuen trimmed test's standard error by ~1% (1/sqrt(148/145)) and, because n_items changes the RNG draw stream entirely, gives a fresh Monte Carlo realization of the binding worst-case scenario, which is orthogonal to and untouched by the failed lo-signal addition in hypothesis 41 (alpha=0.072, TRIM=0.10, n_reps=2, and analyze()'s formula all remain unchanged), so it should increase worst-case power without inflating type-I since the exact symmetry-about-0 argument (hypothesis 8/9/31) that validates the test under every null scenario holds for any n_items.
+
+RESULT 20260829-0319/42: 0.962500  reverted (best 0.957500)
+
