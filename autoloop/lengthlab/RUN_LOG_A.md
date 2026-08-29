@@ -537,3 +537,7 @@ RESULT 20260828-2127/103: 0.020837  reverted (best 0.021064)
 
 RESULT 20260828-2127/104: 0.020661  reverted (best 0.021064)
 
+
+## 20260828-2127/105 HYPOTHESIS: Adopt a localized, per-cap evidence-weighted blend for the identified p_ge branch (mirroring 2127/103's validated global blend - the closest post-81 result at -0.000227 - but replacing its single cap-averaged diagnostic d=mean|sf(c)-emp(c)| with a per-cap d_c, applying the same mean-vs-localized-granularity insight that 2127/101 tested for the mixture's activation gate (mean-to-max swap, lost at 0.021983) but never applied to 103's blend mechanism, which did not yet exist at 101's time): for each identified cap c<=cap, compute its own d_c = |lognormal_sf(mu,sigma,c) - raw_p_emp[c]| (not averaged across identified_caps as in 103), set w_c = clip(1 - d_c/0.02, 0, 1), replace p_ge[c] with w_c*lognormal_sf(mu,sigma,c) + (1-w_c)*p_ge[c] (the existing isotonic-projected value), then re-apply the isotonic nonincreasing projection to the blended sequence since per-cap-varying weights can break monotonicity that a single global weight preserves automatically. This targets samples like tail_pareto where small identified caps are well-fit by the body lognormal while large identified caps near the 8%-weight tail are not - a case 103's single averaged weight cannot exploit, since one scalar must either trust all identified caps equally or none. Leave median, q90, the pinned mixture, and the final beyond-cap clamp completely untouched.
+RESULT 20260828-2127/105: 0.020866  reverted (best 0.021064)
+
