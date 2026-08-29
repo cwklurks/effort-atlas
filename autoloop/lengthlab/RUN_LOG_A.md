@@ -54,3 +54,7 @@ RESULT 20260828-2127/4: 0.024479  reverted (best 0.024558)
 
 RESULT 20260828-2127/5: 0.024694  reverted (best 0.024558)
 
+## 20260828-2127/6 HYPOTHESIS: Stack the two best still-standing corrections from this session (the reviewer's ranked-option-1 bound clamps at 2119/3, 0.024492, and the median_unbiased identified-quantile interpolation at 2127/3, 0.024545, whose combination at 2127/4 gave the session's best score so far, 0.024479) with one further always-true, zero-cost-when-satisfied bound that no prior attempt has used: after computing q90 and median independently, enforce q90 = max(q90, median), since q90 >= median holds for any distribution and a single lognormal fit to bimodal/heavy-tailed data can otherwise return a parametric q90 that undershoots the (often exactly-identified) empirical median, a distinct failure mode from the beyond-cap tail-level errors all prior clamps targeted.
+
+RESULT 20260828-2127/6: 0.024479  reverted (best 0.024558)
+
