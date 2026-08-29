@@ -42,3 +42,7 @@ RESULT 20260828-2127/1: 0.037882  reverted (best 0.024558)
 
 RESULT 20260828-2127/2: 0.034380  reverted (best 0.024558)
 
+## 20260828-2127/3 HYPOTHESIS: The reviewer's 2119/2 strategy is now exhausted (all three ranked tail/branch interventions tried: option 1 near-tied at 0.024492, options 2 and 3 both lost badly), so shift focus away from the unidentified parametric/tail branches entirely and instead reduce estimation error in the already-identified empirical branches (median when cen_frac<0.5, q90 when cen_frac<0.10) by switching their quantile computation from numpy's default 'linear' interpolation to the 'median_unbiased' (Hyndman-Fan Type 8) method, which is approximately median-unbiased regardless of the underlying distribution shape and should shave a small amount of universal Monte Carlo bias/variance off every regime's identified-quantile error without touching the fit, thresholds, or tail extrapolation that six straight attempts have already shown are either load-bearing or unhelpful to alter.
+
+RESULT 20260828-2127/3: 0.024545  reverted (best 0.024558)
+
