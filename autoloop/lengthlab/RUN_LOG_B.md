@@ -99,3 +99,7 @@ RESULT 20260829-0319/21: 0.177500  KEPT (new best)
 
 RESULT 20260829-0319/22: 0.175000  reverted (best 0.177500)
 
+## 20260829-0319/23 HYPOTHESIS: Following the reviewer strategy's ranked direction 2, hypothesis 15's Johnson skewness correction (skew estimated from the trimmed central subsample sorted_did[g:n-g], TRIM=0.10, Winsorized SE and trimmed mean unchanged) was the best-ever analysis-side variant (0.1525 vs plain Yuen's 0.1475, a +0.005 gain) but was measured under the since-superseded alpha=0.05 and missed the old keep threshold by 0.001 - since the correction targets the normal approximation's finite-sample skewness bias (a lever orthogonal to alpha, which instead spends the type-I gate's Monte Carlo slack), stacking this same correction on top of the current best design (145 items x 2 reps, alpha=0.065) should compound with the alpha gains already banked in hypotheses 20-21 and push worst-case power past the new keep threshold without inflating type-I, since the correction's expectation is exactly zero under every null scenario (trimmed-subsample skewness of an exactly-symmetric-about-0 distribution is 0 in expectation) regardless of what alpha it is thresholded against.
+
+RESULT 20260829-0319/23: 0.175000  reverted (best 0.177500)
+
