@@ -15,3 +15,7 @@ RESULT 20260829-0319/3: 0.122500  reverted (best 0.122500)
 
 RESULT 20260829-0319/4: 0.137500  KEPT (new best)
 
+## 20260829-0319/5 HYPOTHESIS: Because each per-cell accuracy is a mean of only n_reps=2 Bernoulli draws, its sampling variance p(1-p)/n_reps is strongly heteroscedastic in p (largest near p=0.5, smallest near the extremes), which inflates and unevenly weights the per-item DiD's estimated variance across items and cells; applying the classical arcsine square-root variance-stabilizing transform y=2*arcsin(sqrt(acc)) to each of the four cells before forming the DiD preserves E[DiD]=0 exactly under every null scenario (matched cells remain iid draws from the same distribution under a_sm==a_big regardless of the monotone transform applied to each), so it should homogenize per-item variance and increase the one-sided paired t-test's power without inflating type-I.
+
+RESULT 20260829-0319/5: 0.137500  reverted (best 0.137500)
+
