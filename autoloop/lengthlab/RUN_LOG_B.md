@@ -298,3 +298,7 @@ RESULT 20260829-0319/65: 0.982500  reverted (best 0.980000)
 
 RESULT 20260829-0319/66: 0.980000  reverted (best 0.980000)
 
+## 20260829-0319/67 HYPOTHESIS: Hypotheses 63-65 tightly bracket the combined statistic's (did = (hi_big-hi_sm) + 0.5*(lo_big-lo_sm), TRIM=0.10, n_items=148, n_reps=2) true alpha cliff between 0.065 (confirmed safe, a real gain to 0.982500 but short of the required >0.006 margin over the current best 0.980000) and 0.07 (confirmed catastrophic type-I gate failure) - exactly matching the bisect-the-bracket pattern that has repeatedly localized keep-worthy or gate-safe points elsewhere in this log (hypotheses 37/39, 43/44, 48-50), rather than guessing another coarse jump or stacking a second, untested lever (e.g. LO_WEIGHT, which hypothesis 66 already showed is flat at the far-more-conservative alpha=0.05 and risks compounding failure if stacked with an alpha move in the same untested combination, per hypotheses 48/49's TRIM+alpha stacking catastrophe); setting DESIGN["alpha"] to the midpoint of this new narrower bracket, 0.0675 (TRIM=0.10, n_items=148, n_reps=2 unchanged), should land strictly between the confirmed-safe 0.065 and confirmed-catastrophic 0.07 points, testing whether crossing additional borderline worst-case-scenario p-values beyond the 0.065 probe is enough to clear the keep margin without inflating type-I, since the exact symmetry-about-0 of did under every null scenario (hypothesis 8/9/31/62) holds for any alpha below the true cliff.
+
+RESULT 20260829-0319/67: 0.985000  reverted (best 0.980000)
+
