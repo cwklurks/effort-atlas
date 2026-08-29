@@ -156,3 +156,7 @@ RESULT 20260828-2127/25: 0.024558  reverted (best 0.024558)
 
 RESULT 20260828-2127/26: 0.024535  reverted (best 0.024558)
 
+## 20260828-2127/27 HYPOTHESIS: Combine the two identified-branch corrections that were each individually near-neutral-to-positive and have never been stacked together - the median_unbiased (Hyndman-Fan Type 8) quantile interpolation for the identified empirical median (cen_frac<0.5) and q90 (cen_frac<0.10) from 2127/3 (0.024545, the best single identified-branch delta of the session) and the isotonic (pool-adjacent-violators) monotonic-non-increasing projection of the identified empirical p_ge(c<=cap) values from 2127/25 (0.024558, an exact tie, meaning it is a safe zero-cost-when-satisfied constraint) - since these two corrections touch disjoint identified quantities (median/q90 vs. p_ge) via disjoint mechanisms (a different interpolation rule vs. a monotonicity projection) and neither was tried in combination with the other (the prior combination attempts at 2127/4, 11, 18 all paired the interpolation swap with unidentified-branch bound clamps or sigma shrinkage, never with isotonic p_ge), stacking them tests whether their small independent gains on the identified branches - the component the reviewer's diagnosis says holds ~90% of the baseline error - compound further than either did alone, while leaving the fit, thresholds, and every unidentified/tail branch completely untouched.
+
+RESULT 20260828-2127/27: 0.024545  reverted (best 0.024558)
+
