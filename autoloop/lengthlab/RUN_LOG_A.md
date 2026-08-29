@@ -58,3 +58,7 @@ RESULT 20260828-2127/5: 0.024694  reverted (best 0.024558)
 
 RESULT 20260828-2127/6: 0.024479  reverted (best 0.024558)
 
+## 20260828-2127/7 HYPOTHESIS: All six identified/tail-branch corrections tried this session (reviewer options 1-3, quantile-interpolation swap, their combination, and the Harrell-Davis estimator, plus the earlier full fit/tail-level replacements) have either lost badly or near-tied within noise of baseline, so shift to a genuinely untouched target - the exactly-identified empirical P(length>=c) for c<=cap, which every prior attempt left as a raw sample proportion - and apply a small empirical-Bayes shrinkage of that count toward the already-computed lognormal fit's survival probability (p_hat = (count + k*prior)/(n+k) with a small pseudo-count k=4), since raw binomial proportions from n=500 have the most sampling variance exactly where true probabilities are small/extreme (the common case for larger caps), and a weak prior pull toward the existing fit should cut that variance on the well-specified lognormal regimes while barely biasing the mixture/pareto regimes since k is small relative to n.
+
+RESULT 20260828-2127/7: 0.024544  reverted (best 0.024558)
+
