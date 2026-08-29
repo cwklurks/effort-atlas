@@ -274,3 +274,7 @@ RESULT 20260829-0319/60: 0.000000  reverted (best 0.970000)
 
 (c) Do NOT retry: any threshold- or scale-only nudge on the unchanged hi-only statistic - alpha anywhere above 0.079, TRIM at any untested value, SE-constant corrections (55), or any pairwise stack of these; the worst null count is pinned at exactly 27/400, so every such move is provably flat or fatal.
 
+## 20260829-0319/61 HYPOTHESIS: Following the reviewer strategy's ranked direction 1 (null-safe item weighting), weighting each item's Winsorized hi-effort DiD by w_i = lo_sm_i + lo_big_i + 0.5 (built purely from the lo-effort cells, which are independent rng draws from the hi-effort cells and so carry zero information about did's sign under any null scenario, leaving the weighted statistic exactly symmetric about 0 whenever a_sm==a_big regardless of the weights drawn) before computing a Horvitz-Thompson-style weighted mean and weighted variance for the one-sided z-test should raise worst-case power by up-weighting items whose lo cells indicate a high underlying per-item accuracy level (and hence, since p_hi and p_lo are both monotonic transforms of the same per-item d_i, a higher expected censoring-sensitivity gap at hi effort under every power scenario) without touching alpha, TRIM's threshold logic, or n_items/n_reps, and without inflating type-I since the weights are informationally independent of did's sign under every null scenario.
+
+RESULT 20260829-0319/61: 0.000000  reverted (best 0.970000)
+
