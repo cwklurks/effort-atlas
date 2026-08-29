@@ -156,3 +156,7 @@ RESULT 20260829-0319/35: 0.957500  reverted (best 0.957500)
 
 RESULT 20260829-0319/36: 0.000000  reverted (best 0.957500)
 
+## 20260829-0319/37 HYPOTHESIS: Hypothesis 36 showed the new two-cell statistic's (hypothesis 31) type-I-vs-alpha cliff sits somewhere in the wide, never-bisected 0.072(confirmed safe, current best 0.9575)-0.085(confirmed catastrophic gate failure, 0.000) band rather than adjacent to 0.072 by coincidence, and every prior alpha cliff-finding episode in this log (hypotheses 20-30, on the old four-cell statistic) succeeded by bisecting a bracketed safe/unsafe interval rather than guessing a big jump - so bisecting this new, much wider bracket at its midpoint, raising DESIGN["alpha"] from 0.072 to 0.078 (leaving TRIM=0.10, n_items=145, n_reps=2 unchanged), should locate whether the cliff lies in the lower or upper half of the interval, and if it lands in the safe half should also directly increase worst-case power by spending more of the same still-unbracketed Monte Carlo type-I slack the new statistic has never had precisely measured.
+
+RESULT 20260829-0319/37: 0.960000  reverted (best 0.957500)
+
