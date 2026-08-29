@@ -140,3 +140,7 @@ RESULT 20260828-2127/21: 0.026680  reverted (best 0.024558)
 
 RESULT 20260828-2127/22: 0.024571  reverted (best 0.024558)
 
+## 20260828-2127/23 HYPOTHESIS: The reviewer's 2127/20 strategy has two of three ranked options already tried (option 1, soft blend of the identified median/q90 with the parametric quantile, lost badly at 0.026680; option 3, a hard gate emitting ALL eight outputs from the fit when d<0.015, only barely lost at 0.024571) but option 2 - the same hard diagnostic gate applied ONLY to the identified p_ge branch (c<=cap), leaving median and q90 completely untouched at their existing empirical/parametric split - has never been tested in isolation, so implement it: compute d = mean over c<=cap of |lognormal_sf(mu,sigma,c) - empirical p_ge(c)|, and when d < 0.015 replace each identified p_ge(c<=cap) with the fitted lognormal SF value instead of the raw empirical proportion, otherwise keep the raw empirical proportion, since isolating the p_ge swap tests whether 2127/22's near-tie was dragged down by also swapping median/q90 (whose full-fit substitution was never validated as safe on its own) versus the p_ge substitution being the actually-beneficial piece of that combined attempt.
+
+RESULT 20260828-2127/23: 0.024489  reverted (best 0.024558)
+
