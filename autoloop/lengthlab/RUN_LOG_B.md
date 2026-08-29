@@ -52,3 +52,7 @@ RESULT 20260829-0319/12: 0.107500  reverted (best 0.147500)
 
 RESULT 20260829-0319/13: 0.150000  reverted (best 0.147500)
 
+## 20260829-0319/14 HYPOTHESIS: Hypothesis 13's Johnson (1978) skewness-adjusted t-statistic computed its skewness coefficient from the WINSORIZED array, which caps exactly the extreme per-item DiD values (from the heavy-tailed tail_pareto scenario's occasional runaway items) that create the asymmetry the correction is meant to detect and correct for, muting the correction's magnitude and plausibly explaining why it only marginally beat the plain Yuen test (0.150 vs 0.1475, short of the keep threshold); computing the skewness coefficient from the RAW (untrimmed, unwinsorized) per-item DiD array instead - while still using the Winsorized SE for the t-statistic's scale and the trimmed mean for its center, so the test's outlier-robustness is unchanged - should yield a stronger, more accurate correction to the normal approximation, since the raw DiD remains exactly symmetric about 0 in expectation under every null scenario (established in hypothesis 8: a mixture over items of distributions each symmetric about 0 given d_i is itself symmetric about 0), so type-I control is preserved regardless of which array the skewness estimate is drawn from.
+
+RESULT 20260829-0319/14: 0.145000  reverted (best 0.147500)
+
