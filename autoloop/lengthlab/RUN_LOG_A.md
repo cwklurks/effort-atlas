@@ -104,3 +104,9 @@ RESULT 20260828-2127/16: 0.024558  reverted (best 0.024558)
 
 RESULT 20260828-2127/17: 0.024425  reverted (best 0.024558)
 
+## 20260828-2127/18 HYPOTHESIS: Three independent, non-overlapping corrections have each individually near-tied baseline with the session's three largest single-lever gains - the reviewer's ranked-option-1 bound clamps (0.024492, delta -0.000066), median_unbiased identified-quantile interpolation (0.024545, delta -0.000013, combining with the clamp for -0.000079 at 2127/4/11), and EM-sigma shrinkage toward the cross-regime-typical 0.85 with weight k/(k+n_uncensored), k=10 (0.024425, delta -0.000133, the single largest gain found this session and never combined with anything) - so stack all three together for the first time: shrink sigma before it feeds every downstream branch, keep mu and the fit's convergence untouched, apply median_unbiased interpolation to both the identified empirical branches and the clamp's own empirical-quantile comparisons, and apply the bound clamps (median/q90 floored at the empirical clamped quantile when unidentified, p_ge beyond cap capped at cen_frac and forced nonincreasing) on top, since the sigma-shrinkage gain in particular has never been tested in combination and stacking the three largest validated deltas is the most direct way to find out whether they compound toward the required margin or saturate like the two-way combo did.
+
+RESULT 20260828-2127/18: pending
+
+RESULT 20260828-2127/18: 0.024344  reverted (best 0.024558)
+
