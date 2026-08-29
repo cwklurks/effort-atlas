@@ -499,3 +499,7 @@ RESULT 20260828-2127/97: 0.036219  reverted (best 0.021064)
 
 RESULT 20260828-2127/98: 0.021086  reverted (best 0.021064)
 
+## 20260828-2127/99 HYPOTHESIS: Following the exhaustion of the 2127/80 strategy's ranked options and 17 further periphery-only tweaks (82-98, all tied exactly or lost) to the fixed sigma2=0.6 constant in 2127/81's standing-best pinned-mixture recipe, replace that fixed sigma2 with a data-driven-but-shrunk estimate: compute the log-std of the real uncensored observations at or above the split point s (genuine draws from the upper/component-2 region, unlike any prior sigma2 mechanism), and shrink that estimate toward the already-validated 0.6 reference with weight n0/(n0+n_above_s), n0=15, falling back to the fixed 0.6 whenever fewer than 10 such points exist - this is mechanistically distinct from both the earlier unshrunk fixed-constant sweeps (0.7/0.5, both lost) and the failed pure-algebraic two-anchor solve (2127/90, derived only from w2/cen_frac with no real data and no shrinkage, which blew up to 0.034667), since real upper-tail data regularized by shrinkage toward the validated constant should be more robust than either a blind guess or an unstable unregularized solve, leaving every other part of 81's recipe (w2 deconvolution, split point, component-1 estimator, gate, mu2 closed form, clamps) byte-identical.
+
+RESULT 20260828-2127/99: 0.034340  reverted (best 0.021064)
+
