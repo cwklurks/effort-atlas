@@ -37,6 +37,11 @@ def analyze(acc: dict) -> float:
     if se == 0:
         return 1.0
     t = m / se
-    # two-sided p via normal approx (n_items is large enough); stdlib only
+    # One-sided p via normal approx (n_items is large enough); stdlib only.
+    # The DiD's sign is known a priori under every power scenario (allowance
+    # only ever widens at high effort, so censoring only ever hurts "hi" more
+    # at the small allowance): testing H1: DiD > 0 spends the whole alpha
+    # budget on the correct tail. Null scenarios keep the DiD symmetric about
+    # 0 by construction (a_sm == a_big), so this does not inflate type-I.
     from statistics import NormalDist
-    return float(2.0 * (1.0 - NormalDist().cdf(abs(t))))
+    return float(1.0 - NormalDist().cdf(t))
