@@ -39,3 +39,7 @@ RESULT 20260829-0319/9: 0.147500  KEPT (new best)
 
 RESULT 20260829-0319/10: 0.130000  reverted (best 0.147500)
 
+## 20260829-0319/11 HYPOTHESIS: The Yuen trimmed test (hypothesis 9, current best) still studentizes a trimmed mean by a Winsorized SD, so its statistic's magnitude (and hence its p-value) remains sensitive to how far the untrimmed 80% of items sit from center, whereas the same exact symmetry-about-0 of per-item DiD under every null scenario (established in hypothesis 8, which validates rank/sign-based tests) also validates a one-sided Wilcoxon signed-rank test whose statistic depends only on the sign and rank order of |DiD| (not magnitude at all), making it fully insensitive to the heavy-tailed tail_pareto scenario's occasional extreme values rather than merely down-weighted by trimming; switching analyze() from the Yuen trimmed t-test to a one-sided Wilcoxon signed-rank test (normal approximation with tie/zero handling and continuity correction, exact under the null symmetry) should increase worst-case power over trimming without inflating type-I.
+
+RESULT 20260829-0319/11: 0.117500  reverted (best 0.147500)
+
