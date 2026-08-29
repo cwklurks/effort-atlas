@@ -346,3 +346,7 @@ RESULT 20260829-0319/77: 0.977500  reverted (best 0.980000)
 
 RESULT 20260829-0319/78: 0.975000  reverted (best 0.980000)
 
+
+## 20260829-0319/79 HYPOTHESIS: The LO_WEIGHT scan now brackets w=0.5 (baseline, 392/400=0.980000) and w=0.75 (hypothesis 66) as an EXACT TIE at 392/400, with both neighbors outside that interval strictly worse (w=0.25 at 390/400 in hypothesis 78, w=0.875 at 390/400 in hypothesis 74, w=1.0 at 389/400 in hypothesis 73) - a classic quantized-plateau signature where the true unimodal SNR peak (E_hi+w*E_lo)/sqrt(V_hi+w^2*V_lo), per hypothesis 73's derivation, sits somewhere inside [0.5, 0.75] but the two tested endpoints happened to land on the same rejection count, and the interior of that specific sub-bracket has never once been probed even though every other successful gain in this log came from bisecting a bracket rather than its already-tested endpoints (alpha: hypotheses 43-44, 63-69; n_items: 42-44); setting LO_WEIGHT to the untested midpoint 0.625 (TRIM=0.10, alpha=0.05, n_items=148, n_reps=2 unchanged) tests whether the peak's exact location inside this tied interval crosses one or more additional borderline worst-case-scenario p-values beyond what either flat endpoint reached, remaining exactly as type-I safe as every other tested weight since lo_big-lo_sm is symmetric about 0 under every null scenario for any fixed scalar w (hypothesis 8/9/31/62/66/73/78).
+RESULT 20260829-0319/79: 0.980000  reverted (best 0.980000)
+
