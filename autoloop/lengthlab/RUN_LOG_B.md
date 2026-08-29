@@ -140,3 +140,7 @@ RESULT 20260829-0319/31: 0.957500  KEPT (new best)
 
 RESULT 20260829-0319/32: 0.957500  reverted (best 0.957500)
 
+## 20260829-0319/33 HYPOTHESIS: Since hypothesis 31 replaced the four-cell DiD with the two-cell did = hi_big - hi_sm, each per-item value is coarsely discrete (hi_sm, hi_big in {0, 0.5, 1} from n_reps=2, so did in {-1,-0.5,0,0.5,1}), and under every power scenario the value did=+1 (hi fully answered+correct at the big allowance while fully censored/wrong at the small allowance) is exactly the maximal-signal event the design is trying to detect - not an outlier caused by measurement noise the way extreme values were under the old summed four-cell statistic (which is why TRIM=0.10 was originally tuned in hypotheses 9-17); the current Yuen trimmed test still discards the top/bottom floor(145*0.10)=14 items by sorted value before computing the mean, which on this new statistic disproportionately discards items sitting at the informative did=+1 extreme rather than noise, directly suppressing power. Since TRIM=0 makes the Yuen test reduce exactly to the plain mean/SD one-sided paired test (per the existing code comment) while leaving alpha, n_items, and n_reps untouched, and the same exact-symmetry-about-0 argument (hypothesis 8) that validates the trimmed test under every null scenario holds equally at TRIM=0, setting TRIM from 0.10 to 0.0 should stop discarding signal-bearing extreme items and increase worst-case power without inflating type-I.
+
+RESULT 20260829-0319/33: 0.000000  reverted (best 0.957500)
+
