@@ -364,3 +364,7 @@ RESULT 20260828-2127/68: 0.025529  reverted (best 0.024558)
 
 RESULT 20260828-2127/69: 0.021582  reverted (best 0.024558)
 
+## 20260828-2127/70 HYPOTHESIS: 2127/69's stack (pinned two-component mixture computed against the sigma-shrunk fit, combined with the order-statistic/monotonicity identified-branch family - EM-sigma shrunk toward 0.85 with weight k/(k+n_uncensored), k=10; log-space median-unbiased quantile for the identified median/q90 reused as the unidentified-branch bound-clamp floor; and isotonic projection of the identified p_ge(c<=cap) proportions) reached the session's closest-ever delta (-0.002976, only 0.000024 short of the 0.003 margin), but unlike 2127/62's earlier mixture+clamps combination it never applied the already-validated 2119/3 safety clamp to the mixture's own beyond-cap p_ge output (cap each p_ge(c>cap) at the exact cen_frac anchor and force the c>cap sequence nonincreasing in c), so reproduce 69's exact construction unchanged and add that one missing, provably zero-cost-when-satisfied clamp on top, since it is the only remaining untested pairing between this session's two closest-to-margin ingredients and is the most plausible single edit left to close the last sliver of the gap.
+
+RESULT 20260828-2127/70: 0.021582  reverted (best 0.024558)
+
