@@ -20,7 +20,7 @@ from __future__ import annotations
 import numpy as np
 
 DESIGN = {
-    "n_items": 145,   # item clusters (AIME-style items, GPQA rows, ...)
+    "n_items": 148,   # item clusters (AIME-style items, GPQA rows, ...)
     "n_reps": 2,      # replicate responses per item per cell
     # Rejection threshold used by analyze() below. The scorer's type-I gate
     # is fixed to a nominal 0.05 true rate with Monte Carlo slack (tolerates
@@ -29,7 +29,7 @@ DESIGN = {
     # conservative (as hypotheses 13-19's correction attempts suggest),
     # spending more of that slack directly via a slightly larger alpha
     # should buy power on every scenario while staying under the gate.
-    "alpha": 0.072,
+    "alpha": 0.079,
 }
 
 

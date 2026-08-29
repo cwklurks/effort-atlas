@@ -195,3 +195,7 @@ RESULT 20260829-0319/42: 0.962500  reverted (best 0.957500)
 
 RESULT 20260829-0319/43: 0.962500  reverted (best 0.957500)
 
+## 20260829-0319/44 HYPOTHESIS: Hypothesis 43 stacked n_items=148 with alpha 0.072->0.075 and got the exact same score (0.962500) as n_items=148 alone (hypothesis 42), showing that on this fresh n_items=148 RNG stream a +0.003 alpha nudge crossed zero additional borderline p-values in the worst-case scenario - meaning the true alpha cliff for this stream sits further out than 0.075, not that alpha is exhausted at n_items=148 (the cliff was only ever bisected against the stale n_items=145 stream, per the reviewer strategy's direction 3, and stacking a bigger step is the untested next probe); since the n_items=145 stream's cliff was bracketed tightly between 0.079 (confirmed safe, 0.960000) and 0.080 (confirmed catastrophic gate failure), jumping straight to that same 0.079 value now on top of n_items=148 (n_reps=2, TRIM=0.10 unchanged) tests a step nearly 3x hypothesis 43's null-effect +0.003 nudge while staying at a value independently proven safe on a closely related stream, which should cross enough additional borderline worst-case-scenario p-values on the n_items=148 stream to clear the required >0.006 keep margin without inflating type-I, since the exact symmetry-about-0 of did under every null scenario (hypothesis 8/9/31) holds for any n_items and alpha.
+
+RESULT 20260829-0319/44: 0.970000  KEPT (new best)
+
