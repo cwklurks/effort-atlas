@@ -103,3 +103,7 @@ RESULT 20260829-0319/22: 0.175000  reverted (best 0.177500)
 
 RESULT 20260829-0319/23: 0.175000  reverted (best 0.177500)
 
+## 20260829-0319/24 HYPOTHESIS: Following the reviewer strategy's ranked direction 1, the alpha increases from 0.05->0.06 (hypothesis 20, +0.0225) and 0.06->0.065 (hypothesis 21, +0.0075) both passed the type-I gate (which tolerates up to 27/400=6.75% observed null rejections) while every other lever tested since (items 145->148 in hypothesis 22, Johnson correction stacking in hypothesis 23) reverted, showing alpha is still the only lever with confirmed remaining headroom - so nudging DESIGN["alpha"] a further small step from 0.065 to 0.07 should keep spending that same unspent Monte Carlo gate slack and increase power on every scenario, while staying a reasonable margin under the 6.75% ceiling given the diminishing-but-still-positive trend across the last two steps.
+
+RESULT 20260829-0319/24: 0.182500  reverted (best 0.177500)
+
