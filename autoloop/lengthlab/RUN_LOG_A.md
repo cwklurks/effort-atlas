@@ -46,3 +46,7 @@ RESULT 20260828-2127/2: 0.034380  reverted (best 0.024558)
 
 RESULT 20260828-2127/3: 0.024545  reverted (best 0.024558)
 
+## 20260828-2127/4 HYPOTHESIS: The reviewer's 2119/2 tail-branch strategy is now exhausted (options 1-3 all tried: 1 near-tied at 0.024492, 2 and 3 lost badly) and the follow-up identified-branch quantile-interpolation idea also only near-tied (0.024545 at 2127/3), so combine the two previously-tried interventions that each independently moved the score in the right direction but individually fell short of the 0.003 margin - apply the reviewer's ranked-option-1 bound-respecting clamps (median/q90 lower-bounded by empirical clamped quantiles when unidentified, p_ge beyond cap capped at cen_frac and forced nonincreasing) together with switching the identified-branch empirical quantiles (median when cen_frac<0.5, q90 when cen_frac<0.10) to the 'median_unbiased' interpolation method, since both are independent, low-risk, bound-respecting/variance-reducing corrections that never touch the fit or tail-level itself, and stacking their small individual gains (-0.000066 and -0.000013 respectively) is the last plausible way for this family of small corrections to approach (even if unlikely to clear) the required margin, which would also cleanly settle whether this whole corrective-clamp family is truly exhausted.
+
+RESULT 20260828-2127/4: 0.024479  reverted (best 0.024558)
+
