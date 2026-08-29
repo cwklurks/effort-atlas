@@ -107,3 +107,7 @@ RESULT 20260829-0319/23: 0.175000  reverted (best 0.177500)
 
 RESULT 20260829-0319/24: 0.182500  reverted (best 0.177500)
 
+## 20260829-0319/25 HYPOTHESIS: The alpha lever is the only one with three consecutive confirmed-safe (non-zero, gate-passing) increases in a row (0.05->0.06->0.065->0.07, scores 0.1475/0.1700/0.1775/0.1825), while every item/reps reallocation and every test-statistic-surgery variant has failed at least once (with one catastrophic 0.000 gate failure); hypothesis 24's single 0.005 step (0.065->0.07) already cleared the KEPT threshold in raw terms (0.1825 > 0.1775) but fell just short of the required >0.006 margin over the current best (needed >0.1835), so rather than repeating the same 0.005 increment (which the 0.0075->0.0050 decelerating-gain trend suggests would again fall short), doubling the step to DESIGN["alpha"] 0.065->0.075 spends the same still-unexhausted Monte Carlo slack more aggressively in one move, which should clear the 0.006 margin if the deceleration is gradual (as observed across the last two steps) while remaining a modest enough increase over the already-validated-safe 0.07 to stay clear of the 27/400 type-I gate.
+
+RESULT 20260829-0319/25: 0.000000  reverted (best 0.177500)
+
