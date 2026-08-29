@@ -148,3 +148,7 @@ RESULT 20260828-2127/23: 0.024489  reverted (best 0.024558)
 
 RESULT 20260828-2127/24: 0.024611  reverted (best 0.024558)
 
+## 20260828-2127/25 HYPOTHESIS: The reviewer's 2127/20 strategy is now exhausted too (all three ranked options plus a KS-diagnostic variant of option 2 tried across 21-24, every one a near-tie or a loss, the closest being 2127/23's isolated p_ge hard-gate at 0.024489), so move to a genuinely untried lever that touches neither the fit nor any diagnostic gate: the exactly-identified empirical p_ge(c) values for c<=cap are currently computed as independent raw binomial proportions per report cap with no enforcement that P(X>=c) must be non-increasing in c, even though every sample with cap=14096 or cap=32000 (obs caps used by the scorer) yields 3 or 6 such identified points from the SAME 500 rows whose true survival values are mathematically guaranteed monotone - apply isotonic regression (pool-adjacent-violators, equal weights, L2-optimal projection onto the non-increasing constraint) across the sorted identified p_ge(c<=cap) values only, leaving median, q90, and every unidentified c>cap tail value completely untouched, since this is a projection onto a constraint that is always true (never introduces bias) and can only reduce variance when independent binomial sampling noise produces small out-of-order violations among the identified points, a distinct mechanism from every previously-tried fit-based, gate-based, or shrinkage-based correction this session.
+
+RESULT 20260828-2127/25: 0.024558  reverted (best 0.024558)
+
