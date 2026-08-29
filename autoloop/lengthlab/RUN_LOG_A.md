@@ -8,3 +8,7 @@ RESULT 20260828-2107/1: 0.035857  reverted (best 0.024558)
 
 RESULT 20260828-2107/2: 0.026344  reverted (best 0.024558)
 
+## 20260828-2119/1 HYPOTHESIS: Replace the Tobit-MLE lognormal fit used as the parametric fallback (unidentified median/q90, and p_ge extrapolation beyond cap) with a robust quantile-matching lognormal fit built from two empirically-identified clamped-data quantiles (falling back to the existing Tobit MLE when too little of the distribution is identified), since likelihood-based EM fitting is pulled off-shape by the bimodal/heavy-tail regimes (as seen in the two prior mixture/anchoring attempts) while quantile matching on identified order statistics should be less sensitive to that misspecification at n=500.
+
+RESULT 20260828-2119/1: 0.041739  reverted (best 0.024558)
+
