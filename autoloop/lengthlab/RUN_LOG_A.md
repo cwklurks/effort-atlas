@@ -234,3 +234,7 @@ RESULT 20260828-2127/40: 0.024344  reverted (best 0.024558)
 
 RESULT 20260828-2127/41: 0.028492  reverted (best 0.024558)
 
+## 20260828-2127/42 HYPOTHESIS: Adopt the reviewer's 2127/40 strategy ranked option 2 (option 1, the censored two-component mixture EM, was tried at 2127/41 and lost badly at 0.028492) - keep the single global Tobit-lognormal fit and every identified branch completely untouched, but for the unidentified branches only (q90 when cen_frac>=0.10, and p_ge extrapolation for c>cap), refit a SECOND, local (mu, sigma) via left-truncated-and-right-censored lognormal MLE restricted to rows above the exactly-identified empirical median (truncation point t=median, entering the likelihood by dividing by SF_normal(log t)), maximized by a coarse deterministic 2-D grid search over (mu, sigma) with one refinement pass (no scipy needed), falling back to the untouched global fit whenever cen_frac>=0.5 (median itself unidentified) or fewer than 50 rows lie above the median - since for true lognormals this local fit recovers essentially the same (mu, sigma) as the global fit (near-no-op) while for mix_bimodal/mix_heavy/tail_pareto it automatically re-weights toward the upper component/tail that actually determines q90 and the beyond-cap survival, the specific untried mechanism (localizing the fit's estimation window rather than changing its family or post-hoc correcting its output) that the reviewer flagged as having margin-sized headroom.
+
+RESULT 20260828-2127/42: 0.061978  reverted (best 0.024558)
+
