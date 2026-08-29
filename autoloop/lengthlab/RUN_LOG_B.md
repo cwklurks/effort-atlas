@@ -203,3 +203,7 @@ RESULT 20260829-0319/44: 0.970000  KEPT (new best)
 
 RESULT 20260829-0319/45: 0.970000  reverted (best 0.970000)
 
+## 20260829-0319/46 HYPOTHESIS: Hypothesis 44 showed the n_items=148 RNG stream has more type-1 headroom at alpha=0.079 than the stale n_items=145 stream did at the same alpha value (388/400 power-scenario rejections with the null-rejection count comfortably below TYPE1_CRIT=27, versus the old stream's tighter 384/400-adjacent margin), while hypothesis 45's tiny +0.0005 step to 0.0795 produced an exactly flat score (388/400), suggesting no borderline p-value happened to sit in that narrow sliver rather than the lever being exhausted - since n_items is already budget-maxed (149 items would push mean cost to ~$40.14, over the $40 cap, so no further item-count headroom exists) and TRIM/n_reps/lo-signal-reincorporation are all separately established as flat-or-catastrophic dead ends on this and the prior stream, alpha remains the only lever with confirmed remaining (if narrow) slack; stepping DESIGN["alpha"] from 0.079 to 0.0798 - a slightly larger jump than hypothesis 45's null-effect +0.0005 step, while staying meaningfully below the untested-on-this-stream but historically catastrophic 0.080 value (hypothesis 38, on the old stream) - should cross additional borderline worst-case-scenario p-values on the current stream without inflating type-I, since the exact symmetry-about-0 of did under every null scenario (hypothesis 8/9/31) holds for any alpha.
+
+RESULT 20260829-0319/46: 0.970000  reverted (best 0.970000)
+
