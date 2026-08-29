@@ -90,3 +90,9 @@ RESULT 20260828-2127/13: 0.030145  reverted (best 0.024558)
 
 RESULT 20260828-2127/14: 0.024558  reverted (best 0.024558)
 
+## 20260828-2127/15 HYPOTHESIS: All fourteen prior attempts either replaced/re-anchored the lognormal fit or its global tail level (closed, every attempt lost badly) or layered small one-sided corrections on the fit's downstream branches (bound clamps, interpolation swaps, shrinkage, bagging, blends, re-anchoring mu to the known median, convergence tuning - eleven more attempts, every one a near-tie or a loss), so this iteration targets a genuinely untried statistical technique on the one remaining untouched lever: the unidentified parametric q90 (cen_frac >= 0.10) currently comes purely from the fitted normal quantile in log-space, which silently assumes the log-data is exactly Gaussian even though mix_bimodal/mix_heavy/tail_pareto are visibly skewed/heavy-tailed in log-space - apply a magnitude-clamped Cornish-Fisher expansion (using skewness/kurtosis estimated from the uncensored log-observations only, when at least 30 such points exist) to correct the standard normal 90th-percentile z-score for that empirical skew/kurtosis before exponentiating, leaving the fit itself, the median branch, and all p_ge branches completely untouched, and leaving q90 itself untouched whenever too few uncensored points exist to estimate shape reliably.
+
+RESULT 20260828-2127/15: pending
+
+RESULT 20260828-2127/15: 0.028266  reverted (best 0.024558)
+
