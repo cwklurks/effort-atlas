@@ -458,3 +458,7 @@ RESULT 20260829-0319/100: 0.000000  reverted (best 0.987500)
 
 RESULT 20260829-0319/101: 0.960000  reverted (best 0.987500)
 
+## 20260829-0319/102 HYPOTHESIS: Following STRATEGY 100's ranked direction 2 (never tried against a post-62 combined statistic, and direction 1's pooling attempt just failed in hypothesis 101), replace the Yuen trimmed-mean normal-approximation p-value with an exact one-sided sign test on the current combined did = hi_diff + 0.625*lo_diff (dropping ties where did==0, m = count of nonzero items, k = count of positive items, p = P(Binom(m,0.5) >= k) computed exactly via math.comb), paired with an alpha reset to the conservative nominal 0.05 in the same edit (n_items=148, n_reps=2, LO_WEIGHT=0.625 unchanged) - since under every null scenario did is exactly symmetric about 0 (hypothesis 8/9/31/62/81's exchangeability argument), each nonzero item is an independent unbiased coin flip under H0, making this test's type-I EXACTLY <= alpha by construction rather than relying on a normal approximation that has repeatedly proven to sit flush against the type-I gate (STRATEGY 60(a), 80(a), 100(a)) and break catastrophically on the slightest perturbation, while under every power scenario the strictly positive expected did should push the sign-test's rejection rate high, so eliminating the cliff-prone normal approximation entirely (rather than nudging its threshold) may unlock the headroom the last ~20 calibration-only attempts could not reach.
+
+RESULT 20260829-0319/102: 0.950000  reverted (best 0.987500)
+
