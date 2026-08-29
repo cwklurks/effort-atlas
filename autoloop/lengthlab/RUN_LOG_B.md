@@ -7,3 +7,7 @@ RESULT 20260829-0319/1: 0.080000  reverted (best 0.075000)
 
 RESULT 20260829-0319/2: 0.122500  KEPT (new best)
 
+## 20260829-0319/3 HYPOTHESIS: Each item's true per-cell accuracy is P_answer(effort,allowance) * sigmoid(BASE - d_i + b_effort), so both the true DiD and the item's overall mean accuracy across the four cells are smooth decreasing functions of the same latent d_i (while their pure measurement-noise covariance is exactly zero by construction, since did=a-b-c+d and x=(a+b+c+d)/4 give zero cross-term for independent-noise cells), so an ANCOVA-style regression adjustment of the per-item DiD on that within-item mean-accuracy covariate (CUPED-like, with the correct n-2 residual degrees of freedom preserving the one-sided test's validity) should remove genuine between-item heterogeneity and increase power without inflating type-I.
+
+RESULT 20260829-0319/3: 0.122500  reverted (best 0.122500)
+
