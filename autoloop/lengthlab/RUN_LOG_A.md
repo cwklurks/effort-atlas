@@ -186,3 +186,7 @@ RESULT 20260828-2127/32: 0.024491  reverted (best 0.024558)
 
 RESULT 20260828-2127/33: 0.024557  reverted (best 0.024558)
 
+## 20260828-2127/34 HYPOTHESIS: Two previously-validated single-lever near-ties have never been stacked together despite touching disjoint parts of the pipeline - EM-sigma shrinkage toward the cross-regime-typical 0.85 with weight k/(k+n_uncensored), k=10, from 2127/17 (0.024425, delta -0.000133, the single largest gain found all session, feeding every downstream branch) and log-space order-statistic interpolation for the identified median (cen_frac<0.5) and q90 (cen_frac<0.10) branches from 2127/31 (0.024557, delta -0.000001, the closest single miss of the session, reducing AM-GM overshoot bias on skewed clamped data) - prior combination attempts paired sigma-shrinkage with median_unbiased interpolation instead (2127/18, 3-way stack, -0.000214, the best full stack this session) or paired log-space interpolation with the bound clamps instead of sigma-shrinkage (2127/32, -0.000067), so this iteration tests the specific untried pairing: sigma-shrinkage (which improves the unidentified parametric branches and the fit feeding the p_ge tail) combined with log-space quantile interpolation (which improves the identified empirical branches), since both act on disjoint mechanisms - one on the fitted parameter, one on the raw-data quantile estimator - and neither has been tested together.
+
+RESULT 20260828-2127/34: 0.024424  reverted (best 0.024558)
+
