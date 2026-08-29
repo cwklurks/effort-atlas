@@ -64,3 +64,7 @@ RESULT 20260828-2127/7: 0.024544  reverted (best 0.024558)
 
 RESULT 20260828-2127/8: 0.024558  reverted (best 0.024558)
 
+## 20260828-2127/9 HYPOTHESIS: The 2127/7 flat pseudo-count shrinkage on the exactly-identified p_ge(c<=cap) branch used flawed reasoning (it assumed binomial sampling variance is largest at extreme probabilities, when p(1-p)/n is actually largest at p=0.5 and smallest near 0/1) and only netted a negligible gain, so replace it with a statistically-correct adaptive James-Stein-style shrinkage that blends the raw empirical proportion with the already-computed lognormal fit's own CDF at c, weighting the parametric prior in proportion to the empirical proportion's own estimated sampling variance p_hat(1-p_hat)/n (heavy shrinkage where that variance is large, near-zero shrinkage where the empirical estimate is already near-certain), targeting variance reduction on p_ge - the component that makes up 6 of the 8 per-cell error terms - while never touching the unidentified tail extrapolation, the fit itself, or the median/q90 branches that every structural-change attempt this session has shown are fragile.
+
+RESULT 20260828-2127/9: 0.024679  reverted (best 0.024558)
+
