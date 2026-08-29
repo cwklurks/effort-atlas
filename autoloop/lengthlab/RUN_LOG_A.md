@@ -368,3 +368,9 @@ RESULT 20260828-2127/69: 0.021582  reverted (best 0.024558)
 
 RESULT 20260828-2127/70: 0.021582  reverted (best 0.024558)
 
+## 20260828-2127/71 HYPOTHESIS: The reviewer's 2127/60 strategy is now exhausted (all three ranked options tried: the pinned two-component mixture plateaued across ten variants 61-66/69-70 in a tight band from delta -0.0022 to -0.0030, just short of the 0.003 margin; the q90 exact-anchor level inversion lost badly at 0.027133; the continuous d-driven q90 inflation also lost at 0.025529), but the pinned mixture's own internal ablation was never completed - 2127/66 isolated p_ge(c>cap)-only substitution (leaving q90 at baseline) and it regressed hard to delta -0.00126, far short of the combined -0.0029, implying q90 substitution carries most of the combined gain, yet the mirror-image cell (q90-only substitution, p_ge left untouched) was never directly tested - so isolate exactly that missing cell: reuse 2127/61/62's exact pinned two-component mixture construction (split point s = geometric mean of the clamped-data median and cap, w2 = exact empirical p_ge(s), component 1 from uncensored points below s with a >=10-point fallback to baseline, fixed sigma2=0.6, mu2 solved in closed form so mixture_sf(cap) reproduces cen_frac exactly, gated on cen_frac>=0.10 and diagnostic d=mean|lognormal_sf(mu,sigma,c)-p_emp(c)|>0.02 over identified caps<=cap) but apply the mixture-CDF bisection substitution to q90 ONLY, leaving p_ge(c>cap), median, and the fit itself completely untouched (no bound clamps either, mirroring 2127/66's ablation style exactly), to determine whether q90 alone reproduces most of the combined mechanism's near-margin gain or whether the two substituted outputs interact nonlinearly.
+
+RESULT 20260828-2127/71: pending
+
+RESULT 20260828-2127/71: 0.022950  reverted (best 0.024558)
+
