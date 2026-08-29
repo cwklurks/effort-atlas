@@ -337,3 +337,7 @@ RESULT 20260828-2127/61: 0.021690  reverted (best 0.024558)
 
 RESULT 20260828-2127/62: 0.021670  reverted (best 0.024558)
 
+## 20260828-2127/63 HYPOTHESIS: 2127/61's pinned two-component mixture (hard-gated on d>0.02) scored delta -0.002868 and 2127/62's added 2119/3 bound clamps (q90 floored at the empirical clamped 90th percentile; p_ge(c>cap) capped at cen_frac and forced nonincreasing) nudged it to delta -0.002888, both the closest results of the session yet still just short of the 0.003 margin - so reimplement the identical mechanism (split point s = geometric mean of the clamped-data median and cap, w2 = exact empirical p_ge(s), component 1 from uncensored log-points below s with a fallback to baseline if fewer than 10 such points, sigma2 fixed at 0.6, mu2 solved in closed form so mixture_sf(cap) reproduces cen_frac exactly, q90 via bisection on the mixture SF, p_ge(c>cap) via direct mixture_sf, the same 2119/3 clamps kept intact) but replace the hard d>0.02 on/off gate with a continuous blend weight = clip((d-0.01)/0.03, 0, 1) applied between the baseline value and the mixture value for both q90 and p_ge(c>cap), since a smooth transition avoids the discontinuous over/under-correction right at the threshold boundary that a hard gate imposes on borderline-misspecified samples, which is the most plausible source of the small remaining shortfall given the mixture mechanism itself is already validated as the closest direction found.
+
+RESULT 20260828-2127/63: 0.022143  reverted (best 0.024558)
+
