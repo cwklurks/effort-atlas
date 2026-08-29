@@ -199,3 +199,7 @@ RESULT 20260829-0319/43: 0.962500  reverted (best 0.957500)
 
 RESULT 20260829-0319/44: 0.970000  KEPT (new best)
 
+## 20260829-0319/45 HYPOTHESIS: Hypothesis 44 showed that alpha=0.079 on the n_items=148 stream clears the type-1 gate with visibly more slack than it did on the old n_items=145 stream (388/400 power-scenario rejections vs the old stream's 384/400 null-adjacent count at the identical alpha value), implying the type-1 rejection count at alpha=0.079 on this stream sits comfortably below TYPE1_CRIT=27 rather than hugging it, so the true cliff for n_items=148 likely sits above 0.079 - but since alpha=0.080 has only ever been confirmed catastrophic on the stale, no-longer-current n_items=145 stream (hypothesis 38) and has never been probed on this stream, jumping the full step to 0.080 risks repeating that gate failure blind; bisecting conservatively to the untested midpoint alpha=0.0795 (TRIM=0.10, n_items=148, n_reps=2 unchanged) tests whether this stream's extra headroom extends past 0.079 while staying half as far from the only known-catastrophic point as a direct jump to 0.080 would, aiming to cross additional borderline worst-case-scenario p-values without inflating type-I, since the exact symmetry-about-0 of did under every null scenario (hypothesis 8/9/31) holds for any alpha.
+
+RESULT 20260829-0319/45: 0.970000  reverted (best 0.970000)
+
