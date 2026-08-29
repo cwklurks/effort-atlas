@@ -349,3 +349,7 @@ RESULT 20260828-2127/64: 0.021982  reverted (best 0.024558)
 
 RESULT 20260828-2127/65: 0.025995  reverted (best 0.024558)
 
+## 20260828-2127/66 HYPOTHESIS: 2127/61-65 all substituted BOTH q90 (via mixture-CDF bisection) and p_ge(c>cap) (via direct mixture_sf) together, and every variant of the gate/clamps/sigma2 landed in a tight band around delta -0.002 to -0.0029 without ever isolating which of the two substituted outputs drives the gain versus which adds noise - so reimplement 2127/62's exact pinned two-component mixture mechanism (same split point s = geometric mean of the clamped-data median and cap, same w2 = empirical p_ge(s), same component-1 fit from uncensored points below s with the >=10-point fallback, same fixed sigma2=0.6, same closed-form mu2 solve so mixture_sf(cap) reproduces cen_frac exactly, same d>0.02 diagnostic gate, same 2119/3 clamps of p_ge(c>cap) to <= cen_frac and nonincreasing) but apply the mixture substitution to p_ge(c>cap) ONLY (six of the eight per-cell error terms, using a direct closed-form SF evaluation with no root-finding) while leaving q90 completely at the untouched single-lognormal baseline (no mixture substitution, no bound-clamp), since q90's mixture value requires an extra bisection root-find on top of the same pinned parameters that could itself be a noise source the combined substitution never let us see separately.
+
+RESULT 20260828-2127/66: 0.023298  reverted (best 0.024558)
+
