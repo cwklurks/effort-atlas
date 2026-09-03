@@ -69,6 +69,7 @@ reap/
   20_BENCHMARK_COMPARISON_2026-08-18.md
   21_MODEL_PAIR_ELIGIBILITY_2026-08-18.md
   22_BENCHMARK_PROVENANCE_AND_CAPABILITY_2026-08-19.md
+  23_BENCHMARK_SCOPE_DECISION_2026-08-20.md
   CODEX_BRIEFING.md
   README.md
   REVIEW_PR1_ECOSYSTEM_AUDIT.md
@@ -115,6 +116,7 @@ tests/
   test_analysis.py
   test_analyze_guard.py
   test_benchmark_provenance.py
+  test_benchmark_scope_decision.py
   test_confirmatory.py
   test_dataset_manifest.py
   test_grader_v2.py
@@ -266,7 +268,7 @@ Cap detection on MathArena is inferential (≥99.5% of per-model max + round-val
  &quot;spot_checks&quot;: &quot;7/7 PASS (see RUN_LOG.md 2026-08-07)&quot;
 }</file><file path="reap/claude_project/PROJECT_BRIEF.md"># PROJECT_BRIEF — canonical state of REAP / Thinking Cut Short
 
-**Last updated: 2026-08-10. Update this file whenever project state changes; it is the single source of truth for Claude Project chats.**
+**Last updated: 2026-08-20. Update this file whenever project state changes; it is the single source of truth for Claude Project chats.**
 
 ## People and roles
 
@@ -315,6 +317,11 @@ call.
 
 - The $0 MathArena/HELM observational study is complete and verified; it remains
   exploratory and separate from all future confirmatory estimates.
+- The 2026-08-20 non-frozen benchmark-scope record makes that separation an
+  explicit design boundary: archived rows retain source-native grades and
+  descriptive claims only, while controlled estimands may use only newly collected
+  rows under a frozen REAP manifest. Exact HMMT cohort and question selection is
+  the next human-owned phase, not a decision inferred from archive performance.
 - Grader v2, Tinker probe tooling, the ecosystem audit, and governance are merged
   to main. The pre-data analysis branch now integrates accepted grader v2, uses
   item-level transition mass rather than replicate-index pairing, and passes the
@@ -348,7 +355,9 @@ call.
 - No paid REAP smoke or confirmatory call has run. Tinker cap semantics, omitted-cap
   cost bounds, sample independence, and OpenAI usage accounting remain unresolved.
 
-Next gates: resolve D03/D04/D06/D09/D11/D12/D13/D15 and obtain Chirag&apos;s scientific
+Next gates: accept the exploratory-versus-controlled benchmark boundary; resolve
+the exact HMMT cohort/question rule without using archived accuracy to hand-pick
+items; resolve D03/D04/D06/D09/D11/D12/D13/D15 and obtain Chirag&apos;s scientific
 signoff on D03-D10; record the final human choices; freeze the scientific design and
 fail-closed activation-or-omission rules; implement and red-team the runner; then
 allow human-initiated smoke. Connor proposes at most $2 for the Tinker reliability
@@ -578,6 +587,10 @@ confirmatory experiment has made **zero** paid calls.
 - HELM evaluates a deliberate 446-question GPQA test split from 448 source rows.
   Only Gemini has complete termination labels (42 length, 404 stop), and its token
   field is all zero. HELM token fields are not a comparable cross-provider unit.
+- The non-frozen benchmark-scope boundary keeps the archive and controlled lanes
+  non-pooling. Archived rows may motivate and inform pre-data design, but they
+  cannot enter a controlled-effect denominator. The exact controlled HMMT cohort
+  and question IDs remain the next human-owned decision.
 
 ## The research question agreed after the meeting
 
@@ -614,9 +627,11 @@ artifact or infer an unrecorded provider fact.
 4. `reap/21_MODEL_PAIR_ELIGIBILITY_2026-08-18.md` — when comparisons are allowed.
 5. `reap/22_BENCHMARK_PROVENANCE_AND_CAPABILITY_2026-08-19.md` — what the pinned
    public files can and cannot answer at the question level.
-6. `reap/next_chapter/index.html` — self-contained plain-language report of this
+6. `reap/23_BENCHMARK_SCOPE_DECISION_2026-08-20.md` — the non-frozen evidence-lane
+   boundary and the exact controlled-scope choices still open.
+7. `reap/next_chapter/index.html` — self-contained plain-language report of this
    chapter; its build receipt states the limits of browser verification.
-7. `reap/02_BUDGET_AND_COSTS.md` and `reap/08_HYPERPARAMETER_DECISIONS.md` — no
+8. `reap/02_BUDGET_AND_COSTS.md` and `reap/08_HYPERPARAMETER_DECISIONS.md` — no
    unbounded model work or assumed provider behavior.
 
 `reap/linux_handoff/REPO_CONTEXT.xml` collects the main tracked documents, source,
@@ -1394,9 +1409,9 @@ No provider or model-generation calls are made by either script.</file><file pat
     &quot;name&quot;: &quot;REAP&quot;,
     &quot;paper&quot;: &quot;Thinking Cut Short&quot;,
     &quot;repository&quot;: &quot;cwklurks/effort-atlas&quot;,
-    &quot;updated&quot;: &quot;2026-08-19&quot;,
+    &quot;updated&quot;: &quot;2026-08-20&quot;,
     &quot;current_phase&quot;: 3,
-    &quot;summary&quot;: &quot;Phase 2 is merged and the decision-independent Phase 3 implementation is approved. The post-meeting benchmark chapter now pins public sources, exposes question-level capability and provenance limits, and prepares a verified Linux handoff. The scientific design remains non-frozen and all spending decisions stay human-owned.&quot;
+    &quot;summary&quot;: &quot;Phase 2 is merged and the decision-independent Phase 3 implementation is approved. The post-meeting benchmark chapter pins public sources, and a non-frozen scope boundary now separates exploratory archives from future controlled denominators. Exact controlled questions and the scientific design remain human-owned; no call is authorized.&quot;
   },
   &quot;safety&quot;: {
     &quot;confirmatory_calls&quot;: 0,
@@ -1438,8 +1453,8 @@ No provider or model-generation calls are made by either script.</file><file pat
       &quot;name&quot;: &quot;Methodology and preregistration freeze&quot;,
       &quot;status&quot;: &quot;in_progress&quot;,
       &quot;progress&quot;: 65,
-      &quot;summary&quot;: &quot;The non-frozen model recommendation, completed development relay, approved offline safeguards, and exact-source benchmark capability audit are preserved. HMMT-2026 item 25, items 31–33, model scope, and final statistical choices remain explicit decisions.&quot;,
-      &quot;gate&quot;: &quot;Human owners Connor and Chirag settle the remaining dataset, model, and statistical choices, then freeze exact rules; no review, report, or Linux handoff authorizes a call.&quot;,
+      &quot;summary&quot;: &quot;The non-frozen model recommendation, approved offline safeguards, exact-source audit, and exploratory-versus-controlled benchmark boundary are preserved. HMMT-2026 item 25, items 31–33, exact controlled questions, model scope, and final statistical choices remain explicit human decisions.&quot;,
+      &quot;gate&quot;: &quot;Human owners Connor and Chirag accept the evidence-lane boundary, settle the exact controlled dataset, model, and statistical choices, then freeze exact rules; no review, report, or Linux handoff authorizes a call.&quot;,
       &quot;url&quot;: &quot;https://github.com/cwklurks/effort-atlas/pull/6&quot;
     },
     {
@@ -1524,6 +1539,11 @@ No provider or model-generation calls are made by either script.</file><file pat
   ],
   &quot;verification&quot;: [
     {
+      &quot;label&quot;: &quot;Benchmark scope boundary contract&quot;,
+      &quot;result&quot;: &quot;4 focused offline tests enforce a non-frozen, zero-call separation between source-native exploratory archives and strict newly collected controlled denominators; exact HMMT questions remain human-pending&quot;,
+      &quot;status&quot;: &quot;passed&quot;
+    },
+    {
       &quot;label&quot;: &quot;Post-meeting benchmark provenance audit&quot;,
       &quot;result&quot;: &quot;Approved after exact-root reconstruction of 20 pinned files and 4,248 sanitized cells; missing responses, item-25 text drift, token-accounting anomalies, privacy boundaries, and artifact freshness were independently mutation-checked&quot;,
       &quot;status&quot;: &quot;passed&quot;
@@ -1535,7 +1555,7 @@ No provider or model-generation calls are made by either script.</file><file pat
     },
     {
       &quot;label&quot;: &quot;Phase 3 current offline checkpoint&quot;,
-      &quot;result&quot;: &quot;273 ordinary tests plus 26 exact-lock Tinker tests passed; the canonical verifier remains offline and both lanes are mandatory&quot;,
+      &quot;result&quot;: &quot;277 ordinary tests plus 26 exact-lock Tinker tests passed; the canonical verifier remains offline and both lanes are mandatory&quot;,
       &quot;status&quot;: &quot;passed&quot;
     },
     {
@@ -1630,6 +1650,12 @@ No provider or model-generation calls are made by either script.</file><file pat
     }
   ],
   &quot;activity&quot;: [
+    {
+      &quot;date&quot;: &quot;2026-08-20&quot;,
+      &quot;phase&quot;: 3,
+      &quot;title&quot;: &quot;Exploratory and controlled benchmark scopes separated&quot;,
+      &quot;detail&quot;: &quot;A non-frozen decision record now keeps public archive rows, source-native grades, and descriptive claims out of every controlled-effect denominator. The first controlled pass remains a compact HMMT candidate, while the exact cohort, question 25, items 31–33, item manifest, model roster, and endpoint priority remain human-pending. No provider, smoke, probe, or confirmatory call occurred.&quot;
+    },
     {
       &quot;date&quot;: &quot;2026-08-19&quot;,
       &quot;phase&quot;: 3,
@@ -1752,6 +1778,7 @@ No provider or model-generation calls are made by either script.</file><file pat
     }
   ],
   &quot;decisions&quot;: [
+    &quot;The non-frozen 23_BENCHMARK_SCOPE_DECISION_2026-08-20.md separates exploratory public archives from future controlled REAP rows. Archived responses may inform pre-data design but never enter a controlled-effect denominator; exact HMMT questions and model panels remain human-pending, and the record authorizes no calls.&quot;,
     &quot;The post-meeting public-source audit is exploratory and approved as a capability/provenance layer, not as confirmatory data or a frozen benchmark choice. HMMT-2026 item 25 and items 31–33 require explicit rules before freeze; archived provider token fields remain route-specific rather than one cross-provider unit.&quot;,
     &quot;The Linux continuation package transfers only committed, secret-free state. Tailscale is transport, Git is the source of truth, and neither the package nor its dashboard authorizes provider access or research execution.&quot;,
     &quot;The completed bounded Claude/Codex development relay is a non-authoritative review aid, not an approval mechanism or freeze-eligible evidence. Its Claude side used claude-fable-5 through eligible regular-plan usage with API/gateway billing absent, usage credits disabled, and automatic model switching disabled. Spending, provider activation, preregistration freeze, and Connor/Chirag choices remain human decisions.&quot;,
@@ -5299,7 +5326,155 @@ Primary source identities used here:
   `bfa36d33e8b98b36b5f3a8c7d52b9a1b7162eae5`, which pins GPQA revision
   `90b8e5be2b1d3d2dbfe016cdab47981150600c4a` and train indices 339 and 105.
 - Original GPQA repository archive commit
-  `d46dc8d5e01b40bcde0bed6bee68a5de953a58f8`.</file><file path="reap/CODEX_BRIEFING.md"># Codex briefing — effort-atlas / REAP
+  `d46dc8d5e01b40bcde0bed6bee68a5de953a58f8`.</file><file path="reap/23_BENCHMARK_SCOPE_DECISION_2026-08-20.md"># REAP benchmark-scope decision
+
+**Date:** 2026-08-20
+**Status:** NON-FROZEN SCOPE BOUNDARY - NO CALL AUTHORIZATION
+
+This record separates the public-archive benchmark work from the future controlled
+REAP experiment. It is a decision about evidence lanes, admissible claims, and the
+order of the remaining decisions. It does not select a final controlled item list,
+freeze D03, approve a model route, authorize spending, or permit a provider,
+smoke, probe, or confirmatory call.
+
+```text
+CONFIRMATORY_CALLS=0
+PAID_STUDY_GENERATION_CALLS=0
+PAID_SMOKE_CALLS=0
+PROVIDER_PROBE_CALLS=0
+DEEPSEEK_DEVELOPMENT_CALLS=0
+```
+
+## Decision
+
+REAP will keep two non-pooling benchmark scopes.
+
+| Boundary | Exploratory public-archive scope | Controlled experiment scope |
+|---|---|---|
+| Data origin | Already-published, revision-pinned MathArena and HELM archives | New responses collected only after a dated REAP preregistration, exact manifests, reviewed runner, executable budget gates, and human activation |
+| Current benchmark coverage | The verified question-level audit covers MathArena HMMT 2025, MathArena HMMT 2026, and HELM GPQA; the protected historical observational study separately includes AIME 2026 and BRUMO 2025 summaries | A compact HMMT short-answer experiment is the current candidate; the exact cohort and question IDs remain a separate human decision |
+| Scientific role | Motivate the mechanism, audit provenance and measurement capability, describe archived question-level accuracy and route-native output fields, and provide pre-data design inputs | Estimate the within-route effort-by-allowance interaction, unanswered length-stop response, large-cap reference behavior, and any prespecified matched-performance operating frontier |
+| Grade | Source-native archived grade, labeled as such | Strict `Final answer: &lt;answer&gt;` presence followed by the frozen deterministic upstream mathematical comparator |
+| Termination | MathArena is `inferred` or `unknown`; HELM Gemini is `observed`; HELM Claude and GPT are `unknown` | Captured at collection time from the exact route and kept separate from grading |
+| Output measure | Route/archive-native and quality-flagged; no universal cross-provider token unit | Frozen per route, with per-response usage and accounting linkage required before activation |
+| Unit and uncertainty | Average attempts within question, weight questions equally, preserve paired-question coverage and explicit missing cells | Independently scheduled attempts with item-clustered analysis and the frozen arm, seed, missingness, and multiplicity rules |
+| Permitted claim | Descriptive archived association, capability, provenance, and operational examples | Prespecified intervention estimates under the frozen questions, prompts, routes, effort values, caps, and analysis |
+| Denominator | Exploratory only | Controlled rows only |
+
+No archived response row, grade, token count, or termination field may enter a
+controlled-effect denominator. No controlled response may be appended to an
+exploratory archive table and presented as one sample. The two scopes may share
+question identifiers only when the controlled manifest independently freezes those
+identifiers; shared IDs do not turn archived attempts into controlled observations.
+
+## Exploratory public-archive scope
+
+The pinned public-source audit remains the authority for what the archived files
+can support:
+
+- HMMT 2025 has 30 source IDs and complete ID coverage for 64 archived models, but
+  prompt variants and unusable token values require explicit quality flags.
+- HMMT 2026 has 33 MathArena item IDs. Question 25 has mixed text versions, items
+  31-33 lack settled official-round provenance, and Qwen3.5-4B has 11 explicit
+  missing model-question cells.
+- HELM evaluates a fixed 446-question GPQA test split. All three archived models
+  share those IDs, but their prompt wrappers and token fields are not one common
+  measurement system. Only Gemini has complete stop labels: 42 `length` and 404
+  `stop`.
+- AIME 2026 and BRUMO 2025 remain part of the earlier protected exploratory
+  observational record. They are not silently promoted into this question-level
+  capability audit or into the controlled experiment.
+
+Allowed exploratory outputs are question-level source-native accuracy, coverage,
+missingness, prompt/version differences, route-native output summaries after
+quality control, and observed/inferred/unknown termination summaries. These
+outputs must remain dataset- and route-labeled.
+
+The exploratory lane must not report:
+
+- a causal claim that a particular answer was wrong because of a cap;
+- a censoring-adjusted or imputed accuracy;
+- a pooled native-token ratio across providers or tokenizers;
+- a strict-REAP regrade where the complete response text and frozen extraction
+  contract are unavailable; or
+- any estimate presented as confirmatory REAP evidence.
+
+## Controlled experiment scope
+
+The controlled lane will collect new, independently scheduled responses on one
+frozen short-answer benchmark scope. Its minimum design contract is:
+
+1. exact source revision, licence record, question IDs, question-text hashes, gold
+   hashes, and a source-defined, outcome-blind inclusion rule;
+2. one exact prompt template plus recorded route wrappers/renderers;
+3. explicit effort and exact integer output allowance on every ordinary request;
+4. strict final-answer-marker extraction and a pinned deterministic upstream
+   scorer that fails closed on import or schema mismatch;
+5. termination reason, route-native usage, request identity, and accounting linkage
+   captured for every attempt;
+6. independent exploratory, smoke, and controlled ledgers and artifact roots; and
+7. item-clustered analysis with no cross-panel pooling of route-specific effort or
+   token units.
+
+The existing effort slope and effort-by-allowance interaction remain the primary
+controlled mechanism target unless Connor and Chirag explicitly replace them in
+the new preregistration. The matched-performance frontier is an additional
+controlled estimand: it is defined only over tested regimes and accuracy levels
+both compared models attain. A cross-route token difference or ratio is
+`not_estimable` unless the frozen eligibility record establishes a commensurate
+output measure.
+
+The public archives may inform pre-data power work, cap placement, quality checks,
+and candidate-item review. Any such use must cite the pinned inputs, occur before
+the scientific freeze, and be recorded as design evidence. It does not move an
+archived outcome into the controlled analysis.
+
+## What this phase decides
+
+This phase decides all of the following:
+
+1. Public archives and newly collected experiment rows are separate evidence
+   layers with separate denominators and claims.
+2. The public-source benchmark audit remains exploratory even when it uses the same
+   question IDs later selected for the experiment.
+3. The first controlled pass stays within a compact HMMT short-answer scope. GPQA,
+   AIME, BRUMO, HARP, and GSM8K are not part of the first controlled schedule
+   unless Connor and Chirag make a new pre-data scope decision.
+4. Cross-provider native-token ratios are not a default controlled endpoint.
+   Within-route output-use results come first; cross-route matched-performance
+   contrasts require an explicit commensurability gate.
+5. This boundary is fixed before choosing the exact controlled questions so
+   archival performance cannot decide which outcomes enter the experiment.
+
+## What this phase deliberately does not decide
+
+The next benchmark-scope phase must resolve, without provider output:
+
+- HMMT 2025, HMMT 2026, or a predeclared cohort relationship for the controlled
+  first pass;
+- the disposition of HMMT-2026 question 25;
+- whether HMMT-2026 MathArena items 31-33 are eligible and how they are described;
+- the exact item count, IDs, scorer schemas, and prompt bytes;
+- whether archived length distributions may enter the power/cap-placement inputs
+  and, if so, the exact frozen transformation;
+- the primary model panels, replication counts, caps, large-cap references, and
+  multiplicity family; and
+- whether the matched-performance frontier remains secondary or replaces any
+  current paper target.
+
+Those choices remain owned by Connor and Chirag under D03-D14. They require a new
+dated record and, ultimately, the new REAP preregistration. This document cannot
+be cited as their approval.
+
+## Gate to the next phase
+
+Proceed to exact controlled-question selection only after this separation is
+accepted as the working boundary. The next artifact should compare the eligible
+HMMT cohort rules using provenance, grading coverage, clustered power, and budget
+consequences without using archived accuracy to hand-pick questions.
+
+Nothing in this decision changes the zero-call state or opens Phase 4. No provider
+call was made to prepare it.</file><file path="reap/CODEX_BRIEFING.md"># Codex briefing — effort-atlas / REAP
 
 Point any new Codex session at this file first: **&quot;Read reap/CODEX_BRIEFING.md and report what you understand the project state to be before doing anything.&quot;** A session that can&apos;t summarize the state correctly should not be given a task.
 
@@ -5324,6 +5499,7 @@ Point any new Codex session at this file first: **&quot;Read reap/CODEX_BRIEFING
 | 13 | `observational/RESULTS.md` + `observational/pipeline.py` + `observational/INPUT_PROVENANCE.md` | The free observational study (done, verified). Pipeline is pinned — agents run it, never rewrite its statistics. Input acquisition is not yet clean-checkout reproducible. |
 | 14 | `src/effort_atlas/` + `tests/` | Existing code. `confirmatory.py`, strict grader v2, and the independently approved pre-data analysis layer are merged. Phase 3 methodology and preregistration are now the active gate. |
 | 15 | `reap/18_POST_MEETING_BENCHMARK_AUDIT_2026-08-18.md` through `reap/22_BENCHMARK_PROVENANCE_AND_CAPABILITY_2026-08-19.md` | Post-meeting research question, cross-model method review, model-pair eligibility rules, and the exact public-source capability audit. The self-contained plain-language view is `reap/next_chapter/index.html`. |
+| 16 | `reap/23_BENCHMARK_SCOPE_DECISION_2026-08-20.md` | Current non-frozen boundary between exploratory public archives and the future controlled experiment. It separates denominators and admissible claims while leaving exact HMMT questions and model panels to the next human decision. |
 
 ## 2. Project state, in one screen
 
@@ -5368,7 +5544,7 @@ model switching were disabled. The completed run predated the final clean-sessio
 and Codex user-configuration isolation hardening, and internal CLI request counts
 remain unverified. It is therefore non-authoritative and not freeze-eligible. The
 current synthesis is in `reap/15_PHASE3_ADVERSARIAL_SYNTHESIS_2026-08-10.md`.
-The current checkpoint is 273 ordinary tests plus 26 exact-lock Tinker tests. The
+The current checkpoint is 277 ordinary tests plus 26 exact-lock Tinker tests. The
 decision-independent implementation passed final adversarial review at `f9aef0b`
 with no critical or warning findings. All study-call and spend counters remain
 zero. Model agreement cannot authorize spending, provider activation,
@@ -5396,6 +5572,15 @@ termination labels here (42 length, 404 stop), while its token field is all zero
 the HELM provider token fields are not one comparable unit. These findings narrow
 the design but do not freeze a dataset, model roster, or analysis and authorize no
 call.
+
+**Benchmark-scope boundary checkpoint (2026-08-20):** the new non-frozen scope
+record separates public-archive evidence from future controlled REAP rows. The
+archive lane remains descriptive and source-native; no archived response, grade,
+token count, or termination field may enter a controlled-effect denominator. The
+first controlled pass remains a compact HMMT short-answer candidate, but HMMT
+2025 versus 2026, question 25, items 31-33, the exact item manifest, model panels,
+and the matched-performance endpoint&apos;s priority remain human-pending. This
+separation authorizes no call and does not freeze D03.
 
 **Funding:** $5,000 Tinker credits + ~$200 OpenAI (supervisor) + &lt;$100 OpenRouter. Platform-scoped pools, never mixed. Cost model and gates in `reap/02_BUDGET_AND_COSTS.md`.
 
@@ -5433,7 +5618,7 @@ schedule/price/route manifest.
 | D — `codex/analysis-layer`, PR #3 | independently approved after remediation and merged at `7c83085` | complete; Phase 3 methodology decisions are now active |
 | E — `codex/runner` | not implemented | waits on accepted grader interfaces, frozen design inputs, and corrected budget math |
 | Phase 3 — `codex/prereg-v2`, draft PR #6 | external review, completed non-authoritative development relay, current synthesis, and offline safeguards preserved | D03/D04/D06/D09/D11/D12/D13/D15 and Chirag scientific signoff remain open; no call authorized |
-| Post-meeting benchmark provenance — `codex/benchmark-provenance-linux` | exact-source audit and sanitized capability table are independently approved; plain-language HTML and verified Linux handoff are complete | publish the reviewed branch, then clone and re-verify it on Linux; no call authorized |
+| Post-meeting benchmark provenance — `codex/benchmark-provenance-linux` | exact-source audit, sanitized capability table, and non-frozen exploratory-versus-controlled scope boundary are preserved; plain-language HTML and verified Linux handoff are complete | obtain human acceptance of the boundary, then decide the exact controlled HMMT question rule; no call authorized |
 
 The current phase-gate and model-routing plan is in
 `reap/10_PHASE_GATE_PLAN_2026-08-08.md`; the current human decision surface is
@@ -5656,6 +5841,7 @@ When higher native reasoning effort lowers benchmark accuracy, how much of the d
 | `13_PHASE3_INTEGRATED_RECOMMENDATION_2026-08-10.md` | Opinionated model, dataset, analysis, budget, and route proposal prepared for external review; non-frozen and no-call |
 | `14_PHASE3_EXTERNAL_REVIEW_2026-08-10.md` | Preserved Fable review with dated corrections and reproducible scratch artifacts; development evidence, not freeze authority |
 | `15_PHASE3_ADVERSARIAL_SYNTHESIS_2026-08-10.md` | Current non-frozen synthesis of model roles, prices, dataset scope, D01-D15 working answers, safeguards, and remaining decisions |
+| `23_BENCHMARK_SCOPE_DECISION_2026-08-20.md` | Non-frozen boundary separating exploratory public archives from future controlled REAP denominators and claims; exact controlled questions remain human-pending |
 | `prompts/PHASE3_EXTERNAL_REVIEW_PROMPT_2026-08-10.md` | Self-contained prompt Connor can use with a separate model, then return for Codex claim auditing |
 | [`status/index.html`](status/index.html) | Generated phase dashboard, safety counters, branch ownership, and verification ledger |
 
@@ -8099,6 +8285,7 @@ CRITICAL_PATHS: dict[str, str] = {
     &quot;reap/20_BENCHMARK_COMPARISON_2026-08-18.md&quot;: &quot;benchmark comparison&quot;,
     &quot;reap/21_MODEL_PAIR_ELIGIBILITY_2026-08-18.md&quot;: &quot;model-pair eligibility gate&quot;,
     &quot;reap/22_BENCHMARK_PROVENANCE_AND_CAPABILITY_2026-08-19.md&quot;: &quot;plain-language source and capability audit&quot;,
+    &quot;reap/23_BENCHMARK_SCOPE_DECISION_2026-08-20.md&quot;: &quot;exploratory-versus-controlled benchmark scope boundary&quot;,
     &quot;reap/CODEX_BRIEFING.md&quot;: &quot;canonical project state and mandatory reading order&quot;,
     &quot;reap/README.md&quot;: &quot;program charter and governance&quot;,
     &quot;reap/claude_project/PROJECT_BRIEF.md&quot;: &quot;canonical collaboration context&quot;,
@@ -17918,6 +18105,58 @@ class BenchmarkProvenanceTests(unittest.TestCase):
 
 
 if __name__ == &quot;__main__&quot;:
+    unittest.main()</file><file path="tests/test_benchmark_scope_decision.py">from __future__ import annotations
+
+import unittest
+from pathlib import Path
+
+
+ROOT = Path(__file__).resolve().parents[1]
+DECISION = ROOT / &quot;reap&quot; / &quot;23_BENCHMARK_SCOPE_DECISION_2026-08-20.md&quot;
+
+
+class BenchmarkScopeDecisionTests(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls) -&gt; None:
+        cls.text = DECISION.read_text(encoding=&quot;utf-8&quot;)
+
+    def test_scope_boundary_is_non_frozen_and_call_free(self) -&gt; None:
+        self.assertIn(&quot;NON-FROZEN SCOPE BOUNDARY&quot;, self.text)
+        self.assertIn(&quot;NO CALL AUTHORIZATION&quot;, self.text)
+        for counter in (
+            &quot;CONFIRMATORY_CALLS=0&quot;,
+            &quot;PAID_STUDY_GENERATION_CALLS=0&quot;,
+            &quot;PAID_SMOKE_CALLS=0&quot;,
+            &quot;PROVIDER_PROBE_CALLS=0&quot;,
+            &quot;DEEPSEEK_DEVELOPMENT_CALLS=0&quot;,
+        ):
+            self.assertIn(counter, self.text)
+
+    def test_exploratory_and_controlled_denominators_cannot_mix(self) -&gt; None:
+        self.assertIn(&quot;Exploratory public-archive scope&quot;, self.text)
+        self.assertIn(&quot;Controlled experiment scope&quot;, self.text)
+        self.assertIn(
+            &quot;No archived response row, grade, token count, or termination field may enter a\n&quot;
+            &quot;controlled-effect denominator&quot;,
+            self.text,
+        )
+        self.assertIn(&quot;Source-native archived grade&quot;, self.text)
+        self.assertIn(&quot;Strict `Final answer: &lt;answer&gt;`&quot;, self.text)
+
+    def test_scope_does_not_overclaim_censoring_or_token_comparability(self) -&gt; None:
+        self.assertIn(&quot;a causal claim that a particular answer was wrong because of a cap&quot;, self.text)
+        self.assertIn(&quot;a censoring-adjusted or imputed accuracy&quot;, self.text)
+        self.assertIn(&quot;a pooled native-token ratio across providers or tokenizers&quot;, self.text)
+        self.assertIn(&quot;`not_estimable`&quot;, self.text)
+
+    def test_exact_controlled_questions_remain_a_later_human_decision(self) -&gt; None:
+        self.assertIn(&quot;What this phase deliberately does not decide&quot;, self.text)
+        self.assertIn(&quot;the disposition of HMMT-2026 question 25&quot;, self.text)
+        self.assertIn(&quot;items 31-33&quot;, self.text)
+        self.assertIn(&quot;owned by Connor and Chirag&quot;, self.text)
+
+
+if __name__ == &quot;__main__&quot;:
     unittest.main()</file><file path="tests/test_confirmatory.py">from __future__ import annotations
 
 import json
@@ -18896,6 +19135,7 @@ class LinuxHandoffTests(unittest.TestCase):
         self.assertIn(&quot;REAP Linux orientation bundle&quot;, context)
         self.assertIn(&quot;reap/CODEX_BRIEFING.md&quot;, context)
         self.assertIn(&quot;reap/22_BENCHMARK_PROVENANCE&quot;, context)
+        self.assertIn(&quot;reap/23_BENCHMARK_SCOPE_DECISION&quot;, context)
         self.assertNotIn(&quot;--no-security-check&quot;, builder)
         self.assertNotIn(&quot;--include-logs&quot;, builder)
         self.assertIn(&quot;--no-git-sort-by-changes&quot;, builder)
@@ -20072,7 +20312,7 @@ class PhaseStatusTests(unittest.TestCase):
             if &quot;12_PHASE3_CONNOR_DECISION_WORKSHEET_2026-08-10.md&quot; in decision
         )
 
-        self.assertEqual(data[&quot;project&quot;][&quot;updated&quot;], &quot;2026-08-19&quot;)
+        self.assertEqual(data[&quot;project&quot;][&quot;updated&quot;], &quot;2026-08-20&quot;)
         self.assertIn(&quot;benchmark chapter&quot;, data[&quot;project&quot;][&quot;summary&quot;])
         self.assertIn(&quot;HMMT-2026 item 25&quot;, phase_three[&quot;summary&quot;])
         self.assertIn(&quot;dataset&quot;, phase_three[&quot;gate&quot;])
@@ -20084,6 +20324,16 @@ class PhaseStatusTests(unittest.TestCase):
         self.assertIn(&quot;no call&quot;, activity[&quot;detail&quot;].lower())
         self.assertIn(&quot;non-frozen&quot;, record.lower())
         self.assertIn(&quot;no call&quot;, record.lower())
+
+        scope_record = next(
+            decision
+            for decision in data[&quot;decisions&quot;]
+            if &quot;23_BENCHMARK_SCOPE_DECISION_2026-08-20.md&quot; in decision
+        )
+        self.assertIn(&quot;exploratory public archives&quot;, scope_record)
+        self.assertIn(&quot;controlled-effect denominator&quot;, scope_record)
+        self.assertIn(&quot;human-pending&quot;, scope_record)
+        self.assertIn(&quot;authorizes no calls&quot;, scope_record)
 
         integrated_record = next(
             decision
@@ -24375,7 +24625,7 @@ interpreter.
 For the pinned observational pipeline, install its locked optional dependencies
 with `uv sync --python 3.12.8 --extra observational`.
 
-The current canonical verifier collects 273 ordinary project tests and 26 exact-lock
+The current canonical verifier collects 277 ordinary project tests and 26 exact-lock
 Tinker tests. The ordinary lane includes collected rescue-analysis tests enforcing
 the amended answer-rescue definition and shared grader-v2 state validation. One
 archive-backed grader test requires `GRADER_V2_ARCHIVE_ROOT`; the committed

@@ -112,21 +112,27 @@
       "purpose": "plain-language source and capability audit"
     },
     {
+      "path": "reap/23_BENCHMARK_SCOPE_DECISION_2026-08-20.md",
+      "sha256": "7a5e576cbd54ba3df89032999aa5d2824765f3f3417e2896492b56f78f811814",
+      "bytes": 8872,
+      "purpose": "exploratory-versus-controlled benchmark scope boundary"
+    },
+    {
       "path": "reap/CODEX_BRIEFING.md",
-      "sha256": "8e5af05b0a832f8fe874d308d821c51e33f1a3f2772032f1389c937bd65fcfd3",
-      "bytes": 23702,
+      "sha256": "256474a930026b8ad87f954ef01c49beb76573726821ac811b62863f244484b5",
+      "bytes": 24676,
       "purpose": "canonical project state and mandatory reading order"
     },
     {
       "path": "reap/README.md",
-      "sha256": "d2cec59c914a5c322045dc083c405cfbec00f3d02580434897053c8b6f064699",
-      "bytes": 4770,
+      "sha256": "d020de5d68ed170b179e0c6005c48161d15d63d92efcbe5db58a6ed5c43df3e3",
+      "bytes": 4980,
       "purpose": "program charter and governance"
     },
     {
       "path": "reap/claude_project/PROJECT_BRIEF.md",
-      "sha256": "e1852733760a20cc86bffd746cc48c9372e1e9853fdaba225a93d2f871ac1260",
-      "bytes": 9340,
+      "sha256": "d32e1bfd6e42e6a12abc3225928b9a2efa373cb940492da84f8bff30514864df",
+      "bytes": 9891,
       "purpose": "canonical collaboration context"
     },
     {
@@ -137,20 +143,20 @@
     },
     {
       "path": "reap/linux_handoff/CONTEXT_BUILD_RECEIPT.md",
-      "sha256": "31e5a7347b0c87e4f04acbaf3c015628c7cf53cd77c55665827a8f9366bc1a58",
+      "sha256": "8701fc1e9941c79a3b936608164a4b8ff2b1c28e5c523cfead368e13c3abd63b",
       "bytes": 856,
       "purpose": "context-bundle security and reproducibility receipt"
     },
     {
       "path": "reap/linux_handoff/CONTEXT_PACK.md",
-      "sha256": "164e74b53c2d28e099a95cb0ecaaab735d8127760e739e69dda075cebc0426ca",
-      "bytes": 5476,
+      "sha256": "026e5b4348d2f779cc5bc9067aa318488bc51daccad63e8e9aed9a4a24d8ff98",
+      "bytes": 5922,
       "purpose": "high-density start context"
     },
     {
       "path": "reap/linux_handoff/REPO_CONTEXT.xml",
-      "sha256": "0c9945a0662251a912ae927257ef4989d11dc1b8da3cec2f2a4fd6a775781573",
-      "bytes": 1266746,
+      "sha256": "d1a653b9b0f14c6182973538ac5c626d02e42844fe7bea590b8c2f51d25379cf",
+      "bytes": 1282574,
       "purpose": "secret-scanned tracked repository context bundle"
     },
     {
@@ -191,8 +197,8 @@
     },
     {
       "path": "scripts/verify_linux_handoff.py",
-      "sha256": "dec2ddd755ee7cfb8627c3dd09e433e46ef0b55314c76cf736aa4ee36ddee93b",
-      "bytes": 11161,
+      "sha256": "69c2ac741a1b9ad49121d04b4ac11de507dec681bfdb8f07ba75d19644655d72",
+      "bytes": 11273,
       "purpose": "pre-environment handoff verifier"
     },
     {
@@ -227,8 +233,8 @@
     },
     {
       "path": "tests/test_linux_handoff.py",
-      "sha256": "8dcc887e334ebb6c38af4573aa3b2a6cd4cead97bebe4424d653046d37ac6c68",
-      "bytes": 7582,
+      "sha256": "3af6cb4ffea51d1f9fdd5f421a2c8318ddb4984aa4b5bcf4e769d215a985267e",
+      "bytes": 7649,
       "purpose": "handoff verifier tests"
     },
     {

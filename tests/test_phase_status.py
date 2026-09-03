@@ -223,7 +223,7 @@ class PhaseStatusTests(unittest.TestCase):
             if "12_PHASE3_CONNOR_DECISION_WORKSHEET_2026-08-10.md" in decision
         )
 
-        self.assertEqual(data["project"]["updated"], "2026-08-19")
+        self.assertEqual(data["project"]["updated"], "2026-08-20")
         self.assertIn("benchmark chapter", data["project"]["summary"])
         self.assertIn("HMMT-2026 item 25", phase_three["summary"])
         self.assertIn("dataset", phase_three["gate"])
@@ -235,6 +235,16 @@ class PhaseStatusTests(unittest.TestCase):
         self.assertIn("no call", activity["detail"].lower())
         self.assertIn("non-frozen", record.lower())
         self.assertIn("no call", record.lower())
+
+        scope_record = next(
+            decision
+            for decision in data["decisions"]
+            if "23_BENCHMARK_SCOPE_DECISION_2026-08-20.md" in decision
+        )
+        self.assertIn("exploratory public archives", scope_record)
+        self.assertIn("controlled-effect denominator", scope_record)
+        self.assertIn("human-pending", scope_record)
+        self.assertIn("authorizes no calls", scope_record)
 
         integrated_record = next(
             decision

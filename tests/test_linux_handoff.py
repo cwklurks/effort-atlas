@@ -106,6 +106,7 @@ class LinuxHandoffTests(unittest.TestCase):
         self.assertIn("REAP Linux orientation bundle", context)
         self.assertIn("reap/CODEX_BRIEFING.md", context)
         self.assertIn("reap/22_BENCHMARK_PROVENANCE", context)
+        self.assertIn("reap/23_BENCHMARK_SCOPE_DECISION", context)
         self.assertNotIn("--no-security-check", builder)
         self.assertNotIn("--include-logs", builder)
         self.assertIn("--no-git-sort-by-changes", builder)

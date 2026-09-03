@@ -4,9 +4,9 @@
     "name": "REAP",
     "paper": "Thinking Cut Short",
     "repository": "cwklurks/effort-atlas",
-    "updated": "2026-08-19",
+    "updated": "2026-08-20",
     "current_phase": 3,
-    "summary": "Phase 2 is merged and the decision-independent Phase 3 implementation is approved. The post-meeting benchmark chapter now pins public sources, exposes question-level capability and provenance limits, and prepares a verified Linux handoff. The scientific design remains non-frozen and all spending decisions stay human-owned."
+    "summary": "Phase 2 is merged and the decision-independent Phase 3 implementation is approved. The post-meeting benchmark chapter pins public sources, and a non-frozen scope boundary now separates exploratory archives from future controlled denominators. Exact controlled questions and the scientific design remain human-owned; no call is authorized."
   },
   "safety": {
     "confirmatory_calls": 0,
@@ -48,8 +48,8 @@
       "name": "Methodology and preregistration freeze",
       "status": "in_progress",
       "progress": 65,
-      "summary": "The non-frozen model recommendation, completed development relay, approved offline safeguards, and exact-source benchmark capability audit are preserved. HMMT-2026 item 25, items 31–33, model scope, and final statistical choices remain explicit decisions.",
-      "gate": "Human owners Connor and Chirag settle the remaining dataset, model, and statistical choices, then freeze exact rules; no review, report, or Linux handoff authorizes a call.",
+      "summary": "The non-frozen model recommendation, approved offline safeguards, exact-source audit, and exploratory-versus-controlled benchmark boundary are preserved. HMMT-2026 item 25, items 31–33, exact controlled questions, model scope, and final statistical choices remain explicit human decisions.",
+      "gate": "Human owners Connor and Chirag accept the evidence-lane boundary, settle the exact controlled dataset, model, and statistical choices, then freeze exact rules; no review, report, or Linux handoff authorizes a call.",
       "url": "https://github.com/cwklurks/effort-atlas/pull/6"
     },
     {
@@ -134,6 +134,11 @@
   ],
   "verification": [
     {
+      "label": "Benchmark scope boundary contract",
+      "result": "4 focused offline tests enforce a non-frozen, zero-call separation between source-native exploratory archives and strict newly collected controlled denominators; exact HMMT questions remain human-pending",
+      "status": "passed"
+    },
+    {
       "label": "Post-meeting benchmark provenance audit",
       "result": "Approved after exact-root reconstruction of 20 pinned files and 4,248 sanitized cells; missing responses, item-25 text drift, token-accounting anomalies, privacy boundaries, and artifact freshness were independently mutation-checked",
       "status": "passed"
@@ -145,7 +150,7 @@
     },
     {
       "label": "Phase 3 current offline checkpoint",
-      "result": "273 ordinary tests plus 26 exact-lock Tinker tests passed; the canonical verifier remains offline and both lanes are mandatory",
+      "result": "277 ordinary tests plus 26 exact-lock Tinker tests passed; the canonical verifier remains offline and both lanes are mandatory",
       "status": "passed"
     },
     {
@@ -240,6 +245,12 @@
     }
   ],
   "activity": [
+    {
+      "date": "2026-08-20",
+      "phase": 3,
+      "title": "Exploratory and controlled benchmark scopes separated",
+      "detail": "A non-frozen decision record now keeps public archive rows, source-native grades, and descriptive claims out of every controlled-effect denominator. The first controlled pass remains a compact HMMT candidate, while the exact cohort, question 25, items 31–33, item manifest, model roster, and endpoint priority remain human-pending. No provider, smoke, probe, or confirmatory call occurred."
+    },
     {
       "date": "2026-08-19",
       "phase": 3,
@@ -362,6 +373,7 @@
     }
   ],
   "decisions": [
+    "The non-frozen 23_BENCHMARK_SCOPE_DECISION_2026-08-20.md separates exploratory public archives from future controlled REAP rows. Archived responses may inform pre-data design but never enter a controlled-effect denominator; exact HMMT questions and model panels remain human-pending, and the record authorizes no calls.",
     "The post-meeting public-source audit is exploratory and approved as a capability/provenance layer, not as confirmatory data or a frozen benchmark choice. HMMT-2026 item 25 and items 31–33 require explicit rules before freeze; archived provider token fields remain route-specific rather than one cross-provider unit.",
     "The Linux continuation package transfers only committed, secret-free state. Tailscale is transport, Git is the source of truth, and neither the package nor its dashboard authorizes provider access or research execution.",
     "The completed bounded Claude/Codex development relay is a non-authoritative review aid, not an approval mechanism or freeze-eligible evidence. Its Claude side used claude-fable-5 through eligible regular-plan usage with API/gateway billing absent, usage credits disabled, and automatic model switching disabled. Spending, provider activation, preregistration freeze, and Connor/Chirag choices remain human decisions.",

@@ -49,6 +49,10 @@ confirmatory experiment has made **zero** paid calls.
 - HELM evaluates a deliberate 446-question GPQA test split from 448 source rows.
   Only Gemini has complete termination labels (42 length, 404 stop), and its token
   field is all zero. HELM token fields are not a comparable cross-provider unit.
+- The non-frozen benchmark-scope boundary keeps the archive and controlled lanes
+  non-pooling. Archived rows may motivate and inform pre-data design, but they
+  cannot enter a controlled-effect denominator. The exact controlled HMMT cohort
+  and question IDs remain the next human-owned decision.
 
 ## The research question agreed after the meeting
 
@@ -85,9 +89,11 @@ artifact or infer an unrecorded provider fact.
 4. `reap/21_MODEL_PAIR_ELIGIBILITY_2026-08-18.md` — when comparisons are allowed.
 5. `reap/22_BENCHMARK_PROVENANCE_AND_CAPABILITY_2026-08-19.md` — what the pinned
    public files can and cannot answer at the question level.
-6. `reap/next_chapter/index.html` — self-contained plain-language report of this
+6. `reap/23_BENCHMARK_SCOPE_DECISION_2026-08-20.md` — the non-frozen evidence-lane
+   boundary and the exact controlled-scope choices still open.
+7. `reap/next_chapter/index.html` — self-contained plain-language report of this
    chapter; its build receipt states the limits of browser verification.
-7. `reap/02_BUDGET_AND_COSTS.md` and `reap/08_HYPERPARAMETER_DECISIONS.md` — no
+8. `reap/02_BUDGET_AND_COSTS.md` and `reap/08_HYPERPARAMETER_DECISIONS.md` — no
    unbounded model work or assumed provider behavior.
 
 `reap/linux_handoff/REPO_CONTEXT.xml` collects the main tracked documents, source,

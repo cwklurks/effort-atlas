@@ -23,6 +23,7 @@ Point any new Codex session at this file first: **"Read reap/CODEX_BRIEFING.md a
 | 13 | `observational/RESULTS.md` + `observational/pipeline.py` + `observational/INPUT_PROVENANCE.md` | The free observational study (done, verified). Pipeline is pinned — agents run it, never rewrite its statistics. Input acquisition is not yet clean-checkout reproducible. |
 | 14 | `src/effort_atlas/` + `tests/` | Existing code. `confirmatory.py`, strict grader v2, and the independently approved pre-data analysis layer are merged. Phase 3 methodology and preregistration are now the active gate. |
 | 15 | `reap/18_POST_MEETING_BENCHMARK_AUDIT_2026-08-18.md` through `reap/22_BENCHMARK_PROVENANCE_AND_CAPABILITY_2026-08-19.md` | Post-meeting research question, cross-model method review, model-pair eligibility rules, and the exact public-source capability audit. The self-contained plain-language view is `reap/next_chapter/index.html`. |
+| 16 | `reap/23_BENCHMARK_SCOPE_DECISION_2026-08-20.md` | Current non-frozen boundary between exploratory public archives and the future controlled experiment. It separates denominators and admissible claims while leaving exact HMMT questions and model panels to the next human decision. |
 
 ## 2. Project state, in one screen
 
@@ -67,7 +68,7 @@ model switching were disabled. The completed run predated the final clean-sessio
 and Codex user-configuration isolation hardening, and internal CLI request counts
 remain unverified. It is therefore non-authoritative and not freeze-eligible. The
 current synthesis is in `reap/15_PHASE3_ADVERSARIAL_SYNTHESIS_2026-08-10.md`.
-The current checkpoint is 273 ordinary tests plus 26 exact-lock Tinker tests. The
+The current checkpoint is 277 ordinary tests plus 26 exact-lock Tinker tests. The
 decision-independent implementation passed final adversarial review at `f9aef0b`
 with no critical or warning findings. All study-call and spend counters remain
 zero. Model agreement cannot authorize spending, provider activation,
@@ -95,6 +96,15 @@ termination labels here (42 length, 404 stop), while its token field is all zero
 the HELM provider token fields are not one comparable unit. These findings narrow
 the design but do not freeze a dataset, model roster, or analysis and authorize no
 call.
+
+**Benchmark-scope boundary checkpoint (2026-08-20):** the new non-frozen scope
+record separates public-archive evidence from future controlled REAP rows. The
+archive lane remains descriptive and source-native; no archived response, grade,
+token count, or termination field may enter a controlled-effect denominator. The
+first controlled pass remains a compact HMMT short-answer candidate, but HMMT
+2025 versus 2026, question 25, items 31-33, the exact item manifest, model panels,
+and the matched-performance endpoint's priority remain human-pending. This
+separation authorizes no call and does not freeze D03.
 
 **Funding:** $5,000 Tinker credits + ~$200 OpenAI (supervisor) + <$100 OpenRouter. Platform-scoped pools, never mixed. Cost model and gates in `reap/02_BUDGET_AND_COSTS.md`.
 
@@ -132,7 +142,7 @@ schedule/price/route manifest.
 | D — `codex/analysis-layer`, PR #3 | independently approved after remediation and merged at `7c83085` | complete; Phase 3 methodology decisions are now active |
 | E — `codex/runner` | not implemented | waits on accepted grader interfaces, frozen design inputs, and corrected budget math |
 | Phase 3 — `codex/prereg-v2`, draft PR #6 | external review, completed non-authoritative development relay, current synthesis, and offline safeguards preserved | D03/D04/D06/D09/D11/D12/D13/D15 and Chirag scientific signoff remain open; no call authorized |
-| Post-meeting benchmark provenance — `codex/benchmark-provenance-linux` | exact-source audit and sanitized capability table are independently approved; plain-language HTML and verified Linux handoff are complete | publish the reviewed branch, then clone and re-verify it on Linux; no call authorized |
+| Post-meeting benchmark provenance — `codex/benchmark-provenance-linux` | exact-source audit, sanitized capability table, and non-frozen exploratory-versus-controlled scope boundary are preserved; plain-language HTML and verified Linux handoff are complete | obtain human acceptance of the boundary, then decide the exact controlled HMMT question rule; no call authorized |
 
 The current phase-gate and model-routing plan is in
 `reap/10_PHASE_GATE_PLAN_2026-08-08.md`; the current human decision surface is

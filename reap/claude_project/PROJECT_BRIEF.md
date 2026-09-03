@@ -1,6 +1,6 @@
 # PROJECT_BRIEF — canonical state of REAP / Thinking Cut Short
 
-**Last updated: 2026-08-10. Update this file whenever project state changes; it is the single source of truth for Claude Project chats.**
+**Last updated: 2026-08-20. Update this file whenever project state changes; it is the single source of truth for Claude Project chats.**
 
 ## People and roles
 
@@ -49,6 +49,11 @@ call.
 
 - The $0 MathArena/HELM observational study is complete and verified; it remains
   exploratory and separate from all future confirmatory estimates.
+- The 2026-08-20 non-frozen benchmark-scope record makes that separation an
+  explicit design boundary: archived rows retain source-native grades and
+  descriptive claims only, while controlled estimands may use only newly collected
+  rows under a frozen REAP manifest. Exact HMMT cohort and question selection is
+  the next human-owned phase, not a decision inferred from archive performance.
 - Grader v2, Tinker probe tooling, the ecosystem audit, and governance are merged
   to main. The pre-data analysis branch now integrates accepted grader v2, uses
   item-level transition mass rather than replicate-index pairing, and passes the
@@ -82,7 +87,9 @@ call.
 - No paid REAP smoke or confirmatory call has run. Tinker cap semantics, omitted-cap
   cost bounds, sample independence, and OpenAI usage accounting remain unresolved.
 
-Next gates: resolve D03/D04/D06/D09/D11/D12/D13/D15 and obtain Chirag's scientific
+Next gates: accept the exploratory-versus-controlled benchmark boundary; resolve
+the exact HMMT cohort/question rule without using archived accuracy to hand-pick
+items; resolve D03/D04/D06/D09/D11/D12/D13/D15 and obtain Chirag's scientific
 signoff on D03-D10; record the final human choices; freeze the scientific design and
 fail-closed activation-or-omission rules; implement and red-team the runner; then
 allow human-initiated smoke. Connor proposes at most $2 for the Tinker reliability

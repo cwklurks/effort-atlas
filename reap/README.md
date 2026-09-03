@@ -39,6 +39,7 @@ When higher native reasoning effort lowers benchmark accuracy, how much of the d
 | `13_PHASE3_INTEGRATED_RECOMMENDATION_2026-08-10.md` | Opinionated model, dataset, analysis, budget, and route proposal prepared for external review; non-frozen and no-call |
 | `14_PHASE3_EXTERNAL_REVIEW_2026-08-10.md` | Preserved Fable review with dated corrections and reproducible scratch artifacts; development evidence, not freeze authority |
 | `15_PHASE3_ADVERSARIAL_SYNTHESIS_2026-08-10.md` | Current non-frozen synthesis of model roles, prices, dataset scope, D01-D15 working answers, safeguards, and remaining decisions |
+| `23_BENCHMARK_SCOPE_DECISION_2026-08-20.md` | Non-frozen boundary separating exploratory public archives from future controlled REAP denominators and claims; exact controlled questions remain human-pending |
 | `prompts/PHASE3_EXTERNAL_REVIEW_PROMPT_2026-08-10.md` | Self-contained prompt Connor can use with a separate model, then return for Codex claim auditing |
 | [`status/index.html`](status/index.html) | Generated phase dashboard, safety counters, branch ownership, and verification ledger |
 

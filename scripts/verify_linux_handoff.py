@@ -41,6 +41,7 @@ CRITICAL_PATHS: dict[str, str] = {
     "reap/20_BENCHMARK_COMPARISON_2026-08-18.md": "benchmark comparison",
     "reap/21_MODEL_PAIR_ELIGIBILITY_2026-08-18.md": "model-pair eligibility gate",
     "reap/22_BENCHMARK_PROVENANCE_AND_CAPABILITY_2026-08-19.md": "plain-language source and capability audit",
+    "reap/23_BENCHMARK_SCOPE_DECISION_2026-08-20.md": "exploratory-versus-controlled benchmark scope boundary",
     "reap/CODEX_BRIEFING.md": "canonical project state and mandatory reading order",
     "reap/README.md": "program charter and governance",
     "reap/claude_project/PROJECT_BRIEF.md": "canonical collaboration context",

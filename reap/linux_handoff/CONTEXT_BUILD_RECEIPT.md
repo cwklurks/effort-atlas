@@ -1,9 +1,9 @@
 # Linux context-bundle build receipt
 
-**Built:** 2026-08-19
+**Built:** 2026-09-03
 **Tool:** Repomix 1.14.0
-**Result:** 109 tracked files, 310,632 estimated tokens, 1,266,746 bytes
-**SHA-256:** `0c9945a0662251a912ae927257ef4989d11dc1b8da3cec2f2a4fd6a775781573`
+**Result:** 111 tracked files, 314,157 estimated tokens, 1,282,574 bytes
+**SHA-256:** `d1a653b9b0f14c6182973538ac5c626d02e42844fe7bea590b8c2f51d25379cf`
 
 Repomix's default security scan reported no suspicious files. The deterministic
 pack excludes volatile Git history and Git change-frequency sorting. A second
