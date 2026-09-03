@@ -1,6 +1,6 @@
 # Agent playbook — running parallel agents on REAP without wrecking it
 
-**Principle: parallel lanes, serial gates.** Agents work branches and open PRs; nothing merges without tests green + one cross-review; Connor is the only merger. No agent touches frozen artifacts (PREREGISTRATION.md, amendments, committed schedules, frozen grader/analysis commits). No agent makes paid study or provider-probe calls. The selected DeepSeek V4 Flash development-only lane through Fireworks ZDR is disabled until its route configuration and hard dollar ceiling are committed. The distinct user-triggered on-demand Kimi rule remains governed by `AGENTS.md`. No keys in prompts — env vars only.
+**Principle: parallel lanes, serial gates.** Agents work branches and open PRs; nothing merges without tests green + one cross-review; Connor is the only merger. No agent touches frozen artifacts (PREREGISTRATION.md, amendments, committed schedules, frozen grader/analysis commits). No agent makes paid study or provider-probe calls. The proposed DeepSeek V4 Flash development-only lane through Fireworks ZDR is disabled until Connor approves and commits its route configuration and hard dollar ceiling. The distinct user-triggered on-demand Kimi rule remains governed by `AGENTS.md`. No keys in prompts — env vars only.
 
 ## Lane map
 

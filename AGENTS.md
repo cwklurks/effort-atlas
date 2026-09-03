@@ -22,10 +22,10 @@ budget gates, and the REAP preregistration are complete and frozen.
 2. Never make paid study-generation, smoke, or provider-probe calls. Scripts must
    default to `--dry-run`; live execution is human-initiated. Read secrets only
    from environment variables and fail loudly when a required variable is unset.
-   No development-model provider exception is currently active. The selected
+   No development-model provider exception is currently active. The proposed
    DeepSeek V4 Flash development-only lane through Fireworks ZDR remains disabled
-   until its route configuration and hard dollar ceiling are committed. The
-   separate user-triggered on-demand Kimi rule remains unchanged and does not
+   until Connor approves and commits its route configuration and hard dollar
+   ceiling. The separate user-triggered on-demand Kimi rule remains unchanged and does not
    authorize the Fireworks lane.
 3. Set `max_tokens` explicitly on every ordinary request template. Also set effort
    explicitly wherever the platform supports it. The only allowed omission is the
@@ -76,9 +76,10 @@ budget gates, and the REAP preregistration are complete and frozen.
 
 - Keep one Sol integration owner for each phase. Use Terra for fast, read-only
   repository exploration and Sol XHigh for independent high-consequence review.
-- DeepSeek V4 Flash through Fireworks ZDR is selected for bounded mechanical
-  development work but remains disabled until its development-only route
-  configuration and hard dollar ceiling are committed. If that gate later opens,
+- DeepSeek V4 Flash through Fireworks ZDR is proposed for bounded mechanical
+  development work but remains disabled until Connor approves and commits its
+  development-only route configuration and hard dollar ceiling. If that gate later
+  opens,
   give it explicit file ownership and measurable checks; never send secrets or
   research data, and have Codex review every diff and rerun every claimed test.
 - Preserve the distinct on-demand Kimi instruction: it applies only when the user
@@ -88,13 +89,14 @@ budget gates, and the REAP preregistration are complete and frozen.
 
 ## Current priority and ownership boundaries
 
-Phase 0 governance and Phase 1 Tasks A-C are merged. Phase 2 has integrated grader
-v2 with the analysis layer, remediated the initial review blockers, and passed
-independent statistical re-review; human review and merge of PR #3 remain. The later critical path is
-REAP preregistration freeze and Task E's runner/budget gates. Do not begin E until
-the integrated grader-analysis interfaces are accepted and the required design
-inputs are frozen; do not run any smoke or confirmatory call until the later human
-gate opens.
+Phase 0 governance, Phase 1 Tasks A-C, and the independently reviewed Phase 2
+grader-analysis integration are merged. Phase 3 is the current gate: settle every
+supervisor decision in `reap/11_PHASE3_DECISION_PACKET_2026-08-08.md`, then freeze
+a new REAP preregistration without changing the Phase-I frozen record. The packet
+has passed independent technical review, but every D01-D15 choice remains advisory
+and human-pending. The later critical path is Task E's runner/budget gates. Do not
+begin E until the required design inputs are frozen; do not run any smoke or
+confirmatory call until the later human gate opens.
 
 The canonical project/task state lives in `reap/CODEX_BRIEFING.md`; update that file
 when the state materially changes, without rewriting frozen historical records.
