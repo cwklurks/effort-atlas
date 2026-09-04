@@ -13,11 +13,11 @@ Fail-closed by construction:
   * one attempt per item, max_retries must be 0, fallbacks disabled;
   * ledgered spend + worst case of the next call must stay under both the
     per-dataset and the total ceiling, or the run halts BEFORE that call;
-  * live execution requires pilot.enabled, a verified balance with a date, a
-    named approver, and an explicit environment acknowledgement;
+  * live execution requires dated human evidence and approval of the exact
+    inputs/configuration/host, plus an explicit environment acknowledgement;
   * the ledger (confirmatory.AttemptLedger, hash-chained, append-only) is
-    content-free; response text goes to a gitignored file. GPQA question text
-    never leaves restricted_local/.
+    content-free; responses and caches are gitignored because they can echo
+    restricted questions. The original GPQA source remains restricted_local/.
 """
 
 from __future__ import annotations
@@ -29,13 +29,20 @@ import os
 import random
 import sys
 import time
+import statistics
+import uuid
+from copy import deepcopy
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from pathlib import Path
 
 from . import ROOT, load_config
 from .client import Completion, InklingClient
-from .confirmatory import AttemptLedger
+from .confirmatory import sha256_json
+from .pilot_accounting import AccountingHalt, BudgetJournal, CeilingHalt, money
+from .pilot_contract import ACCOUNT_LEDGER_PATH, configuration_failures, live_gate_failures, run_manifest
+from .pilot_integrity import load_selected_items
+from .pilot_receipts import validate_completion, reconcile_receipt, fetch_receipt
 from .wrapper import Rendered, render, strict_terminator_present
 
 LIVE_ACK_ENV = "EFFORT_ATLAS_PILOT_LIVE_ACK"
@@ -44,78 +51,22 @@ RESTRICTED_FILES = {"gpqa_main": "restricted_local/gpqa_main.RESTRICTED.jsonl"}
 EXIT_GATE_REFUSED, EXIT_CEILING_HALT, EXIT_CIRCUIT_BREAKER = 2, 3, 4
 
 
-class CeilingHalt(RuntimeError):
-    pass
-
-
-class CircuitBreaker(RuntimeError):
-    pass
-
-
-# ── items ────────────────────────────────────────────────────────────────────
-
-def _read_jsonl(path: Path) -> list[dict]:
-    with path.open(encoding="utf-8") as fh:
-        return [json.loads(line) for line in fh if line.strip()]
-
-
-def load_selected_items(cfg: dict, selection: dict, *, cap_dir: Path | None = None) -> list[dict]:
-    """Return the selected source rows, with GPQA text merged from restricted_local.
-
-    Every selected row is checked against the selection file's prompt_sha256 so
-    the runner cannot silently ask a different item than the one recorded.
-    """
-    cap_dir = cap_dir or (ROOT / cfg["paths"]["data"])
-    wanted = cfg["pilot"]["datasets"]
-    out: list[dict] = []
-    for name in wanted:
-        if name not in selection["datasets"]:
-            raise SystemExit(f"selection has no dataset {name!r}")
-        spec = selection["datasets"][name]
-        path = cap_dir / spec["file"]
-        if not path.exists():
-            raise SystemExit(f"{path} missing; run capabilities/acquire.py")
-        rows = {(r["split"], r["source_row_index"]): r for r in _read_jsonl(path)}
-        restricted: dict[str, dict] = {}
-        if name in RESTRICTED_FILES:
-            rpath = cap_dir / RESTRICTED_FILES[name]
-            if not rpath.exists():
-                raise SystemExit(
-                    f"{rpath} missing: GPQA text exists only locally; run "
-                    "capabilities/acquire.py (never commit or share that file)"
-                )
-            restricted = {r["source_item_id"]: r for r in _read_jsonl(rpath)}
-        for e in spec["items"]:
-            row = rows.get((e["split"], e["source_row_index"]))
-            if row is None:
-                raise SystemExit(f"{name}: selected row {e['split']}/{e['source_row_index']} not in file")
-            if row["source_item_id"] != e["source_item_id"]:
-                raise SystemExit(f"{name}: item id mismatch at row {e['source_row_index']}")
-            if row["prompt_sha256"] != e["prompt_sha256"]:
-                raise SystemExit(f"{name}: prompt_sha256 mismatch for {e['source_item_id']}")
-            if restricted:
-                full = restricted.get(row["source_item_id"])
-                if full is None or full["full_row_sha256"] != row["full_row_sha256"]:
-                    raise SystemExit(
-                        f"{name}: restricted row for {row['source_item_id']} missing or "
-                        "hash-mismatched against the committed skeleton"
-                    )
-                row = full
-            out.append(row)
-    return out
-
-
 # ── cost and ceilings ────────────────────────────────────────────────────────
 
 def estimate_prompt_tokens(text: str) -> int:
-    """Conservative pre-call estimate (chars/3). Real counts come from usage."""
+    """Forecast heuristic only; spending reservations use an approved allowance."""
     return max(1, math.ceil(len(text) / 3))
+
+
+def request_input_bytes(item: Rendered) -> int:
+    messages = item.messages if item.messages is not None else [{"role": "user", "content": item.prompt}]
+    return len(json.dumps(messages, ensure_ascii=False, separators=(",", ":")).encode("utf-8"))
 
 
 def worst_case_call_usd(cfg: dict, prompt_tokens: int) -> float:
     pr = cfg["pricing"]
     cap = int(cfg["pilot"]["cap"])
-    return (prompt_tokens * pr["input_per_mtok"] + cap * pr["output_per_mtok"]) / 1e6
+    return (cfg["pilot"]["input_token_allowance"] * pr["input_per_mtok"] + cap * pr["output_per_mtok"]) / 1e6
 
 
 def expected_call_usd(cfg: dict, prompt_tokens: int, effort: str) -> float:
@@ -128,11 +79,13 @@ def expected_call_usd(cfg: dict, prompt_tokens: int, effort: str) -> float:
 
 
 def actual_call_usd(cfg: dict, comp: Completion) -> float:
+    if comp.cached:
+        return 0.0
     if comp.reported_cost_usd is not None:
-        return float(comp.reported_cost_usd)
+        return float(money(comp.reported_cost_usd))
     pr = cfg["pricing"]
-    out_tokens = comp.completion_tokens + (comp.reasoning_tokens or 0)
-    return (comp.prompt_tokens * pr["input_per_mtok"] + out_tokens * pr["output_per_mtok"]) / 1e6
+    # OpenRouter completion usage includes the reasoning-token subset.
+    return (comp.prompt_tokens * pr["input_per_mtok"] + comp.completion_tokens * pr["output_per_mtok"]) / 1e6
 
 
 @dataclass
@@ -162,31 +115,6 @@ class CeilingGuard:
         self.spent_by_dataset[dataset] = self.spent_by_dataset.get(dataset, 0.0) + usd
 
 
-# ── live gate ────────────────────────────────────────────────────────────────
-
-def live_gate_failures(cfg: dict, env: dict | None = None) -> list[str]:
-    env = os.environ if env is None else env
-    b, p = cfg["budget"], cfg["pilot"]
-    fails = []
-    if not p.get("enabled"):
-        fails.append("pilot.enabled is false")
-    if b.get("balance_verified_usd") is None or not b.get("balance_verified_on"):
-        fails.append("budget.balance_verified_usd / balance_verified_on not set from the account page")
-    if not b.get("preflight_approved_by"):
-        fails.append("budget.preflight_approved_by is empty (needs written approval)")
-    if cfg["provider"].get("max_retries", 1) != 0:
-        fails.append("provider.max_retries must be 0")
-    extra = cfg["provider"].get("request_extra_body", {}).get("provider", {})
-    if extra.get("allow_fallbacks") is not False or not extra.get("only"):
-        fails.append("provider must be pinned (only: [...]) with allow_fallbacks: false")
-    if env.get(LIVE_ACK_ENV) != LIVE_ACK_VALUE:
-        fails.append(f"environment {LIVE_ACK_ENV} != {LIVE_ACK_VALUE}")
-    bal = b.get("balance_verified_usd")
-    if bal is not None and b["total_ceiling_usd"] > float(bal) - float(b.get("reserve_margin_usd", 0)):
-        fails.append("budget.total_ceiling_usd exceeds verified balance minus reserve")
-    return fails
-
-
 # ── mock client ──────────────────────────────────────────────────────────────
 
 MOCK_MEDIAN_TOKENS = {
@@ -207,7 +135,7 @@ class PilotClient(InklingClient):
             return super().complete(
                 prompt, effort, item_id, max_tokens=max_tokens, seed=seed, messages=messages
             )
-        key = self._cache_key(prompt, effort, max_tokens=max_tokens, seed=seed, messages=messages)
+        key = self._cache_key(prompt, effort, max_tokens=max_tokens, seed=seed, messages=messages, item_id=item_id)
         cached = self._cache_get(key)
         if cached is not None:
             return Completion(**cached, cached=True)
@@ -279,7 +207,7 @@ def _summary(cfg: dict, rows: list[dict], guard: CeilingGuard, halt: str | None)
         # (finish_reason=length at the cap) also satisfy length >= c.
         d["p_length_ge"] = {str(c): (sum(t >= c for t in toks) / n if n else None) for c in caps if c <= cap}
         d["median_completion_tokens"] = (
-            sorted(toks)[n // 2] if n and d["length_stops"] < n / 2 else None
+            statistics.median(toks) if n and d["length_stops"] < n / 2 else None
         )
         d["mean_reported"] = False  # never report a mean with censored rows
         d["spend_usd"] = round(d["spend_usd"], 4)
@@ -300,9 +228,11 @@ def dry_run(cfg: dict, rendered: list[Rendered], out_dir: Path) -> dict:
     table: dict[str, dict] = {}
     for r in rendered:
         est_in = estimate_prompt_tokens(r.request_text_for_estimate())
-        d = table.setdefault(r.dataset, {"items": 0, "est_prompt_tokens": 0, "expected_usd": 0.0, "worst_usd": 0.0})
+        d = table.setdefault(r.dataset, {"items": 0, "est_prompt_tokens": 0, "expected_usd": 0.0,
+                                        "worst_usd": 0.0, "requests_over_input_byte_limit": 0})
         d["items"] += 1
         d["est_prompt_tokens"] += est_in
+        d["requests_over_input_byte_limit"] += int(request_input_bytes(r) > cfg["pilot"]["request_input_byte_limit"])
         for lvl in levels:
             d["expected_usd"] += expected_call_usd(cfg, est_in, lvl)
             d["worst_usd"] += worst_case_call_usd(cfg, est_in)
@@ -315,10 +245,12 @@ def dry_run(cfg: dict, rendered: list[Rendered], out_dir: Path) -> dict:
         tot_e += d["expected_usd"]; tot_w += d["worst_usd"]
         d["expected_usd"] = round(d["expected_usd"], 4); d["worst_usd"] = round(d["worst_usd"], 4)
     print(f"{'TOTAL':<14}{'':>6}{'':>7}{tot_e:>12.2f}{tot_w:>10.2f}  total ceiling ${guard_limits['total_ceiling_usd']:.2f}")
-    print("\nDry run only. No provider call was made. Prices are the config's and must be re-pinned in the preflight doc.")
+    print("\nDry run only. Reservations assume the configured input allowance, output cap and price limits are valid for the approved route. Human evidence is required.")
     report = {
         "mode": "dry_run", "generated_at": _now(), "levels": levels, "cap": cfg["pilot"]["cap"],
         "pricing": cfg["pricing"], "budget": guard_limits, "datasets": table,
+        "reservation_input_allowance": cfg["pilot"]["input_token_allowance"],
+        "input_admissible": not any(d["requests_over_input_byte_limit"] for d in table.values()),
         "expected_total_usd": round(tot_e, 4), "worst_total_usd": round(tot_w, 4),
     }
     out_dir.mkdir(parents=True, exist_ok=True)
@@ -326,116 +258,198 @@ def dry_run(cfg: dict, rendered: list[Rendered], out_dir: Path) -> dict:
     return report
 
 
-def run(cfg: dict, rendered: list[Rendered], *, mock: bool, out_dir: Path,
-        client: InklingClient | None = None) -> tuple[dict, int]:
-    tag = "mock" if mock else "live"
-    stamp = time.strftime("%Y%m%d_%H%M%S")
-    out_dir.mkdir(parents=True, exist_ok=True)
-    ledger = AttemptLedger(out_dir / f"ledger_{tag}_{stamp}.jsonl")
-    responses_path = out_dir / f"responses_{tag}_{stamp}.jsonl"
-    guard = CeilingGuard(
-        per_dataset_ceiling=float(cfg["budget"]["per_dataset_ceiling_usd"]),
-        total_ceiling=float(cfg["budget"]["total_ceiling_usd"]),
-    )
-    client = client or PilotClient(cfg, ROOT, mock=mock)
-    cap = int(cfg["pilot"]["cap"])
-    levels = cfg["effort"]["levels"]
-    req_seed = cfg["pilot"].get("request_seed")
-    breaker_n = int(cfg["pilot"].get("circuit_breaker_consecutive_errors", 5))
-    pcfg = cfg["provider"]
-    route = (pcfg.get("request_extra_body", {}).get("provider", {}).get("only") or ["unpinned"])
-    rows: list[dict] = []
-    halt: str | None = None
-    exit_code = 0
-    consecutive_errors = 0
-    n_total = len(rendered) * len(levels)
+def _safe_metadata(comp) -> dict:
+    """Allowlisted accounting only; never copy exception text or request content."""
+    result = {}
+    for key in ("prompt_tokens", "completion_tokens", "reasoning_tokens"):
+        value = getattr(comp, key, None)
+        if type(value) is int and value >= 0:
+            result[key] = value
+    for key in ("reported_cost_usd", "latency_s"):
+        value = getattr(comp, key, None)
+        if type(value) in (int, float) and math.isfinite(value) and value >= 0:
+            result[key] = value
+    import re
+    for source, target in (("generation_id", "generation_id"), ("provider", "served_provider"),
+                           ("finish_reason", "finish_reason")):
+        value = getattr(comp, source, None)
+        if isinstance(value, str) and re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9 ._:/-]{0,159}", value):
+            result[target] = value
+    return result
 
-    with responses_path.open("a", encoding="utf-8") as resp_fh:
+
+def _refused(failures):
+    print("RUN REFUSED: " + "; ".join(failures))
+    return {"exploratory": True, "halt": "gate_refused", "failures": failures}, EXIT_GATE_REFUSED
+
+
+def run(cfg: dict, rendered: list[Rendered], *, mock: bool, out_dir: Path,
+        client: InklingClient | None = None, receipt_fetcher=None) -> tuple[dict, int]:
+    cfg = deepcopy(cfg)
+    failures = configuration_failures(cfg)
+    if failures:
+        return _refused(failures)
+    selection_digest = cfg.get("_selection_sha256", "synthetic")
+    try:
+        if not mock:
+            # Direct Python callers pass through the same gates as the CLI.
+            selection = json.loads((ROOT / cfg["pilot"]["selection"]).read_text())
+            expected = render_all(cfg, load_selected_items(cfg, selection, cap_dir=ROOT / cfg["paths"]["data"]))
+            selection_digest = selection["selection_sha256"]
+            expected_manifest = run_manifest(cfg, expected, selection_digest)
+            supplied_manifest = run_manifest(cfg, rendered, selection_digest)
+            if expected_manifest != supplied_manifest:
+                return _refused(["rendered inputs differ from the validated selection"])
+            if out_dir.resolve() != (ROOT / cfg["paths"]["results"]).resolve():
+                return _refused(["output directory differs from the approved configuration"])
+        manifest = run_manifest(cfg, rendered, selection_digest)
+        if not mock:
+            failures = live_gate_failures(cfg, manifest_sha256=manifest["run_sha256"], root=ROOT)
+            if failures:
+                return _refused(failures)
+        for item in rendered:
+            if request_input_bytes(item) > cfg["pilot"]["request_input_byte_limit"]:
+                return _refused(["request exceeds the approved input byte limit"])
+    except (OSError, ValueError, KeyError, TypeError):
+        return _refused(["selection, rendered inputs, or approval manifest is invalid"])
+
+    cfg["_pilot_run_id"] = manifest["run_sha256"]
+    tag = "mock" if mock else "live"
+    stamp = time.strftime("%Y%m%d_%H%M%S") + "_" + uuid.uuid4().hex[:12]
+    out_dir.mkdir(parents=True, exist_ok=True)
+    manifest_path = out_dir / f"run_manifest_{tag}_{manifest['run_sha256']}.json"
+    encoded_manifest = json.dumps(manifest, indent=1, allow_nan=False) + "\n"
+    if manifest_path.exists() and manifest_path.read_text() != encoded_manifest:
+        return _refused(["immutable run manifest already exists with different bytes"])
+    if not manifest_path.exists():
+        with manifest_path.open("x") as fh:
+            fh.write(encoded_manifest)
+    responses_path = out_dir / f"responses_{tag}_{stamp}.jsonl"
+    budget = cfg["budget"]
+    # All live models/stages share this fixed account journal. Output/cache paths
+    # and new run labels cannot reset the account or per-model ceilings.
+    ledger_path = out_dir / "ledger_mock.jsonl" if mock else ACCOUNT_LEDGER_PATH
+    pool = (budget["total_ceiling_usd"] if mock else
+            budget["balance_verified_usd"] - budget["reserve_margin_usd"])
+    journal = BudgetJournal(ledger_path, model=cfg["provider"]["model"],
+                            total_ceiling=budget["total_ceiling_usd"],
+                            per_dataset_ceiling=budget["per_dataset_ceiling_usd"], pool_ceiling=pool)
+    client = client or PilotClient(cfg, ROOT, mock=mock, live_authorized=not mock)
+    # Injected mock clients stay useful for offline failure fixtures. Real clients
+    # receive the same immutable scope before cache lookup.
+    if hasattr(client, "cfg"):
+        client.cfg = cfg
+    fetch = receipt_fetcher or fetch_receipt
+    cap, levels = cfg["pilot"]["cap"], cfg["effort"]["levels"]
+    seed = cfg["pilot"]["request_seed"]
+    pcfg = cfg["provider"]
+    route = pcfg["request_extra_body"]["provider"]["only"][0].strip().casefold()
+    rows, halt, exit_code, reused = [], None, 0, 0
+    n_total = len(rendered) * len(levels)
+    with responses_path.open("x", encoding="utf-8") as resp_fh:
         try:
             for r in rendered:
                 for effort in levels:
                     item_id = f"{r.dataset}:{r.source_item_id}"
-                    est_in = estimate_prompt_tokens(r.request_text_for_estimate())
-                    guard.check_before_call(r.dataset, worst_case_call_usd(cfg, est_in))
-                    started = _now()
-                    base_event = {
-                        "panel": cfg["pilot"]["label"], "phase": "exploratory_pilot",
+                    identity = {"model": pcfg["model"], "provider_route": route,
+                                "item_id": item_id, "effort": effort, "cap": cap,
+                                "seed": seed, "prompt_sha256": r.prompt_sha256, "mock": mock}
+                    job_id = sha256_json(identity)
+                    if journal.completed(job_id):
+                        reused += 1
+                        continue  # existing measurement, never another independent sample
+                    kwargs = {"max_tokens": cap, "seed": seed, "messages": r.messages}
+                    if hasattr(client, "cached_completion") and client.cached_completion(
+                        r.request_text_for_estimate(), effort, item_id, **kwargs
+                    ) is not None:
+                        raise AccountingHalt("Cache entry lacks a reconciled journal job; manual reconciliation required")
+                    event = {
+                        "job_id": job_id, "panel": cfg["pilot"]["label"], "phase": "exploratory_pilot",
                         "model": pcfg["model"], "requested_provider": pcfg["name"],
-                        "provider_route": ",".join(route), "item_id": item_id,
-                        "domain": r.dataset, "effort": effort, "cap": cap, "replicate": 1,
-                        "max_tokens": cap, "max_tokens_requested": cap,
-                        "request_started_at": started,
-                        "request_config": {
-                            "wrapper_version": r.wrapper_version,
-                            "prompt_sha256": r.prompt_sha256,
-                            "terminator_required": r.terminator_required,
-                            "seed": req_seed, "effort_mode": cfg["effort"]["mode"],
-                        },
+                        "provider_route": route, "item_id": item_id, "domain": r.dataset,
+                        "effort": effort, "cap": cap, "replicate": 1,
+                        "max_tokens": cap, "max_tokens_requested": cap, "request_started_at": _now(),
+                        "request_config": {"run_sha256": manifest["run_sha256"],
+                                           "wrapper_version": r.wrapper_version,
+                                           "prompt_sha256": r.prompt_sha256,
+                                           "terminator_required": r.terminator_required,
+                                           "seed": seed, "effort_mode": cfg["effort"]["mode"]},
                     }
+                    journal.reserve(event, worst_case_call_usd(cfg, 0))
+                    comp, known_cost = None, None
                     try:
-                        comp = client.complete(
-                            r.request_text_for_estimate(), effort, item_id,
-                            max_tokens=cap, seed=req_seed, messages=r.messages,
-                        )
-                    except Exception as err:  # noqa: BLE001 — ledger the attempt, keep going
-                        consecutive_errors += 1
-                        ledger.append({
-                            **base_event, "event_type": "error", "route_status": "request_failed",
-                            "accounting_status": "none", "error_class": type(err).__name__,
-                            "request_ended_at": _now(), "cached": False,
-                        })
-                        rows.append({"dataset": r.dataset, "item_id": item_id, "effort": effort, "error": str(err)})
-                        print(f"  FAILED {item_id} @ {effort}: {err}")
-                        if consecutive_errors >= breaker_n:
-                            raise CircuitBreaker(f"{consecutive_errors} consecutive errors")
-                        continue
-                    consecutive_errors = 0
-                    cost = actual_call_usd(cfg, comp)
-                    guard.record(r.dataset, cost)
-                    term = strict_terminator_present(comp.text)
-                    ledger.append({
-                        **base_event,
-                        "event_type": "cache" if comp.cached else "success",
-                        "route_status": "mock" if mock else "pinned",
-                        "accounting_status": "mock" if mock else "usage_reported",
-                        "served_provider": comp.provider, "generation_id": comp.generation_id,
-                        "prompt_tokens": comp.prompt_tokens, "completion_tokens": comp.completion_tokens,
-                        "reasoning_tokens": comp.reasoning_tokens, "finish_reason": comp.finish_reason,
-                        "reported_cost_usd": comp.reported_cost_usd, "latency_s": comp.latency_s,
-                        "cached": comp.cached, "extracted_answer_present": term,
-                        "request_ended_at": _now(),
-                        "billed_status": "mock" if mock else ("receipt_pending" if not comp.cached else "cached"),
-                    })
-                    resp_fh.write(json.dumps({
-                        "dataset": r.dataset, "item_id": item_id, "effort": effort, "cap": cap,
-                        "finish_reason": comp.finish_reason, "completion_tokens": comp.completion_tokens,
-                        "reasoning_tokens": comp.reasoning_tokens, "prompt_tokens": comp.prompt_tokens,
-                        "terminator_present": term, "terminator_required": r.terminator_required,
-                        "response_text": comp.text, "reasoning_text": comp.reasoning_text,
-                        "cached": comp.cached, "mock": mock,
-                    }) + "\n")
-                    resp_fh.flush()
-                    rows.append({
-                        "dataset": r.dataset, "item_id": item_id, "effort": effort,
-                        "finish_reason": comp.finish_reason, "completion_tokens": comp.completion_tokens,
-                        "terminator_present": term, "terminator_required": r.terminator_required,
-                        "cost_usd": cost,
-                    })
+                        comp = client.complete(r.request_text_for_estimate(), effort, item_id, **kwargs)
+                        event.update(_safe_metadata(comp))
+                        event["request_ended_at"] = _now()
+                        known_cost = event.get("reported_cost_usd")
+                        if comp.cached:
+                            raise AccountingHalt("Unjournaled cache response cannot become a fresh measurement")
+                        validate_completion(cfg, comp, mock=mock)
+                        term = strict_terminator_present(comp.text)
+                        resp_fh.write(json.dumps({
+                            "job_id": job_id, "run_sha256": manifest["run_sha256"],
+                            "dataset": r.dataset, "item_id": item_id, "effort": effort, "cap": cap,
+                            **_safe_metadata(comp), "terminator_present": term,
+                            "terminator_required": r.terminator_required,
+                            "response_text": comp.text, "reasoning_text": comp.reasoning_text,
+                            "cached": False, "mock": mock,
+                        }, allow_nan=False) + "\n")
+                        resp_fh.flush()
+                        os.fsync(resp_fh.fileno())
+                        if mock:
+                            cost = actual_call_usd(cfg, comp)
+                            event.update(route_status="mock", accounting_status="mock", billed_status="mock")
+                        else:
+                            # Preserve the generation ID and usage before any receipt race/crash.
+                            journal.unresolved(event, error_class="ReceiptPending", known_exposure_usd=known_cost)
+                            payload = fetch(cfg, comp.generation_id)
+                            if isinstance(payload, dict) and isinstance(payload.get("data"), dict):
+                                data = payload["data"]
+                                amount = data.get("total_cost")
+                                if data.get("id") == comp.generation_id and type(amount) in (int, float) and math.isfinite(amount) and amount >= 0:
+                                    known_cost = max(known_cost or 0, amount)
+                            receipt = reconcile_receipt(cfg, comp, payload)
+                            event.update(receipt)
+                            cost = receipt["receipt_cost_usd"]
+                            event.update(route_status="expected", accounting_status="valid", billed_status="reconciled")
+                        event.update(cached=False, extracted_answer_present=term)
+                        journal.settle(event, cost, generation_id=comp.generation_id)
+                    except (Exception, KeyboardInterrupt, SystemExit) as err:
+                        if comp is None:
+                            from types import SimpleNamespace
+                            event.update(_safe_metadata(SimpleNamespace(**getattr(err, "metadata", {}))))
+                            known_cost = event.get("reported_cost_usd")
+                        event["request_ended_at"] = _now()
+                        journal.unresolved(event, error_class=type(err).__name__, known_exposure_usd=known_cost)
+                        rows.append({"dataset": r.dataset, "item_id": item_id, "effort": effort,
+                                     "error": "accounting_unresolved"})
+                        raise AccountingHalt("Attempt unresolved; reservation retained, further submissions blocked") from None
+                    rows.append({"dataset": r.dataset, "item_id": item_id, "effort": effort,
+                                 "finish_reason": comp.finish_reason, "completion_tokens": comp.completion_tokens,
+                                 "terminator_present": term, "terminator_required": r.terminator_required,
+                                 "cost_usd": cost})
                     if len(rows) % 100 == 0 or n_total <= 10:
-                        print(f"  {len(rows)}/{n_total}  spent ${guard.spent_total:.2f}")
+                        print(f"  {len(rows)}/{n_total}  accounted ${journal.spent_total:.2f}")
         except CeilingHalt as err:
             halt, exit_code = f"ceiling_halt: {err}", EXIT_CEILING_HALT
-            print(f"\nHALT before next call: {err}")
-        except CircuitBreaker as err:
-            halt, exit_code = f"circuit_breaker: {err}", EXIT_CIRCUIT_BREAKER
-            print(f"\nHALT: {err}")
-
-    summary = _summary(cfg, rows, guard, halt)
-    summary["ledger"] = str(ledger.path.relative_to(ROOT)) if ledger.path.is_absolute() and ROOT in ledger.path.parents else str(ledger.path)
-    summary["ledger_verified"] = ledger.verify()
-    (out_dir / f"summary_{tag}_{stamp}.json").write_text(json.dumps(summary, indent=1) + "\n")
-    print(f"\n{'mock' if mock else 'LIVE'} run finished: {len(rows)} attempts, spent ${guard.spent_total:.2f}, "
-          f"halt={halt or 'none'} -> {out_dir}")
+        except (AccountingHalt, ValueError):
+            halt, exit_code = "accounting_halt: ledger reconciliation required", EXIT_CIRCUIT_BREAKER
+    try:
+        snapshot = journal.snapshot()
+        guard = CeilingGuard(budget["per_dataset_ceiling_usd"], budget["total_ceiling_usd"],
+                             snapshot["spent_by_dataset"])
+        summary = _summary(cfg, rows, guard, halt)
+        summary.update(snapshot)
+        verified = journal.ledger.verify()
+    except (AccountingHalt, ValueError, OSError):
+        summary = {"exploratory": True, "halt": "accounting_halt: invalid journal", "datasets": {}}
+        exit_code, verified = EXIT_CIRCUIT_BREAKER, False
+    summary.update(ledger=str(ledger_path), ledger_verified=verified,
+                   run_sha256=manifest["run_sha256"], already_completed_jobs=reused,
+                   statistics_scope="new reconciled observations in this invocation",
+                   mock=mock, responses=str(responses_path))
+    (out_dir / f"summary_{tag}_{stamp}.json").write_text(json.dumps(summary, indent=1, allow_nan=False) + "\n")
+    print(f"\n{tag} run: {len(rows)} new attempts, {reused} already completed; halt={summary['halt'] or 'none'}")
     return summary, exit_code
 
 
@@ -446,17 +460,14 @@ def render_all(cfg: dict, items: list[dict]) -> list[Rendered]:
 
 def write_rendered_manifest(cfg: dict, selection: dict, rendered: list[Rendered], out_dir: Path) -> Path:
     out_dir.mkdir(parents=True, exist_ok=True)
-    manifest = {
-        "label": cfg["pilot"]["label"],
-        "selection_sha256": selection["selection_sha256"],
-        "selection_rule": selection["rule"],
-        "wrapper_seed": cfg["pilot"]["wrapper_seed"],
-        "cap": cfg["pilot"]["cap"],
-        "content_free": True,
-        "items": [r.manifest_row() for r in rendered],
-    }
-    path = out_dir / "rendered_manifest.json"
-    path.write_text(json.dumps(manifest, indent=1) + "\n")
+    manifest = run_manifest(cfg, rendered, selection["selection_sha256"])
+    path = out_dir / f"rendered_manifest_{manifest['run_sha256']}.json"
+    content = json.dumps(manifest, indent=1, allow_nan=False) + "\n"
+    if path.exists() and path.read_text() != content:
+        raise ValueError("Immutable rendered manifest differs from existing bytes")
+    if not path.exists():
+        with path.open("x") as fh:
+            fh.write(content)
     return path
 
 
@@ -471,25 +482,28 @@ def main(argv: list[str] | None = None) -> int:
     args = ap.parse_args(argv)
 
     cfg = load_config(args.config)
-    sel_path = Path(args.selection or cfg["pilot"]["selection"])
-    if not sel_path.is_absolute():
-        sel_path = ROOT / sel_path
-    selection = json.loads(sel_path.read_text())
-    out_dir = ROOT / cfg["paths"]["results"]
-
-    if args.live:
-        fails = live_gate_failures(cfg)
-        if fails:
-            print("LIVE REFUSED. Open gates:")
-            for f in fails:
-                print(f"  - {f}")
-            return EXIT_GATE_REFUSED
-
-    items = load_selected_items(cfg, selection)
-    rendered = render_all(cfg, items)
-    manifest_path = write_rendered_manifest(cfg, selection, rendered, out_dir)
-    print(f"{len(rendered)} items rendered with {rendered[0].wrapper_version if rendered else '-'}; "
-          f"content-free manifest -> {manifest_path.relative_to(ROOT)}")
+    failures = configuration_failures(cfg)
+    if failures:
+        return _refused(failures)[1]
+    if args.selection:
+        cfg["pilot"]["selection"] = args.selection
+    if args.live and cfg["pilot"]["enabled"] is not True:
+        return _refused(live_gate_failures(cfg, root=ROOT))[1]
+    try:
+        sel_path = ROOT / cfg["pilot"]["selection"]
+        selection = json.loads(sel_path.read_text())
+        items = load_selected_items(cfg, selection, cap_dir=ROOT / cfg["paths"]["data"])
+        rendered = render_all(cfg, items)
+        cfg["_selection_sha256"] = selection["selection_sha256"]
+        out_dir = ROOT / cfg["paths"]["results"]
+        if args.live:
+            failures = live_gate_failures(cfg, manifest_sha256=run_manifest(cfg, rendered, selection["selection_sha256"])["run_sha256"], root=ROOT)
+            if failures:
+                return _refused(failures)[1]
+        manifest_path = write_rendered_manifest(cfg, selection, rendered, out_dir)
+    except (OSError, ValueError, TypeError, KeyError):
+        return _refused(["selection or immutable rendered manifest validation failed"])[1]
+    print(f"{len(rendered)} items rendered; content-free manifest -> {manifest_path}")
 
     if args.mock or args.live:
         _, code = run(cfg, rendered, mock=args.mock, out_dir=out_dir)

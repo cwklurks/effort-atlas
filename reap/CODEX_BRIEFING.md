@@ -20,6 +20,15 @@ Point any new Codex session at this file first: **"Read reap/CODEX_BRIEFING.md a
 
 ## 2. Project state, in one screen
 
+**Current checkout update, 2026-09-03:** `codex/pilot-safety` repairs the exploratory
+pilot audit findings without enabling live calls. See
+`reap/29_PILOT_SAFETY_REMEDIATION_2026-09-03.md` for the approval evidence contract,
+durable host-wide account ledger, offline verification and remaining limits.
+The accepted strict grader at `9a54f17` is imported here; the separate analysis
+integration and Task E are outside this repair. All shipped pilot approvals are
+unset and live switches false. Historical branch/main milestones below and in
+the status dashboard do not authorize execution from this checkout.
+
 **The paper:** output-token walls truncate reasoning responses before a final answer exists; graders score deletions as wrong; higher effort writes longer and hits walls more — so a wall can masquerade as "thinking makes models worse." Two halves: censored-length analysis (supervisor's) + effort×allowance interventions (ours). Merged paper, Connor first author.
 
 **What exists and works:** the frozen Phase-I preregistration + one dated amendment ($0 confirmatory spend, ever); the offline confirmatory preflight (hash-chained AttemptLedger, seeded/hashed schedules, receipt reconciliation); the cap-semantics and observational studies; and independently reviewed Phase-1 implementations for the ecosystem audit, strict grader v2, and fail-closed Tinker probe. Grader v2 reproducibly identifies all 78 archived 4,096-token rows as unanswered with no raw response text committed. The ecosystem audit's real-only table, uniform control gate, receipts, and synthetic separation are independently recomputed. The Tinker probe's dry-run plan is safe, but pinned SDK 0.25.0 is proven to resubmit and its live path therefore blocks before client construction.

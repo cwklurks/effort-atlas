@@ -104,6 +104,8 @@ def dry_run(cfg: dict, items: list[dict]) -> None:
 
 
 def run(mock: bool, config_path: str | Path | None = None) -> None:
+    if not mock:
+        raise SystemExit("Legacy paid sweeps are disabled. Use the approved exploratory pilot workflow.")
     cfg = load_config(config_path)
     if not mock and cfg["sweep"].get("enabled") is False:
         reason = cfg["sweep"].get("pause_reason", "manual safety gate")
@@ -172,7 +174,8 @@ def run(mock: bool, config_path: str | Path | None = None) -> None:
                                 return
                             time.sleep(30)
                             continue
-                        ok, extracted = grade(item["grader"], comp.text, item["answer"])
+                        grading = grade(item["grader"], comp.text, item["answer"])
+                        ok = grading["correct"]
                         row = {
                             "item_id": item["id"], "domain": item["domain"],
                             "effort": effort, "seed": seed,
@@ -181,7 +184,7 @@ def run(mock: bool, config_path: str | Path | None = None) -> None:
                                 if budget is not None
                                 else cfg["provider"]["max_completion_tokens"]
                             ),
-                            "correct": ok, "extracted": extracted, "gold": item["answer"],
+                            **grading, "extracted": grading["extracted_answer"], "gold": item["answer"],
                             "completion_tokens": comp.completion_tokens,
                             "reasoning_tokens": comp.reasoning_tokens,
                             "prompt_tokens": comp.prompt_tokens,
@@ -214,8 +217,10 @@ def run(mock: bool, config_path: str | Path | None = None) -> None:
 
 def main() -> None:
     ap = argparse.ArgumentParser()
-    ap.add_argument("--dry-run", action="store_true", help="cost estimate only")
-    ap.add_argument("--mock", action="store_true", help="fake responses, no API")
+    mode = ap.add_mutually_exclusive_group()
+    mode.add_argument("--dry-run", action="store_true", help="cost estimate only (default)")
+    mode.add_argument("--mock", action="store_true", help="fake responses, no API")
+    mode.add_argument("--live", action="store_true", help="refused: legacy paid sweeps are disabled")
     ap.add_argument(
         "--config",
         default=None,
@@ -223,7 +228,9 @@ def main() -> None:
     )
     args = ap.parse_args()
 
-    if args.dry_run:
+    if args.live:
+        raise SystemExit("Legacy paid sweeps are disabled. Use the approved exploratory pilot workflow.")
+    if not args.mock:
         cfg = load_config(args.config)
         items = load_items(
             ROOT / cfg["paths"]["data"],
