@@ -4,9 +4,9 @@
     "name": "REAP",
     "paper": "Thinking Cut Short",
     "repository": "cwklurks/effort-atlas",
-    "updated": "2026-09-06",
+    "updated": "2026-09-07",
     "current_phase": 3,
-    "summary": "Exploratory Inkling baseline is prepared offline on Mac and box: matching 1,000-item plans, pinned upstream prompts and deterministic scoring, explicit medium/max cap. Live accounting policy, route evidence and human launch remain unresolved."
+    "summary": "Connor approved $250 medium and $250 conditional max with whole-stage Tinker reservation and aggregate reconciliation. The separate human-launch path is implemented and independently reviewed offline; Mac and box verification passes. Account/route evidence and launch key remain missing; no provider calls."
   },
   "safety": {
     "confirmatory_calls": 0,
@@ -131,6 +131,11 @@
   ],
   "verification": [
     {
+      "label": "Approved Tinker stage accounting and human-launch boundary",
+      "result": "Mac and box Python 3.12.8: canonical 251 run, 250 passed, one optional source rebuild skipped; 12 supplemental upstream/SDK tests and both 1,000-item synthetic rehearsals passed. Independent Sol XHigh re-review is clean (41 focused tests); complete box replay passed in 80 seconds with the same preparation hash. No provider calls.",
+      "status": "passed"
+    },
+    {
       "label": "Inkling baseline offline preparation",
       "result": "Mac and box Python 3.12.8: canonical 210 run, 209 passed, one optional source-root rebuild skipped; ten pinned-upstream/SDK tests and 1,000-item synthetic rehearsal passed. Identical plan hashes; archived grader acceptance passed; Python networking denied. Live readiness not established. Independent Sol XHigh re-review passed after a regression repaired missing private gold-map authentication.",
       "status": "passed"
@@ -217,6 +222,12 @@
     }
   ],
   "activity": [
+    {
+      "date": "2026-09-07",
+      "phase": 3,
+      "title": "Stage accounting policy approved and implemented",
+      "detail": "Connor approved whole-stage reservation, delayed aggregate billing reconciliation, $250 medium and $250 conditional max. Private response/grade integrity, no-retry restart gates and exact account evidence checks passed independent offline review. Complete box replay passed in 80 seconds; live account facts remain unverified."
+    },
     {
       "date": "2026-09-06",
       "phase": 3,

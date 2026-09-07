@@ -1,8 +1,10 @@
 # Inkling baseline: offline preparation
 
-This prepares the agreed 1,000-item exploratory baseline. It does not collect
-research responses and has no live execution path. The remaining Tinker billing
-decision is concrete in `ACCOUNTING_PROPOSAL.md`.
+The preparation command creates the agreed 1,000-item exploratory baseline offline.
+The separate `effort_atlas.inkling_stage` command implements the September 7 approved
+stage accounting and an evidence-bound human launch path; it also defaults to dry-run.
+See `RUNBOOK.md` and `ACCOUNTING_APPROVAL_2026-09-07.md`. Account and route evidence
+remain unverified, and Codex has made no provider calls.
 
 ## Prepared design
 

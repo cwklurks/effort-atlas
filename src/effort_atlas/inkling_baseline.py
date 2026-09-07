@@ -25,8 +25,8 @@ SELECTION = "capabilities/selections/selection_stratified200_seed20260830_v1.jso
 BLOCKERS = (
     "Tinker organization access and credit eligibility for this endpoint are unverified",
     "Reasoning-inclusive cap and token accounting require route evidence",
-    "Per-request billed-cost reconciliation is not established for this endpoint",
-    "Dated prices, verified balance and a separate run ceiling are not approved",
+    "Whole-stage billing reconciliation requires verified attribution and account evidence",
+    "Dated prices and verified balance are missing; approved stage ceilings are conditional",
     "Independent review and host-bound human launch evidence remain required",
 )
 
@@ -152,7 +152,8 @@ def prepare(*, root: Path = ROOT, upstream_root: Path | None = None, mock: bool 
                 "http_client_follow_redirects": False, "http_client_trust_env": False},
         "input_admission_bytes": 60000, "input_token_allowance_verified": False,
         "tinker_credits_reported_usd": 5000, "credit_balance_verified": False,
-        "approved_run_ceiling_usd": None, "pricing_verified": False,
+        "approved_run_ceiling_usd": 500, "approved_stage_ceilings_usd": {"medium": 250, "max": 250},
+        "accounting_policy_approved_on": "2026-09-07", "pricing_verified": False,
         "selection_sha256": selection["selection_sha256"], "upstream": upstream,
         "private_requests_sha256": hashlib.sha256(private_jsonl.encode()).hexdigest(),
         "implementation_sha256": {

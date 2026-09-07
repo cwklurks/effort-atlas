@@ -20,6 +20,16 @@ Point any new Codex session at this file first: **"Read reap/CODEX_BRIEFING.md a
 
 ## 2. Project state, in one screen
 
+**Current exploratory update, 2026-09-07:** Connor approved whole-stage Tinker
+reservation and delayed aggregate reconciliation, with $250 medium and $250
+conditional max ceilings. The separate stage command and evidence-bound human
+launch path are implemented; default execution is offline. Mac tests and both
+1,000-item synthetic rehearsals pass. Independent Sol XHigh review is clean after regression repairs. The complete
+offline verification also passes on the box, with the same preparation hash. Current account/route facts and the box's launch key remain absent;
+no provider call has been made. See `reap/31_INKLING_STAGE_ACCOUNTING_2026-09-07.md`
+and `reap/inkling_baseline/RUNBOOK.md`. This supersedes the pending policy decision
+below, not the historical frozen design or confirmatory gates.
+
 **Exploratory preparation update, 2026-09-06:** Connor reported advisor agreement
 and accepted the stratified 1,000-item Tinker Inkling baseline direction, medium
 effort and a 32,768-token cap. SSH to the box works. The original-reservation

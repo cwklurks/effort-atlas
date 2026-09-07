@@ -20,3 +20,6 @@ REAP_VERIFY_PYTHON="$BASELINE_PYTHON_BIN"
 export REAP_VERIFY_PYTHON
 PYTHONPATH=src:tests "$reap_verify_wrapper" -m unittest discover -s tests/baseline -v
 PYTHONPATH=src "$reap_verify_wrapper" -m effort_atlas.inkling_baseline --mock
+# Rehearse the approved whole-stage accounting without any account/provider access.
+PYTHONPATH=src "$reap_verify_wrapper" -m effort_atlas.inkling_stage --dry-run
+PYTHONPATH=src "$reap_verify_wrapper" -m effort_atlas.inkling_stage --mock
