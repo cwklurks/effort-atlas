@@ -4,9 +4,9 @@
     "name": "REAP",
     "paper": "Thinking Cut Short",
     "repository": "cwklurks/effort-atlas",
-    "updated": "2026-09-03",
+    "updated": "2026-09-06",
     "current_phase": 3,
-    "summary": "This checkout repairs exploratory pilot request, accounting, integrity and grading safeguards. Live approval remains unset; methodology freeze, Task E and confirmatory execution remain blocked."
+    "summary": "Exploratory Inkling baseline preparation is in progress after Connor reported advisor agreement. Original-reservation settlement is repaired; Tinker integration, prompt provenance, scoring and box verification remain. Live switches remain disabled."
   },
   "safety": {
     "confirmatory_calls": 0,
@@ -131,6 +131,11 @@
   ],
   "verification": [
     {
+      "label": "Original-reservation settlement regression",
+      "result": "Two regressions failed before the repair; 22 focused tests and the canonical offline suite pass afterward: 205 tests run, 204 passed, one optional source-root rebuild skipped. Archived grader verification passed. Network was blocked; Linux verification remains pending.",
+      "status": "passed"
+    },
+    {
       "label": "Exploratory pilot safety remediation",
       "result": "Python 3.12.8 canonical offline suite: 203 run, 202 passed, one optional exact-root source rebuild skipped; archived 78-row grader verification passed. Network-blocked 1,000-item mock and no-new-spend resume passed. Independent reviews passed after remediation. No provider calls.",
       "status": "passed"
@@ -207,6 +212,12 @@
     }
   ],
   "activity": [
+    {
+      "date": "2026-09-06",
+      "phase": 3,
+      "title": "Inkling baseline direction accepted; box reachable",
+      "detail": "Connor accepted the stratified 1,000-item Tinker baseline direction. A receipt above its original reservation now halts even after pending exposure rises and the journal reloads. Prompt and Tinker preparation are in progress; no paid calls."
+    },
     {
       "date": "2026-09-03",
       "phase": 3,

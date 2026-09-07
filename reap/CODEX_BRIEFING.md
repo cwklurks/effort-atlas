@@ -20,6 +20,14 @@ Point any new Codex session at this file first: **"Read reap/CODEX_BRIEFING.md a
 
 ## 2. Project state, in one screen
 
+**Exploratory preparation update, 2026-09-06:** Connor reported advisor agreement
+and accepted the stratified 1,000-item Tinker Inkling baseline direction, medium
+effort and a 32,768-token cap. SSH to the box works. The original-reservation
+settlement defect is repaired and verified by focused offline regressions.
+Tinker integration, prompt provenance, scoring and box verification remain in
+progress; see `reap/30_INKLING_BASELINE_PREPARATION_2026-09-06.md`. No live switch
+or receipt/price/route approval is inferred from this scientific agreement.
+
 **Current checkout update, 2026-09-03:** `codex/pilot-safety` repairs the exploratory
 pilot audit findings without enabling live calls. See
 `reap/29_PILOT_SAFETY_REMEDIATION_2026-09-03.md` for the approval evidence contract,

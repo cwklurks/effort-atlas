@@ -93,6 +93,20 @@ class BudgetJournalTests(unittest.TestCase):
             with self.assertRaises(AccountingHalt):
                 j.reserve(event("two"), 0.0)
 
+    def test_receipt_pending_cannot_raise_original_reservation_after_restart(self):
+        with tempfile.TemporaryDirectory() as td:
+            path = Path(td) / "ledger.jsonl"
+            j = self.journal(path)
+            j.reserve(event("one"), 0.10)
+            j.unresolved(event("one"), error_class="ReceiptPending", known_exposure_usd=0.11)
+            fresh = self.journal(path)
+            with self.assertRaises(AccountingHalt):
+                fresh.settle(event("one"), 0.11, generation_id="g1")
+            self.assertIsNone(fresh.completed("one"))
+            self.assertAlmostEqual(fresh.exposure_total, 0.11)
+            with self.assertRaises(AccountingHalt):
+                fresh.reserve(event("two"), 0.0)
+
 
 if __name__ == "__main__":
     unittest.main()

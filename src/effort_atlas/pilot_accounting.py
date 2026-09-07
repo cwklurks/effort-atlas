@@ -159,7 +159,9 @@ class BudgetJournal:
                 s["settled"].get("generation_id") == generation_id for s in jobs.values()
             ):
                 raise AccountingHalt("Missing or reused generation identity")
-            if amount > state["exposure"]:
+            # Pending receipts can raise known exposure, never the allowance
+            # approved before submission. Keep a breach unresolved on restart.
+            if amount > money(state["reserve"]["request_config"]["reserved_usd"]):
                 self._append_unresolved(event, "ReservationExceeded", amount)
                 raise AccountingHalt("Billed cost exceeded the reserved allowance")
             self.ledger.append({**event, "event_type": "success", "generation_id": generation_id,

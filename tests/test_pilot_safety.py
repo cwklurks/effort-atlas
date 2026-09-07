@@ -203,6 +203,31 @@ class LiveOrchestrationWithoutNetworkTests(unittest.TestCase):
         self.assertTrue(result["ledger_verified"])
         self.assertEqual(result["unresolved_jobs"], 0)
 
+    def test_receipt_above_reservation_halts_before_second_request(self):
+        self.cfg["pilot"].update(cap=100, input_token_allowance=100)
+        self.cfg["provider"]["max_completion_tokens"] = 100
+        self.cfg["budget"].update(total_ceiling_usd=.0005, per_dataset_ceiling_usd=.0005)
+        self.approve()
+        owner = self
+        class Overcharged:
+            calls = 0
+            def complete(self, *args, **kwargs):
+                self.calls += 1
+                comp = owner.completion(self.calls)
+                comp.reported_cost_usd = .00055
+                return comp
+        client = Overcharged()
+        def receipt(cfg, generation_id):
+            result = self.receipt(cfg, generation_id)
+            result["data"]["total_cost"] = .00055
+            return result
+        result, code = self.execute(client, receipt)
+        self.assertEqual(code, pilot.EXIT_CIRCUIT_BREAKER)
+        self.assertEqual(client.calls, 1)
+        self.assertEqual(result["unresolved_jobs"], 1)
+        self.assertEqual(result["spent_total"], 0)
+        self.assertAlmostEqual(result["pool_exposure"], .00055)
+
     def test_stale_approval_and_modified_rendered_bytes_prevent_any_call(self):
         client = self.client()
         self.cfg["pilot"]["request_seed"] += 1
