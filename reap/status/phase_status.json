@@ -132,7 +132,7 @@
   "verification": [
     {
       "label": "Inkling baseline offline preparation",
-      "result": "Mac and box Python 3.12.8: canonical 210 run, 209 passed, one optional source-root rebuild skipped; nine pinned-upstream/SDK tests and 1,000-item synthetic rehearsal passed. Identical plan hashes; archived grader acceptance passed; Python networking denied. Live readiness not established.",
+      "result": "Mac and box Python 3.12.8: canonical 210 run, 209 passed, one optional source-root rebuild skipped; ten pinned-upstream/SDK tests and 1,000-item synthetic rehearsal passed. Identical plan hashes; archived grader acceptance passed; Python networking denied. Live readiness not established. Independent Sol XHigh re-review passed after a regression repaired missing private gold-map authentication.",
       "status": "passed"
     },
     {

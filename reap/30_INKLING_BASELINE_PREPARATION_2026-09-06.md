@@ -63,10 +63,10 @@ Termination reasons remain separate from strict extraction and dataset scoring.
 ## Verification on Mac and box
 
 Python 3.12.8 canonical suite: 210 run, 209 passed, one optional exact-root source
-rebuild skipped. The archived 78-row grader acceptance passes. Nine supplemental
+rebuild skipped. The archived 78-row grader acceptance passes. Ten supplemental
 tests exercise actual pinned upstream imports and the Anthropic SDK's offline
 transport. A 1,000-item synthetic rehearsal passes on both hosts with identical
-plan hash `5b4688415f8da85c7d32c75903978b68192dbab7558aeef6ec90bfd0f0c74d37`.
+plan hash `255f8a60659ec93e2346256a52f7a645c33e3cb512d43cc831ab81c1ecfa414c`.
 Python socket access is denied during all verification; model calls are zero.
 
 The isolated box checkout is `/home/connork/code/inkling-baseline-20260906`.
@@ -74,6 +74,12 @@ Source validation correctly rejected dataset symlinks outside that checkout;
 private copies from existing files on the same box satisfy the original boundary.
 No restricted question text, private responses or credentials were transferred
 from the Mac. The original box checkout and source files were preserved.
+
+Independent Sol XHigh review identified an unauthenticated private gold mapping.
+A failing regression reproduced it. The plan now includes the private request
+file's SHA-256 and the option-mapping implementation hash. Tests prove a gold-only
+change changes the plan and same-plan private-byte tampering refuses preparation.
+Independent re-review found no remaining actionable issue in this bounded scope.
 
 ## Remaining human/accounting gates
 

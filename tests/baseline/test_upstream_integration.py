@@ -3,14 +3,20 @@
 Run alongside, never instead of, scripts/verify_offline.sh. No model calls.
 """
 import json
+import hashlib
+from pathlib import Path
+from dataclasses import replace
+import shutil
+import tempfile
 import unittest
+from unittest.mock import patch
 
 import anthropic
 import httpx2
 
 from effort_atlas import ROOT
 from effort_atlas.baseline_upstream import render_baseline, score_baseline, verify_upstream
-from effort_atlas.inkling_baseline import build_request, client_options, parse_response
+from effort_atlas.inkling_baseline import build_request, client_options, parse_response, prepare, DATASETS, SELECTION
 from test_pilot import _row
 
 UPSTREAM = ROOT / ".cache_pilot/inkling_baseline_upstream"
@@ -92,6 +98,39 @@ class PinnedPromptAndScoringTests(unittest.TestCase):
         self.assertFalse(score["extracted_answer_present"])
         self.assertIsNone(score["correct"])
         self.assertEqual(score["grading_status"], "pending_official_judge")
+
+
+    def test_plan_binds_private_answer_keys_and_refuses_tampered_artifacts(self):
+        rows = [_row(dataset, index, category="business")
+                for dataset in DATASETS for index in range(200)]
+        rendered, temperature = render_baseline(rows[0], seed=20260830)
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            for relative in (SELECTION, "src/effort_atlas/inkling_baseline.py",
+                             "src/effort_atlas/baseline_upstream.py", "src/effort_atlas/graders.py",
+                             "src/effort_atlas/wrapper.py", "reap/inkling_baseline/requirements.lock"):
+                target = root / relative
+                target.parent.mkdir(parents=True, exist_ok=True)
+                shutil.copyfile(ROOT / relative, target)
+            with patch("effort_atlas.inkling_baseline.load_selected_items", return_value=rows), \
+                 patch("effort_atlas.baseline_upstream.render_baseline", return_value=(rendered, temperature)):
+                first = prepare(root=root, upstream_root=UPSTREAM)
+                directory = Path(first["directory"])
+                manifest = json.loads((directory / "manifest.json").read_text())
+                private_path = directory / "requests.private.jsonl"
+                self.assertEqual(manifest["private_requests_sha256"],
+                                 hashlib.sha256(private_path.read_bytes()).hexdigest())
+                self.assertIn("src/effort_atlas/wrapper.py", manifest["implementation_sha256"])
+                private_path.write_bytes(private_path.read_bytes() + b" ")
+                with self.assertRaisesRegex(ValueError, "refusing to replace"):
+                    prepare(root=root, upstream_root=UPSTREAM)
+            changed = replace(rendered, gold_letter="B" if rendered.gold_letter != "B" else "A")
+            with patch("effort_atlas.inkling_baseline.load_selected_items", return_value=rows), \
+                 patch("effort_atlas.baseline_upstream.render_baseline", return_value=(changed, temperature)):
+                second = prepare(root=root, upstream_root=UPSTREAM)
+            self.assertNotEqual(first["plan_sha256"], second["plan_sha256"])
+            second_manifest = json.loads((Path(second["directory"]) / "manifest.json").read_text())
+            self.assertEqual(manifest["items"], second_manifest["items"])
 
 
 class ActualSDKTransportTests(unittest.TestCase):

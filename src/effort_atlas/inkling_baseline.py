@@ -140,6 +140,7 @@ def prepare(*, root: Path = ROOT, upstream_root: Path | None = None, mock: bool 
                        "source_row_index": row["source_row_index"], "wrapper_version": rendered.wrapper_version,
                        "source_prompt_sha256": row["prompt_sha256"], "temperature": temperature,
                        "medium_request_sha256": sha256_json(medium), "max_request_sha256": sha256_json(maximum)})
+    private_jsonl = "".join(json.dumps(row, ensure_ascii=False) + "\n" for row in private)
     manifest = {
         "schema_version": "inkling-baseline-preparation-v1", "phase": "exploratory",
         "live_enabled": False, "launch_ready": False, "launch_blockers": list(BLOCKERS),
@@ -153,11 +154,13 @@ def prepare(*, root: Path = ROOT, upstream_root: Path | None = None, mock: bool 
         "tinker_credits_reported_usd": 5000, "credit_balance_verified": False,
         "approved_run_ceiling_usd": None, "pricing_verified": False,
         "selection_sha256": selection["selection_sha256"], "upstream": upstream,
+        "private_requests_sha256": hashlib.sha256(private_jsonl.encode()).hexdigest(),
         "implementation_sha256": {
             str(path): hashlib.sha256((root / path).read_bytes()).hexdigest()
             for path in (Path("src/effort_atlas/inkling_baseline.py"),
                          Path("src/effort_atlas/baseline_upstream.py"),
                          Path("src/effort_atlas/graders.py"),
+                         Path("src/effort_atlas/wrapper.py"),
                          Path("reap/inkling_baseline/requirements.lock"))
         },
         "dataset_counts": dict(Counter(row["dataset"] for row in source_rows)), "items": public,
@@ -168,7 +171,7 @@ def prepare(*, root: Path = ROOT, upstream_root: Path | None = None, mock: bool 
     out.mkdir(parents=True, exist_ok=True, mode=0o700)
     out.chmod(0o700)
     _write_once(out / "manifest.json", json.dumps(manifest, indent=2) + "\n")
-    _write_once(out / "requests.private.jsonl", "".join(json.dumps(row, ensure_ascii=False) + "\n" for row in private))
+    _write_once(out / "requests.private.jsonl", private_jsonl)
     if mock:
         synthetic = []
         for index, (row, item) in enumerate(zip(source_rows, private)):

@@ -95,7 +95,8 @@ rejected by the existing source-integrity check.
 
 Preparation artifacts are written under
 `results_pilot/inkling_tinker_baseline/preparation/<plan_sha256>/`. The public
-manifest contains hashes and identifiers. The request and mock-response JSONLs
+manifest contains hashes and identifiers, including the SHA-256 of the complete
+private request file and its recorded gold mappings. The request and mock-response JSONLs
 are private, mode 0600, inside a mode-0700 directory and remain gitignored. Existing
 artifacts with different bytes are never overwritten. Do not put the private
 JSONLs in a transfer bundle or PR.
