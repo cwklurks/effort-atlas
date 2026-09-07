@@ -24,9 +24,14 @@ Point any new Codex session at this file first: **"Read reap/CODEX_BRIEFING.md a
 and accepted the stratified 1,000-item Tinker Inkling baseline direction, medium
 effort and a 32,768-token cap. SSH to the box works. The original-reservation
 settlement defect is repaired and verified by focused offline regressions.
-Tinker integration, prompt provenance, scoring and box verification remain in
-progress; see `reap/30_INKLING_BASELINE_PREPARATION_2026-09-06.md`. No live switch
-or receipt/price/route approval is inferred from this scientific agreement.
+Offline Tinker request preparation, pinned HELM prompt adaptations, strict
+choice/IFEval scoring and a 1,000-item synthetic rehearsal now pass on Mac and box
+with matching plan hashes. No live collection path is included. Tinker billing
+needs a human policy decision: its documented hourly export does not supply the
+current runner's per-request dollar receipts. See
+`reap/30_INKLING_BASELINE_PREPARATION_2026-09-06.md` and
+`reap/inkling_baseline/ACCOUNTING_PROPOSAL.md`. No live switch or receipt/price/route
+approval is inferred from the scientific agreement.
 
 **Current checkout update, 2026-09-03:** `codex/pilot-safety` repairs the exploratory
 pilot audit findings without enabling live calls. See

@@ -1,6 +1,6 @@
 # Inkling baseline preparation — 2026-09-06
 
-Status: exploratory preparation in progress. No paid calls made by Codex;
+Status: offline preparation implemented; live accounting decision outstanding. No paid calls made by Codex;
 all live switches and machine-verifiable approval fields remain disabled/unset.
 This dated note records the current decision without changing frozen history.
 
@@ -19,10 +19,11 @@ these recommendations in the current task:
 - Start from original evaluation templates; adapt only the final-answer format
   where strict extraction requires it. Preserve IFEval instructions and WildBench
   conversations. Remove the custom "Think as much as you need" addition.
-  Template provenance and implementation still need verification; do not label
-  the current custom wrapper as an exact or completed HELM adaptation.
+  The prepared prompts import pinned HELM constructors. The adaptations are
+  documented in `reap/inkling_baseline/README.md`; this is not an exact HELM replay.
 - Score MMLU-Pro/GPQA by the recorded option mapping, IFEval by imported official
-  checks, and Omni-MATH by its official evaluator. Defer WildBench quality judging.
+  checks. Omni-MATH scoring remains pending its official paid evaluator; defer
+  WildBench quality judging.
   No pooled five-dataset gold-answer accuracy is justified.
 
 ## Box and implementation checkpoint
@@ -41,22 +42,59 @@ optional exact-root source rebuild skipped. Archived grader verification passes;
 a process-wide socket guard blocks network access during verification. The Linux
 handoff digest was regenerated after the briefing change.
 
-## Remaining preparation
+## Offline implementation checkpoint
 
-1. Verify/import original benchmark prompt logic and document exact adaptations.
-2. Prepare Tinker-specific request serialization and offline verification. The
-   old OpenRouter config cannot spend Tinker credits and must not be relabeled.
-3. Establish Tinker route, credit eligibility, reasoning-inclusive cap semantics,
-   token accounting and billing joins. Current documentation is not empirical
-   evidence that the earlier pinned SDK retry blocker is resolved.
-4. Add per-effort summaries and validated dataset-specific scoring.
-5. Validate source bytes, request manifests, budget projections and the canonical
-   offline suite on the isolated box checkout before a human launch.
+`python -m effort_atlas.inkling_baseline` defaults to dry-run preparation and has
+no live path. It prepares medium/max request hashes for the same 1,000 source
+items, pinned model, explicit cap, temperatures and prompts. Private request and
+synthetic response files stay local and gitignored. Missing inputs, changed
+source hashes or failed imports refuse preparation; upstream renderers and the
+Google IFEval evaluator are imported, not reconstructed.
 
-Tinker primary references consulted September 6:
+The pinned Anthropic-compatible client serializes one POST in offline transport
+tests, including failure, timeout and redirect cases. This is client-level test
+evidence only. It does not establish backend billing, retry or cap semantics.
+The legacy Tinker 0.25.0 probe remains blocked and unchanged.
+
+The OpenRouter pilot now reports dataset-by-effort cells, with response and error
+denominators separate. Historical pooled dataset summaries are explicitly labeled.
+Termination reasons remain separate from strict extraction and dataset scoring.
+
+## Verification on Mac and box
+
+Python 3.12.8 canonical suite: 210 run, 209 passed, one optional exact-root source
+rebuild skipped. The archived 78-row grader acceptance passes. Nine supplemental
+tests exercise actual pinned upstream imports and the Anthropic SDK's offline
+transport. A 1,000-item synthetic rehearsal passes on both hosts with identical
+plan hash `5b4688415f8da85c7d32c75903978b68192dbab7558aeef6ec90bfd0f0c74d37`.
+Python socket access is denied during all verification; model calls are zero.
+
+The isolated box checkout is `/home/connork/code/inkling-baseline-20260906`.
+Source validation correctly rejected dataset symlinks outside that checkout;
+private copies from existing files on the same box satisfy the original boundary.
+No restricted question text, private responses or credentials were transferred
+from the Mac. The original box checkout and source files were preserved.
+
+## Remaining human/accounting gates
+
+Tinker's documented hourly billing export has token quantities and can lag by
+hours; it does not supply the existing runner's per-generation dollar receipts.
+`reap/inkling_baseline/ACCOUNTING_PROPOSAL.md` proposes reserving a whole stage
+upfront, then reconciling aggregate usage and account deductions before any next
+stage. Proposed ceilings are $250 medium and $250 conditional max, subject to
+verified route-specific rates, token allowances and credit eligibility. No ceiling
+or change to settlement policy is approved by this note.
+
+After a human policy decision, implement and independently review the accounting
+path and human launch gates. Account access, prices, cap semantics, input admission,
+billing attribution and available credits remain unverified. A second stage needs
+complete, valid medium results and reconciled billing. No confirmatory execution
+or change to frozen research artifacts is included.
+
+Primary references consulted September 6:
 
 - https://tinker-docs.thinkingmachines.ai/tinker/compatible-apis/anthropic/
 - https://tinker-docs.thinkingmachines.ai/tinker/models/
+- https://tinker-docs.thinkingmachines.ai/tinker/cli/billing/
 
-These describe a compatible inference API and route-dependent prices. They do
-not establish account credit eligibility or settle this project's receipt gates.
+These are documentation, not empirical account or provider evidence.

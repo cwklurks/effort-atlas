@@ -47,6 +47,27 @@ class RunnerSafetyTests(unittest.TestCase):
             comp.reported_cost_usd = 123
             self.assertEqual(pilot.actual_call_usd(cfg, comp), 0)
 
+    def test_summary_keeps_effort_cells_and_error_denominators_separate(self):
+        with tempfile.TemporaryDirectory() as td:
+            cfg = _cfg(Path(td), levels=("medium", "max"))
+            cfg["pilot"]["report_caps"] = [1000]
+            rows = [{"dataset": "a", "effort": effort, "completion_tokens": tokens,
+                     "finish_reason": finish, "terminator_present": True,
+                     "terminator_required": True, "cost_usd": 0}
+                    for effort, tokens, finish in (("medium", 100, "stop"), ("max", 32000, "length"))]
+            rows.append({"dataset": "a", "effort": "max", "error": "request_error"})
+            result = pilot._summary(cfg, rows, pilot.CeilingGuard(1, 1), None)
+            cells = result["dataset_effort_cells"]["a"]
+            self.assertEqual(cells["medium"]["median_completion_tokens"], 100)
+            self.assertIsNone(cells["max"]["median_completion_tokens"])
+            self.assertEqual(cells["medium"]["p_length_ge"]["1000"], 0)
+            self.assertEqual(cells["max"]["p_length_ge"]["1000"], 1)
+            self.assertEqual(cells["max"]["attempts"], 2)
+            self.assertEqual(cells["max"]["responses"], 1)
+            self.assertEqual(cells["max"]["errors"], 1)
+            self.assertEqual(cells["max"]["length_stop_rate"], 1)
+            self.assertEqual(result["dataset_summary_scope"], "pooled_across_efforts")
+
     def test_length_stop_below_cap_is_not_used_as_an_uncensored_length(self):
         with tempfile.TemporaryDirectory() as td:
             root = Path(td)

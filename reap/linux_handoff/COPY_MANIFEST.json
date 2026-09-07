@@ -89,8 +89,8 @@
     },
     {
       "path": "reap/CODEX_BRIEFING.md",
-      "sha256": "80196c01d02d357e93061af64112c10f70737f73c32893afb876290d81effbf2",
-      "bytes": 16215,
+      "sha256": "166dad89217f579b185d7a6796ae8be7ca7da3d4a323d0f4ce0bb08294365cf7",
+      "bytes": 16540,
       "purpose": "canonical project state and mandatory reading order"
     },
     {

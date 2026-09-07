@@ -6,7 +6,7 @@
     "repository": "cwklurks/effort-atlas",
     "updated": "2026-09-06",
     "current_phase": 3,
-    "summary": "Exploratory Inkling baseline preparation is in progress after Connor reported advisor agreement. Original-reservation settlement is repaired; Tinker integration, prompt provenance, scoring and box verification remain. Live switches remain disabled."
+    "summary": "Exploratory Inkling baseline is prepared offline on Mac and box: matching 1,000-item plans, pinned upstream prompts and deterministic scoring, explicit medium/max cap. Live accounting policy, route evidence and human launch remain unresolved."
   },
   "safety": {
     "confirmatory_calls": 0,
@@ -131,8 +131,13 @@
   ],
   "verification": [
     {
+      "label": "Inkling baseline offline preparation",
+      "result": "Mac and box Python 3.12.8: canonical 210 run, 209 passed, one optional source-root rebuild skipped; nine pinned-upstream/SDK tests and 1,000-item synthetic rehearsal passed. Identical plan hashes; archived grader acceptance passed; Python networking denied. Live readiness not established.",
+      "status": "passed"
+    },
+    {
       "label": "Original-reservation settlement regression",
-      "result": "Two regressions failed before the repair; 22 focused tests and the canonical offline suite pass afterward: 205 tests run, 204 passed, one optional source-root rebuild skipped. Archived grader verification passed. Network was blocked; Linux verification remains pending.",
+      "result": "Two regressions failed before repair; focused tests and canonical suites pass on Mac and box. Settlement halts above the original reservation even after pending exposure changes. No provider calls.",
       "status": "passed"
     },
     {
@@ -212,6 +217,12 @@
     }
   ],
   "activity": [
+    {
+      "date": "2026-09-06",
+      "phase": 3,
+      "title": "Inkling offline baseline reproduced on box",
+      "detail": "Pinned HELM templates, strict choice and official IFEval scoring, medium/max 32768-token plans and per-effort summaries verified. Tinker hourly billing lacks per-request dollar receipts; a separate whole-stage reservation proposal awaits a human decision. Zero paid calls."
+    },
     {
       "date": "2026-09-06",
       "phase": 3,

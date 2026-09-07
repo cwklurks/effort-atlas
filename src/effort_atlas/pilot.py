@@ -180,42 +180,48 @@ def _now() -> str:
     return datetime.now(timezone.utc).isoformat()
 
 
-def _summary(cfg: dict, rows: list[dict], guard: CeilingGuard, halt: str | None) -> dict:
-    caps = [int(c) for c in cfg["pilot"]["report_caps"]]
+def _cell_summary(cfg: dict, rows: list[dict]) -> dict:
     cap = int(cfg["pilot"]["cap"])
-    per: dict[str, dict] = {}
-    for r in rows:
-        d = per.setdefault(r["dataset"], {
-            "attempts": 0, "errors": 0, "length_stops": 0, "terminator_present": 0,
-            "terminator_required": 0, "completion_tokens": [], "spend_usd": 0.0,
-        })
-        d["attempts"] += 1
-        if r.get("error"):
-            d["errors"] += 1
-            continue
-        d["spend_usd"] += r["cost_usd"]
-        d["completion_tokens"].append(r["completion_tokens"])
-        if r["finish_reason"] == "length":
-            d["length_stops"] += 1
-        if r["terminator_required"]:
-            d["terminator_required"] += 1
-            d["terminator_present"] += int(r["terminator_present"])
-    for name, d in per.items():
-        toks = d.pop("completion_tokens")
-        n = len(toks)
-        # P(length >= c) is exactly identified for c <= cap: censored rows
-        # (finish_reason=length at the cap) also satisfy length >= c.
-        d["p_length_ge"] = {str(c): (sum(t >= c for t in toks) / n if n else None) for c in caps if c <= cap}
-        d["median_completion_tokens"] = (
-            statistics.median(toks) if n and d["length_stops"] < n / 2 else None
-        )
-        d["mean_reported"] = False  # never report a mean with censored rows
-        d["spend_usd"] = round(d["spend_usd"], 4)
+    responses = [r for r in rows if not r.get("error")]
+    tokens = [r["completion_tokens"] for r in responses]
+    n = len(responses)
+    length_stops = sum(r["finish_reason"] == "length" for r in responses)
+    required = [r for r in responses if r["terminator_required"]]
+    return {
+        "attempts": len(rows), "responses": n, "errors": len(rows) - n,
+        "length_stops": length_stops,
+        "length_stop_rate": length_stops / n if n else None,
+        "terminator_required": len(required),
+        "terminator_present": sum(bool(r["terminator_present"]) for r in required),
+        # Cap-censored rows also satisfy length >= c for c <= the collection cap.
+        "p_length_ge": {str(c): sum(t >= c for t in tokens) / n if n else None
+                        for c in cfg["pilot"]["report_caps"] if c <= cap},
+        "median_completion_tokens": statistics.median(tokens) if n and length_stops < n / 2 else None,
+        "mean_reported": False,
+        "spend_usd": round(sum(r["cost_usd"] for r in responses), 4),
+    }
+
+
+def _summary(cfg: dict, rows: list[dict], guard: CeilingGuard, halt: str | None) -> dict:
+    datasets: dict[str, list[dict]] = {}
+    cells: dict[str, dict[str, list[dict]]] = {}
+    for row in rows:
+        dataset = row["dataset"]
+        # Historical rows without effort remain visibly unidentified, never
+        # assigned to a configured level by guesswork.
+        effort = row.get("effort", "unspecified")
+        datasets.setdefault(dataset, []).append(row)
+        cells.setdefault(dataset, {}).setdefault(effort, []).append(row)
     return {
         "label": cfg["pilot"]["label"],
         "exploratory": True,
-        "cap": cap,
-        "datasets": per,
+        "cap": int(cfg["pilot"]["cap"]),
+        "datasets": {name: _cell_summary(cfg, group) for name, group in datasets.items()},
+        "dataset_summary_scope": "pooled_across_efforts",
+        "dataset_effort_cells": {
+            dataset: {effort: _cell_summary(cfg, group) for effort, group in groups.items()}
+            for dataset, groups in cells.items()
+        },
         "spend_total_usd": round(guard.spent_total, 4),
         "halt": halt,
         "finished_at": _now(),
