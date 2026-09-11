@@ -22,7 +22,7 @@ Detailed first-launch and continuation commands are in
 
 ## Verification and launch state
 
-The new pause/resume regressions failed before implementation. Local offline
+The new pause/resume regressions failed before implementation. Mac and box offline
 verification now passes 252 canonical tests (251 passed, one optional source
 rebuild skipped), 14 supplemental upstream/SDK tests, and both 1,000-item synthetic
 rehearsals. Independent Sol XHigh review is clean; the reviewer reran all four
@@ -30,10 +30,14 @@ SDK collection tests and nine stage-boundary tests with Python networking denied
 
 The preparation hash remains
 `345e5727528d8af0ea208e2a0b266d33093f241fdf2744423e444bc49abc6320`.
-SSH to the box timed out on September 10. Connor reports that the key is present
-in his box shell and believes the input count completed; the count file has not
-yet been verified remotely. Box delivery and verification of this update are
-pending. No generation or other provider call was made by Codex.
+SSH to the box initially timed out on September 10, then reconnected after Connor
+reported it online. The nine-file update is installed and the complete offline
+suite passed there with the same preparation hash. The expected medium input-count
+file is absent; a filename search of the results directory found only the old
+launch template. Connor reports that his key is set in his own box shell.
+A fresh blank `results_pilot/inkling-stage-evidence/launch-medium-20260910.json`
+was prepared offline without overwriting the original. Account evidence and input
+counts still need completion. No generation or other provider call was made by Codex.
 
 A Tinker reply is not itself an approval gate. Required account/route evidence
 must still support the launch record. Derek's August 26 reply, supplied by Connor

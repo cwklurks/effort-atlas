@@ -23,9 +23,9 @@ Point any new Codex session at this file first: **"Read reap/CODEX_BRIEFING.md a
 **Exploratory launch preparation, 2026-09-10:** Connor wants to start the agreed
 1,000-item medium baseline. An optional five-new-request pause now preserves the
 same plan and full stage reservation, then authenticates and skips saved rows on
-continuation. Local full verification and both 1,000-item rehearsals pass; independent Sol XHigh
-review is clean. SSH to the box timed out, so the reported input-count file and
-box delivery remain unverified. Existing launch evidence is still required; old
+continuation. Full verification and both 1,000-item rehearsals pass on Mac and box; independent
+Sol XHigh review is clean. The box reconnected and the update is installed. The
+expected medium input-count file is absent and the launch account fields remain blank. Existing launch evidence is still required; old
 execution hashes must be refreshed. See `reap/32_INKLING_BASELINE_PAUSE_2026-09-10.md`.
 No provider call has been made by Codex.
 
