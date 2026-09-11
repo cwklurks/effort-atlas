@@ -23,13 +23,13 @@ import test_inkling_stage_contract as stage_contract_tests
 
 class StageCollectionIntegrationTests(unittest.TestCase):
     @contextmanager
-    def scenario(self, *, error=False):
+    def scenario(self, *, error=False, count=2):
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary).resolve()
             selection = root / SELECTION
             selection.parent.mkdir(parents=True)
             selection.write_bytes((ROOT / SELECTION).read_bytes())
-            rows = [_row('mmlu_pro', index, category='business') for index in (1, 2)]
+            rows = [_row('mmlu_pro', index, category='business') for index in range(1, count + 1)]
             private, items = [], []
             for row in rows:
                 rendered, temperature = render_baseline(row, seed=20260830)
@@ -41,7 +41,7 @@ class StageCollectionIntegrationTests(unittest.TestCase):
                 items.append({f'{stage}_request_sha256': sha256_json(build_request(template, stage)) for stage in ('medium','max')})
             plan = {'plan_sha256': 'b'*64, 'items': items}
             policy = deepcopy(load_policy())
-            policy['items_per_stage'] = 2  # This fixture is synthetic, never a launch policy.
+            policy['items_per_stage'] = count  # This fixture is synthetic, never a launch policy.
             execution = {'execution_sha256': 'c'*64, 'policy_sha256': sha256_json(policy)}
             evidence = stage_contract_tests.StageEvidenceTests().fixture(root)
             evidence['policy_sha256'] = sha256_json(policy)
@@ -78,10 +78,41 @@ class StageCollectionIntegrationTests(unittest.TestCase):
                 stack.enter_context(patch.object(runner,'ACCOUNT_LEDGER',root/'account'/'ledger.jsonl'))
                 stack.enter_context(patch.object(runner,'_make_client',side_effect=factory))
                 stack.enter_context(patch.object(runner,'_journal',side_effect=synthetic_journal))
-                def collect():
+                def collect(**kwargs):
                     return runner.collect(plan,private,policy,execution,evidence,stage='medium',root=root,
-                        env={ACK_ENV:ACK_VALUE,'TINKER_API_KEY':'synthetic'})
+                        env={ACK_ENV:ACK_VALUE,'TINKER_API_KEY':'synthetic'}, **kwargs)
                 yield root, private, requests, clients, collect
+
+    def test_pause_after_five_and_resume_keeps_reservation_and_never_repeats_items(self):
+        with self.scenario(count=6) as (root, private, requests, clients, collect):
+            paused = collect(max_new_requests=5)
+            self.assertEqual(len(requests), 5)
+            self.assertEqual(paused['invocation_status'], 'paused')
+            self.assertEqual(paused['new_response_count'], 5)
+            self.assertEqual(paused['stages']['medium']['response_count'], 5)
+            self.assertNotIn(paused['stages']['medium']['status'], {'finished', 'reconciled'})
+            reservation = paused['reserved_usd']
+            self.assertNotEqual(reservation, '0')
+            finished = collect(max_new_requests=5)
+            self.assertEqual(len(requests), 6)
+            self.assertEqual(finished['stages']['medium']['status'], 'finished')
+            self.assertEqual(finished['stages']['medium']['response_count'], 6)
+            self.assertEqual(finished['reserved_usd'], reservation)
+            self.assertEqual(len({request.content for request in requests}), 6)
+            collect(max_new_requests=5)
+            self.assertEqual(len(requests), 6)
+            self.assertEqual(len(clients), 2)
+
+    def test_pause_does_not_allow_resume_with_a_changed_saved_response(self):
+        with self.scenario() as (root, private, requests, clients, collect):
+            collect(max_new_requests=1)
+            identity = runner._identity(private[0])
+            folder = root / 'results_pilot/inkling_tinker_baseline/collection' / ('b'*64) / 'medium'
+            (folder / f'{identity}.response.private.json').write_text('tampered')
+            with self.assertRaises(ValueError):
+                collect(max_new_requests=1)
+            self.assertEqual(len(requests), 1)
+            self.assertEqual(len(clients), 1)
 
     def test_actual_sdk_collection_and_clean_restart_do_not_resubmit(self):
         with self.scenario() as (root, private, requests, clients, collect):

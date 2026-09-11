@@ -182,8 +182,12 @@ def _verify_saved(journal, plan, private, rows, rendered, stage, root):
 
 
 def collect(plan: dict, private: list[dict], policy: dict, execution: dict, evidence: dict,
-            *, stage: str, root: Path = ROOT, env: dict | None = None) -> dict:
+            *, stage: str, root: Path = ROOT, env: dict | None = None,
+            max_new_requests: int | None = None) -> dict:
     """Validate identically for CLI and direct calls, before constructing a client."""
+    if max_new_requests is not None and (
+            type(max_new_requests) is not int or not 1 <= max_new_requests <= 1000):
+        raise ValueError('max_new_requests must be an integer from 1 to 1000')
     env = os.environ if env is None else env
     if policy != load_policy(root) or execution != execution_manifest(plan, policy, root=root):
         raise ValueError('direct launch differs from the current approved policy or execution')
@@ -213,6 +217,7 @@ def collect(plan: dict, private: list[dict], policy: dict, execution: dict, evid
         if journal.snapshot()['stages'][stage]['status'] in {'finished', 'reconciled'}:
             return journal.snapshot()
         _write_private(out / f'launch-evidence.{valid["evidence_sha256"]}.private.json', (json.dumps(evidence, indent=2) + '\n').encode())
+        new_response_count = 0
         with _make_client(env) as client:
             for index, item in enumerate(private):
                 identity = _identity(item)
@@ -222,6 +227,11 @@ def collect(plan: dict, private: list[dict], policy: dict, execution: dict, evid
                     if record['status'] != 'complete' or digest(_read_private(raw_path)) != record['response_sha256']:
                         raise ValueError('prior attempt is uncertain or its private response is missing/changed')
                     continue
+                if max_new_requests is not None and new_response_count >= max_new_requests:
+                    # Keep the full stage reservation and all remaining items pending.
+                    # A later invocation authenticates saved rows and continues this plan.
+                    return {**journal.snapshot(), 'invocation_status': 'paused',
+                            'new_response_count': new_response_count}
                 if datetime.now(timezone.utc) >= timestamp(evidence['expires_at']):
                     raise ValueError('launch evidence expired; stop before the next submission')
                 request = build_request(item['template'], stage)
@@ -244,6 +254,7 @@ def collect(plan: dict, private: list[dict], policy: dict, execution: dict, evid
                         provider_response_id=parsed['generation_id'], prompt_tokens=parsed['input_tokens_reported'],
                         completion_tokens=parsed['output_tokens_reported'], native_stop_reason=parsed['native_stop_reason'],
                         response_sha256=digest(envelope))
+                    new_response_count += 1
                 except BaseException as exc:
                     response = getattr(exc, 'response', None)
                     try:
@@ -325,7 +336,11 @@ def main() -> int:
     modes.add_argument('--count-inputs', type=Path, metavar='OUTPUT', help='human tokenizer requests; no generation')
     modes.add_argument('--reconcile', type=Path, metavar='RECORD', help='read local billing evidence; no provider call')
     parser.add_argument('--write-evidence-template', type=Path)
+    parser.add_argument('--max-new-requests', type=int, metavar='N',
+                        help='with --live, pause after at most N new requests; retain the full stage reservation')
     args = parser.parse_args()
+    if args.max_new_requests is not None and not args.live:
+        parser.error('--max-new-requests requires --live')
     try:
         directory = args.plan or Path(prepare()['directory'])
         plan, private = load_plan(directory)
@@ -338,7 +353,8 @@ def main() -> int:
             _write_private(args.write_evidence_template,
                 (json.dumps(evidence_template(plan, execution, args.stage), indent=2) + '\n').encode())
         if args.live:
-            result = collect(plan, private, policy, execution, evidence, stage=args.stage)
+            result = collect(plan, private, policy, execution, evidence, stage=args.stage,
+                             max_new_requests=args.max_new_requests)
         elif args.count_inputs:
             result = count_inputs(plan, private, args.stage, args.count_inputs)
         elif args.reconcile:

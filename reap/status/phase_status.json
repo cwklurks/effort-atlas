@@ -4,9 +4,9 @@
     "name": "REAP",
     "paper": "Thinking Cut Short",
     "repository": "cwklurks/effort-atlas",
-    "updated": "2026-09-07",
+    "updated": "2026-09-10",
     "current_phase": 3,
-    "summary": "Connor approved $250 medium and $250 conditional max with whole-stage Tinker reservation and aggregate reconciliation. The separate human-launch path is implemented and independently reviewed offline; Mac and box verification passes. Account/route evidence and launch key remain missing; no provider calls."
+    "summary": "The approved 1,000-item medium baseline supports a five-new-request pause with its full reservation held and saved rows authenticated on continuation. Local full verification and independent Sol XHigh review pass. Box SSH timed out; input-count completion and box delivery are unverified. Existing launch evidence remains required; no provider calls by Codex."
   },
   "safety": {
     "confirmatory_calls": 0,
@@ -131,6 +131,11 @@
   ],
   "verification": [
     {
+      "label": "Five-question baseline pause and authenticated continuation",
+      "result": "Mac Python 3.12.8: canonical 252 run, 251 passed, one optional source rebuild skipped; 14 supplemental upstream/SDK tests and both 1,000-item synthetic rehearsals passed. Independent Sol XHigh review is clean with 13 focused tests rerun. Preparation hash unchanged; box delivery and verification pending because SSH timed out.",
+      "status": "passed"
+    },
+    {
       "label": "Approved Tinker stage accounting and human-launch boundary",
       "result": "Mac and box Python 3.12.8: canonical 251 run, 250 passed, one optional source rebuild skipped; 12 supplemental upstream/SDK tests and both 1,000-item synthetic rehearsals passed. Independent Sol XHigh re-review is clean (41 focused tests); complete box replay passed in 80 seconds with the same preparation hash. No provider calls.",
       "status": "passed"
@@ -222,6 +227,12 @@
     }
   ],
   "activity": [
+    {
+      "date": "2026-09-10",
+      "phase": 3,
+      "title": "First-five baseline pause prepared",
+      "detail": "Connor chose the actual 1,000-item medium baseline over a separate diagnostic. The optional pause preserves questions, caps, input-count hashes and stage reservation. Local full verification, both 1,000-item rehearsals and independent Sol XHigh review pass. Box handoff and input-count verification await box connectivity."
+    },
     {
       "date": "2026-09-07",
       "phase": 3,

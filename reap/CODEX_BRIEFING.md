@@ -20,6 +20,15 @@ Point any new Codex session at this file first: **"Read reap/CODEX_BRIEFING.md a
 
 ## 2. Project state, in one screen
 
+**Exploratory launch preparation, 2026-09-10:** Connor wants to start the agreed
+1,000-item medium baseline. An optional five-new-request pause now preserves the
+same plan and full stage reservation, then authenticates and skips saved rows on
+continuation. Local full verification and both 1,000-item rehearsals pass; independent Sol XHigh
+review is clean. SSH to the box timed out, so the reported input-count file and
+box delivery remain unverified. Existing launch evidence is still required; old
+execution hashes must be refreshed. See `reap/32_INKLING_BASELINE_PAUSE_2026-09-10.md`.
+No provider call has been made by Codex.
+
 **Current exploratory update, 2026-09-07:** Connor approved whole-stage Tinker
 reservation and delayed aggregate reconciliation, with $250 medium and $250
 conditional max ceilings. The separate stage command and evidence-bound human

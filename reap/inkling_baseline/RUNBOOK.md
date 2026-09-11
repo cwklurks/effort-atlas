@@ -64,8 +64,41 @@ Only after the evidence record is complete and the exact execution reviewed:
 ```sh
 export EFFORT_ATLAS_INKLING_LIVE_ACK=I_HAVE_VERIFIED_THE_STAGE_EVIDENCE
 PYTHONPATH=src .cache/inkling-baseline-env/bin/python -m effort_atlas.inkling_stage \
+  --stage medium --evidence results_pilot/inkling-stage-evidence/launch-medium.json \
+  --live --max-new-requests 5
+```
+
+This runs at most five new questions from the approved 1,000-item medium plan.
+They are ordinary baseline observations. The runner preserves their responses and
+grades, leaves the remaining questions pending, and retains the full stage cost
+reservation. A clean pause prints `invocation_status: "paused"`; it does not finish
+or reconcile the stage. An error or uncertain response still blocks continuation.
+
+Inspect the saved raw responses for reported input/output usage, the returned
+stop reason, and separate thinking/text blocks. Check whether the answer and its
+grade agree. Five normal completions cannot establish how a cap collision behaves;
+record that as untested rather than marking a cap check passed. A pause does not
+replace any of the launch evidence requirements above or authorize a scientific
+change based on the first five answers.
+
+After reviewing these rows, continue the same plan and current launch evidence:
+
+```sh
+PYTHONPATH=src .cache/inkling-baseline-env/bin/python -m effort_atlas.inkling_stage \
   --stage medium --evidence results_pilot/inkling-stage-evidence/launch-medium.json --live
 ```
+
+Saved responses are authenticated and skipped; this sends only the remaining
+questions. Keep `--max-new-requests 5` if another pause is wanted. The limit counts
+new requests in that invocation, not the total number already collected. It does
+not reduce the 1,000-item stage or its reservation. Expired evidence still requires
+a current human-reviewed record for the same reserved configuration.
+
+The September 10 pause update changes the execution hash but not the question
+plan or input counts. Any launch template made before that update must be replaced
+by a newly reviewed record at a fresh path; the template writer deliberately
+refuses to overwrite old evidence. Preserve the original record and use the new
+path in both launch and continuation commands.
 
 Run in a persistent terminal session such as tmux. The process holds a host-wide
 account lock and keeps its journal in

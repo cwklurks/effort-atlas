@@ -11,6 +11,15 @@ from effort_atlas.inkling_stage_contract import load_policy
 
 
 class StageBoundaryTests(unittest.TestCase):
+    def test_invalid_invocation_limit_stops_before_client_or_reservation(self):
+        for limit in (0, -1, True, 1.5, 1001):
+            with self.subTest(limit=limit), patch.object(stage, '_make_client') as client, \
+                 patch.object(stage, '_journal') as journal:
+                with self.assertRaisesRegex(ValueError, 'max_new_requests'):
+                    stage.collect({}, [], {}, {}, {}, stage='medium', env={}, max_new_requests=limit)
+                client.assert_not_called()
+                journal.assert_not_called()
+
     def test_direct_call_cannot_replace_approved_policy(self):
         with patch.object(stage, '_make_client') as client:
             with self.assertRaisesRegex(ValueError, 'approved policy'):
