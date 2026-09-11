@@ -26,6 +26,21 @@ from .inkling_stage_contract import (ACK_ENV, ACK_VALUE, ACCOUNT_LEDGER, CHECKS,
     execution_manifest, load_plan, load_policy, timestamp, validate_evidence)
 
 
+# Only these exact, locally authored messages may be shown. Provider errors can
+# contain credentials or response text, so arbitrary exception text stays private.
+SAFE_SETUP_ERRORS = {
+    'TINKER_API_KEY must be set in the launching environment': (
+        'api_key_missing', 'Set and export TINKER_API_KEY in the same terminal, then retry.'),
+    'explicit input-count acknowledgement required': (
+        'input_count_ack_missing',
+        'Export EFFORT_ATLAS_INKLING_COUNT_ACK=I_APPROVE_INPUT_TOKEN_COUNTING in the same terminal.'),
+    'use the pinned supplemental Anthropic environment': (
+        'sdk_version_mismatch', 'Use .cache/inkling-baseline-env/bin/python on the box.'),
+    'invalid input count': (
+        'invalid_input_count', 'The tokenizer returned an invalid count; stop and inspect the provider response.'),
+}
+
+
 def _utc() -> str:
     return datetime.now(timezone.utc).isoformat()
 
@@ -382,7 +397,11 @@ def main() -> int:
         print(json.dumps(result, indent=2, default=str))
         return 0
     except Exception as exc:
-        print(json.dumps({'status': 'stage_refused', 'error_class': type(exc).__name__}))
+        result = {'status': 'stage_refused', 'error_class': type(exc).__name__}
+        explanation = SAFE_SETUP_ERRORS.get(str(exc)) if type(exc) is ValueError else None
+        if explanation is not None:
+            result.update(error_code=explanation[0], message=explanation[1])
+        print(json.dumps(result))
         return 2
 
 

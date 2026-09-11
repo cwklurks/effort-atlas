@@ -46,3 +46,21 @@ native sampling route; details for the compatible route and account deduction
 remain unresolved. Five normal completions cannot establish cap-collision
 behavior. Separate reasoning-token counts remain optional, and no scientific
 or accounting requirement is silently relaxed by this operational pause.
+
+## Count-command error reporting
+
+Connor supplied a count-command failure showing only `ValueError`, then confirmed
+that `TINKER_API_KEY` was missing in the launching terminal. The box's offline
+preparation, plan, policy and execution checks all passed. A key exported in an
+earlier shell is not automatically available in a new terminal.
+
+The command now reports a fixed `api_key_missing` code and safe setup guidance.
+An exact allowlist also explains a missing count acknowledgement, an incorrect
+SDK environment and an invalid returned count. Other exception details remain
+redacted. The missing-key CLI regression failed before the fix; 254 canonical
+tests on both Mac and box (253 passed, one optional skip), 14 supplemental tests
+and independent Sol XHigh review pass. Authentication and live gates are unchanged.
+The current fresh blank box template is
+`results_pilot/inkling-stage-evidence/launch-medium-20260910-v2.json`.
+Previous blank templates are preserved; use a reviewed record bound to the current
+execution hash before any live launch.

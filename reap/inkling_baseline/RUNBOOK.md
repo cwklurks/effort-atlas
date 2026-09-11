@@ -28,6 +28,9 @@ Synthetic records stay separate from collection and never count as observations.
 
 Set `TINKER_API_KEY` locally in the launching shell. It was absent from the SSH
 environment checked September 7. Do not paste it into the task or commit it.
+The key must be exported in the same terminal that runs the command; a new
+terminal does not inherit an earlier shell export. `api_key_missing` means that
+this launching shell has no key, not that Tinker rejected the credential.
 
 Verify the exact compatible endpoint and model's eligibility for the account's
 credits, dated input/output rates, available balance, reasoning-inclusive output

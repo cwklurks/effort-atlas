@@ -3,7 +3,9 @@ from pathlib import Path
 import tempfile
 import json
 import base64
+import io
 import unittest
+from contextlib import redirect_stdout
 from unittest.mock import patch, Mock
 
 from effort_atlas import inkling_stage as stage
@@ -11,6 +13,32 @@ from effort_atlas.inkling_stage_contract import load_policy
 
 
 class StageBoundaryTests(unittest.TestCase):
+    def counting_cli_error(self, error):
+        output = io.StringIO()
+        with patch('sys.argv', ['inkling_stage', '--count-inputs', '/unused/counts.json']), \
+             patch.object(stage, 'prepare', return_value={'directory': '/unused'}), \
+             patch.object(stage, 'load_plan', return_value=({}, [])), \
+             patch.object(stage, 'load_policy', return_value={}), \
+             patch.object(stage, 'execution_manifest', return_value={}), \
+             patch.object(stage, 'count_inputs', side_effect=error), redirect_stdout(output):
+            self.assertEqual(stage.main(), 2)
+        return json.loads(output.getvalue())
+
+    def test_count_cli_explains_missing_key_in_the_launching_terminal(self):
+        with self.assertRaises(ValueError) as raised:
+            stage._make_client({})
+        result = self.counting_cli_error(raised.exception)
+        self.assertEqual(result['error_code'], 'api_key_missing')
+        self.assertIn('same terminal', result['message'])
+
+    def test_cli_does_not_echo_unrecognized_exception_details(self):
+        secret = 'private-test-credential-and-response-text'
+        for error in (ValueError(secret), RuntimeError(secret)):
+            with self.subTest(error=type(error).__name__):
+                result = self.counting_cli_error(error)
+                self.assertNotIn(secret, json.dumps(result))
+                self.assertNotIn('message', result)
+
     def test_invalid_invocation_limit_stops_before_client_or_reservation(self):
         for limit in (0, -1, True, 1.5, 1001):
             with self.subTest(limit=limit), patch.object(stage, '_make_client') as client, \

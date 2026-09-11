@@ -27,6 +27,11 @@ continuation. Full verification and both 1,000-item rehearsals pass on Mac and b
 Sol XHigh review is clean. The box reconnected and the update is installed. The
 expected medium input-count file is absent and the launch account fields remain blank. Existing launch evidence is still required; old
 execution hashes must be refreshed. See `reap/32_INKLING_BASELINE_PAUSE_2026-09-10.md`.
+The count command failed because Connor confirmed the key was missing in the
+launching terminal. Safe, fixed setup-error guidance is now implemented and
+independently reviewed and verified on both hosts. The current fresh blank box
+template is `launch-medium-20260910-v2.json`; actual counts and account evidence
+still need completion.
 No provider call has been made by Codex.
 
 **Current exploratory update, 2026-09-07:** Connor approved whole-stage Tinker

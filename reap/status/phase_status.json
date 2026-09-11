@@ -131,6 +131,11 @@
   ],
   "verification": [
     {
+      "label": "Safe count-command setup diagnostics",
+      "result": "Mac and box: canonical 254 run, 253 passed, one optional source rebuild skipped; 14 supplemental tests passed. Missing-key regression reproduced before fix; arbitrary exception details stay redacted. Independent Sol XHigh review clean with 11 focused tests rerun. No provider calls by Codex.",
+      "status": "passed"
+    },
+    {
       "label": "Five-question baseline pause and authenticated continuation",
       "result": "Mac and box Python 3.12.8: canonical 252 run, 251 passed, one optional source rebuild skipped; 14 supplemental upstream/SDK tests and both 1,000-item synthetic rehearsals passed. Independent Sol XHigh review is clean with 13 focused tests rerun. Preparation hash unchanged. Fresh blank box launch template prepared; medium input-count file absent.",
       "status": "passed"
@@ -227,6 +232,12 @@
     }
   ],
   "activity": [
+    {
+      "date": "2026-09-10",
+      "phase": 3,
+      "title": "Count refusal traced to launching-shell key",
+      "detail": "Connor confirmed the key was missing in the terminal that ran the tokenizer command. Box offline preflight passed. Fixed allowlisted setup guidance preserves redaction of arbitrary exception text. Mac and box canonical/supplemental suites and independent Sol XHigh review pass. A current blank v2 launch template is prepared; actual counts and account evidence remain incomplete."
+    },
     {
       "date": "2026-09-10",
       "phase": 3,
