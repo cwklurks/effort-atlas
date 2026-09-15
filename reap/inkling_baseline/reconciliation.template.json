@@ -1,0 +1,32 @@
+{
+  "schema_version": "inkling-billing-reconciliation-v1",
+  "plan_sha256": null,
+  "stage": "medium",
+  "model": "thinkingmachines/Inkling",
+  "window_start": null,
+  "window_end": null,
+  "account_id": null,
+  "billing_group": null,
+  "export_observed_at": null,
+  "complete": false,
+  "billing_scope": {
+    "user_id": null,
+    "project_id": null,
+    "session_ids": []
+  },
+  "raw_export": {
+    "path": null,
+    "sha256": null
+  },
+  "account_deduction": {
+    "path": null,
+    "sha256": null
+  },
+  "attestation": {
+    "reviewed_by": null,
+    "reviewed_at": null,
+    "reviewed_raw_export": false,
+    "reviewed_account_deduction": false,
+    "no_unrelated_usage": false
+  }
+}

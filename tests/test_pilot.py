@@ -60,18 +60,21 @@ def _cfg(tmp: Path, *, per_ds=30.0, total=60.0, cap=32000, levels=("medium",)):
         "provider": {
             "name": "test_route", "model": "test/model", "max_completion_tokens": cap,
             "max_retries": 0,
-            "request_extra_body": {"provider": {"only": ["together"], "allow_fallbacks": False}},
+            "request_extra_body": {"provider": {"only": ["together"], "allow_fallbacks": False,
+                "require_parameters": True, "max_price": {"prompt": 1.0, "completion": 4.0}}},
         },
         "effort": {"mode": "openrouter_reasoning", "param_name": "reasoning",
                    "levels": list(levels), "ordinal": {"medium": 1}},
         "pilot": {"enabled": False, "label": "test_pilot", "datasets": ["ds_a", "ds_b"],
                   "wrapper_seed": 7, "request_seed": 7, "cap": cap,
+                  "input_token_allowance": 1000, "request_input_byte_limit": 10000,
                   "report_caps": [4096, 14096], "circuit_breaker_consecutive_errors": 5},
         "pricing": {"input_per_mtok": 1.0, "output_per_mtok": 4.0,
                     "expected_input_tokens": 100, "expected_output_tokens": {"medium": 1000},
-                    "cap_bounds_billable_tokens": True},
+                    "cap_bounds_billable_tokens": True, "completion_includes_reasoning": True},
         "budget": {"per_dataset_ceiling_usd": per_ds, "total_ceiling_usd": total,
                    "reserve_margin_usd": 0.0, "balance_verified_usd": None,
+                   "receipt_mismatch_stop_fraction": 0.20,
                    "balance_verified_on": None, "preflight_approved_by": None},
         "paths": {"data": "capabilities", "results": str(tmp / "results"), "cache": str(tmp / "cache")},
     }
@@ -225,6 +228,7 @@ class CeilingTests(unittest.TestCase):
             self.assertIn("ceiling_halt", summary["halt"])
             self.assertTrue(summary["ledger_verified"])
             ledger_rows = [json.loads(l) for l in (tmp / "out").glob("ledger_*.jsonl").__next__().read_text().splitlines()]
+            ledger_rows = [r for r in ledger_rows if r["event_type"] == "success"]
             self.assertEqual(len(ledger_rows), 3)
             self.assertEqual({r["finish_reason"] for r in ledger_rows}, {"length"})
             self.assertEqual(summary["datasets"]["ds_a"]["length_stops"], 3)
@@ -258,13 +262,13 @@ class GateTests(unittest.TestCase):
         self.assertEqual(cfg["pilot"]["cap"], 32000)
         self.assertEqual(cfg["provider"]["max_completion_tokens"], 32000)
 
-    def test_gate_opens_only_when_every_field_is_set(self):
+    def test_old_approval_fields_are_insufficient_without_bound_evidence(self):
         with tempfile.TemporaryDirectory() as tmp:
             cfg = _cfg(Path(tmp))
             cfg["pilot"]["enabled"] = True
             cfg["budget"].update({"balance_verified_usd": 100.0, "balance_verified_on": "2026-08-30",
                                   "preflight_approved_by": "Chirag, 2026-08-30", "reserve_margin_usd": 10.0})
-            self.assertEqual(live_gate_failures(cfg, env={"EFFORT_ATLAS_PILOT_LIVE_ACK": "I_HAVE_READ_THE_APPROVED_PREFLIGHT"}), [])
+            self.assertTrue(live_gate_failures(cfg, env={"EFFORT_ATLAS_PILOT_LIVE_ACK": "I_HAVE_READ_THE_APPROVED_PREFLIGHT"}))
             cfg["budget"]["total_ceiling_usd"] = 95.0   # > balance - reserve
             self.assertTrue(live_gate_failures(cfg, env={"EFFORT_ATLAS_PILOT_LIVE_ACK": "I_HAVE_READ_THE_APPROVED_PREFLIGHT"}))
 
@@ -285,19 +289,11 @@ class GateTests(unittest.TestCase):
 
 
 class LoadTests(unittest.TestCase):
-    def test_selected_items_verified_against_selection_hashes(self):
+    def test_unpinned_selection_is_refused(self):
         with tempfile.TemporaryDirectory() as tmp:
-            cap = Path(tmp)
-            rows = [_row("ds_a", i) for i in range(3)]
-            (cap / "a.jsonl").write_text("\n".join(json.dumps(r) for r in rows) + "\n")
-            sel = {"datasets": {"ds_a": {"file": "a.jsonl", "items": [
-                {"split": "test", "source_row_index": 1, "source_item_id": "ds_a-1", "prompt_sha256": rows[1]["prompt_sha256"]}]}}}
-            cfg = _cfg(cap); cfg["pilot"]["datasets"] = ["ds_a"]
-            items = load_selected_items(cfg, sel, cap_dir=cap)
-            self.assertEqual([i["source_item_id"] for i in items], ["ds_a-1"])
-            sel["datasets"]["ds_a"]["items"][0]["prompt_sha256"] = "0" * 64
-            with self.assertRaises(SystemExit):
-                load_selected_items(cfg, sel, cap_dir=cap)
+            cfg = _cfg(Path(tmp))
+            with self.assertRaises(ValueError):
+                load_selected_items(cfg, {"datasets": {}}, cap_dir=Path(tmp))
 
 
 class MultiModelConfigTests(unittest.TestCase):
@@ -355,7 +351,7 @@ class MultiModelConfigTests(unittest.TestCase):
             self.assertEqual(client.calls, 6)   # 2 items x 3 levels
             ledger_rows = [json.loads(l) for l in
                            next((tmp / "out").glob("ledger_*.jsonl")).read_text().splitlines()]
-            self.assertEqual([r["effort"] for r in ledger_rows],
+            self.assertEqual([r["effort"] for r in ledger_rows if r["event_type"] == "success"],
                              ["low", "high", "max", "low", "high", "max"])
             self.assertEqual(summary["datasets"]["ds_a"]["attempts"], 6)
 

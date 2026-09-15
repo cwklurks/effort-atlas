@@ -1,0 +1,190 @@
+{
+  "schema_version": "benchmark-source-manifest-v1",
+  "purpose": "Public code and tokenizer resources for offline adapted HELM prompts and original Google IFEval checks. Contains no benchmark questions or provider responses.",
+  "source_policies": {
+    "apache2": {
+      "license": "Apache-2.0",
+      "redistribution": "Pinned upstream code, imported without fallback implementations."
+    },
+    "nltk_data": {
+      "license": "NLTK Punkt resource terms; not independently verified in this preparation",
+      "redistribution": "Reacquired locally from the pinned NLTK data repository; not bundled in commits."
+    }
+  },
+  "helm_revision": "bfa36d33e8b98b36b5f3a8c7d52b9a1b7162eae5",
+  "google_ifeval_revision": "c7f60c013623e613732a096e2a0c2872491ec912",
+  "nltk_revision": "550b6625bcef1f2abff2ff770a5a0d272c9c6b2a",
+  "entries": [
+    {
+      "source_id": "helm_source-benchmark-run_specs-capabilities_run_specs.py",
+      "role": "upstream_code",
+      "policy": "apache2",
+      "url": "https://raw.githubusercontent.com/stanford-crfm/helm/bfa36d33e8b98b36b5f3a8c7d52b9a1b7162eae5/src/helm/benchmark/run_specs/capabilities_run_specs.py",
+      "path": "helm_source/benchmark/run_specs/capabilities_run_specs.py",
+      "bytes": 12067,
+      "sha256": "b1baa1223e00a2e8d5e397abc2854aeb5956765923838aacb261a5bb4792af55",
+      "installed_helm_path": "benchmark/run_specs/capabilities_run_specs.py"
+    },
+    {
+      "source_id": "helm_source-benchmark-adaptation-adapter_spec.py",
+      "role": "upstream_code",
+      "policy": "apache2",
+      "url": "https://raw.githubusercontent.com/stanford-crfm/helm/bfa36d33e8b98b36b5f3a8c7d52b9a1b7162eae5/src/helm/benchmark/adaptation/adapter_spec.py",
+      "path": "helm_source/benchmark/adaptation/adapter_spec.py",
+      "bytes": 6054,
+      "sha256": "99fa94e6592f37650e394ae57604cdabfbbc8aa45a8da82fce29b21964213d0b",
+      "installed_helm_path": "benchmark/adaptation/adapter_spec.py"
+    },
+    {
+      "source_id": "helm_source-benchmark-adaptation-prompt.py",
+      "role": "upstream_code",
+      "policy": "apache2",
+      "url": "https://raw.githubusercontent.com/stanford-crfm/helm/bfa36d33e8b98b36b5f3a8c7d52b9a1b7162eae5/src/helm/benchmark/adaptation/prompt.py",
+      "path": "helm_source/benchmark/adaptation/prompt.py",
+      "bytes": 2158,
+      "sha256": "bcf08578a554c296e74ded086e9864c8028592433462710e35fbe371bf078f9d",
+      "installed_helm_path": "benchmark/adaptation/prompt.py"
+    },
+    {
+      "source_id": "helm_source-benchmark-adaptation-adapters-adapter.py",
+      "role": "upstream_code",
+      "policy": "apache2",
+      "url": "https://raw.githubusercontent.com/stanford-crfm/helm/bfa36d33e8b98b36b5f3a8c7d52b9a1b7162eae5/src/helm/benchmark/adaptation/adapters/adapter.py",
+      "path": "helm_source/benchmark/adaptation/adapters/adapter.py",
+      "bytes": 1239,
+      "sha256": "35bb2f3484c3ff10721f1c249e41d2fef5abcef3b5a5e03d4f5ae359bcff732d",
+      "installed_helm_path": "benchmark/adaptation/adapters/adapter.py"
+    },
+    {
+      "source_id": "helm_source-benchmark-adaptation-adapters-in_context_learning_adapter.py",
+      "role": "upstream_code",
+      "policy": "apache2",
+      "url": "https://raw.githubusercontent.com/stanford-crfm/helm/bfa36d33e8b98b36b5f3a8c7d52b9a1b7162eae5/src/helm/benchmark/adaptation/adapters/in_context_learning_adapter.py",
+      "path": "helm_source/benchmark/adaptation/adapters/in_context_learning_adapter.py",
+      "bytes": 15030,
+      "sha256": "f0b7a90a42396f430e2fbd2944f19beef107d0a14cc48969090215233413fef1",
+      "installed_helm_path": "benchmark/adaptation/adapters/in_context_learning_adapter.py"
+    },
+    {
+      "source_id": "helm_source-benchmark-adaptation-adapters-generation_adapter.py",
+      "role": "upstream_code",
+      "policy": "apache2",
+      "url": "https://raw.githubusercontent.com/stanford-crfm/helm/bfa36d33e8b98b36b5f3a8c7d52b9a1b7162eae5/src/helm/benchmark/adaptation/adapters/generation_adapter.py",
+      "path": "helm_source/benchmark/adaptation/adapters/generation_adapter.py",
+      "bytes": 2180,
+      "sha256": "2c8eee5a92881ef4d48c68b28268c1ff51cb936eaf364618081588c74104c8be",
+      "installed_helm_path": "benchmark/adaptation/adapters/generation_adapter.py"
+    },
+    {
+      "source_id": "helm_source-benchmark-adaptation-adapters-multiple_choice_joint_adapter.py",
+      "role": "upstream_code",
+      "policy": "apache2",
+      "url": "https://raw.githubusercontent.com/stanford-crfm/helm/bfa36d33e8b98b36b5f3a8c7d52b9a1b7162eae5/src/helm/benchmark/adaptation/adapters/multiple_choice_joint_adapter.py",
+      "path": "helm_source/benchmark/adaptation/adapters/multiple_choice_joint_adapter.py",
+      "bytes": 4579,
+      "sha256": "9ce0ae5fd94529bdc11e9ce7853c293423b462c64136170c62e167b0b4ffbbeb",
+      "installed_helm_path": "benchmark/adaptation/adapters/multiple_choice_joint_adapter.py"
+    },
+    {
+      "source_id": "helm_source-benchmark-adaptation-adapters-multiple_choice_joint_chain_of_thought_adapter.py",
+      "role": "upstream_code",
+      "policy": "apache2",
+      "url": "https://raw.githubusercontent.com/stanford-crfm/helm/bfa36d33e8b98b36b5f3a8c7d52b9a1b7162eae5/src/helm/benchmark/adaptation/adapters/multiple_choice_joint_chain_of_thought_adapter.py",
+      "path": "helm_source/benchmark/adaptation/adapters/multiple_choice_joint_chain_of_thought_adapter.py",
+      "bytes": 3282,
+      "sha256": "455e81de2e63b816c90ad3c35b349f99ae3d617783ab7bd0010e714309c7f9c0",
+      "installed_helm_path": "benchmark/adaptation/adapters/multiple_choice_joint_chain_of_thought_adapter.py"
+    },
+    {
+      "source_id": "helm_source-benchmark-adaptation-adapters-chat_adapter.py",
+      "role": "upstream_code",
+      "policy": "apache2",
+      "url": "https://raw.githubusercontent.com/stanford-crfm/helm/bfa36d33e8b98b36b5f3a8c7d52b9a1b7162eae5/src/helm/benchmark/adaptation/adapters/chat_adapter.py",
+      "path": "helm_source/benchmark/adaptation/adapters/chat_adapter.py",
+      "bytes": 1852,
+      "sha256": "d4f7f65e076daea0316d93e451fc3b4d41f696bba56280d3902f10d2c7244070",
+      "installed_helm_path": "benchmark/adaptation/adapters/chat_adapter.py"
+    },
+    {
+      "source_id": "helm_source-benchmark-scenarios-scenario.py",
+      "role": "upstream_code",
+      "policy": "apache2",
+      "url": "https://raw.githubusercontent.com/stanford-crfm/helm/bfa36d33e8b98b36b5f3a8c7d52b9a1b7162eae5/src/helm/benchmark/scenarios/scenario.py",
+      "path": "helm_source/benchmark/scenarios/scenario.py",
+      "bytes": 9483,
+      "sha256": "e795d2de8157663c490383b06b82d29e9e8fa24681bdac57b1c9aaed42a4c8b0",
+      "installed_helm_path": "benchmark/scenarios/scenario.py"
+    },
+    {
+      "source_id": "instruction_following_eval-instructions.py",
+      "role": "upstream_code",
+      "policy": "apache2",
+      "url": "https://raw.githubusercontent.com/google-research/google-research/c7f60c013623e613732a096e2a0c2872491ec912/instruction_following_eval/instructions.py",
+      "path": "instruction_following_eval/instructions.py",
+      "bytes": 52878,
+      "sha256": "0165cde6379c3f6bba468a7759fa27247b72f4b8d5fd2821c27d72a34e0e25ce"
+    },
+    {
+      "source_id": "instruction_following_eval-evaluation_main.py",
+      "role": "upstream_code",
+      "policy": "apache2",
+      "url": "https://raw.githubusercontent.com/google-research/google-research/c7f60c013623e613732a096e2a0c2872491ec912/instruction_following_eval/evaluation_main.py",
+      "path": "instruction_following_eval/evaluation_main.py",
+      "bytes": 8431,
+      "sha256": "5fdc16ea814a5201cf6d3be63d9ac4b616da8517f67ee7adb2aee3cde35fa5c6"
+    },
+    {
+      "source_id": "instruction_following_eval-instructions_util.py",
+      "role": "upstream_code",
+      "policy": "apache2",
+      "url": "https://raw.githubusercontent.com/google-research/google-research/c7f60c013623e613732a096e2a0c2872491ec912/instruction_following_eval/instructions_util.py",
+      "path": "instruction_following_eval/instructions_util.py",
+      "bytes": 19538,
+      "sha256": "3c99e463ab63f73429efb75e333cbff6deb017e41658566e4c4bc4ecf39085db"
+    },
+    {
+      "source_id": "instruction_following_eval-instructions_registry.py",
+      "role": "upstream_code",
+      "policy": "apache2",
+      "url": "https://raw.githubusercontent.com/google-research/google-research/c7f60c013623e613732a096e2a0c2872491ec912/instruction_following_eval/instructions_registry.py",
+      "path": "instruction_following_eval/instructions_registry.py",
+      "bytes": 7240,
+      "sha256": "042338c16bd33231b7b42612d1ca075f48f6fdbc53d0d5e7a700b29da416067b"
+    },
+    {
+      "source_id": "punkt_tab.zip",
+      "role": "tokenizer_data",
+      "policy": "nltk_data",
+      "url": "https://raw.githubusercontent.com/nltk/nltk_data/550b6625bcef1f2abff2ff770a5a0d272c9c6b2a/packages/tokenizers/punkt_tab.zip",
+      "path": "punkt_tab.zip",
+      "bytes": 4319076,
+      "sha256": "e57f64187974277726a3417ca6f181ec5403676c717672eef6a748a7b20e0106"
+    }
+  ],
+  "nltk_english_files": [
+    {
+      "member": "punkt_tab/english/abbrev_types.txt",
+      "path": "nltk_data/tokenizers/punkt_tab/english/abbrev_types.txt",
+      "bytes": 619,
+      "sha256": "92a3e070f43d9b4c5534758ca40ad7343b04e7e29bfe0c2eb658a39445a4f779"
+    },
+    {
+      "member": "punkt_tab/english/collocations.tab",
+      "path": "nltk_data/tokenizers/punkt_tab/english/collocations.tab",
+      "bytes": 594,
+      "sha256": "8e2da1225e4dd2cc9dba261ee231ccb134859e21b46006e7f472c5ee269af0cf"
+    },
+    {
+      "member": "punkt_tab/english/ortho_context.tab",
+      "path": "nltk_data/tokenizers/punkt_tab/english/ortho_context.tab",
+      "bytes": 236303,
+      "sha256": "4bbcca25ed3d3f06c02402abf8419b9f033b8adc06e7b482eca4e45f81a5dc4c"
+    },
+    {
+      "member": "punkt_tab/english/sent_starters.txt",
+      "path": "nltk_data/tokenizers/punkt_tab/english/sent_starters.txt",
+      "bytes": 241,
+      "sha256": "f3f8535483e1dba487241b764945168123bca3209a9645e59acd1225dc76edac"
+    }
+  ]
+}
