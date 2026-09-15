@@ -20,6 +20,14 @@ ACK_ENV = 'EFFORT_ATLAS_INKLING_LIVE_ACK'
 ACK_VALUE = 'I_HAVE_VERIFIED_THE_STAGE_EVIDENCE'
 CHECKS = ('pricing', 'balance', 'credit_eligibility', 'cap_semantics',
           'billing_attribution', 'independent_review', 'input_counts')
+FIRST_FIVE_SCHEMA = 'inkling-first-five-evidence-v1'
+FIRST_FIVE_APPROVAL = Path('reap/inkling_baseline/FIRST_FIVE_APPROVAL_2026-09-15.md')
+FIRST_FIVE_ACK = 'I_ACCEPT_THE_FIRST_FIVE_ASSUMPTIONS'
+FIRST_FIVE_ASSUMPTIONS = {
+    'pricing': 'Listed rates are assumed to apply to this account and endpoint; actual charges are unverified.',
+    'credit_eligibility': 'Research credits are assumed to cover this endpoint; eligibility is unverified.',
+    'cap_semantics': 'The cap and reported output usage are assumed to include thinking and final-answer tokens; route-specific behavior is unverified.',
+}
 PREPARATION_FILES = ('src/effort_atlas/inkling_baseline.py', 'src/effort_atlas/baseline_upstream.py',
                      'src/effort_atlas/graders.py', 'src/effort_atlas/wrapper.py',
                      'reap/inkling_baseline/requirements.lock')
@@ -28,7 +36,7 @@ EXECUTION_FILES = PREPARATION_FILES + ('src/effort_atlas/inkling_accounting.py',
                    'src/effort_atlas/inkling_billing.py', 'src/effort_atlas/confirmatory.py',
                    'src/effort_atlas/pilot_integrity.py', 'src/effort_atlas/pilot_accounting.py',
                    'src/effort_atlas/benchmark_provenance.py', 'src/effort_atlas/__init__.py',
-                   'reap/inkling_baseline/upstream_sources.json')
+                   'reap/inkling_baseline/upstream_sources.json', str(FIRST_FIVE_APPROVAL))
 
 
 def digest(data: bytes) -> str:
@@ -132,9 +140,15 @@ def validate_evidence(evidence: dict, *, root: Path, plan_sha256: str, policy_sh
               'execution_host', 'account_id', 'approved_by', 'approved_at', 'expires_at', 'rates',
               'balance_usd', 'input_allowance', 'context_window', 'billing_group', 'window_start',
               'window_end', 'checks', 'artifacts'}
+    first_five = isinstance(evidence, dict) and evidence.get('schema_version') == FIRST_FIVE_SCHEMA
+    if first_five:
+        fields |= {'assumptions', 'first_five_policy_sha256'}
     if not isinstance(evidence, dict) or set(evidence) != fields:
         raise ValueError('launch evidence fields are missing or unexpected')
-    expected = {'schema_version': 'inkling-launch-evidence-v1', 'execution_sha256': execution_sha256,
+    if first_five and (stage != 'medium' or evidence['assumptions'] != FIRST_FIVE_ASSUMPTIONS
+            or evidence['first_five_policy_sha256'] != digest((root / FIRST_FIVE_APPROVAL).read_bytes())):
+        raise ValueError('first-five evidence must bind the approved medium-only assumptions')
+    expected = {'schema_version': FIRST_FIVE_SCHEMA if first_five else 'inkling-launch-evidence-v1', 'execution_sha256': execution_sha256,
                 'plan_sha256': plan_sha256, 'policy_sha256': policy_sha256, 'stage': stage,
                 'execution_host': socket.gethostname()}
     if stage not in {'medium', 'max'} or any(evidence[k] != v for k, v in expected.items()):
@@ -167,7 +181,8 @@ def validate_evidence(evidence: dict, *, root: Path, plan_sha256: str, policy_sh
         raise ValueError('stage cost exceeds ceiling or available balance after reserve')
     if (not isinstance(evidence['checks'], dict) or not isinstance(evidence['artifacts'], dict)
             or set(evidence['checks']) != set(CHECKS) or set(evidence['artifacts']) != set(CHECKS)
-            or any(evidence['checks'][name] is not True for name in CHECKS)):
+            or any(evidence['checks'][name] is not (False if first_five and name in FIRST_FIVE_ASSUMPTIONS else True)
+                   for name in CHECKS)):
         raise ValueError('required human evidence check missing')
     artifacts = {name: read_artifact(root, evidence['artifacts'][name]) for name in CHECKS}
     counts = json.loads(artifacts['input_counts'])
@@ -183,6 +198,7 @@ def validate_evidence(evidence: dict, *, root: Path, plan_sha256: str, policy_sh
     if len(request_hashes) != len(set(request_hashes)) or set(values) != set(request_hashes):
         raise ValueError('input counts do not cover the exact stage requests')
     return {'input_counts': values, 'worst_case_usd': worst,
+            'first_five_policy_sha256': evidence['first_five_policy_sha256'] if first_five else None,
             'account_sha256': digest(evidence['account_id'].encode()),
             'billing_group_sha256': digest(evidence['billing_group'].encode()),
             'evidence_sha256': sha256_json(evidence)}

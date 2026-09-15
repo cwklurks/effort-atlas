@@ -25,6 +25,7 @@ NATIVE_STOP_REASONS = frozenset({"end_turn", "max_tokens"})
 PRODUCTION_ITEM_COUNT = 1000
 PRODUCTION_MAX_TOKENS = 32768
 ACCOUNTING_SCHEMA_VERSION = "inkling-stage-accounting-v1"
+FIRST_FIVE_ACCOUNTING_SCHEMA = "inkling-stage-accounting-first-five-v1"
 PANEL = "inkling_baseline"
 MILLION = Decimal(1_000_000)
 _SHA256_RE = re.compile(r"[0-9a-f]{64}\Z")
@@ -251,6 +252,8 @@ class InklingStageJournal:
                     "completion_tokens": 0,
                     "length_stops": 0,
                     "deduction": Decimal(0),
+                    "first_five_policy_sha256": None,
+                    "first_five_review_sha256": None,
                 }
                 for stage in STAGES
             },
@@ -260,7 +263,7 @@ class InklingStageJournal:
 
     def _verify_binding(self, row: dict[str, Any], config: dict[str, Any]) -> str:
         expected_config = {
-            "schema_version": ACCOUNTING_SCHEMA_VERSION,
+            "schema_version": FIRST_FIVE_ACCOUNTING_SCHEMA if config.get('first_five_policy_sha256') else ACCOUNTING_SCHEMA_VERSION,
             "policy_sha256": self.policy_sha256,
             "plan_sha256": self.plan_sha256,
             "account_sha256": self.account_sha256,
@@ -327,6 +330,9 @@ class InklingStageJournal:
     def _stage_config(self, state: dict[str, Any]) -> dict[str, Any]:
         return {
             **self._base_config(""),
+            **({'first_five_policy_sha256': state['first_five_policy_sha256']}
+               if state.get('first_five_policy_sha256') else {}),
+            **({'schema_version': FIRST_FIVE_ACCOUNTING_SCHEMA} if state.get('first_five_policy_sha256') else {}),
             "input_allowance": state["input_allowance"],
             "input_rate_per_million": _decimal_text(state["input_rate"]),
             "output_rate_per_million": _decimal_text(state["output_rate"]),
@@ -344,6 +350,11 @@ class InklingStageJournal:
         }
 
     def _load_stage_config(self, config: dict[str, Any], stage: str) -> dict[str, Any]:
+        first_five = config.get('first_five_policy_sha256')
+        if first_five is not None:
+            _require_sha256('first_five_policy_sha256', first_five)
+            if stage != 'medium':
+                raise AccountingHalt('First-five exception is medium only')
         allowance = config.get("input_allowance")
         if type(allowance) is not int or allowance <= 0:
             raise AccountingHalt("Journal input allowance is malformed")
@@ -363,6 +374,7 @@ class InklingStageJournal:
         if bound != expected_bound or bound > ceiling:
             raise AccountingHalt("Journal stage bound does not match its approved inputs")
         return {
+            'first_five_policy_sha256': first_five,
             "input_allowance": allowance,
             "input_rate": input_rate,
             "output_rate": output_rate,
@@ -406,6 +418,7 @@ class InklingStageJournal:
                 "reserve_stage", "begin_attempt", "record_response",
                 "block_attempt", "block_stage", "finish_stage",
                 "block_reconciliation", "settle_stage",
+                "review_first_five",
             }:
                 raise AccountingHalt("Unknown event in the Inkling accounting journal")
             current = state["stages"][stage]
@@ -458,7 +471,17 @@ class InklingStageJournal:
                 raise AccountingHalt("Journal action precedes its stage reservation")
             self._same_stage_config(config, current)
 
+            if action == 'review_first_five':
+                if (row.get('item_id') != '__stage__' or row.get('job_id') != self._stage_job_id(stage)
+                        or row.get('event_type') != 'success'):
+                    raise AccountingHalt('First-five review event is malformed')
+                self._check_first_five_review(current, config.get('review_sha256'),
+                                              config.get('response_sha256s'))
+                current['first_five_review_sha256'] = config['review_sha256']
+                continue
+
             if action == "begin_attempt":
+                self._check_first_five_limit(current)
                 item_id = row.get("item_id")
                 request_id = row.get("request_id")
                 if (
@@ -649,8 +672,13 @@ class InklingStageJournal:
         balance_evidence_sha256: str,
         window_start: datetime | str,
         window_end: datetime | str,
+        first_five_policy_sha256: str | None = None,
     ) -> dict[str, Any]:
         stage = _require_stage(stage)
+        if first_five_policy_sha256 is not None:
+            _require_sha256('first_five_policy_sha256', first_five_policy_sha256)
+            if stage != 'medium':
+                raise ValueError('First-five exception is medium only')
         allowance = _require_positive_int("input_allowance", input_allowance)
         input_rate = _require_decimal(
             "input_rate_per_million", input_rate_per_million, positive=True
@@ -720,6 +748,9 @@ class InklingStageJournal:
                 "billed_status": "held",
             })
             event["request_config"].update({
+                **({'first_five_policy_sha256': first_five_policy_sha256}
+                   if first_five_policy_sha256 else {}),
+                **({'schema_version': FIRST_FIVE_ACCOUNTING_SCHEMA} if first_five_policy_sha256 else {}),
                 "input_allowance": allowance,
                 "input_rate_per_million": _decimal_text(input_rate),
                 "output_rate_per_million": _decimal_text(output_rate),
@@ -771,6 +802,7 @@ class InklingStageJournal:
         with self._locked() as rows:
             state = self._state(rows)
             current = self._require_collecting_stage(state, stage)
+            self._check_first_five_limit(current)
             if instant < current["window_start"]:
                 raise AccountingHalt("Stage billing window has not started")
             if instant >= current["window_end"]:
@@ -797,6 +829,34 @@ class InklingStageJournal:
                 "request_started_at": _event_time(instant),
                 "accounting_status": "attempt_pending", "billed_status": "held",
             })
+            return self.ledger.append(event)
+
+    @staticmethod
+    def _check_first_five_limit(current):
+        if (current.get('first_five_policy_sha256') and not current.get('first_five_review_sha256')
+                and len(current['attempts']) >= 5):
+            raise AccountingHalt('First five require human review before another request')
+
+    @staticmethod
+    def _check_first_five_review(current, review_sha256, response_sha256s):
+        _require_sha256('review_sha256', review_sha256)
+        if (not current.get('first_five_policy_sha256') or current.get('first_five_review_sha256')
+                or current['blocked'] or current['finished'] or current['reconciled']
+                or len(current['attempts']) != 5
+                or any(a['status'] != 'complete' for a in current['attempts'].values())
+                or current['length_stops']
+                or response_sha256s != [a['response_sha256'] for a in current['attempts'].values()]):
+            raise AccountingHalt('Review must bind exactly five complete uncapped responses')
+
+    def review_first_five(self, stage, *, review_sha256, response_sha256s):
+        stage = _require_stage(stage)
+        with self._locked() as rows:
+            current = self._require_collecting_stage(self._state(rows), stage)
+            self._check_first_five_review(current, review_sha256, response_sha256s)
+            event = self._base_event(stage, 'review_first_five')
+            self._add_stage_config(event, current)
+            event['request_config'].update(review_sha256=review_sha256, response_sha256s=response_sha256s)
+            event.update(event_type='success', accounting_status='first_five_reviewed', billed_status='held')
             return self.ledger.append(event)
 
     def _block_attempt_locked(
@@ -1091,6 +1151,10 @@ class InklingStageJournal:
                     "window_end": stage["window_end_text"],
                 }
             stages[name] = {
+                'first_five_policy_sha256': stage['first_five_policy_sha256'],
+                'first_five_review_sha256': stage['first_five_review_sha256'],
+                'first_five_review_required': bool(stage['first_five_policy_sha256']
+                    and not stage['first_five_review_sha256'] and len(attempts) >= 5),
                 "status": status,
                 "reserved_usd": reserved_usd,
                 "configuration": configuration,

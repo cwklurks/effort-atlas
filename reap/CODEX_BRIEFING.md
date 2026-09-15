@@ -20,18 +20,19 @@ Point any new Codex session at this file first: **"Read reap/CODEX_BRIEFING.md a
 
 ## 2. Project state, in one screen
 
-**Exploratory launch preparation, 2026-09-10:** Connor wants to start the agreed
-1,000-item medium baseline. An optional five-new-request pause now preserves the
-same plan and full stage reservation, then authenticates and skips saved rows on
-continuation. Full verification and both 1,000-item rehearsals pass on Mac and box; independent
-Sol XHigh review is clean. The box reconnected and the update is installed. The
-expected medium input-count file is absent and the launch account fields remain blank. Existing launch evidence is still required; old
-execution hashes must be refreshed. See `reap/32_INKLING_BASELINE_PAUSE_2026-09-10.md`.
-The count command failed because Connor confirmed the key was missing in the
-launching terminal. Safe, fixed setup-error guidance is now implemented and
-independently reviewed and verified on both hosts. The current fresh blank box
-template is `launch-medium-20260910-v2.json`; actual counts and account evidence
-still need completion.
+**Exploratory first-five setup, 2026-09-15:** Connor authorized a bounded initial
+five observations from the same 1,000-item medium plan while explicitly recording
+unverified account rates, credit eligibility and cap/usage semantics. A durable
+journal limit and separately authorized, response-bound continuation review are
+verified on Mac (256 canonical tests, one optional skip, 20 supplemental tests, both 1,000-item rehearsals; independent Sol XHigh re-review clean). No email is mandatory; assumed facts remain labeled unverified.
+The full-stage reservation and existing $250/$250 ceilings remain unchanged.
+
+Connor completed all 1,000 tokenizer requests on September 10 local time. The
+saved report was independently checked for exact plan/request coverage. Account
+evidence is saved privately on the box. Earlier populated drafts have
+old execution hashes and are not live approvals. The box is currently unreachable;
+updated installation and host verification are pending. See
+`reap/33_FIRST_FIVE_LAUNCH_2026-09-15.md` and the baseline runbook.
 No provider call has been made by Codex.
 
 **Current exploratory update, 2026-09-07:** Connor approved whole-stage Tinker

@@ -4,9 +4,9 @@
     "name": "REAP",
     "paper": "Thinking Cut Short",
     "repository": "cwklurks/effort-atlas",
-    "updated": "2026-09-10",
+    "updated": "2026-09-15",
     "current_phase": 3,
-    "summary": "The approved 1,000-item medium baseline supports a five-new-request pause with its full reservation held and saved rows authenticated on continuation. Mac and box offline verification and independent Sol XHigh review pass. The update and a fresh blank launch template are on the box. Medium input counts are absent; account/route evidence remains incomplete. No provider calls by Codex."
+    "summary": "First-five exploratory launch verified locally: explicit unverified pricing/credit/cap assumptions, cumulative journal limit, separate response-bound human continuation review. The 1,000 input counts are complete and verified. Independent re-review clean. No provider calls by Codex. Box installation pending connectivity."
   },
   "safety": {
     "confirmatory_calls": 0,
@@ -131,6 +131,11 @@
   ],
   "verification": [
     {
+      "label": "Mandatory first-five journal gate",
+      "result": "Mac: canonical 256 run, 255 passed, one optional source-rebuild skip; 20 supplemental tests and both 1,000-item synthetic rehearsals passed. Independent Sol XHigh re-review clean after 44 offline checks. Stale execution and legacy reservation bypass regressions pass. Box installation pending connectivity.",
+      "status": "passed"
+    },
+    {
       "label": "Safe count-command setup diagnostics",
       "result": "Mac and box: canonical 254 run, 253 passed, one optional source rebuild skipped; 14 supplemental tests passed. Missing-key regression reproduced before fix; arbitrary exception details stay redacted. Independent Sol XHigh review clean with 11 focused tests rerun. No provider calls by Codex.",
       "status": "passed"
@@ -232,6 +237,12 @@
     }
   ],
   "activity": [
+    {
+      "date": "2026-09-15",
+      "phase": 3,
+      "title": "First-five exception authorized",
+      "detail": "Connor accepted a first-five start with explicit unverified provider assumptions and a mandatory review before question six. Input counts are complete. Initial approval does not authorize continuation."
+    },
     {
       "date": "2026-09-10",
       "phase": 3,

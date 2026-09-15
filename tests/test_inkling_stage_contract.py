@@ -106,5 +106,28 @@ class StageEvidenceTests(unittest.TestCase):
                 spec['sha256']=hashlib.sha256(path.read_bytes()).hexdigest()
                 with self.assertRaises(ValueError): self.validate(evidence,root)
 
+    def test_first_five_accepts_explicit_assumptions_without_marking_them_verified(self):
+        from effort_atlas.inkling_stage_contract import FIRST_FIVE_SCHEMA, FIRST_FIVE_ASSUMPTIONS, FIRST_FIVE_APPROVAL
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            evidence = self.fixture(root)
+            approval = root / FIRST_FIVE_APPROVAL
+            approval.parent.mkdir(parents=True, exist_ok=True)
+            approval.write_text('Synthetic user decision')
+            evidence.update(schema_version=FIRST_FIVE_SCHEMA,
+                assumptions=dict(FIRST_FIVE_ASSUMPTIONS),
+                first_five_policy_sha256=hashlib.sha256(approval.read_bytes()).hexdigest())
+            for name in FIRST_FIVE_ASSUMPTIONS:
+                evidence['checks'][name] = False
+            valid = self.validate(evidence, root)
+            self.assertEqual(valid['first_five_policy_sha256'], evidence['first_five_policy_sha256'])
+            self.assertFalse(evidence['checks']['cap_semantics'])
+            for name in ('balance', 'input_counts', 'independent_review', 'billing_attribution'):
+                evidence['checks'][name] = False
+                with self.subTest(name=name), self.assertRaises(ValueError): self.validate(evidence, root)
+                evidence['checks'][name] = True
+            evidence['assumptions']['cap_semantics'] = 'verified'
+            with self.assertRaises(ValueError): self.validate(evidence, root)
+
 
 if __name__ == '__main__': unittest.main()

@@ -23,7 +23,8 @@ from . import ROOT
 from .confirmatory import sha256_json
 from .inkling_baseline import MODEL, BASE_URL, CAP, build_request, client_options, parse_response, prepare
 from .inkling_stage_contract import (ACK_ENV, ACK_VALUE, ACCOUNT_LEDGER, CHECKS, digest,
-    execution_manifest, load_plan, load_policy, timestamp, validate_evidence)
+    execution_manifest, load_plan, load_policy, timestamp, validate_evidence, read_artifact,
+    FIRST_FIVE_SCHEMA, FIRST_FIVE_ACK, FIRST_FIVE_APPROVAL, FIRST_FIVE_ASSUMPTIONS)
 
 
 # Only these exact, locally authored messages may be shown. Provider errors can
@@ -134,8 +135,8 @@ def _identity(item: dict) -> str:
     return sha256_json({'dataset': item['dataset'], 'source_item_id': item['source_item_id']})
 
 
-def evidence_template(manifest: dict, execution: dict, stage: str) -> dict:
-    return {'schema_version': 'inkling-launch-evidence-v1', 'execution_sha256': execution['execution_sha256'],
+def evidence_template(manifest: dict, execution: dict, stage: str, *, first_five=False, root=ROOT) -> dict:
+    result = {'schema_version': 'inkling-launch-evidence-v1', 'execution_sha256': execution['execution_sha256'],
             'plan_sha256': manifest['plan_sha256'], 'policy_sha256': execution['policy_sha256'],
             'stage': stage, 'execution_host': execution['execution_host'], 'account_id': None,
             'approved_by': None, 'approved_at': None, 'expires_at': None,
@@ -144,6 +145,12 @@ def evidence_template(manifest: dict, execution: dict, stage: str) -> dict:
             'billing_group': None, 'window_start': None, 'window_end': None,
             'checks': {name: False for name in CHECKS},
             'artifacts': {name: {'path': None, 'sha256': None} for name in CHECKS}}
+    if first_five:
+        if stage != 'medium':
+            raise ValueError('first-five template is medium only')
+        result.update(schema_version=FIRST_FIVE_SCHEMA, assumptions=dict(FIRST_FIVE_ASSUMPTIONS),
+                      first_five_policy_sha256=digest((root / FIRST_FIVE_APPROVAL).read_bytes()))
+    return result
 
 
 def _validated(plan: dict, execution: dict, evidence: dict, stage: str, root: Path, *, allow_expired=False):
@@ -198,7 +205,7 @@ def _verify_saved(journal, plan, private, rows, rendered, stage, root):
 
 def collect(plan: dict, private: list[dict], policy: dict, execution: dict, evidence: dict,
             *, stage: str, root: Path = ROOT, env: dict | None = None,
-            max_new_requests: int | None = None) -> dict:
+            max_new_requests: int | None = None, first_five_review: dict | None = None) -> dict:
     """Validate identically for CLI and direct calls, before constructing a client."""
     if max_new_requests is not None and (
             type(max_new_requests) is not int or not 1 <= max_new_requests <= 1000):
@@ -207,8 +214,9 @@ def collect(plan: dict, private: list[dict], policy: dict, execution: dict, evid
     if policy != load_policy(root) or execution != execution_manifest(plan, policy, root=root):
         raise ValueError('direct launch differs from the current approved policy or execution')
     valid = _validated(plan, execution, evidence, stage, root)
-    if env.get(ACK_ENV) != ACK_VALUE:
-        raise ValueError(f'{ACK_ENV} must explicitly acknowledge verified stage evidence')
+    acknowledgement = FIRST_FIVE_ACK if evidence['schema_version'] == FIRST_FIVE_SCHEMA else ACK_VALUE
+    if env.get(ACK_ENV) != acknowledgement:
+        raise ValueError(f'{ACK_ENV} must explicitly acknowledge the launch evidence basis')
     if not env.get('TINKER_API_KEY'):
         raise ValueError('TINKER_API_KEY must be set in the launching environment')
     # Re-render from verified original sources before any reservation/submission.
@@ -229,8 +237,25 @@ def collect(plan: dict, private: list[dict], policy: dict, execution: dict, evid
             _verify_saved(journal, plan, private, rows, rendered, 'medium', root)
         _reserve_if_new(journal, stage, evidence)
         _verify_saved(journal, plan, private, rows, rendered, stage, root)
+        if first_five_review is not None:
+            _apply_first_five_review(journal, plan, execution, first_five_review, root, stage)
+        review_hash = journal.snapshot()['stages'][stage].get('first_five_review_sha256')
+        if review_hash:
+            saved_review = json.loads(_read_private(out / f'first-five-review.{review_hash}.private.json'))
+            snapshot = journal.snapshot()
+            identity = {'execution_sha256': execution['execution_sha256'], 'stage': stage,
+                'plan_sha256': plan['plan_sha256'], 'account_sha256': snapshot['account_sha256'],
+                'billing_group_sha256': snapshot['billing_group_sha256'],
+                'first_five_policy_sha256': snapshot['stages'][stage]['first_five_policy_sha256'],
+                'responses': [{'item_id': item, 'sha256': row['response_sha256']}
+                    for item, row in list(snapshot['stages'][stage]['attempts'].items())[:5]]}
+            if (sha256_json(saved_review) != review_hash
+                    or any(saved_review.get(k) != v for k, v in identity.items())):
+                raise ValueError('saved continuation review changed or binds a different execution')
         if journal.snapshot()['stages'][stage]['status'] in {'finished', 'reconciled'}:
             return journal.snapshot()
+        if journal.snapshot()['stages'][stage]['first_five_review_required']:
+            return _pause_for_review(journal.snapshot(), execution, out, 0)
         _write_private(out / f'launch-evidence.{valid["evidence_sha256"]}.private.json', (json.dumps(evidence, indent=2) + '\n').encode())
         new_response_count = 0
         with _make_client(env) as client:
@@ -242,6 +267,8 @@ def collect(plan: dict, private: list[dict], policy: dict, execution: dict, evid
                     if record['status'] != 'complete' or digest(_read_private(raw_path)) != record['response_sha256']:
                         raise ValueError('prior attempt is uncertain or its private response is missing/changed')
                     continue
+                if journal.snapshot()['stages'][stage]['first_five_review_required']:
+                    return _pause_for_review(journal.snapshot(), execution, out, new_response_count)
                 if max_new_requests is not None and new_response_count >= max_new_requests:
                     # Keep the full stage reservation and all remaining items pending.
                     # A later invocation authenticates saved rows and continues this plan.
@@ -292,13 +319,24 @@ def collect(plan: dict, private: list[dict], policy: dict, execution: dict, evid
 def _reserve_if_new(journal, stage, evidence):
     snapshot = journal.snapshot()['stages'].get(stage, {'status': 'not_started'})
     if snapshot['status'] == 'not_started':
+        if stage == 'medium' and evidence['schema_version'] != FIRST_FIVE_SCHEMA:
+            raise ValueError('initial medium launch requires the first-five evidence record')
         journal.reserve_stage(stage, input_allowance=evidence['input_allowance'],
             input_rate_per_million=Decimal(str(evidence['rates']['input_per_mtok'])),
             output_rate_per_million=Decimal(str(evidence['rates']['output_per_mtok'])),
             verified_balance_usd=Decimal(str(evidence['balance_usd'])),
             balance_evidence_sha256=evidence['artifacts']['balance']['sha256'],
-            window_start=timestamp(evidence['window_start']), window_end=timestamp(evidence['window_end']))
+            window_start=timestamp(evidence['window_start']), window_end=timestamp(evidence['window_end']),
+            first_five_policy_sha256=evidence.get('first_five_policy_sha256'))
     else:
+        if snapshot.get('first_five_policy_sha256'):
+            if (evidence['schema_version'] == FIRST_FIVE_SCHEMA
+                    and snapshot['first_five_policy_sha256'] != evidence['first_five_policy_sha256']):
+                raise ValueError('first-five policy differs from the original reservation')
+            if evidence['schema_version'] != FIRST_FIVE_SCHEMA and not snapshot.get('first_five_review_sha256'):
+                raise ValueError('first-five review cannot be bypassed with a different launch record')
+        elif stage == 'medium':
+            raise ValueError('legacy unrestricted medium reservation requires a reviewed migration')
         config = snapshot.get('configuration') or {}
         if (config.get('input_allowance') != evidence['input_allowance']
                 or Decimal(config.get('input_rate_per_million', '-1')) != Decimal(str(evidence['rates']['input_per_mtok']))
@@ -309,6 +347,69 @@ def _reserve_if_new(journal, stage, evidence):
         if snapshot['status'] == 'blocked' or any(
                 row['status'] != 'complete' for row in snapshot['attempts'].values()):
             raise ValueError('uncertain stage or pending attempt requires manual reconciliation')
+
+
+REVIEW_CHECKS = ('raw_responses_and_usage', 'answer_extraction_and_grades',
+                 'available_billing_evidence', 'residual_assumptions_accepted')
+
+
+def _pause_for_review(snapshot, execution, out, new_response_count):
+    result = {**snapshot, 'invocation_status': 'paused_for_review', 'new_response_count': new_response_count}
+    if snapshot['stages']['medium']['length_stops']:
+        result['review_blocker'] = 'reported cap stop; automatic continuation review is not permitted'
+    else:
+        template = first_five_review_template(snapshot, execution)
+        path = out / f'first-five-review-template.{execution["execution_sha256"]}.private.json'
+        _write_private(path, (json.dumps(template, indent=2) + '\n').encode())
+        result['review_template'] = str(path)
+    return result
+
+
+def first_five_review_template(snapshot, execution):
+    current = snapshot['stages']['medium']
+    if (not current['first_five_review_required'] or current['response_count'] != 5
+            or current['blocked'] or current['length_stops']):
+        raise ValueError('review requires five complete uncapped medium responses')
+    return {'schema_version': 'inkling-first-five-review-v1', 'stage': 'medium',
+        'plan_sha256': snapshot['plan_sha256'], 'execution_sha256': execution['execution_sha256'],
+        'account_sha256': snapshot['account_sha256'], 'billing_group_sha256': snapshot['billing_group_sha256'],
+        'first_five_policy_sha256': current['first_five_policy_sha256'],
+        'responses': [{'item_id': item, 'sha256': row['response_sha256']}
+                      for item, row in current['attempts'].items()],
+        'reviewed_by': None, 'reviewed_at': None, 'authorize_remaining': False,
+        'checks': {name: False for name in REVIEW_CHECKS},
+        'residual_assumptions': dict(FIRST_FIVE_ASSUMPTIONS),
+        'artifacts': {name: {'path': None, 'sha256': None} for name in ('review_notes', 'billing')}}
+
+
+def _apply_first_five_review(journal, plan, execution, review, root, stage):
+    if stage != 'medium':
+        raise ValueError('first-five review is medium only')
+    snapshot = journal.snapshot()
+    expected = first_five_review_template(snapshot, execution)
+    if not isinstance(review, dict) or set(review) != set(expected):
+        raise ValueError('first-five review fields missing or unexpected')
+    mutable = {'reviewed_by', 'reviewed_at', 'authorize_remaining', 'checks', 'artifacts'}
+    if any(review[k] != expected[k] for k in expected.keys() - mutable):
+        raise ValueError('first-five review identity or response hashes differ')
+    now = datetime.now(timezone.utc)
+    reviewed = timestamp(review['reviewed_at'])
+    last_response = max(timestamp(a['request_ended_at']) for a in snapshot['stages']['medium']['attempts'].values())
+    if (not isinstance(review['reviewed_by'], str) or not review['reviewed_by'].strip()
+            or review['authorize_remaining'] is not True
+            or not now - timedelta(days=1) <= reviewed <= now or reviewed < last_response
+            or not isinstance(review['checks'], dict) or set(review['checks']) != set(REVIEW_CHECKS)
+            or any(review['checks'][name] is not True for name in REVIEW_CHECKS)
+            or not isinstance(review['artifacts'], dict) or set(review['artifacts']) != {'review_notes', 'billing'}):
+        raise ValueError('current explicit human continuation review required')
+    for spec in review['artifacts'].values():
+        read_artifact(root, spec)
+    review_hash = sha256_json(review)
+    folder = root / 'results_pilot/inkling_tinker_baseline/collection' / plan['plan_sha256'] / stage
+    _write_private(folder / f'first-five-review.{review_hash}.private.json',
+                   (json.dumps(review, indent=2) + '\n').encode())
+    journal.review_first_five(stage, review_sha256=review_hash,
+                             response_sha256s=[row['sha256'] for row in review['responses']])
 
 
 def count_inputs(plan, private, stage, destination: Path, *, env=None, root: Path = ROOT):
@@ -351,11 +452,17 @@ def main() -> int:
     modes.add_argument('--count-inputs', type=Path, metavar='OUTPUT', help='human tokenizer requests; no generation')
     modes.add_argument('--reconcile', type=Path, metavar='RECORD', help='read local billing evidence; no provider call')
     parser.add_argument('--write-evidence-template', type=Path)
+    parser.add_argument('--first-five', action='store_true', help='write a first-five assumptions template, offline only')
+    parser.add_argument('--review-first-five', type=Path, help='with --live, separately authorize continuation after reviewing the five saved responses')
     parser.add_argument('--max-new-requests', type=int, metavar='N',
                         help='with --live, pause after at most N new requests; retain the full stage reservation')
     args = parser.parse_args()
     if args.max_new_requests is not None and not args.live:
         parser.error('--max-new-requests requires --live')
+    if args.first_five and (not args.write_evidence_template or args.live or args.mock or args.count_inputs or args.reconcile):
+        parser.error('--first-five requires an offline --write-evidence-template')
+    if args.review_first_five and not args.live:
+        parser.error('--review-first-five requires --live')
     try:
         directory = args.plan or Path(prepare()['directory'])
         plan, private = load_plan(directory)
@@ -366,10 +473,11 @@ def main() -> int:
             if args.live or args.reconcile or args.count_inputs:
                 raise ValueError('write the evidence template during offline preflight only')
             _write_private(args.write_evidence_template,
-                (json.dumps(evidence_template(plan, execution, args.stage), indent=2) + '\n').encode())
+                (json.dumps(evidence_template(plan, execution, args.stage, first_five=args.first_five), indent=2) + '\n').encode())
         if args.live:
             result = collect(plan, private, policy, execution, evidence, stage=args.stage,
-                             max_new_requests=args.max_new_requests)
+                             max_new_requests=args.max_new_requests,
+                             first_five_review=json.loads(args.review_first_five.read_text()) if args.review_first_five else None)
         elif args.count_inputs:
             result = count_inputs(plan, private, args.stage, args.count_inputs)
         elif args.reconcile:
