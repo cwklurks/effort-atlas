@@ -4,9 +4,9 @@
     "name": "REAP",
     "paper": "Thinking Cut Short",
     "repository": "cwklurks/effort-atlas",
-    "updated": "2026-08-10",
+    "updated": "2026-09-16",
     "current_phase": 3,
-    "summary": "Phase 2 is merged; Connor's Phase 3 positions and an integrated model portfolio, dataset, and statistics recommendation are ready for his separate-model review before the remaining human decisions are frozen."
+    "summary": "First human medium launch interrupted before a response was saved. One unresolved attempt, zero completed observations. Journal retains reservation and blocks further collection; provider outcome and billing unknown. Offline first-five verification remains valid. No provider calls by Codex."
   },
   "safety": {
     "confirmatory_calls": 0,
@@ -131,6 +131,41 @@
   ],
   "verification": [
     {
+      "label": "Mandatory first-five journal gate",
+      "result": "Mac and box: canonical 256 run, 255 passed, one optional source-rebuild skip; 20 supplemental tests and both 1,000-item synthetic rehearsals passed. Independent Sol XHigh re-review clean after 44 offline checks. Stale execution and legacy reservation bypass regressions pass. Updated box execution and existing count report verified; private first-five launch record validates offline.",
+      "status": "passed"
+    },
+    {
+      "label": "Safe count-command setup diagnostics",
+      "result": "Mac and box: canonical 254 run, 253 passed, one optional source rebuild skipped; 14 supplemental tests passed. Missing-key regression reproduced before fix; arbitrary exception details stay redacted. Independent Sol XHigh review clean with 11 focused tests rerun. No provider calls by Codex.",
+      "status": "passed"
+    },
+    {
+      "label": "Five-question baseline pause and authenticated continuation",
+      "result": "Mac and box Python 3.12.8: canonical 252 run, 251 passed, one optional source rebuild skipped; 14 supplemental upstream/SDK tests and both 1,000-item synthetic rehearsals passed. Independent Sol XHigh review is clean with 13 focused tests rerun. Preparation hash unchanged. Fresh blank box launch template prepared; medium input-count file absent.",
+      "status": "passed"
+    },
+    {
+      "label": "Approved Tinker stage accounting and human-launch boundary",
+      "result": "Mac and box Python 3.12.8: canonical 251 run, 250 passed, one optional source rebuild skipped; 12 supplemental upstream/SDK tests and both 1,000-item synthetic rehearsals passed. Independent Sol XHigh re-review is clean (41 focused tests); complete box replay passed in 80 seconds with the same preparation hash. No provider calls.",
+      "status": "passed"
+    },
+    {
+      "label": "Inkling baseline offline preparation",
+      "result": "Mac and box Python 3.12.8: canonical 210 run, 209 passed, one optional source-root rebuild skipped; ten pinned-upstream/SDK tests and 1,000-item synthetic rehearsal passed. Identical plan hashes; archived grader acceptance passed; Python networking denied. Live readiness not established. Independent Sol XHigh re-review passed after a regression repaired missing private gold-map authentication.",
+      "status": "passed"
+    },
+    {
+      "label": "Original-reservation settlement regression",
+      "result": "Two regressions failed before repair; focused tests and canonical suites pass on Mac and box. Settlement halts above the original reservation even after pending exposure changes. No provider calls.",
+      "status": "passed"
+    },
+    {
+      "label": "Exploratory pilot safety remediation",
+      "result": "Python 3.12.8 canonical offline suite: 203 run, 202 passed, one optional exact-root source rebuild skipped; archived 78-row grader verification passed. Network-blocked 1,000-item mock and no-new-spend resume passed. Independent reviews passed after remediation. No provider calls.",
+      "status": "passed"
+    },
+    {
       "label": "Integrated recommendation and external-review packet",
       "result": "112 ordinary tests including the private grader archive plus 26 exact-lock Tinker tests passed; the D01-D15 proposal, five zero-call counters, route/grader blockers, required review output, and independently recomputed cost bounds are present; external review remains pending",
       "status": "passed"
@@ -202,6 +237,60 @@
     }
   ],
   "activity": [
+    {
+      "date": "2026-09-16",
+      "phase": 3,
+      "title": "First human launch interrupted and blocked",
+      "detail": "A keyboard interrupt occurred during the first request, before a response was saved. One unresolved attempt and zero completed observations are recorded. Launch evidence validates; the account journal retains the reservation and blocks retries. Recovery requires provider evidence or an explicitly reviewed decision. No journal was erased and no provider call was made by Codex."
+    },
+    {
+      "date": "2026-09-16",
+      "phase": 3,
+      "title": "First-five update installed and verified on box",
+      "detail": "The reviewed update passed the full offline suite on the reconnected box with the unchanged preparation hash. Private first-five evidence binds the current execution and existing user artifacts. Initial evidence expires after 24 hours; later launch requires renewal. No account journal exists yet, no continuation is approved, and Codex made no provider calls."
+    },
+    {
+      "date": "2026-09-15",
+      "phase": 3,
+      "title": "First-five exception authorized",
+      "detail": "Connor accepted a first-five start with explicit unverified provider assumptions and a mandatory review before question six. Input counts are complete. Initial approval does not authorize continuation."
+    },
+    {
+      "date": "2026-09-10",
+      "phase": 3,
+      "title": "Count refusal traced to launching-shell key",
+      "detail": "Connor confirmed the key was missing in the terminal that ran the tokenizer command. Box offline preflight passed. Fixed allowlisted setup guidance preserves redaction of arbitrary exception text. Mac and box canonical/supplemental suites and independent Sol XHigh review pass. A current blank v2 launch template is prepared; actual counts and account evidence remain incomplete."
+    },
+    {
+      "date": "2026-09-10",
+      "phase": 3,
+      "title": "First-five baseline pause prepared",
+      "detail": "Connor chose the actual 1,000-item medium baseline over a separate diagnostic. The optional pause preserves questions, caps, input-count hashes and stage reservation. Mac and box full verification, both 1,000-item rehearsals and independent Sol XHigh review pass. The box reconnected; the medium count file is absent and launch evidence remains incomplete."
+    },
+    {
+      "date": "2026-09-07",
+      "phase": 3,
+      "title": "Stage accounting policy approved and implemented",
+      "detail": "Connor approved whole-stage reservation, delayed aggregate billing reconciliation, $250 medium and $250 conditional max. Private response/grade integrity, no-retry restart gates and exact account evidence checks passed independent offline review. Complete box replay passed in 80 seconds; live account facts remain unverified."
+    },
+    {
+      "date": "2026-09-06",
+      "phase": 3,
+      "title": "Inkling offline baseline reproduced on box",
+      "detail": "Pinned HELM templates, strict choice and official IFEval scoring, medium/max 32768-token plans and per-effort summaries verified. Tinker hourly billing lacks per-request dollar receipts; a separate whole-stage reservation proposal awaits a human decision. Zero paid calls."
+    },
+    {
+      "date": "2026-09-06",
+      "phase": 3,
+      "title": "Inkling baseline direction accepted; box reachable",
+      "detail": "Connor accepted the stratified 1,000-item Tinker baseline direction. A receipt above its original reservation now halts even after pending exposure rises and the journal reloads. Prompt and Tinker preparation are in progress; no paid calls."
+    },
+    {
+      "date": "2026-09-03",
+      "phase": 3,
+      "title": "Exploratory pilot audit remediated on an isolated branch",
+      "detail": "Strict request and approval validation, one-submission transport, durable host-wide reservations, receipt reconciliation, input/source integrity and accepted strict grading are implemented. Human price, route, balance and evidence gates remain unset; this is not Task E."
+    },
     {
       "date": "2026-08-10",
       "phase": 3,
@@ -300,6 +389,7 @@
     }
   ],
   "decisions": [
+    "The codex/pilot-safety checkout is an exploratory remediation branch. Historical main/PR milestones are retained as history; current execution requires its own exact manifest approval and host-wide accounting reconciliation. No paid execution is authorized.",
     "The non-frozen 13_PHASE3_INTEGRATED_RECOMMENDATION_2026-08-10.md is an opinionated proposal for Connor's separate-model review, not a human decision or call authorization; its companion prompt requires a claim-by-claim external verdict.",
     "The non-frozen 12_PHASE3_CONNOR_DECISION_WORKSHEET_2026-08-10.md records Connor's current positions and all alternatives; open questions remain and it authorizes no call.",
     "Connor supports a planned shared 30-of-33 HMMT-2026 subset, separate arm sampling, standard 32K GPT-OSS-120B, Terra in principle, and descriptive/bootstrap-first analysis; standard Inkling's scientific direction is accepted while its scope/allocation and the broader Tinker model portfolio are reopened.",

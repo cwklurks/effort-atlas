@@ -1,0 +1,19 @@
+{
+  "schema_version": "inkling-stage-policy-v1",
+  "approved_by": "Connor",
+  "approved_on": "2026-09-07",
+  "decision": "whole_stage_reservation_then_aggregate_reconciliation",
+  "phase": "exploratory",
+  "model": "thinkingmachines/Inkling",
+  "stage_ceilings_usd": {
+    "medium": 250,
+    "max": 250
+  },
+  "combined_ceiling_usd": 500,
+  "research_reserve_usd": 3000,
+  "items_per_stage": 1000,
+  "max_tokens": 32768,
+  "maximum_requires_reconciled_uncapped_medium": true,
+  "approval_record_sha256": "95bc3ba0e58cf205dae00945973ce1002ec51fdaa909a8bf3722c889d9c2d286",
+  "live_account_evidence_verified": false
+}

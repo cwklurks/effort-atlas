@@ -1,0 +1,18 @@
+{
+  "schema_version": "inkling-account-deduction-v1",
+  "plan_sha256": null,
+  "stage": "medium",
+  "model": "thinkingmachines/Inkling",
+  "window_start": null,
+  "window_end": null,
+  "account_sha256": null,
+  "billing_group_sha256": null,
+  "raw_export_sha256": null,
+  "deduction_usd": null,
+  "statement_artifacts": [
+    {
+      "path": null,
+      "sha256": null
+    }
+  ]
+}

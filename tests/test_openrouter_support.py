@@ -9,7 +9,7 @@ from types import SimpleNamespace
 
 from effort_atlas import ROOT, load_config
 from effort_atlas.analyze import effort_ordinal
-from effort_atlas.client import InklingClient
+from effort_atlas.client import InklingClient, RequestFailure
 from effort_atlas.openrouter_receipts import build_receipt
 from effort_atlas.sweep import dry_run, load_items
 
@@ -46,6 +46,7 @@ class OpenRouterSupportTests(unittest.TestCase):
                 error=None,
                 choices=[
                     SimpleNamespace(
+                        index=0,
                         delta=SimpleNamespace(
                             content=None,
                             reasoning="normalized reasoning",
@@ -69,6 +70,7 @@ class OpenRouterSupportTests(unittest.TestCase):
                 error=None,
                 choices=[
                     SimpleNamespace(
+                        index=0,
                         delta=SimpleNamespace(
                             content="Final answer: 42",
                             reasoning=None,
@@ -141,6 +143,7 @@ class OpenRouterSupportTests(unittest.TestCase):
                 error=None,
                 choices=[
                     SimpleNamespace(
+                        index=0,
                         delta=SimpleNamespace(
                             content="Final answer: 42",
                             reasoning="reasoning",
@@ -186,6 +189,7 @@ class OpenRouterSupportTests(unittest.TestCase):
                 error=None,
                 choices=[
                     SimpleNamespace(
+                        index=0,
                         delta=SimpleNamespace(
                             content=None,
                             reasoning="partial reasoning",
@@ -213,7 +217,7 @@ class OpenRouterSupportTests(unittest.TestCase):
         )
 
         with self.assertRaisesRegex(
-            RuntimeError, "ended without usage.*gen-incomplete"
+            RequestFailure, "missing_usage_accounting"
         ):
             client._real_complete("prompt", "max")
 
@@ -292,6 +296,7 @@ class OpenRouterSupportTests(unittest.TestCase):
                 error=None,
                 choices=[
                     SimpleNamespace(
+                        index=0,
                         delta=SimpleNamespace(
                             content="Final answer: 42",
                             reasoning="reasoning",
@@ -340,6 +345,7 @@ class OpenRouterSupportTests(unittest.TestCase):
                 error=None,
                 choices=[
                     SimpleNamespace(
+                        index=0,
                         delta=SimpleNamespace(
                             content="Final answer: 42",
                             reasoning="reasoning",

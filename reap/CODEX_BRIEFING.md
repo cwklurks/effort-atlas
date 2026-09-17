@@ -20,6 +20,67 @@ Point any new Codex session at this file first: **"Read reap/CODEX_BRIEFING.md a
 
 ## 2. Project state, in one screen
 
+**Human launch interrupted, September 16 Pacific:** The first medium attempt was
+started by Connor and recorded `KeyboardInterrupt` before a response was saved.
+The account journal retains the reservation and blocks the stage. There are zero
+completed observations and one unresolved attempt; provider completion and billing
+are unknown. The launch evidence itself still validates. Do not retry, erase the
+journal, or create another account identity to bypass the block. The current
+runner has no uncertain-attempt recovery path. Provider evidence or an explicitly
+reviewed recovery decision is needed before further collection. This supersedes
+the earlier ready-to-launch and absent-journal statements below. No provider call
+was made by Codex.
+
+**Exploratory first-five setup, 2026-09-15:** Connor authorized a bounded initial
+five observations from the same 1,000-item medium plan while explicitly recording
+unverified account rates, credit eligibility and cap/usage semantics. A durable
+journal limit and separately authorized, response-bound continuation review are
+verified on Mac and box (256 canonical tests, one optional skip, 20 supplemental tests, both 1,000-item rehearsals; independent Sol XHigh re-review clean). No email is mandatory; assumed facts remain labeled unverified.
+The full-stage reservation and existing $250/$250 ceilings remain unchanged.
+
+Connor completed all 1,000 tokenizer requests on September 10 local time. The
+saved report was independently checked for exact plan/request coverage. Account
+evidence is saved privately on the box. Earlier populated drafts have
+old execution hashes and are not live approvals. On September 16 the updated
+installation passed full offline host verification with the same plan hash. A new
+private first-five launch record validates against the current box execution and
+existing user evidence; human review and launch remain. No account journal exists
+yet. Approval timestamps expire after 24 hours; later launch needs renewal. See
+`reap/33_FIRST_FIVE_LAUNCH_2026-09-15.md` and the baseline runbook.
+No provider call has been made by Codex.
+
+**Current exploratory update, 2026-09-07:** Connor approved whole-stage Tinker
+reservation and delayed aggregate reconciliation, with $250 medium and $250
+conditional max ceilings. The separate stage command and evidence-bound human
+launch path are implemented; default execution is offline. Mac tests and both
+1,000-item synthetic rehearsals pass. Independent Sol XHigh review is clean after regression repairs. The complete
+offline verification also passes on the box, with the same preparation hash. Current account/route facts and the box's launch key remain absent;
+no provider call has been made. See `reap/31_INKLING_STAGE_ACCOUNTING_2026-09-07.md`
+and `reap/inkling_baseline/RUNBOOK.md`. This supersedes the pending policy decision
+below, not the historical frozen design or confirmatory gates.
+
+**Exploratory preparation update, 2026-09-06:** Connor reported advisor agreement
+and accepted the stratified 1,000-item Tinker Inkling baseline direction, medium
+effort and a 32,768-token cap. SSH to the box works. The original-reservation
+settlement defect is repaired and verified by focused offline regressions.
+Offline Tinker request preparation, pinned HELM prompt adaptations, strict
+choice/IFEval scoring and a 1,000-item synthetic rehearsal now pass on Mac and box
+with matching plan hashes. No live collection path is included. Tinker billing
+needs a human policy decision: its documented hourly export does not supply the
+current runner's per-request dollar receipts. See
+`reap/30_INKLING_BASELINE_PREPARATION_2026-09-06.md` and
+`reap/inkling_baseline/ACCOUNTING_PROPOSAL.md`. No live switch or receipt/price/route
+approval is inferred from the scientific agreement.
+
+**Current checkout update, 2026-09-03:** `codex/pilot-safety` repairs the exploratory
+pilot audit findings without enabling live calls. See
+`reap/29_PILOT_SAFETY_REMEDIATION_2026-09-03.md` for the approval evidence contract,
+durable host-wide account ledger, offline verification and remaining limits.
+The accepted strict grader at `9a54f17` is imported here; the separate analysis
+integration and Task E are outside this repair. All shipped pilot approvals are
+unset and live switches false. Historical branch/main milestones below and in
+the status dashboard do not authorize execution from this checkout.
+
 **The paper:** output-token walls truncate reasoning responses before a final answer exists; graders score deletions as wrong; higher effort writes longer and hits walls more — so a wall can masquerade as "thinking makes models worse." Two halves: censored-length analysis (supervisor's) + effort×allowance interventions (ours). Merged paper, Connor first author.
 
 **What exists and works:** the frozen Phase-I preregistration + one dated amendment ($0 confirmatory spend, ever); the offline confirmatory preflight (hash-chained AttemptLedger, seeded/hashed schedules, receipt reconciliation); the cap-semantics and observational studies; and independently reviewed Phase-1 implementations for the ecosystem audit, strict grader v2, and fail-closed Tinker probe. Grader v2 reproducibly identifies all 78 archived 4,096-token rows as unanswered with no raw response text committed. The ecosystem audit's real-only table, uniform control gate, receipts, and synthetic separation are independently recomputed. The Tinker probe's dry-run plan is safe, but pinned SDK 0.25.0 is proven to resubmit and its live path therefore blocks before client construction.

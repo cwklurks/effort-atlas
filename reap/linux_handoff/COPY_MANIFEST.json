@@ -89,8 +89,8 @@
     },
     {
       "path": "reap/CODEX_BRIEFING.md",
-      "sha256": "a95c4b5de0458a1e2e3cacf8ac8241364a07bde4732371ed00b01ab3200d0476",
-      "bytes": 15052,
+      "sha256": "2b85eead31995f248e3afdc2b06b5a03f0ed9cd6d4525e38c14841a18ef8243b",
+      "bytes": 19453,
       "purpose": "canonical project state and mandatory reading order"
     },
     {
@@ -143,8 +143,8 @@
     },
     {
       "path": "src/effort_atlas/graders.py",
-      "sha256": "187a7c2cb5219338c4844249b1a47dc04e5a6034c8a16a7fbcbfaaddca1dc464",
-      "bytes": 2336,
+      "sha256": "db8de71ac582650ef1f54887e95fe06cc5599e6df0d7ef274353e9dc7a9ef6bf",
+      "bytes": 5290,
       "purpose": "answer-extraction implementation"
     },
     {
