@@ -4,9 +4,9 @@
     "name": "REAP",
     "paper": "Thinking Cut Short",
     "repository": "cwklurks/effort-atlas",
-    "updated": "2026-09-15",
+    "updated": "2026-09-16",
     "current_phase": 3,
-    "summary": "First-five exploratory launch verified locally: explicit unverified pricing/credit/cap assumptions, cumulative journal limit, separate response-bound human continuation review. The 1,000 input counts are complete and verified. Independent re-review clean. No provider calls by Codex. Box installation pending connectivity."
+    "summary": "First-five exploratory launch installed and verified on Mac and box: explicit unverified pricing/credit/cap assumptions, cumulative journal limit, separate response-bound human continuation review. All 1,000 input counts verified. Private launch record validates offline; human review and launch remain. No provider calls by Codex."
   },
   "safety": {
     "confirmatory_calls": 0,
@@ -132,7 +132,7 @@
   "verification": [
     {
       "label": "Mandatory first-five journal gate",
-      "result": "Mac: canonical 256 run, 255 passed, one optional source-rebuild skip; 20 supplemental tests and both 1,000-item synthetic rehearsals passed. Independent Sol XHigh re-review clean after 44 offline checks. Stale execution and legacy reservation bypass regressions pass. Box installation pending connectivity.",
+      "result": "Mac and box: canonical 256 run, 255 passed, one optional source-rebuild skip; 20 supplemental tests and both 1,000-item synthetic rehearsals passed. Independent Sol XHigh re-review clean after 44 offline checks. Stale execution and legacy reservation bypass regressions pass. Updated box execution and existing count report verified; private first-five launch record validates offline.",
       "status": "passed"
     },
     {
@@ -237,6 +237,12 @@
     }
   ],
   "activity": [
+    {
+      "date": "2026-09-16",
+      "phase": 3,
+      "title": "First-five update installed and verified on box",
+      "detail": "The reviewed update passed the full offline suite on the reconnected box with the unchanged preparation hash. Private first-five evidence binds the current execution and existing user artifacts. Initial evidence expires after 24 hours; later launch requires renewal. No account journal exists yet, no continuation is approved, and Codex made no provider calls."
+    },
     {
       "date": "2026-09-15",
       "phase": 3,

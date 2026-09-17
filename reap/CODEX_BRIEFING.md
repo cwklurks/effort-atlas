@@ -24,14 +24,17 @@ Point any new Codex session at this file first: **"Read reap/CODEX_BRIEFING.md a
 five observations from the same 1,000-item medium plan while explicitly recording
 unverified account rates, credit eligibility and cap/usage semantics. A durable
 journal limit and separately authorized, response-bound continuation review are
-verified on Mac (256 canonical tests, one optional skip, 20 supplemental tests, both 1,000-item rehearsals; independent Sol XHigh re-review clean). No email is mandatory; assumed facts remain labeled unverified.
+verified on Mac and box (256 canonical tests, one optional skip, 20 supplemental tests, both 1,000-item rehearsals; independent Sol XHigh re-review clean). No email is mandatory; assumed facts remain labeled unverified.
 The full-stage reservation and existing $250/$250 ceilings remain unchanged.
 
 Connor completed all 1,000 tokenizer requests on September 10 local time. The
 saved report was independently checked for exact plan/request coverage. Account
 evidence is saved privately on the box. Earlier populated drafts have
-old execution hashes and are not live approvals. The box is currently unreachable;
-updated installation and host verification are pending. See
+old execution hashes and are not live approvals. On September 16 the updated
+installation passed full offline host verification with the same plan hash. A new
+private first-five launch record validates against the current box execution and
+existing user evidence; human review and launch remain. No account journal exists
+yet. Approval timestamps expire after 24 hours; later launch needs renewal. See
 `reap/33_FIRST_FIVE_LAUNCH_2026-09-15.md` and the baseline runbook.
 No provider call has been made by Codex.
 
