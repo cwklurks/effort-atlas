@@ -6,7 +6,7 @@
     "repository": "cwklurks/effort-atlas",
     "updated": "2026-09-16",
     "current_phase": 3,
-    "summary": "First-five exploratory launch installed and verified on Mac and box: explicit unverified pricing/credit/cap assumptions, cumulative journal limit, separate response-bound human continuation review. All 1,000 input counts verified. Private launch record validates offline; human review and launch remain. No provider calls by Codex."
+    "summary": "First human medium launch interrupted before a response was saved. One unresolved attempt, zero completed observations. Journal retains reservation and blocks further collection; provider outcome and billing unknown. Offline first-five verification remains valid. No provider calls by Codex."
   },
   "safety": {
     "confirmatory_calls": 0,
@@ -237,6 +237,12 @@
     }
   ],
   "activity": [
+    {
+      "date": "2026-09-16",
+      "phase": 3,
+      "title": "First human launch interrupted and blocked",
+      "detail": "A keyboard interrupt occurred during the first request, before a response was saved. One unresolved attempt and zero completed observations are recorded. Launch evidence validates; the account journal retains the reservation and blocks retries. Recovery requires provider evidence or an explicitly reviewed decision. No journal was erased and no provider call was made by Codex."
+    },
     {
       "date": "2026-09-16",
       "phase": 3,

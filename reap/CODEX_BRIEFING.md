@@ -20,6 +20,17 @@ Point any new Codex session at this file first: **"Read reap/CODEX_BRIEFING.md a
 
 ## 2. Project state, in one screen
 
+**Human launch interrupted, September 16 Pacific:** The first medium attempt was
+started by Connor and recorded `KeyboardInterrupt` before a response was saved.
+The account journal retains the reservation and blocks the stage. There are zero
+completed observations and one unresolved attempt; provider completion and billing
+are unknown. The launch evidence itself still validates. Do not retry, erase the
+journal, or create another account identity to bypass the block. The current
+runner has no uncertain-attempt recovery path. Provider evidence or an explicitly
+reviewed recovery decision is needed before further collection. This supersedes
+the earlier ready-to-launch and absent-journal statements below. No provider call
+was made by Codex.
+
 **Exploratory first-five setup, 2026-09-15:** Connor authorized a bounded initial
 five observations from the same 1,000-item medium plan while explicitly recording
 unverified account rates, credit eligibility and cap/usage semantics. A durable
